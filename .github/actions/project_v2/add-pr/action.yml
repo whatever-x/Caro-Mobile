@@ -1,0 +1,42 @@
+name: Add PR to ProjectV2
+
+inputs:
+  repository_token:
+    required: true
+  project_id:
+    required: true
+  pr_node_id:
+    required: true
+
+outputs:
+  item_id:
+    value: ${{ steps.add.outputs.item_id }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Add PR to Project
+      id: add
+      shell: bash
+      env:
+        REPOSITORY_TOKEN: ${{ inputs.repository_token }}
+        PROJECT_ID: ${{ inputs.project_id }}
+        PR_NODE_ID: ${{ inputs.pr_node_id }}
+      run: |
+        set -euo pipefail
+
+        response=$(curl -s -X POST \
+          -H "Authorization: Bearer $REPOSITORY_TOKEN" \
+          -H "Content-Type: application/json" \
+          -d "{\"query\":\"mutation { addProjectV2ItemById(input: { projectId: \\\"$PROJECT_ID\\\", contentId: \\\"$PR_NODE_ID\\\" }) { item { id } } }\"}" \
+          https://api.github.com/graphql)
+
+        item_id=$(echo "$response" | jq -r '.data.addProjectV2ItemById.item.id')
+
+        if [ "$item_id" != "null" ] && [ -n "$item_id" ]; then
+          echo "✅ Successfully added PR to the project. item_id=$item_id"
+          echo "item_id=$item_id" >> "$GITHUB_OUTPUT"
+        else
+          echo "❌ Failed to add PR to the project. Response: $response"
+          exit 1
+        fi

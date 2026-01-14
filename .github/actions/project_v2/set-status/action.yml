@@ -1,0 +1,40 @@
+name: Set ProjectV2 Status
+
+inputs:
+  repository_token:
+    required: true
+  project_id:
+    required: true
+  item_id:
+    required: true
+  status_field_id:
+    required: true
+  review_status_id:
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Update Project Status
+      shell: bash
+      env:
+        REPOSITORY_TOKEN: ${{ inputs.repository_token }}
+        PROJECT_ID: ${{ inputs.project_id }}
+        ITEM_ID: ${{ inputs.item_id }}
+        STATUS_FIELD_ID: ${{ inputs.status_field_id }}
+        REVIEW_STATUS_ID: ${{ inputs.review_status_id }}
+      run: |
+        set -euo pipefail
+
+        response=$(curl -s -X POST \
+          -H "Authorization: Bearer $REPOSITORY_TOKEN" \
+          -H "Content-Type: application/json" \
+          -d "{\"query\":\"mutation { updateProjectV2ItemFieldValue(input: { projectId: \\\"$PROJECT_ID\\\", itemId: \\\"$ITEM_ID\\\", fieldId: \\\"$STATUS_FIELD_ID\\\", value: { singleSelectOptionId: \\\"$REVIEW_STATUS_ID\\\" } }) { clientMutationId } }\"}" \
+          https://api.github.com/graphql)
+
+        echo "Response: $response"
+
+        if echo "$response" | jq -e '.errors' > /dev/null; then
+          echo "❌ GraphQL API returned an error."
+          exit 1
+        fi

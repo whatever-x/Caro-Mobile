@@ -1,0 +1,60 @@
+name: Set ProjectV2 Start Date
+
+inputs:
+  repository_token:
+    required: true
+  project_id:
+    required: true
+  item_id:
+    required: true
+  start_date_field_id:
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Update Project Start Date
+      shell: bash
+      env:
+        REPOSITORY_TOKEN: ${{ inputs.repository_token }}
+        PROJECT_ID: ${{ inputs.project_id }}
+        ITEM_ID: ${{ inputs.item_id }}
+        START_DATE_FIELD_ID: ${{ inputs.start_date_field_id }}
+      run: |
+        set -euo pipefail
+
+        START_DATE=$(date -u +'%Y-%m-%d')
+        echo "Start date: $START_DATE"
+
+        GRAPHQL_QUERY=$(jq -n \
+          --arg projectId "$PROJECT_ID" \
+          --arg itemId "$ITEM_ID" \
+          --arg fieldId "$START_DATE_FIELD_ID" \
+          --arg startDate "$START_DATE" \
+          '{
+            query: "mutation {
+              updateProjectV2ItemFieldValue(
+                input: {
+                  projectId: \"\($projectId)\",
+                  itemId: \"\($itemId)\",
+                  fieldId: \"\($fieldId)\",
+                  value: { date: \"\($startDate)\" }
+                }
+              ) { clientMutationId }
+            }"
+          }')
+
+        response=$(curl -s -X POST \
+          -H "Authorization: Bearer $REPOSITORY_TOKEN" \
+          -H "Content-Type: application/json" \
+          -d "$GRAPHQL_QUERY" \
+          https://api.github.com/graphql)
+
+        echo "Response: $response"
+
+        if echo "$response" | jq -e '.errors' > /dev/null; then
+          echo "❌ Failed to set Start Date."
+          exit 1
+        else
+          echo "✅ Successfully set Start Date to $START_DATE."
+        fi
