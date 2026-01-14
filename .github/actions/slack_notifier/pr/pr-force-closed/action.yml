@@ -9,6 +9,7 @@ runs:
   steps:
     - name: Extract PR force closed info
       id: pr-force-info
+      shell: bash
       run: |
         PR_NUMBER=$(jq -r '.pull_request.number' "$GITHUB_EVENT_PATH")
         PR_TITLE=$(jq -r '.pull_request.title' "$GITHUB_EVENT_PATH")
