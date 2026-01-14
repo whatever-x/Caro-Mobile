@@ -1,0 +1,47 @@
+name: Slack - PR Line Commented
+
+inputs:
+  slack_webhook_url:
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Extract PR line comment info
+      id: pr-line-comment
+      shell: bash
+      run: |
+        PR_NUMBER=$(jq -r '.pull_request.number' "$GITHUB_EVENT_PATH")
+        PR_TITLE=$(jq -r '.pull_request.title' "$GITHUB_EVENT_PATH")
+        PR_URL=$(jq -r '.pull_request.html_url' "$GITHUB_EVENT_PATH")
+        
+        COMMENT_BODY=$(jq -r '.comment.body' "$GITHUB_EVENT_PATH")
+        COMMENT_AUTHOR=$(jq -r '.comment.user.login' "$GITHUB_EVENT_PATH")
+        COMMENT_AUTHOR_URL="https://github.com/${COMMENT_AUTHOR}"
+        
+        if [ -z "$COMMENT_BODY" ] || [ "$COMMENT_BODY" == "null" ]; then
+          COMMENT_BODY="(❌코멘트가 없습니다)"
+        fi
+        
+        echo "pr_number=$PR_NUMBER" >> $GITHUB_OUTPUT
+        echo "pr_title=$PR_TITLE" >> $GITHUB_OUTPUT
+        echo "pr_url=$PR_URL" >> $GITHUB_OUTPUT
+        echo "comment_author=$COMMENT_AUTHOR" >> $GITHUB_OUTPUT
+        echo "comment_author_url=$COMMENT_AUTHOR_URL" >> $GITHUB_OUTPUT
+        echo "comment_body=$(printf "%s" "$COMMENT_BODY" | jq -Rs .)" >> $GITHUB_OUTPUT
+
+    - name: Send Slack Notification
+      uses: slackapi/slack-github-action@v2.1.1
+      with:
+        webhook: ${{ inputs.slack_webhook_url }}
+        webhook-type: incoming-webhook
+        payload: |
+          blocks:
+            - type: "section"
+              text:
+                type: "mrkdwn"
+                text: "💬 PR 라인 코멘트\n- *<${{ steps.pr-line-comment.outputs.pr_url }}|${{ steps.pr-line-comment.outputs.pr_title }}>* #${{ steps.pr-line-comment.outputs.pr_number }}\n```${{ fromJson(steps.pr-line-comment.outputs.comment_body) }}```"
+            - type: "context"
+              elements:
+                - type: "mrkdwn"
+                  text: "by <${{ steps.pr-line-comment.outputs.comment_author_url }}|${{ steps.pr-line-comment.outputs.comment_author }}>"
