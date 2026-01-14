@@ -1,0 +1,36 @@
+name: PR Open Setting
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+
+jobs:
+  project-v2:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Add PR to Project
+        id: add
+        uses: ./.github/actions/project_v2/add-pr
+        with:
+          repository_token: ${{ secrets.REPOSITORY_TOKEN }}
+          project_id: ${{ secrets.PROJECT_ID }}
+          pr_node_id: ${{ github.event.pull_request.node_id }}
+
+      - name: Update Project Status
+        uses: ./.github/actions/project_v2/set-status
+        with:
+          repository_token: ${{ secrets.REPOSITORY_TOKEN }}
+          project_id: ${{ secrets.PROJECT_ID }}
+          item_id: ${{ steps.add.outputs.item_id }}
+          status_field_id: ${{ secrets.STATUS_FIELD_ID }}
+          review_status_id: ${{ secrets.REVIEW_STATUS_ID }}
+
+      - name: Update Project Start Date
+        uses: ./.github/actions/project_v2/set-start-date
+        with:
+          repository_token: ${{ secrets.REPOSITORY_TOKEN }}
+          project_id: ${{ secrets.PROJECT_ID }}
+          item_id: ${{ steps.add.outputs.item_id }}
+          start_date_field_id: ${{ secrets.START_DATE_FIELD_ID }}
