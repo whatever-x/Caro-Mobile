@@ -1,0 +1,27 @@
+name: Slack Issue Notifier
+
+on:
+  issues:
+    types: [opened, closed]
+
+jobs:
+  # ✅ 이슈 생성 알림
+  notify-issue-opened:
+    if: github.event_name == 'issues' && github.event.action == 'opened'
+    runs-on: ubuntu-latest
+    steps:
+        - uses: actions/checkout@v4
+        - uses: ./.github/actions/slack_notifier/issue/issue-opened
+          with:
+            slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+  # ✅ 이슈 종료 알림
+  notify-issue-closed:
+    if: github.event_name == 'issues' && github.event.action == 'closed'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/slack_notifier/issue/issue-closed
+        with:
+          slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
+          repository_token: ${{ secrets.REPOSITORY_TOKEN }}
