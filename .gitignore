@@ -18,8 +18,7 @@ fastlane/.env
 fastlane/report.xml
 fastlane/*.p8
 
-# ComposeApp
-app/google-services.json
+androidApp/google-services.json
 core/database/schemas
 */*/exported*/*
 
