@@ -1,0 +1,35 @@
+# Root
+*.iml
+.kotlin/
+.gradle
+**/build/
+xcuserdata
+!src/**/build/
+local.properties
+.idea
+.DS_Store
+captures
+.externalNativeBuild
+.cxx
+*.jks
+*.aab
+*.apk
+fastlane/.env
+fastlane/report.xml
+fastlane/*.p8
+
+# ComposeApp
+app/google-services.json
+core/database/schemas
+*/*/exported*/*
+
+# Xcode
+**/GoogleService-Info.plist
+**/GoogleService-Info-Qa.plist
+*.xcworkspace
+*.xcuserdata/
+!*.xcworkspace/contents.xcworkspacedata
+!*.xcodeproj/project.pbxproj
+!*.xcodeproj/xcshareddata/
+**/xcshareddata/WorkspaceSettings.xcsettings
+*.xcconfig
