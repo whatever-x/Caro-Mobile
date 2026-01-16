@@ -4,7 +4,6 @@ import com.whatever.caro.version
 import org.gradle.api.JavaVersion
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.jetbrains.kotlin.gradle.dsl.KotlinAndroidProjectExtension
 
 class AndroidApplicationPlugin : Plugin<Project> {
     override fun apply(target: Project) {
@@ -13,10 +12,6 @@ class AndroidApplicationPlugin : Plugin<Project> {
                 apply("com.android.application")
                 apply("org.jetbrains.compose")
                 apply("org.jetbrains.kotlin.plugin.compose")
-            }
-
-            extensions.configure<KotlinAndroidProjectExtension>("kotlin") {
-                jvmToolchain(17)
             }
 
             androidApplication {

@@ -1,5 +1,3 @@
-import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
-
 plugins {
     alias(libs.plugins.android.application) apply false
     alias(libs.plugins.android.kotlin.multiplatform.library) apply false
@@ -14,10 +12,4 @@ plugins {
     alias(libs.plugins.firebase.crashlytics) apply false
     alias(libs.plugins.mokkery) apply false
     alias(libs.plugins.spotless) apply false
-}
-
-plugins.withId("org.jetbrains.kotlin.jvm") {
-    extensions.configure<KotlinJvmProjectExtension>("kotlin") {
-        jvmToolchain(17)
-    }
 }
