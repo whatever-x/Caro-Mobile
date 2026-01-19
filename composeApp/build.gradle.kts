@@ -8,13 +8,13 @@ plugins {
 
 kotlin {
     android {
-        namespace = "com.whatever.caro.shared"
+        namespace = "com.whatever.caro.composeApp"
     }
 
     targets.withType<KotlinNativeTarget>().configureEach {
         if (konanTarget.family.isAppleFamily) {
             binaries.framework {
-                baseName = "Shared"
+                baseName = "ComposeApp"
                 isStatic = true
             }
         }

@@ -31,4 +31,4 @@ dependencyResolutionManagement {
 rootProject.name = "CaroMobile"
 
 include(":androidApp")
-include(":shared")
+include(":composeApp")
