@@ -1,0 +1,11 @@
+git_url("git@github.com:whatever-x/ios-match.git")
+storage_mode("git")
+
+username(ENV["APP_STORE_ID"])
+team_id(ENV["APP_STORE_CONNECT_TEAM_ID"])
+
+app_identifier([
+  "com.whatever.caro",
+  "com.whatever.caro.qa",
+  "com.whatever.caro.dev"
+])
