@@ -5,6 +5,7 @@ import com.whatever.caro.version
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.internal.Actions.with
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 class KmpAndroidPlugin : Plugin<Project> {
     override fun apply(target: Project) {
@@ -19,6 +20,14 @@ class KmpAndroidPlugin : Plugin<Project> {
 
                     compileSdk = libs.version("android-compileSdk").toInt()
                     minSdk = libs.version("android-minSdk").toInt()
+
+                    compilerOptions {
+                        jvmTarget.set(JvmTarget.JVM_17)
+                    }
+
+                    androidResources {
+                        enable = true
+                    }
                 }
             }
         }

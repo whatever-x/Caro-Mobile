@@ -32,3 +32,6 @@ rootProject.name = "CaroMobile"
 
 include(":androidApp")
 include(":composeApp")
+
+include(":core:designsystem")
+include(":core:ui")
