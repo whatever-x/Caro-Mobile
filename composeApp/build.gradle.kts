@@ -27,6 +27,7 @@ kotlin {
         commonMain.dependencies {
             implementation(projects.core.designsystem)
             implementation(projects.core.ui)
+            implementation(projects.core.viewmodel)
         }
     }
 

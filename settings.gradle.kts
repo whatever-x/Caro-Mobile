@@ -35,3 +35,4 @@ include(":composeApp")
 
 include(":core:designsystem")
 include(":core:ui")
+include(":core:viewmodel")
