@@ -1,10 +1,10 @@
-package com.whatever.caro.viewmodel
+package com.whatever.caro.core.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.whatever.caro.viewmodel.contract.Intent
-import com.whatever.caro.viewmodel.contract.SideEffect
-import com.whatever.caro.viewmodel.contract.UiState
+import com.whatever.caro.core.viewmodel.contract.UiIntent
+import com.whatever.caro.core.viewmodel.contract.UiSideEffect
+import com.whatever.caro.core.viewmodel.contract.UiState
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
@@ -18,11 +18,9 @@ import kotlinx.coroutines.launch
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 
-abstract class BaseViewModel<S: UiState, I: Intent, SE: SideEffect>(
-
+abstract class BaseViewModel<S: UiState, I: UiIntent, SE: UiSideEffect>(
+    initialState: S
 ) : ViewModel() {
-    private val initialState: S by lazy { createInitialState() }
-    protected abstract fun createInitialState(): S
     protected abstract suspend fun handleIntent(intent: I)
 
     private val _state = MutableStateFlow(initialState)

@@ -1,33 +1,27 @@
-package com.whatever.caro.designsystem
+package com.whatever.caro.core.ui
 
-import androidx.compose.material3.Button
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import caromobile.core.designsystem.generated.resources.Res
 import caromobile.core.designsystem.generated.resources.test
+import com.whatever.caro.core.designsystem.CaroButton
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
-fun CaroButton(
+fun CaroTestUi(
     text: String,
     onClick: () -> Unit,
 ) {
-    Button(
+    CaroButton(
+        text = text,
         onClick = onClick
-    ) {
-        Text(
-            text = text
-        )
-    }
+    )
 }
 
-@Preview
-@Preview(locale = "en")
-@Preview(locale = "ko")
 @Composable
-private fun CaroButtonPreview() {
-    CaroButton(
+@Preview
+private fun CaroTestUiPreview() {
+    CaroTestUi(
         text = stringResource(resource = Res.string.test),
         onClick = {}
     )
