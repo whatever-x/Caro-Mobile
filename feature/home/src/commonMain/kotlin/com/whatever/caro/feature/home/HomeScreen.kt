@@ -1,0 +1,29 @@
+package com.whatever.caro.feature.home
+
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import com.whatever.caro.core.model.User
+import com.whatever.caro.feature.home.mvi.HomeIntent
+import com.whatever.caro.feature.home.mvi.HomeState
+
+@Composable
+internal fun HomeScreen(
+    user: User,
+    state: HomeState,
+    onIntent: (HomeIntent) -> Unit,
+) {
+    Column(
+        modifier = Modifier.fillMaxSize()
+    ) {
+        Text(
+            text = state.test
+        )
+
+        Text(
+            text = user.name
+        )
+    }
+}
