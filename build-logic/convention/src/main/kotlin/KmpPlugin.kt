@@ -1,7 +1,6 @@
 import com.whatever.caro.kotlin
 import com.whatever.caro.library
 import com.whatever.caro.libs
-import com.whatever.caro.sourceSets
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 
@@ -13,16 +12,12 @@ class KmpPlugin : Plugin<Project> {
             }
 
             kotlin {
-                iosX64()
-                iosArm64()
-                iosSimulatorArm64()
-
                 compilerOptions {
                     freeCompilerArgs.add("-Xexpect-actual-classes")
                 }
 
-                sourceSets {
-                    commonMain.dependencies {
+                sourceSets.getByName("commonMain") {
+                    dependencies {
                         implementation(libs.library("napier"))
                     }
                 }

@@ -1,7 +1,6 @@
 import com.whatever.caro.kotlin
 import com.whatever.caro.library
 import com.whatever.caro.libs
-import com.whatever.caro.sourceSets
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 
@@ -13,8 +12,8 @@ class KotlinSerializationPlugin : Plugin<Project> {
             }
 
             kotlin {
-                sourceSets {
-                    commonMain.dependencies {
+                sourceSets.getByName("commonMain") {
+                    dependencies {
                         implementation(libs.library("kotlinx-serialization-json"))
                     }
                 }

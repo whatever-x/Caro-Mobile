@@ -47,6 +47,10 @@ gradlePlugin {
             id = "caro.kmp.android"
             implementationClass = "KmpAndroidPlugin"
         }
+        register("kmpIos") {
+            id = "caro.kmp.ios"
+            implementationClass = "KmpIosPlugin"
+        }
         register("kotlinSerialization") {
             id = "caro.kotlin.serialization"
             implementationClass = "KotlinSerializationPlugin"
@@ -58,6 +62,14 @@ gradlePlugin {
         register("kmpTest") {
             id = "caro.kmp.test"
             implementationClass = "KmpTestPlugin"
+        }
+        register("feature") {
+            id = "caro.feature"
+            implementationClass = "FeaturePlugin"
+        }
+        register("koinAnnotation") {
+            id = "caro.koin.annotation"
+            implementationClass = "KoinAnnotationPlugin"
         }
     }
 }
