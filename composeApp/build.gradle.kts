@@ -27,9 +27,15 @@ kotlin {
 
         }
         commonMain.dependencies {
+            implementation(projects.core.data)
             implementation(projects.core.designsystem)
             implementation(projects.core.ui)
             implementation(projects.core.viewmodel)
+            implementation(projects.core.navigator)
+            implementation(projects.core.model)
+
+            implementation(projects.feature.home)
+            implementation(projects.feature.login)
         }
     }
 

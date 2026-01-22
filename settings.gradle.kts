@@ -34,6 +34,8 @@ include(":androidApp")
 include(":composeApp")
 
 // :Core
+include(":core:data")
+include(":core:model")
 include(":core:designsystem")
 include(":core:ui")
 include(":core:navigator")
