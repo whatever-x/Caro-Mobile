@@ -40,6 +40,7 @@ include(":core:designsystem")
 include(":core:ui")
 include(":core:navigator")
 include(":core:viewmodel")
+include(":core:remote")
 
 // :Feature
 include(":feature:home")

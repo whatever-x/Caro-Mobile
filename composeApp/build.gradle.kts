@@ -33,6 +33,7 @@ kotlin {
             implementation(projects.core.viewmodel)
             implementation(projects.core.navigator)
             implementation(projects.core.model)
+            implementation(projects.core.remote)
 
             implementation(projects.feature.home)
             implementation(projects.feature.login)

@@ -6,5 +6,7 @@
 	<true/>
 	<key>CFBundleDisplayName</key>
 	<string>$(APP_DISPLAY_NAME)</string>
+	<key>Caro Base Url</key>
+	<string>$(CARO_BASE_URL)</string>
 </dict>
 </plist>
