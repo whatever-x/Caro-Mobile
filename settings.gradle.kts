@@ -36,6 +36,7 @@ include(":composeApp")
 // :Core
 include(":core:designsystem")
 include(":core:ui")
+include(":core:navigator")
 include(":core:viewmodel")
 
 // :Feature

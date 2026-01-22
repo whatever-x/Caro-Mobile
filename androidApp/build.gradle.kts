@@ -8,8 +8,5 @@ dependencies {
     implementation(projects.composeApp)
 
     implementation(libs.androidx.activity.compose)
-}
-
-android {
-
+    implementation(libs.napier)
 }
