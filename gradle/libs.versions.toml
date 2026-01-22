@@ -59,8 +59,9 @@ firebase-bom = "34.7.0"
 firebase-crahslytics = "3.0.6"
 
 # Utility
-kmp-spm = "1.4.5"
+kmp-spm = "1.4.6"
 play-review = "2.0.2"
+compose-stable-marker = "1.0.7"
 
 # Test
 turbine = "1.2.1"
@@ -83,6 +84,7 @@ androidx-sqlite-bundled = { group = "androidx.sqlite", name = "sqlite-bundled", 
 
 # org.jetbrains.kotlinx
 kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
+kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "kotlinx-coroutines" }
 kotlinx-collections-immutable = { group = "org.jetbrains.kotlinx", name = "kotlinx-collections-immutable", version.ref = "kotlinx-collections-immutable" }
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
 kotlinx-date-time = { group = "org.jetbrains.kotlinx", name = "kotlinx-datetime", version.ref = "kotlinx-date-time" }
@@ -100,6 +102,7 @@ jetbrains-compose-resources = { group = "org.jetbrains.compose.components", name
 jetbrains-androidx-lifecycle-viewmodel = { group = "org.jetbrains.androidx.lifecycle", name = "lifecycle-viewmodel", version.ref = "jetbrains-androidx-lifecycle" }
 jetbrains-androidx-lifecycle-viewmodel-savestate = { group = "org.jetbrains.androidx.lifecycle", name = "lifecycle-viewmodel-savedstate", version.ref = "jetbrains-androidx-lifecycle" }
 jetbrains-androidx-lifecycle-runtime-compose = { group = "org.jetbrains.androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "jetbrains-androidx-lifecycle" }
+jetbrains-androidx-lifecycle-viewmodel-nav3 = { group = "org.jetbrains.androidx.lifecycle", name = "lifecycle-viewmodel-navigation3", version.ref = "jetbrains-androidx-lifecycle" }
 jetbrains-androidx-navigation3-ui = { group = "org.jetbrains.androidx.navigation3", name = "navigation3-ui", version.ref = "jetbrains-androidx-navigation3-ui" }
 jetbrains-androidx-navigation3-event = { group = "rg.jetbrains.androidx.navigationevent", name = "navigationevent-compose", version.ref = "jetbrains-androidx-navigation3-event" }
 
@@ -109,6 +112,7 @@ koin-androidx-compose = { module = "io.insert-koin:koin-androidx-compose", versi
 koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
 koin-compose = { module = "io.insert-koin:koin-compose", version.ref = "koin" }
 koin-compose-viewmodel = { module = "io.insert-koin:koin-compose-viewmodel", version.ref = "koin" }
+koin-compose-navigation3 = { group = "io.insert-koin", name = "koin-compose-navigation3", version.ref = "koin" }
 koin-annotation = { group = "io.insert-koin", name = "koin-annotations", version.ref = "koin-annotation" }
 koin-ksp-compiler = { group = "io.insert-koin", name = "koin-ksp-compiler", version.ref = "koin-annotation" }
 
@@ -142,6 +146,7 @@ firebase-fcm = { group = "com.google.firebase", name = "firebase-messaging" }
 
 # Utility
 play-review = { group = "com.google.android.play", name = "review-ktx", version.ref = "play-review" }
+compose-stable-marker = { group = "com.github.skydoves", name = "compose-stable-marker", version.ref = "compose-stable-marker" }
 
 # Test
 turbine = { group = "app.cash.turbine", name = "turbine", version.ref = "turbine" }
@@ -172,12 +177,10 @@ mokkery = { id = "dev.mokkery", version.ref = "mokkery" }
 spotless = { id = "com.diffplug.gradle.spotless", version.ref = "spotless" }
 
 [bundles]
-ktor = [
-    "ktor-client-core",
+ktor-client-plugin = [
     "ktor-client-content-negotiation",
     "ktor-client-auth",
     "ktor-client-logging",
-    "ktor-serialization-kotlinx-json",
 ]
 coil = [
     "coil-compose",
