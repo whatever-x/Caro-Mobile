@@ -8,10 +8,6 @@ import org.gradle.internal.Actions.with
 class FeaturePlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
-            with(pluginManager) {
-                apply("com.google.devtools.ksp")
-            }
-
             kotlin {
                 sourceSets.getByName("commonMain") {
                     dependencies {
