@@ -5,7 +5,7 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.dependencies
 
-class KoinAnnotationPlugin : Plugin<Project> {
+class KoinPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
             with(pluginManager) {
@@ -17,7 +17,16 @@ class KoinAnnotationPlugin : Plugin<Project> {
                     implementation(libs.library("koin-core"))
                     implementation(libs.library("koin-annotation"))
                 }
+
+                sourceSets.named("commonMain").configure {
+                    kotlin.srcDir("build/generated/ksp/metadata/commonMain/kotlin")
+                }
             }
+
+            tasks.matching { it.name.startsWith("ksp") && it.name != "kspCommonMainKotlinMetadata" }
+                .configureEach {
+                    dependsOn("kspCommonMainKotlinMetadata")
+                }
 
             dependencies {
                 add("kspCommonMainMetadata", libs.library("koin-ksp-compiler"))

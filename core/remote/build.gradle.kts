@@ -2,7 +2,7 @@ plugins {
     id("caro.kmp")
     id("caro.kmp.android")
     id("caro.kmp.ios")
-    id("caro.koin.annotation")
+    id("caro.koin")
     id("caro.kotlin.serialization")
 }
 

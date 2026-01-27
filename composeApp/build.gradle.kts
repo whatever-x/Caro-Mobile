@@ -5,7 +5,7 @@ plugins {
     id("caro.kmp.android")
     id("caro.kmp.ios")
     id("caro.cmp")
-    id("caro.koin.annotation")
+    id("caro.koin")
 }
 
 kotlin {
@@ -44,16 +44,9 @@ kotlin {
             implementation(libs.jetbrains.androidx.lifecycle.viewmodel.nav3)
         }
     }
-
-    sourceSets.named("commonMain").configure {
-        kotlin.srcDir("build/generated/ksp/metadata/commonMain/kotlin")
-    }
-}
-
-tasks.matching { it.name.startsWith("ksp") && it.name != "kspCommonMainKotlinMetadata" }.configureEach {
-    dependsOn("kspCommonMainKotlinMetadata")
 }
 
 ksp {
-    arg("KOIN_CONFIG_CHECK","true")
+    arg("KOIN_CONFIG_CHECK", "true")
+    arg("KOIN_LOG_TIMES", "true")
 }
