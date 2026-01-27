@@ -3,7 +3,7 @@ package com.whatever.caro.composeApp.di
 import com.whatever.caro.core.data.di.RepositoryModule
 import com.whatever.caro.core.navigator.di.NavigatorModule
 import com.whatever.caro.core.remote.di.NetworkModule
-import com.whatever.caro.core.remote.di.RemoteDataSourceModule
+import com.whatever.caro.core.remote.di.RemoteModule
 import com.whatever.caro.feature.home.di.HomeModule
 import com.whatever.caro.feature.login.di.LoginModule
 import org.koin.core.annotation.Configuration
@@ -15,7 +15,7 @@ import org.koin.core.annotation.Module
         // :core
         NavigatorModule::class,
         RepositoryModule::class,
-        RemoteDataSourceModule::class,
+        RemoteModule::class,
         NetworkModule::class,
 
         // :feature
