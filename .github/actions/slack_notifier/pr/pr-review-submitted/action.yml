@@ -33,11 +33,13 @@ runs:
         echo "reviewer_url=$REVIEWER_URL" >> "$GITHUB_OUTPUT"
         echo "reviewer_avatar=$REVIEWER_AVATAR" >> "$GITHUB_OUTPUT"
         echo "has_review_body=$HAS_REVIEW_BODY" >> "$GITHUB_OUTPUT"
-
+        
         if [ "$HAS_REVIEW_BODY" = "true" ]; then
+          REVIEW_BODY_INDENTED="$(printf "%s" "$REVIEW_BODY" | tr -d '\r' | sed 's/^/  /')"
+        
           {
-            echo "review_body<<EOF"
-            echo "$REVIEW_BODY"
+            echo "review_body_indented<<EOF"
+            echo "$REVIEW_BODY_INDENTED"
             echo "EOF"
           } >> "$GITHUB_OUTPUT"
         fi
@@ -63,7 +65,7 @@ runs:
                   - *<${{ steps.pr-review-info.outputs.reviewer_url }}|${{ steps.pr-review-info.outputs.reviewer }}>* 님의 리뷰 코멘트
 
                   ```
-                  ${{ steps.pr-review-info.outputs.review_body }}
+                  ${{ steps.pr-review-info.outputs.review_body_indented }}
                   ```
               accessory:
                 type: image
