@@ -28,7 +28,12 @@ runs:
         echo "pr_url=$PR_URL" >> $GITHUB_OUTPUT
         echo "comment_author=$COMMENT_AUTHOR" >> $GITHUB_OUTPUT
         echo "comment_author_url=$COMMENT_AUTHOR_URL" >> $GITHUB_OUTPUT
-        echo "comment_body=$(printf "%s" "$COMMENT_BODY" | jq -Rs .)" >> $GITHUB_OUTPUT
+
+        {
+          echo "comment_body<<EOF"
+          echo "$COMMENT_BODY"
+          echo "EOF"
+        } >> $GITHUB_OUTPUT
 
     - name: Send Slack Notification
       uses: slackapi/slack-github-action@v2.1.1
@@ -37,11 +42,17 @@ runs:
         webhook-type: incoming-webhook
         payload: |
           blocks:
-            - type: "section"
+            - type: section
               text:
-                type: "mrkdwn"
-                text: "💬 PR 라인 코멘트\n- *<${{ steps.pr-line-comment.outputs.pr_url }}|${{ steps.pr-line-comment.outputs.pr_title }}>* #${{ steps.pr-line-comment.outputs.pr_number }}\n```${{ fromJson(steps.pr-line-comment.outputs.comment_body) }}```"
-            - type: "context"
+                type: mrkdwn
+                text: |-
+                  💬 PR 라인 코멘트
+                  - *<${{ steps.pr-line-comment.outputs.pr_url }}|${{ steps.pr-line-comment.outputs.pr_title }}>* #${{ steps.pr-line-comment.outputs.pr_number }}
+
+                  ```
+                  ${{ steps.pr-line-comment.outputs.comment_body }}
+                  ```
+            - type: context
               elements:
-                - type: "mrkdwn"
+                - type: mrkdwn
                   text: "by <${{ steps.pr-line-comment.outputs.comment_author_url }}|${{ steps.pr-line-comment.outputs.comment_author }}>"
