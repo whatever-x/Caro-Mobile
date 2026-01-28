@@ -48,10 +48,7 @@ runs:
                 text: |-
                   💬 PR 라인 코멘트
                   - *<${{ steps.pr-line-comment.outputs.pr_url }}|${{ steps.pr-line-comment.outputs.pr_title }}>* #${{ steps.pr-line-comment.outputs.pr_number }}
-
-                  ```
                   ${{ steps.pr-line-comment.outputs.comment_body }}
-                  ```
             - type: context
               elements:
                 - type: mrkdwn
