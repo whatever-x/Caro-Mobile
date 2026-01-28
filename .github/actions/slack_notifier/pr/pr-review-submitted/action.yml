@@ -25,42 +25,47 @@ runs:
         if [ -z "$REVIEW_BODY" ] || [ "$REVIEW_BODY" = "null" ]; then
           HAS_REVIEW_BODY=false
         fi
-        
-        echo "pr_number=$PR_NUMBER" >> $GITHUB_OUTPUT
-        echo "pr_title=$PR_TITLE" >> $GITHUB_OUTPUT
-        echo "pr_url=$PR_URL" >> $GITHUB_OUTPUT
-        echo "reviewer=$REVIEWER" >> $GITHUB_OUTPUT
-        echo "reviewer_url=$REVIEWER_URL" >> $GITHUB_OUTPUT
-        echo "reviewer_avatar=$REVIEWER_AVATAR" >> $GITHUB_OUTPUT
-        echo "review_body=$(printf "%s" "$REVIEW_BODY" | jq -Rs .)" >> $GITHUB_OUTPUT
-        echo "has_review_body=$HAS_REVIEW_BODY" >> $GITHUB_OUTPUT
-        
+
+        echo "pr_number=$PR_NUMBER" >> "$GITHUB_OUTPUT"
+        echo "pr_title=$PR_TITLE" >> "$GITHUB_OUTPUT"
+        echo "pr_url=$PR_URL" >> "$GITHUB_OUTPUT"
+        echo "reviewer=$REVIEWER" >> "$GITHUB_OUTPUT"
+        echo "reviewer_url=$REVIEWER_URL" >> "$GITHUB_OUTPUT"
+        echo "reviewer_avatar=$REVIEWER_AVATAR" >> "$GITHUB_OUTPUT"
+        echo "has_review_body=$HAS_REVIEW_BODY" >> "$GITHUB_OUTPUT"
+
         if [ "$HAS_REVIEW_BODY" = "true" ]; then
           {
             echo "review_body<<EOF"
             echo "$REVIEW_BODY"
             echo "EOF"
-          } >> $GITHUB_OUTPUT
+          } >> "$GITHUB_OUTPUT"
         fi
 
     - name: Send Slack Notification
-      if: steps.pr-review-info.outputs.has_review_body == 'true'
+      if: ${{ steps.pr-review-info.outputs.has_review_body == 'true' }}
       uses: slackapi/slack-github-action@v2.1.1
       with:
         webhook: ${{ inputs.slack_webhook_url }}
         webhook-type: incoming-webhook
         payload: |
           blocks:
-            - type: "header"
+            - type: header
               text:
-                type: "plain_text"
-                text: "${{ inputs.review_header }}"
+                type: plain_text
+                text: ${{ inputs.review_header }}
                 emoji: true
-            - type: "section"
+            - type: section
               text:
-                type: "mrkdwn"
-                text: "- *<${{ steps.pr-review-info.outputs.pr_url }}|${{ steps.pr-review-info.outputs.pr_title }}>* #${{ steps.pr-review-info.outputs.pr_number }}\n- *<${{ steps.pr-review-info.outputs.reviewer_url }}|${{ steps.pr-review-info.outputs.reviewer }}>* 님의 리뷰 코멘트\n```${{ fromJson(steps.pr-review-info.outputs.review_body) }}```"
+                type: mrkdwn
+                text: |-
+                  - *<${{ steps.pr-review-info.outputs.pr_url }}|${{ steps.pr-review-info.outputs.pr_title }}>* #${{ steps.pr-review-info.outputs.pr_number }}
+                  - *<${{ steps.pr-review-info.outputs.reviewer_url }}|${{ steps.pr-review-info.outputs.reviewer }}>* 님의 리뷰 코멘트
+
+                  ```
+                  ${{ steps.pr-review-info.outputs.review_body }}
+                  ```
               accessory:
-                type: "image"
-                image_url: "${{ steps.pr-review-info.outputs.reviewer_avatar }}"
-                alt_text: "by ${{ steps.pr-review-info.outputs.reviewer }}"
+                type: image
+                image_url: ${{ steps.pr-review-info.outputs.reviewer_avatar }}
+                alt_text: by ${{ steps.pr-review-info.outputs.reviewer }}
