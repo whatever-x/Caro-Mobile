@@ -20,9 +20,10 @@ runs:
         REVIEWER_URL="https://github.com/${REVIEWER}"
         REVIEWER_AVATAR=$(jq -r '.review.user.avatar_url' "$GITHUB_EVENT_PATH")
         REVIEW_BODY=$(jq -r '.review.body' "$GITHUB_EVENT_PATH")
-        
-        if [ -z "$REVIEW_BODY" ] || [ "$REVIEW_BODY" == "null" ]; then
-          REVIEW_BODY="(❌코멘트가 없습니다)"
+
+        HAS_REVIEW_BODY=true
+        if [ -z "$REVIEW_BODY" ] || [ "$REVIEW_BODY" = "null" ]; then
+          HAS_REVIEW_BODY=false
         fi
         
         echo "pr_number=$PR_NUMBER" >> $GITHUB_OUTPUT
@@ -32,8 +33,18 @@ runs:
         echo "reviewer_url=$REVIEWER_URL" >> $GITHUB_OUTPUT
         echo "reviewer_avatar=$REVIEWER_AVATAR" >> $GITHUB_OUTPUT
         echo "review_body=$(printf "%s" "$REVIEW_BODY" | jq -Rs .)" >> $GITHUB_OUTPUT
+        echo "has_review_body=$HAS_REVIEW_BODY" >> $GITHUB_OUTPUT
+        
+        if [ "$HAS_REVIEW_BODY" = "true" ]; then
+          {
+            echo "review_body<<EOF"
+            echo "$REVIEW_BODY"
+            echo "EOF"
+          } >> $GITHUB_OUTPUT
+        fi
 
     - name: Send Slack Notification
+      if: steps.pr-review-info.outputs.has_review_body == 'true'
       uses: slackapi/slack-github-action@v2.1.1
       with:
         webhook: ${{ inputs.slack_webhook_url }}
