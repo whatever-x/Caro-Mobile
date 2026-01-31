@@ -28,6 +28,10 @@ dependencyResolutionManagement {
     }
 }
 
+plugins {
+    id("org.jetbrains.kotlinx.kover.aggregation") version "0.9.4"
+}
+
 rootProject.name = "CaroMobile"
 
 include(":androidApp")

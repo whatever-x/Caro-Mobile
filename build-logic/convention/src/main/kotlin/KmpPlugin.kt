@@ -19,6 +19,7 @@ class KmpPlugin : Plugin<Project> {
                 sourceSets.getByName("commonMain") {
                     dependencies {
                         implementation(libs.library("napier"))
+                        implementation(libs.library("kotlinx-coroutines-core"))
                     }
                 }
             }

@@ -21,7 +21,7 @@ androidx-room = "2.8.4"
 
 # org.jetbrains.kotlinx
 kotlinx-coroutines = "1.10.2"
-kotlinx-serialization = "1.10.0-RC" # kotlin 2.3.0 base
+kotlinx-serialization = "1.10.0"
 kotlinx-date-time = "0.7.1"
 kotlinx-collections-immutable = "0.4.0"
 
@@ -42,7 +42,7 @@ koin = "4.2.0-beta2"
 koin-annotation = "2.3.2-Beta1"
 
 # Network
-ktor = "3.3.3"
+ktor = "3.4.0"
 
 # Image Loader
 coil3 = "3.3.0"
@@ -55,20 +55,22 @@ napier = "2.7.1"
 
 # Firebase
 gms = "4.4.4"
-firebase-bom = "34.7.0"
+firebase-bom = "34.8.0"
 firebase-crahslytics = "3.0.6"
 
 # Utility
-kmp-spm = "1.4.6"
+kmp-spm = "1.4.7"
 play-review = "2.0.2"
 compose-stable-marker = "1.0.7"
 
 # Test
 turbine = "1.2.1"
 mokkery = "3.1.1"
+kotest = "6.1.1"
+kover = "0.9.4"
 
 # Lint
-spotless = "8.1.0"
+spotless = "8.2.0"
 ktlint-cli = "1.6.0"
 
 [libraries]
@@ -150,8 +152,12 @@ compose-stable-marker = { group = "com.github.skydoves", name = "compose-stable-
 
 # Test
 turbine = { group = "app.cash.turbine", name = "turbine", version.ref = "turbine" }
-mokkery = { group = "dev.mokkery", name = "mokkery-gradle", version.ref = "mokkery" }
+kotest-assertions-core = { group = "io.kotest", name = "kotest-assertions-core", version.ref = "kotest" }
+kotest-framework-engine = { group = "io.kotest", name = "kotest-framework-engine", version.ref = "kotest" }
+kotest-runner-junit5 = { group = "io.kotest", name = "kotest-runner-junit5", version.ref = "kotest" }
+kotest-extensions-koin = { group = "io.kotest", name = "kotest-extensions-koin", version.ref = "kotest" }
 kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "kotlinx-coroutines" }
+koin-test = { group = "io.insert-koin", name = "koin-test", version.ref = "koin" }
 
 # Gradle-Plugin
 kotlin-gradleplugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
@@ -162,19 +168,33 @@ compose-multiplatform-gradleplugin = { group = "org.jetbrains.compose", name = "
 ksp-gradleplugin = { group = "com.google.devtools.ksp", name = "com.google.devtools.ksp.gradle.plugin", version.ref = "ksp" }
 
 [plugins]
+# Android
 android-application = { id = "com.android.application", version.ref = "agp" }
+room = { id = "androidx.room", version.ref = "androidx-room" }
+
+# KMP
 android-kotlin-multiplatform-library = { id = "com.android.kotlin.multiplatform.library", version.ref = "agp" }
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
-kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+
+# Compose
 compose-multiplatform = { id = "org.jetbrains.compose", version.ref = "compose-multiplatform" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
-ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
-room = { id = "androidx.room", version.ref = "androidx-room" }
+
+# Codegen
 kmp-spm = { id = "io.github.frankois944.spmForKmp", version.ref = "kmp-spm" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+
+# Google
 google-services = { id = "com.google.gms.google-services", version.ref = "gms" }
 firebase-crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "firebase-crahslytics" }
+
+# Test
 mokkery = { id = "dev.mokkery", version.ref = "mokkery" }
 spotless = { id = "com.diffplug.gradle.spotless", version.ref = "spotless" }
+kotest = { id = "io.kotest", version.ref = "kotest" }
+kover = { id = "org.jetbrains.kotlinx.kover", version.ref = "kover" }
+kover-aggregation = { id = "org.jetbrains.kotlinx.kover.aggregation", version.ref = "kover" }
 
 [bundles]
 ktor-client-plugin = [

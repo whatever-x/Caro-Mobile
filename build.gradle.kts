@@ -12,4 +12,5 @@ plugins {
     alias(libs.plugins.firebase.crashlytics) apply false
     alias(libs.plugins.mokkery) apply false
     alias(libs.plugins.spotless) apply false
+    alias(libs.plugins.kotest) apply false
 }

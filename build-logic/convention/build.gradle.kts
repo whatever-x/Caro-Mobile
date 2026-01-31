@@ -67,9 +67,9 @@ gradlePlugin {
             id = "caro.feature"
             implementationClass = "FeaturePlugin"
         }
-        register("koinAnnotation") {
-            id = "caro.koin.annotation"
-            implementationClass = "KoinAnnotationPlugin"
+        register("koinPlugin") {
+            id = "caro.koin"
+            implementationClass = "KoinPlugin"
         }
     }
 }

@@ -4,7 +4,7 @@ plugins {
     id("caro.kmp.android")
     id("caro.cmp")
     id("caro.feature")
-    id("caro.koin.annotation")
+    id("caro.koin")
 }
 
 kotlin {
