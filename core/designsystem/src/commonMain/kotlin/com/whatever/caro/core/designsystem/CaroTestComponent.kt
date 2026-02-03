@@ -14,10 +14,10 @@ fun CaroButton(
     onClick: () -> Unit,
 ) {
     Button(
-        onClick = onClick
+        onClick = onClick,
     ) {
         Text(
-            text = text
+            text = text,
         )
     }
 }
@@ -29,6 +29,6 @@ fun CaroButton(
 private fun CaroButtonPreview() {
     CaroButton(
         text = stringResource(resource = Res.string.test),
-        onClick = {}
+        onClick = {},
     )
 }

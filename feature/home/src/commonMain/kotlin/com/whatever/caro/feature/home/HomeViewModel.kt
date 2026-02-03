@@ -14,9 +14,8 @@ class HomeViewModel(
     @InjectedParam private val navKey: HomeEntry,
     private val demoRepository: DemoRepository,
 ) : BaseViewModel<HomeState, HomeIntent, HomeSideEffect>(
-    initialState = HomeState()
-) {
-
+        initialState = HomeState(),
+    ) {
     override fun handleClientException(throwable: Throwable) {
         TODO()
     }
@@ -32,10 +31,9 @@ class HomeViewModel(
             reduce {
                 copy(
                     screenName = "HomeScreen",
-                    name = userData.name
+                    name = userData.name,
                 )
             }
         }
     }
-
 }

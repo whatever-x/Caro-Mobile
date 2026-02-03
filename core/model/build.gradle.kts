@@ -18,5 +18,4 @@ kotlin {
             api(libs.compose.stable.marker)
         }
     }
-
 }

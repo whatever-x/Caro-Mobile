@@ -25,7 +25,7 @@ val navigationModule: Module =
         navigation<HomeEntry> { navKey ->
             HomeRoute(
                 viewModel = koinViewModel<HomeViewModel> { parametersOf(navKey) },
-                navDispatcher = get()
+                navDispatcher = get(),
             )
         }
     }

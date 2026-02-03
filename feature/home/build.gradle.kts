@@ -17,5 +17,4 @@ kotlin {
             implementation(projects.core.model)
         }
     }
-
 }

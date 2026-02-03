@@ -25,7 +25,6 @@ fun HomeRoute(
 
     HomeScreen(
         state = state,
-        onIntent = viewModel::intent
+        onIntent = viewModel::intent,
     )
-
 }

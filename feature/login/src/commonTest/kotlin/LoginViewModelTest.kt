@@ -19,7 +19,9 @@ import org.koin.test.KoinTest
 import org.koin.test.inject
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class LoginViewModelTest : KoinTest, FunSpec() {
+class LoginViewModelTest :
+    FunSpec(),
+    KoinTest {
     init {
         extensions(KoinExtension(LoginModule().module))
 

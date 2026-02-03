@@ -21,19 +21,19 @@ import kotlinx.serialization.modules.polymorphic
 import org.koin.compose.koinInject
 
 @Composable
-fun CaroApp(
-    navDispatcher: NavigationDispatcher = koinInject()
-) {
-    val config = SavedStateConfiguration {
-        serializersModule = SerializersModule {
-            polymorphic(NavKey::class) {
-                subclass(LoginEntry::class, LoginEntry.serializer())
-                subclass(HomeEntry::class, HomeEntry.serializer())
-            }
+fun CaroApp(navDispatcher: NavigationDispatcher = koinInject()) {
+    val config =
+        SavedStateConfiguration {
+            serializersModule =
+                SerializersModule {
+                    polymorphic(NavKey::class) {
+                        subclass(LoginEntry::class, LoginEntry.serializer())
+                        subclass(HomeEntry::class, HomeEntry.serializer())
+                    }
+                }
         }
-    }
 
-    val backStack = rememberNavBackStack(config,LoginEntry)
+    val backStack = rememberNavBackStack(config, LoginEntry)
 
     LaunchedEffect(navDispatcher) {
         navDispatcher.commands.collect { command ->
@@ -41,14 +41,17 @@ fun CaroApp(
                 is NavCommand.Back -> {
                     if (backStack.size > 1) backStack.removeAt(backStack.lastIndex)
                 }
+
                 is NavCommand.To -> {
                     Napier.d { "To : ${command.key}" }
                     backStack.add(command.key)
                 }
+
                 is NavCommand.Replace -> {
                     if (backStack.isNotEmpty()) backStack.removeAt(backStack.lastIndex)
                     backStack.add(command.key)
                 }
+
                 is NavCommand.ResetTo -> {
                     backStack.clear()
                     backStack.add(command.key)
@@ -60,15 +63,16 @@ fun CaroApp(
     // TODO : CaroTheme 생성 후 교체
     MaterialTheme {
         Scaffold(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.fillMaxSize(),
         ) { innerPadding ->
             Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues = innerPadding)
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues = innerPadding),
             ) {
                 CaroNavHost(
-                    backStack = backStack
+                    backStack = backStack,
                 )
             }
         }

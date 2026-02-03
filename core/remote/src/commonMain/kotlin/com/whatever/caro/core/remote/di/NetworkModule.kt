@@ -11,20 +11,17 @@ import org.koin.core.annotation.Single
 
 @Module
 class NetworkModule {
-
     @Single
-    fun provideHttpClientEngine(): HttpClientEngine =
-        HttpClientEngineProvider().createEngine()
+    fun provideHttpClientEngine(): HttpClientEngine = HttpClientEngineProvider().createEngine()
 
     /**
      * Auth 설정없는 기본 클라이언트
      */
     @Single
     @NetworkClient(CaroClient.Default)
-    fun provideDefaultHttpClient(
-        engine: HttpClientEngine,
-    ): HttpClient =
-        HttpClientFactory.create(engine = engine)
+    fun provideDefaultHttpClient(engine: HttpClientEngine): HttpClient =
+        HttpClientFactory
+            .create(engine = engine)
             .config {
                 // TODO : Ktor 커스텀 플러그인 등록
             }
@@ -34,12 +31,10 @@ class NetworkModule {
      */
     @Single
     @NetworkClient(CaroClient.Auth)
-    fun authClient(
-        engine: HttpClientEngine,
-    ): HttpClient =
-        HttpClientFactory.create(engine = engine)
+    fun authClient(engine: HttpClientEngine): HttpClient =
+        HttpClientFactory
+            .create(engine = engine)
             .config {
                 // TODO : Ktor 커스텀 플러그인 등록
             }
-
 }

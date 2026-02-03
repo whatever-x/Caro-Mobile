@@ -20,22 +20,27 @@ fun LoginRoute(
     LaunchedEffect(Unit) {
         viewModel.sideEffect.collect { sideEffect ->
             when (sideEffect) {
-                is LoginSideEffect.NavigateHome -> navDispatcher.emit(
-                    command = NavCommand.To(
-                        key = HomeEntry(
-                            payload = Payload(
-                                id = 1,
-                                name = "test"
-                            )
-                        )
+                is LoginSideEffect.NavigateHome -> {
+                    navDispatcher.emit(
+                        command =
+                            NavCommand.To(
+                                key =
+                                    HomeEntry(
+                                        payload =
+                                            Payload(
+                                                id = 1,
+                                                name = "test",
+                                            ),
+                                    ),
+                            ),
                     )
-                )
+                }
             }
         }
     }
 
     LoginScreen(
         state = state,
-        onIntent = viewModel::intent
+        onIntent = viewModel::intent,
     )
 }
