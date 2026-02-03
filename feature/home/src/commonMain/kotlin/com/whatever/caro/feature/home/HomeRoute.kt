@@ -12,16 +12,18 @@ fun HomeRoute(
     navDispatcher: NavigationDispatcher,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
-    val user by viewModel.user.collectAsStateWithLifecycle()
+
+    LaunchedEffect(Unit) {
+        viewModel.init()
+    }
 
     LaunchedEffect(Unit) {
         viewModel.sideEffect.collect { sideEffect ->
-
+            TODO()
         }
     }
 
     HomeScreen(
-        user = user,
         state = state,
         onIntent = viewModel::intent
     )

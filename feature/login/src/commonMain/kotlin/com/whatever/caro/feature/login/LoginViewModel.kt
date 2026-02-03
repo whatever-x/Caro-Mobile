@@ -12,6 +12,10 @@ class LoginViewModel(
     initialState = LoginState()
 ) {
 
+    override fun handleClientException(throwable: Throwable) {
+        TODO()
+    }
+
     override suspend fun handleIntent(intent: LoginIntent) {
         when (intent) {
             is LoginIntent.ClickLogin -> postSideEffect(LoginSideEffect.NavigateHome)
