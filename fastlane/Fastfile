@@ -1,0 +1,22 @@
+platform :ios do
+  lane :dev_match do
+    match(
+      type: "development",
+      app_identifier: ["com.whatever.caro.dev"]
+    )
+  end
+
+  lane :qa_match do
+    match(
+      type: "appstore",
+      app_identifier: ["com.whatever.caro.qa"]
+    )
+  end
+
+  lane :prod_match do
+    match(
+      type: "appstore",
+      app_identifier: ["com.whatever.caro"]
+    )
+  end
+end
