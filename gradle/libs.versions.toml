@@ -70,8 +70,8 @@ kotest = "6.1.1"
 kover = "0.9.4"
 
 # Lint
-spotless = "8.2.0"
-ktlint-cli = "1.6.0"
+spotless = "8.2.1"
+ktlint-cli = "1.8.0"
 
 [libraries]
 # androidX
