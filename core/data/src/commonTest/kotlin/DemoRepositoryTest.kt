@@ -23,8 +23,9 @@ import org.koin.test.KoinTest
 import org.koin.test.get
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class DemoRepositoryImplKoinTest : FunSpec(), KoinTest {
-
+class DemoRepositoryTest :
+    FunSpec(),
+    KoinTest {
     private lateinit var overrideModule: Module
 
     init {
@@ -34,31 +35,34 @@ class DemoRepositoryImplKoinTest : FunSpec(), KoinTest {
                     RepositoryModule().module,
                     RemoteModule().module,
                     NetworkModule().module,
-                )
-            )
+                ),
+            ),
         )
 
         test("getData - datasource 호출 + 매핑") {
             runTest {
                 val demoDataSourceMock = mock<DemoDataSource>()
 
-                overrideModule = module {
-                    single<DemoDataSource> { demoDataSourceMock }
-                }
+                overrideModule =
+                    module {
+                        single<DemoDataSource> { demoDataSourceMock }
+                    }
 
                 loadKoinModules(overrideModule)
 
                 everySuspend {
                     demoDataSourceMock.getRestWithQuery(query = 123)
-                } returns DemoResponse(
-                    user = DemoDto(id = 123L, name = "테스터")
-                )
+                } returns
+                    DemoResponse(
+                        user = DemoDto(id = 123L, name = "테스터"),
+                    )
 
                 val repo: DemoRepository = get()
 
-                repo.getData(123L) shouldBe DemoResponse(
-                    user = DemoDto(id = 123L, name = "테스터")
-                ).toUser()
+                repo.getData(123L) shouldBe
+                    DemoResponse(
+                        user = DemoDto(id = 123L, name = "테스터"),
+                    ).toUser()
             }
         }
 

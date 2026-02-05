@@ -29,8 +29,9 @@ import org.koin.test.KoinTest
 import org.koin.test.get
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class HomeViewModelTest : FunSpec(), KoinTest {
-
+class HomeViewModelTest :
+    FunSpec(),
+    KoinTest {
     private lateinit var overrideModule: Module
 
     init {
@@ -52,9 +53,10 @@ class HomeViewModelTest : FunSpec(), KoinTest {
             runTest {
                 val demoRepositoryMock = mock<DemoRepository>()
 
-                overrideModule = module {
-                    single<DemoRepository> { demoRepositoryMock }
-                }
+                overrideModule =
+                    module {
+                        single<DemoRepository> { demoRepositoryMock }
+                    }
                 loadKoinModules(overrideModule)
 
                 everySuspend { demoRepositoryMock.getData(1L) } returns User(1L, "건형")
@@ -65,10 +67,11 @@ class HomeViewModelTest : FunSpec(), KoinTest {
                 vm.init()
                 advanceUntilIdle()
 
-                vm.state.value shouldBe HomeState(
-                    screenName = "HomeScreen",
-                    name = "건형",
-                )
+                vm.state.value shouldBe
+                    HomeState(
+                        screenName = "HomeScreen",
+                        name = "건형",
+                    )
             }
         }
     }
