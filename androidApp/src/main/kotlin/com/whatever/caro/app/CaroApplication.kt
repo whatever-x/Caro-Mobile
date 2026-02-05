@@ -18,5 +18,4 @@ class CaroApplication : Application() {
             Napier.base(DebugAntilog())
         }
     }
-
 }

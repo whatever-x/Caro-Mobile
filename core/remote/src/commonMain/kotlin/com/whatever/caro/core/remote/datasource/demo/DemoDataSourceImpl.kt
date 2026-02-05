@@ -13,13 +13,14 @@ internal class DemoDataSourceImpl(
     @NetworkClient(CaroClient.Auth) private val authClient: HttpClient,
     @NetworkClient(CaroClient.Default) private val defaultClient: HttpClient,
 ) : DemoDataSource {
-
-    private val demoResponse = DemoResponse(
-        user = DemoDto(
-            id = 0L,
-            name = "이름"
+    private val demoResponse =
+        DemoResponse(
+            user =
+                DemoDto(
+                    id = 0L,
+                    name = "이름",
+                ),
         )
-    )
 
     override suspend fun getRestWithPath(path: Long): DemoResponse {
 //        return authClient.get(BASE_DEMO_URL + "/$path")
@@ -38,7 +39,7 @@ internal class DemoDataSourceImpl(
 
     override suspend fun getRestWithQueryPath(
         query: Int,
-        path: Long
+        path: Long,
     ): DemoResponse {
 //        return authClient.get(BASE_DEMO_URL + "/$path") {
 //            parameter("queryKey", query)
@@ -58,5 +59,4 @@ internal class DemoDataSourceImpl(
     companion object {
         private const val BASE_DEMO_URL = "/v1/demo..."
     }
-
 }

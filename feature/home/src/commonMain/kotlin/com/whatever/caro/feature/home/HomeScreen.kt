@@ -14,14 +14,14 @@ internal fun HomeScreen(
     onIntent: (HomeIntent) -> Unit,
 ) {
     Column(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier.fillMaxSize(),
     ) {
         Text(
-            text = state.screenName
+            text = state.screenName,
         )
 
         Text(
-            text = state.name
+            text = state.name,
         )
     }
 }

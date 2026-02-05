@@ -6,10 +6,10 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class HomeEntry(
     val payload: Payload,
-): NavKey
+) : NavKey
 
 @Serializable
 data class Payload(
     val id: Int,
-    val name: String
+    val name: String,
 )

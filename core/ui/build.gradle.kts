@@ -15,5 +15,4 @@ kotlin {
             implementation(projects.core.designsystem)
         }
     }
-
 }

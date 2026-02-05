@@ -12,10 +12,10 @@ internal fun LoginScreen(
     onIntent: (LoginIntent) -> Unit,
 ) {
     Button(
-        onClick = { onIntent(LoginIntent.ClickLogin) }
+        onClick = { onIntent(LoginIntent.ClickLogin) },
     ) {
         Text(
-            text = state.test
+            text = state.test,
         )
     }
 }

@@ -24,7 +24,6 @@ kotlin {
 
     sourceSets {
         androidMain.dependencies {
-
         }
         commonMain.dependencies {
             implementation(projects.core.data)

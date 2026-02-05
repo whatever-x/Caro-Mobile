@@ -7,11 +7,10 @@ import com.whatever.caro.feature.login.mvi.LoginState
 import org.koin.android.annotation.KoinViewModel
 
 @KoinViewModel
-class LoginViewModel(
-) : BaseViewModel<LoginState, LoginIntent, LoginSideEffect>(
-    initialState = LoginState()
-) {
-
+class LoginViewModel :
+    BaseViewModel<LoginState, LoginIntent, LoginSideEffect>(
+        initialState = LoginState(),
+    ) {
     override fun handleClientException(throwable: Throwable) {
         TODO()
     }
@@ -21,5 +20,4 @@ class LoginViewModel(
             is LoginIntent.ClickLogin -> postSideEffect(LoginSideEffect.NavigateHome)
         }
     }
-
 }

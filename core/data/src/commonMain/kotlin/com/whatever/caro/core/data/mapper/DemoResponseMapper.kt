@@ -6,5 +6,5 @@ import com.whatever.caro.core.remote.model.demo.response.DemoResponse
 fun DemoResponse.toUser(): User =
     User(
         id = this.user.id,
-        name = this.user.name
+        name = this.user.name,
     )

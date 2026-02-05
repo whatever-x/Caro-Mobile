@@ -18,5 +18,4 @@ kotlin {
             implementation(libs.kotlinx.coroutines.core)
         }
     }
-
 }

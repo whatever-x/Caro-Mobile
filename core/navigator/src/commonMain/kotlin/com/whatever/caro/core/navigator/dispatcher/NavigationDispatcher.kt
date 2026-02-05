@@ -5,5 +5,6 @@ import kotlinx.coroutines.flow.Flow
 
 interface NavigationDispatcher {
     val commands: Flow<NavCommand>
+
     suspend fun emit(command: NavCommand)
 }
