@@ -12,7 +12,6 @@ class KmpTestPlugin : Plugin<Project> {
         with(target) {
             with(pluginManager) {
                 apply("dev.mokkery")
-                apply("org.jetbrains.kotlinx.kover")
                 apply("io.kotest")
             }
 
