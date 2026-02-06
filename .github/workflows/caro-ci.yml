@@ -68,18 +68,13 @@ jobs:
       - name: Generate Kover XML
         run: ./gradlew koverAllXmlReport --build-cache --parallel
 
-      - name: Collect Kover XML Report Paths
-        id: report-paths
-        run: |
-          echo "paths<<EOF" >> $GITHUB_OUTPUT
-          find . -path "*/build/reports/kover/report.xml" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
-
       - name: Comment coverage on PR
         uses: mi-kas/kover-report@v1.9
         with:
           path: |
-            ${{ steps.report-paths.outputs.paths }}
+            core/data/build/reports/kover/report.xml
+            feature/login/build/reports/kover/report.xml
+            feature/home/build/reports/kover/report.xml
           title: ViewModel / Repository Test Coverage
           update-comment: true
           min-coverage-overall: 80
