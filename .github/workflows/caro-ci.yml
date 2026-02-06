@@ -71,13 +71,15 @@ jobs:
       - name: Collect Kover XML Report Paths
         id: report-paths
         run: |
-          PATHS=$(find . -path "*/build/reports/kover/report.xml" -print0 | xargs -0 echo)
-          echo "paths=$PATHS" >> $GITHUB_OUTPUT
+          echo "paths<<EOF" >> $GITHUB_OUTPUT
+          find . -path "*/build/reports/kover/report.xml" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
 
       - name: Comment coverage on PR
         uses: mi-kas/kover-report@v1.9
         with:
-          path: ${{ steps.report-paths.outputs.paths }}
+          path: |
+            ${{ steps.report-paths.outputs.paths }}
           title: ViewModel / Repository Test Coverage
           update-comment: true
           min-coverage-overall: 80
