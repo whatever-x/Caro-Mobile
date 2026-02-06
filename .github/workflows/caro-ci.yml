@@ -76,6 +76,7 @@ jobs:
 
       - name: Collect Kover XML Report Paths
         id: report-paths
+        if: always()
         run: |
           echo "paths<<EOF" >> $GITHUB_OUTPUT
           find . -path "*/build/reports/kover/**/report.xml" >> $GITHUB_OUTPUT
