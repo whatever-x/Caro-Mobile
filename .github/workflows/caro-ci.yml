@@ -79,15 +79,14 @@ jobs:
         if: always()
         run: |
           echo "paths<<EOF" >> $GITHUB_OUTPUT
-          find . -path "*/build/reports/kover/**/report.xml" >> $GITHUB_OUTPUT
+          find . -path "*/build/reports/kover/report.xml" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
 
       - name: Comment coverage on PR
         if: always()
         uses: mi-kas/kover-report@v1.9
         with:
-          path: |
-            ${{ steps.report-paths.outputs.paths }}
+          path: ${{ steps.report-paths.outputs.paths }}
           title: ViewModel / Repository Test Coverage
           update-comment: true
           min-coverage-overall: 80
