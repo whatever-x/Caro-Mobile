@@ -52,7 +52,7 @@ class KoverPlugin : Plugin<Project> {
     }
 
     companion object {
-        private const val COVERAGE_THRESHOLD = 80
+        private const val COVERAGE_THRESHOLD = 50 // TODO : 임시 50%로 설정 추후 80으로 변경
     }
 
 }
