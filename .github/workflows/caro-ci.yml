@@ -97,7 +97,7 @@ jobs:
           payload: |
             {
               "text": "${{ job.status == 'success'
-                && format('<{0}|#%s PR> 테스트 커버리지 통과 ✅', github.event.pull_request.html_url, github.event.pull_request.number)
-                || format('<{0}|#%s PR> 테스트 커버리지 미달 ❌', github.event.pull_request.html_url, github.event.pull_request.number)
+                && format('<{0}|PR #{1}> 테스트 커버리지 통과 ✅', github.event.pull_request.html_url, github.event.pull_request.number)
+                || format('<{0}|PR #{1}> 테스트 커버리지 미달 ❌', github.event.pull_request.html_url, github.event.pull_request.number)
               }}"
             }
