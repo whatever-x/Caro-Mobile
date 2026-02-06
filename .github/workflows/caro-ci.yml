@@ -65,6 +65,9 @@ jobs:
         with:
           cache-read-only: ${{ github.event_name == 'pull_request' }}
 
+      - name: Run test
+        run: ./gradlew test --build-cache --parallel
+
       - name: Generate Kover XML
         run: ./gradlew koverAllXmlReport --build-cache --parallel
 
