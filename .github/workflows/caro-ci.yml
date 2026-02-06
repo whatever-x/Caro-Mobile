@@ -82,6 +82,7 @@ jobs:
           title: ViewModel / Repository Test Coverage
           update-comment: true
           min-coverage-overall: 80
+          min-coverage-changed-files: 80
           coverage-counter-type: LINE
 
       - name: Slack Notify Coverage Result
