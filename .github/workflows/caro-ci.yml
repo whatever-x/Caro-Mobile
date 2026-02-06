@@ -68,7 +68,11 @@ jobs:
       - name: Generate Kover XML
         run: ./gradlew koverAllXmlReport --build-cache --parallel
 
+      - name: Verify coverage
+        run: ./gradlew koverAllVerify --build-cache --parallel
+
       - name: Comment coverage on PR
+        if: always()
         uses: mi-kas/kover-report@v1.9
         with:
           path: |
@@ -79,3 +83,17 @@ jobs:
           update-comment: true
           min-coverage-overall: 80
           coverage-counter-type: LINE
+
+      - name: Slack Notify Coverage Result
+        if: always()
+        uses: slackapi/slack-github-action@v2.1.1
+        with:
+          webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
+          webhook-type: incoming-webhook
+          payload: |
+            {
+              "text": "${{ job.status == 'success'
+                && format('<{0}|#%s PR> 테스트 커버리지 통과 ✅', github.event.pull_request.html_url, github.event.pull_request.number)
+                || format('<{0}|#%s PR> 테스트 커버리지 미달 ❌', github.event.pull_request.html_url, github.event.pull_request.number)
+              }}"
+            }
