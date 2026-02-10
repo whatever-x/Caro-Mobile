@@ -62,6 +62,7 @@ firebase-crahslytics = "3.0.6"
 kmp-spm = "1.4.7"
 play-review = "2.0.2"
 compose-stable-marker = "1.0.7"
+build-konfig = "0.17.1"
 
 # Test
 turbine = "1.2.1"
@@ -175,6 +176,7 @@ room = { id = "androidx.room", version.ref = "androidx-room" }
 # KMP
 android-kotlin-multiplatform-library = { id = "com.android.kotlin.multiplatform.library", version.ref = "agp" }
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+build-konfig = { id = "com.codingfeline.buildkonfig", version.ref = "build-konfig" }
 
 # Compose
 compose-multiplatform = { id = "org.jetbrains.compose", version.ref = "compose-multiplatform" }
