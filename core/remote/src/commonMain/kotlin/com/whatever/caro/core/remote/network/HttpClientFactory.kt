@@ -16,7 +16,6 @@ import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 
 object HttpClientFactory {
-
     fun create(engine: HttpClientEngine): HttpClient =
         HttpClient(engine) {
             expectSuccess = true
@@ -45,5 +44,4 @@ object HttpClientFactory {
                 level = if (CaroNetworkConfig.isDebug) LogLevel.ALL else LogLevel.NONE
             }
         }
-
 }

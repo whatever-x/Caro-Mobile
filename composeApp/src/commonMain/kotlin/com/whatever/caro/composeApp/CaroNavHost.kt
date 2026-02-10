@@ -19,10 +19,11 @@ internal fun CaroNavHost(
     NavDisplay(
         modifier = modifier,
         backStack = backStack,
-        entryDecorators = listOf(
-            rememberSaveableStateHolderNavEntryDecorator(),
-            rememberViewModelStoreNavEntryDecorator(),
-        ),
-        entryProvider = koinEntryProvider()
+        entryDecorators =
+            listOf(
+                rememberSaveableStateHolderNavEntryDecorator(),
+                rememberViewModelStoreNavEntryDecorator(),
+            ),
+        entryProvider = koinEntryProvider(),
     )
 }

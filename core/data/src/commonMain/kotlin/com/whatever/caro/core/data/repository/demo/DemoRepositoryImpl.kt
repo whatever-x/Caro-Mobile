@@ -11,17 +11,16 @@ import org.koin.core.annotation.Single
 internal class DemoRepositoryImpl(
     private val demoDataSource: DemoDataSource,
 ) : DemoRepository {
-
     override suspend fun getData(id: Long): User {
         val result = demoDataSource.getRestWithQuery(query = id.toInt())
 
         return result.toUser()
     }
 
-    override fun getDataFlow(id: Long): Flow<User> = flow {
-        val result = demoDataSource.getRestWithQuery(query = id.toInt())
+    override fun getDataFlow(id: Long): Flow<User> =
+        flow {
+            val result = demoDataSource.getRestWithQuery(query = id.toInt())
 
-        emit(value = result.toUser())
-    }
-
+            emit(value = result.toUser())
+        }
 }

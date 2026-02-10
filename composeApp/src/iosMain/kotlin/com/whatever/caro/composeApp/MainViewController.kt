@@ -6,7 +6,7 @@ import io.github.aakira.napier.Napier
 import kotlin.experimental.ExperimentalNativeApi
 
 @OptIn(ExperimentalNativeApi::class)
-fun MainViewController() =
+fun mainViewController() =
     ComposeUIViewController {
         if (Platform.isDebugBinary) {
             Napier.base(DebugAntilog())

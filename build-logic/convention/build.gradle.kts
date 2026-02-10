@@ -71,5 +71,9 @@ gradlePlugin {
             id = "caro.koin"
             implementationClass = "KoinPlugin"
         }
+        register("koverPlugin") {
+            id = "caro.kover"
+            implementationClass = "KoverPlugin"
+        }
     }
 }

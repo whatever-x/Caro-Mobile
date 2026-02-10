@@ -29,7 +29,6 @@ dependencyResolutionManagement {
 }
 
 plugins {
-    id("org.jetbrains.kotlinx.kover.aggregation") version "0.9.4"
     id("caro.build.konfig.setting")
 }
 

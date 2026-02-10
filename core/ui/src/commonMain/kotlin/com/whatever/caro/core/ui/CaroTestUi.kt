@@ -14,7 +14,7 @@ fun CaroTestUi(
 ) {
     CaroButton(
         text = text,
-        onClick = onClick
+        onClick = onClick,
     )
 }
 
@@ -23,6 +23,6 @@ fun CaroTestUi(
 private fun CaroTestUiPreview() {
     CaroTestUi(
         text = stringResource(resource = Res.string.test),
-        onClick = {}
+        onClick = {},
     )
 }

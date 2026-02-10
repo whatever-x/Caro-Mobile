@@ -68,11 +68,11 @@ build-konfig = "0.17.1"
 turbine = "1.2.1"
 mokkery = "3.1.1"
 kotest = "6.1.1"
-kover = "0.9.4"
+kover = "0.9.6"
 
 # Lint
-spotless = "8.2.0"
-ktlint-cli = "1.6.0"
+spotless = "8.2.1"
+ktlint-cli = "1.8.0"
 
 [libraries]
 # androidX
@@ -167,6 +167,7 @@ kotlin-serialization-gradleplugin = { group = "org.jetbrains.kotlin", name = "ko
 compose-compiler-gradleplugin = { group = "org.jetbrains.kotlin", name = "compose-compiler-gradle-plugin", version.ref = "kotlin" }
 compose-multiplatform-gradleplugin = { group = "org.jetbrains.compose", name = "compose-gradle-plugin", version.ref = "compose-multiplatform" }
 ksp-gradleplugin = { group = "com.google.devtools.ksp", name = "com.google.devtools.ksp.gradle.plugin", version.ref = "ksp" }
+kover-gradleplugin = { group = "org.jetbrains.kotlinx", name = "kover-gradle-plugin", version.ref = "kover" }
 
 [plugins]
 # Android
@@ -196,7 +197,6 @@ mokkery = { id = "dev.mokkery", version.ref = "mokkery" }
 spotless = { id = "com.diffplug.gradle.spotless", version.ref = "spotless" }
 kotest = { id = "io.kotest", version.ref = "kotest" }
 kover = { id = "org.jetbrains.kotlinx.kover", version.ref = "kover" }
-kover-aggregation = { id = "org.jetbrains.kotlinx.kover.aggregation", version.ref = "kover" }
 
 [bundles]
 ktor-client-plugin = [
@@ -224,5 +224,6 @@ build-logic-plugins = [
     "compose-compiler-gradleplugin",
     "compose-multiplatform-gradleplugin",
     "android-gradleplugin",
-    "ksp-gradleplugin"
+    "ksp-gradleplugin",
+    "kover-gradleplugin",
 ]

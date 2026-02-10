@@ -1,3 +1,6 @@
+import com.diffplug.gradle.spotless.SpotlessExtension
+import com.diffplug.spotless.extra.wtp.EclipseWtpFormatterStep
+
 plugins {
     alias(libs.plugins.android.application) apply false
     alias(libs.plugins.android.kotlin.multiplatform.library) apply false
@@ -14,4 +17,70 @@ plugins {
     alias(libs.plugins.spotless) apply false
     alias(libs.plugins.kotest) apply false
     alias(libs.plugins.build.konfig) apply false
+    alias(libs.plugins.kover) apply false
+}
+
+val ktlintCliVersion = libs.versions.ktlint.cli.get()
+
+subprojects {
+    apply(plugin = "com.diffplug.spotless")
+
+    configure<SpotlessExtension> {
+        kotlin {
+            target("**/*.kt")
+            targetExclude(
+                "**/build/**",
+                "**/generated/**"
+            )
+            ktlint(ktlintCliVersion)
+        }
+
+        kotlinGradle {
+            target("**/*.gradle.kts")
+            ktlint(ktlintCliVersion)
+        }
+
+        format("xml") {
+            target(
+                "src/**/values/*.xml",
+                "src/**/AndroidManifest.xml"
+            )
+            targetExclude(
+                "**/build/**",
+                "**/generated/**"
+            )
+
+            eclipseWtp(EclipseWtpFormatterStep.XML)
+        }
+    }
+}
+
+/**
+ * Kover 적용된 모듈에 대한 XML 리포트 생성
+ * 터미널에서 ./gradlew koverAllXmlReport 를 실행
+ */
+tasks.register("koverAllXmlReport") {
+    group = "verification"
+    description = "Generate Kover XML reports for all coverage-enabled modules"
+
+    dependsOn(
+        ":feature:login:koverXmlReport",
+        ":feature:home:koverXmlReport",
+        ":core:data:koverXmlReport"
+    )
+}
+
+/**
+ * Kover 적용된 모듈에 대한 검증 실행
+ * 터미널에서 ./gradlew koverAllVerify 를 실행
+ */
+tasks.register("koverAllVerify") {
+    group = "verification"
+    description = "Verify Kover coverage for all coverage-enabled modules"
+
+    dependsOn(
+        ":feature:login:koverVerify",
+        ":feature:home:koverVerify",
+        ":core:data:koverVerify"
+    )
 }

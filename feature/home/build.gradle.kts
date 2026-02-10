@@ -5,6 +5,8 @@ plugins {
     id("caro.cmp")
     id("caro.feature")
     id("caro.koin")
+    id("caro.kmp.test")
+    id("caro.kover")
 }
 
 kotlin {
@@ -17,5 +19,4 @@ kotlin {
             implementation(projects.core.model)
         }
     }
-
 }

@@ -21,6 +21,6 @@ import org.koin.core.annotation.Module
         // :feature
         HomeModule::class,
         LoginModule::class,
-    ]
+    ],
 )
 class AppModule

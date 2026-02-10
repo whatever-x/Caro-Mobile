@@ -18,8 +18,8 @@ import kotlinx.coroutines.launch
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 
-abstract class BaseViewModel<S: UiState, I: UiIntent, SE: UiSideEffect>(
-    initialState: S
+abstract class BaseViewModel<S : UiState, I : UiIntent, SE : UiSideEffect>(
+    initialState: S,
 ) : ViewModel() {
     protected abstract suspend fun handleIntent(intent: I)
 
@@ -64,5 +64,4 @@ abstract class BaseViewModel<S: UiState, I: UiIntent, SE: UiSideEffect>(
     open fun handleClientException(throwable: Throwable) {
         Napier.e { "handleClientException = ${throwable.message}" }
     }
-
 }

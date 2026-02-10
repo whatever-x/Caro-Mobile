@@ -8,7 +8,7 @@ import org.koin.ksp.generated.startKoin
 @KoinApplication
 object KoinApp
 
-fun initKoin(configuration : KoinAppDeclaration? = null) {
+fun initKoin(configuration: KoinAppDeclaration? = null) {
     KoinApp.startKoin {
         includes(configuration)
         modules(
