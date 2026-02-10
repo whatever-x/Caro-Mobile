@@ -40,14 +40,14 @@ kotlin {
 buildkonfig {
     packageName = "com.whatever.caro.core.remote.generated"
 
-    defaultConfigs {  }
+    defaultConfigs { }
 
     targetConfigs("qa") {
         create("android") {
             buildConfigField(
                 FieldSpec.Type.STRING,
                 "SERVER_BASE_URL",
-                getLocalProperty("CARO_QA_SERVER") ?: error("CARO_BASE_URL을 찾을 수 없습니다.")
+                getLocalProperty("CARO_QA_SERVER") ?: error("CARO_BASE_URL을 찾을 수 없습니다."),
             )
             buildConfigField(FieldSpec.Type.BOOLEAN, "IS_DEBUG", "true")
         }
@@ -58,7 +58,7 @@ buildkonfig {
             buildConfigField(
                 FieldSpec.Type.STRING,
                 "SERVER_BASE_URL",
-                getLocalProperty("CARO_DEV_SERVER") ?: error("CARO_BASE_URL을 찾을 수 없습니다.")
+                getLocalProperty("CARO_DEV_SERVER") ?: error("CARO_BASE_URL을 찾을 수 없습니다."),
             )
             buildConfigField(FieldSpec.Type.BOOLEAN, "IS_DEBUG", "true")
         }
@@ -69,7 +69,7 @@ buildkonfig {
             buildConfigField(
                 FieldSpec.Type.STRING,
                 "SERVER_BASE_URL",
-                getLocalProperty("CARO_PROD_SERVER") ?: error("CARO_BASE_URL을 찾을 수 없습니다.")
+                getLocalProperty("CARO_PROD_SERVER") ?: error("CARO_BASE_URL을 찾을 수 없습니다."),
             )
             buildConfigField(FieldSpec.Type.BOOLEAN, "IS_DEBUG", "false")
         }
