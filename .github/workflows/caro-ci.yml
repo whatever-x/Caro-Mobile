@@ -17,6 +17,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
+      - name: Generate Local Properties File
+        run: |
+          echo "${{ secrets.LOCAL_PROPERTIES }}" > local.properties
+          echo "sdk.dir=$ANDROID_HOME" >> local.properties
+
       - name: Set up JDK 17
         uses: actions/setup-java@v5
         with:
@@ -53,6 +58,11 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+
+      - name: Generate Local Properties File
+        run: |
+          echo "${{ secrets.LOCAL_PROPERTIES }}" > local.properties
+          echo "sdk.dir=$ANDROID_HOME" >> local.properties
 
       - name: Set up JDK 17
         uses: actions/setup-java@v5

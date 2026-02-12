@@ -28,6 +28,10 @@ dependencyResolutionManagement {
     }
 }
 
+plugins {
+    id("caro.build.konfig.setting")
+}
+
 rootProject.name = "CaroMobile"
 
 include(":androidApp")

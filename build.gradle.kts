@@ -16,6 +16,7 @@ plugins {
     alias(libs.plugins.mokkery) apply false
     alias(libs.plugins.spotless) apply false
     alias(libs.plugins.kotest) apply false
+    alias(libs.plugins.build.konfig) apply false
     alias(libs.plugins.kover) apply false
 }
 
