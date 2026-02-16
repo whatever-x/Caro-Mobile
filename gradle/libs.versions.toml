@@ -73,6 +73,7 @@ kover = "0.9.6"
 # Lint
 spotless = "8.2.1"
 ktlint-cli = "1.8.0"
+stability-analyzer = "0.6.7"
 
 [libraries]
 # androidX
@@ -166,6 +167,7 @@ compose-compiler-gradleplugin = { group = "org.jetbrains.kotlin", name = "compos
 compose-multiplatform-gradleplugin = { group = "org.jetbrains.compose", name = "compose-gradle-plugin", version.ref = "compose-multiplatform" }
 ksp-gradleplugin = { group = "com.google.devtools.ksp", name = "com.google.devtools.ksp.gradle.plugin", version.ref = "ksp" }
 kover-gradleplugin = { group = "org.jetbrains.kotlinx", name = "kover-gradle-plugin", version.ref = "kover" }
+stability-analyzer-gradleplugin = { group = "com.github.skydoves.compose.stability.analyzer", name = "com.github.skydoves.compose.stability.analyzer.gradle.plugin", version.ref = "stability-analyzer" }
 
 [plugins]
 # Android
@@ -180,6 +182,7 @@ build-konfig = { id = "com.codingfeline.buildkonfig", version.ref = "build-konfi
 # Compose
 compose-multiplatform = { id = "org.jetbrains.compose", version.ref = "compose-multiplatform" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+compose-stability-analyzer = { id = "com.github.skydoves.compose.stability.analyzer", version.ref = "stability-analyzer" }
 
 # Codegen
 kmp-spm = { id = "io.github.frankois944.spmForKmp", version.ref = "kmp-spm" }
@@ -228,4 +231,5 @@ build-logic-plugins = [
     "android-gradleplugin",
     "ksp-gradleplugin",
     "kover-gradleplugin",
+    "stability-analyzer-gradleplugin",
 ]
