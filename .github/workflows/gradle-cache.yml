@@ -1,0 +1,47 @@
+name: Gradle Cache
+
+on:
+  push:
+    branches:
+      - develop
+
+concurrency:
+  group: gradle-cache-warm-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  gradle-cache:
+    name: Gradle Cache
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v2
+
+      - name: Generate Local Properties File
+        run: |
+          echo "${{ secrets.LOCAL_PROPERTIES }}" > local.properties
+          echo "sdk.dir=$ANDROID_HOME" >> local.properties
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v5
+        with:
+          cache-read-only: false
+
+      - name: Warm tasks
+        run: |
+          ./gradlew \
+            :androidApp:assembleDebug \
+            test \
+            --build-cache --parallel --stacktrace
