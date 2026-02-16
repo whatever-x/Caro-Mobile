@@ -88,3 +88,28 @@ jobs:
                 || format('<{0}|PR #{1}> 테스트 커버리지 미달 ❌', github.event.pull_request.html_url, github.event.pull_request.number)
               }}"
             }
+
+  stability-check:
+    name: Compose Stability Check
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - uses: ./.github/actions/ci/set-up
+        with:
+          local_properties: ${{ secrets.LOCAL_PROPERTIES }}
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3.2.2
+
+      - name: Append "sdk.dir" to local.properties
+        shell: bash
+        run: |
+          echo "sdk.dir=${ANDROID_SDK_ROOT:-$ANDROID_HOME}" >> local.properties
+
+      - name: Build Project
+        run: ./gradlew :androidApp:assembleDebug --build-cache
+
+      - name: Stability check
+        run: ./gradlew stabilityCheck
