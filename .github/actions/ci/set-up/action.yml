@@ -1,7 +1,9 @@
 name: CI Set Up
+description: CI 환경을 위한 local.properties, JDK 17, Gradle 설정을 수행합니다.
 
 inputs:
   local_properties:
+    description: local.properties에 추가할 속성들
     required: false
     default: ""
 
