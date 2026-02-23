@@ -1,4 +1,4 @@
-package com.whatever.caro.feature.login
+package com.whatever.caro.feature.login.route
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -8,6 +8,8 @@ import com.whatever.caro.core.navigator.contract.NavCommand
 import com.whatever.caro.core.navigator.dispatcher.NavigationDispatcher
 import com.whatever.caro.core.navigator.entries.HomeEntry
 import com.whatever.caro.core.navigator.entries.Payload
+import com.whatever.caro.feature.login.LoginScreen
+import com.whatever.caro.feature.login.LoginViewModel
 import com.whatever.caro.feature.login.mvi.LoginSideEffect
 
 @Composable

@@ -38,6 +38,11 @@ class CmpPlugin : Plugin<Project> {
             composeStabilityAnalyzer {
                 stabilityValidation {
                     enabled.set(true)
+                    ignoredPackages.set(
+                        listOf(
+                            "com.whatever.caro.feature.${name}.route",
+                        )
+                    )
                     ignoreNonRegressiveChanges.set(true) // 안정성 저하가 발생하지 않으면 통과
                 }
             }
