@@ -1,4 +1,4 @@
-name: Slack Notifier
+name: Slack Comment Notifier
 
 on:
   issue_comment:
