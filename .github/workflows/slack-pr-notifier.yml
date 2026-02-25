@@ -63,7 +63,11 @@ jobs:
 
   # ✅ PR 리뷰 코멘트
   notify-pr-review-commented:
-    if: github.event_name == 'pull_request_review' && github.event.action == 'submitted' && github.event.review.state == 'commented'
+    if: |
+      github.event_name == 'pull_request_review' &&
+      github.event.action == 'submitted' &&
+      github.event.review.state == 'commented' &&
+      github.event.comment.user.type != 'Bot'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -74,7 +78,10 @@ jobs:
 
   # ✅ PR 라인 코멘트
   notify-pr-line-commented:
-    if: github.event_name == 'pull_request_review_comment' && github.event.action == 'created'
+    if: |
+      github.event_name == 'pull_request_review_comment' &&
+      github.event.action == 'created' &&
+      github.event.comment.user.type != 'Bot'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
