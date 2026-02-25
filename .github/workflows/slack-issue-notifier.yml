@@ -7,7 +7,9 @@ on:
 jobs:
   # ✅ 이슈 생성 알림
   notify-issue-opened:
-    if: github.event_name == 'issues' && github.event.action == 'opened'
+    if: |
+      github.event_name == 'issues' &&
+      github.event.action == 'opened'
     runs-on: ubuntu-latest
     steps:
         - uses: actions/checkout@v4
@@ -17,7 +19,9 @@ jobs:
 
   # ✅ 이슈 종료 알림
   notify-issue-closed:
-    if: github.event_name == 'issues' && github.event.action == 'closed'
+    if: |
+      github.event_name == 'issues' &&
+      github.event.action == 'closed'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
