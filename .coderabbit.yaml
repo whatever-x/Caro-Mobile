@@ -1,0 +1,86 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+language: ko-KR
+tone_instructions: 4줄 이하의 짧은 리뷰에는 간결하고 명확한 내용을 담아 낼 것. 5줄 이상의 긴 리뷰에는 제안하려는 사례와 기대효과 및 트레이드 오프에 대한 내용을 명시할 것.
+reviews:
+  high_level_summary_instructions: |
+    기본틀은 아래 형식에 맞게 요약하여 작성할 것
+
+    ## 작업한 내용
+    - 작업한 내용을 간결하게 작성
+
+    ## PR 포인트
+    ### 대분류
+    - PR에서 중요한 사항을 작성 
+
+    작업한 내용은 아래 예시와 같은 형식으로 간결하게 작성할 것
+
+    [예시]
+    ## 작업한 내용
+    - Stability Analyzer 플러그인 추가
+    - build-logic에 Stability Analyzer 설정 추가
+    - Stability Analyzer CI 추가
+    - XXX 화면 개발
+    - XXX 로직 개발
+
+    PR 포인트는 아래 예시와 같은 형식으로 간결하게 작성할 것
+
+    [예시]
+    ## PR 포인트
+    ### Stability 베이스라인 업데이트 지침
+    - Compose Stability Analyzer 베이스라인 업데이트 지침은 공식문서를 따릅니다.
+    - 해당 PR을 기준으로 최초 1회 베이스라인을 추가합니다.
+    - 안정성 변경이 의도적인 경우 베이스라인을 업데이트하고 사유와 함께 커밋 로그에 남깁니다.
+      - 커밋 예) chore : xxx 컴포저블 런타임 파라미터 추가
+  auto_title_instructions: |-
+    - 작업의 성격에 맞는 키워드는 제목 앞에 **필수**로 붙입니다.
+        - `[키워드 종류]`
+            - [Init] - 초기화 관련 작업
+            - [Feature] - 기능 및 함수, 클래스, 변수 추가 작업
+            - [Refactor] - 코드 최적화 및 기능 개선 성격의 작업
+            - [Build] - 빌드 관련 작업
+            - [Docs] - 문서 관련 작업
+            - [Chore] - 패키지명 및 경로, 모듈명, 함수명, 클래스명, 변수명 변경 작업
+            - [Fix] - 버그로 인한 코드 수정 작업
+            - [Hot Fix] - 치명적인 버그 발생으로 인한 긴급 수정 작업
+            - [Release] - 프로덕션 배포를 위한 작업
+            - [QA] - QA 피드백에 대한 작업
+  suggested_labels: false
+  suggested_reviewers: false
+  in_progress_fortune: false
+  poem: false
+  auto_review:
+    auto_incremental_review: false
+    drafts: true
+  finishing_touches:
+    docstrings:
+      enabled: false
+    unit_tests:
+      enabled: false
+  pre_merge_checks:
+    docstrings:
+      mode: 'off'
+    title:
+      requirements: |-
+        - 작업의 성격에 맞는 키워드는 제목 앞에 **필수**로 붙입니다.
+            - `[키워드 종류]`
+                - [Init] - 초기화 관련 작업
+                - [Feature] - 기능 및 함수, 클래스, 변수 추가 작업
+                - [Refactor] - 코드 최적화 및 기능 개선 성격의 작업
+                - [Build] - 빌드 관련 작업
+                - [Docs] - 문서 관련 작업
+                - [Chore] - 패키지명 및 경로, 모듈명, 함수명, 클래스명, 변수명 변경 작업
+                - [Fix] - 버그로 인한 코드 수정 작업
+                - [Hot Fix] - 치명적인 버그 발생으로 인한 긴급 수정 작업
+                - [Release] - 프로덕션 배포를 위한 작업
+                - [QA] - QA 피드백에 대한 작업
+  tools:
+    github-checks:
+      timeout_ms: 900000
+knowledge_base:
+  code_guidelines:
+    filePatterns:
+      - '**/AGENTS.md'
+      - '**/CLAUDE.md'
+code_generation:
+  docstrings:
+    language: ko-KR
