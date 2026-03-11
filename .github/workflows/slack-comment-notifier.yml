@@ -1,4 +1,4 @@
-name: Slack Notifier
+name: Slack Comment Notifier
 
 on:
   issue_comment:
@@ -7,7 +7,11 @@ on:
 jobs:
   # ✅ 이슈 코멘트
   notify-issue-commented:
-    if: github.event_name == 'issue_comment' && github.event.action == 'created' && github.event.issue.pull_request == null
+    if: |
+      github.event_name == 'issue_comment' &&
+      github.event.action == 'created' &&
+      github.event.issue.pull_request == null &&
+      github.event.comment.user.type != 'Bot'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -17,7 +21,11 @@ jobs:
 
   # ✅ PR 일반 코멘트
   notify-pr-general-commented:
-    if: github.event_name == 'issue_comment' && github.event.action == 'created' && github.event.issue.pull_request != null
+    if: |
+      github.event_name == 'issue_comment' &&
+      github.event.action == 'created' &&
+      github.event.issue.pull_request != null &&
+      github.event.comment.user.type != 'Bot'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

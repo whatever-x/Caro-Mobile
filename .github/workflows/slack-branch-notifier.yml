@@ -10,7 +10,9 @@ on:
 jobs:
   # ✅ 브랜치 생성
   notify-branch-created:
-    if: github.event.ref_type == 'branch' && github.event_name == 'create'
+    if: |
+      github.event.ref_type == 'branch' &&
+      github.event_name == 'create'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -20,7 +22,9 @@ jobs:
 
   # ✅ 브랜치 삭제
   notify-branch-deleted:
-    if: github.event.ref_type == 'branch' && github.event_name == 'delete'
+    if: |
+      github.event.ref_type == 'branch' &&
+      github.event_name == 'delete'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -30,7 +34,9 @@ jobs:
 
   # ✅ 커밋 푸시
   notify-push-commit:
-    if: github.event_name == 'push' && startsWith(github.ref, 'refs/heads/')
+    if: |
+      github.event_name == 'push' &&
+      startsWith(github.ref, 'refs/heads/')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
