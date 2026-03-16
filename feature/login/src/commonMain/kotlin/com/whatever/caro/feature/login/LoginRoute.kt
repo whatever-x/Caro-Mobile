@@ -29,7 +29,7 @@ import org.koin.compose.koinInject
 fun LoginRoute(
     viewModel: LoginViewModel,
     navDispatcher: NavigationDispatcher,
-    googleAuthenticator: SocialAuthenticator<GoogleUser> = koinInject<GoogleAuthProvider>.get(),
+    googleAuthenticator: SocialAuthenticator<GoogleUser> = koinInject<GoogleAuthProvider>().get(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackbarHost = LocalSnackbarHostState.current
