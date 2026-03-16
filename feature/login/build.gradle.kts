@@ -25,7 +25,7 @@ kotlin {
             implementation(libs.android.google.id)
         }
         commonMain.dependencies {
-
+            implementation(projects.core.model)
         }
     }
 }
