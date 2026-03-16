@@ -1,3 +1,6 @@
+import com.codingfeline.buildkonfig.compiler.FieldSpec
+import org.jetbrains.compose.internal.utils.getLocalProperty
+
 plugins {
     id("caro.kmp")
     id("caro.kmp.ios")
@@ -7,6 +10,7 @@ plugins {
     id("caro.koin")
     id("caro.kmp.test")
     id("caro.kover")
+    alias(libs.plugins.build.konfig)
 }
 
 kotlin {
@@ -15,7 +19,25 @@ kotlin {
     }
 
     sourceSets {
-        commonMain.dependencies {
+        androidMain.dependencies {
+            implementation(libs.androidx.credentials.credentials)
+            implementation(libs.androidx.credentials.auth)
+            implementation(libs.android.google.id)
         }
+        commonMain.dependencies {
+
+        }
+    }
+}
+
+buildkonfig {
+    packageName = "com.whatever.caro.feature.login.generated"
+
+    defaultConfigs {
+        buildConfigField(
+            FieldSpec.Type.STRING,
+            "GOOGLE_CLIENT_ID",
+            getLocalProperty("GOOGLE_CLIENT_ID") ?: error("CLIENT_ID를 찾을 수 없습니다"),
+        )
     }
 }
