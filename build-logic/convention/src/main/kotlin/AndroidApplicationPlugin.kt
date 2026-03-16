@@ -67,19 +67,19 @@ class AndroidApplicationPlugin : Plugin<Project> {
                 }
 
                 buildTypes {
-                    create(PROD_BUILD_TYPE) {
-                        signingConfig = signingConfigs.getByName(PROD_BUILD_TYPE)
-                        isDebuggable = false
-                        isMinifyEnabled = true
-                    }
-
-                    create(DEV_BUILD_TYPE) {
-                        initWith(getByName(DEV_BUILD_TYPE))
+                    getByName("debug") {
+                        signingConfig = signingConfigs.getByName(DEV_BUILD_TYPE)
                         applicationIdSuffix = ".dev"
                         versionNameSuffix = "-dev"
                         isDebuggable = true
                         isMinifyEnabled = false
                         resValue("string", "app_name", "Caro-Dev")
+                    }
+
+                    release {
+                        signingConfig = signingConfigs.getByName(PROD_BUILD_TYPE)
+                        isDebuggable = false
+                        isMinifyEnabled = true
                     }
 
                     create(QA_BUILD_TYPE) {
