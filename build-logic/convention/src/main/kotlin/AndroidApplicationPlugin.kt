@@ -45,22 +45,36 @@ class AndroidApplicationPlugin : Plugin<Project> {
                     targetCompatibility = JavaVersion.VERSION_17
                 }
 
-                signingConfigs { // TODO : keystore 관리 논의 필요
-                    create("release") { }
-                    create(DEV_BUILD_TYPE) { }
-                    create(QA_BUILD_TYPE) { }
-                    create(PROD_BUILD_TYPE) { } // TODO : keyStore 생성 및 등록
+                signingConfigs {
+                    create(DEV_BUILD_TYPE) {
+                        Properties().run {
+                            load(FileInputStream(rootProject.file("local.properties")))
+                            storeFile = rootProject.file(this["STORE_FILE"] as String)
+                            keyAlias = this["KEY_ALIAS"] as String
+                            keyPassword = this["KEY_PASSWORD"] as String
+                            storePassword = this["STORE_PASSWORD"] as String
+                        }
+                    }
+                    create(PROD_BUILD_TYPE) {
+                        Properties().run {
+                            load(FileInputStream(rootProject.file("local.properties")))
+                            storeFile = rootProject.file(this["STORE_FILE"] as String)
+                            keyAlias = this["KEY_ALIAS"] as String
+                            keyPassword = this["KEY_PASSWORD"] as String
+                            storePassword = this["STORE_PASSWORD"] as String
+                        }
+                    }
                 }
 
                 buildTypes {
                     create(PROD_BUILD_TYPE) {
-                        signingConfig = signingConfigs.getByName("release") // TODO : keystore 생성 후 변경
+                        signingConfig = signingConfigs.getByName(PROD_BUILD_TYPE)
                         isDebuggable = false
                         isMinifyEnabled = true
                     }
 
                     create(DEV_BUILD_TYPE) {
-                        initWith(getByName("debug")) // TODO : keystore 생성 후 변경
+                        initWith(getByName(DEV_BUILD_TYPE))
                         applicationIdSuffix = ".dev"
                         versionNameSuffix = "-dev"
                         isDebuggable = true
@@ -69,7 +83,7 @@ class AndroidApplicationPlugin : Plugin<Project> {
                     }
 
                     create(QA_BUILD_TYPE) {
-                        initWith(getByName("debug")) // TODO : keystore 생성 후 변경
+                        signingConfig = signingConfigs.getByName(DEV_BUILD_TYPE)
                         applicationIdSuffix = ".qa"
                         versionNameSuffix = "-qa"
                         isDebuggable = true
