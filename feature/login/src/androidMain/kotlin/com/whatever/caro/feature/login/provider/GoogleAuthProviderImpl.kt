@@ -1,7 +1,6 @@
 package com.whatever.caro.feature.login.provider
 
 import android.content.Context
-import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import androidx.credentials.Credential
@@ -54,10 +53,10 @@ private class GoogleAuthenticator(
             ).credential
             val user = getGoogleUserFromCredential(credential) ?: return SocialLoginResult.Failed
             SocialLoginResult.Success(user)
-        } catch (e: NoCredentialException) {
+        } catch (_: NoCredentialException) {
             // 첫 로그인에 대한 fallback
             val fallbackOption = GetGoogleIdOption.Builder()
-                .setServerClientId(BuildKonfig.GOOGLE_CLIENT_ID)
+                .setServerClientId(BuildKonfig.GOOGLE_WEB_CLIENT_ID)
                 .setFilterByAuthorizedAccounts(false)
                 .setAutoSelectEnabled(false)
                 .build()
@@ -74,7 +73,7 @@ private class GoogleAuthenticator(
                 val user =
                     getGoogleUserFromCredential(credential) ?: return SocialLoginResult.Failed
                 SocialLoginResult.Success(user)
-            } catch (e: NoCredentialException) {
+            } catch (_: NoCredentialException) {
                 SocialLoginResult.Failed
             }
         }
