@@ -1,5 +1,10 @@
+@file:OptIn(ExperimentalSpmForKmpFeature::class)
+
 import com.codingfeline.buildkonfig.compiler.FieldSpec
+import io.github.frankois944.spmForKmp.swiftPackageConfig
+import io.github.frankois944.spmForKmp.utils.ExperimentalSpmForKmpFeature
 import org.jetbrains.compose.internal.utils.getLocalProperty
+import java.net.URI
 
 plugins {
     id("caro.kmp")
@@ -11,9 +16,29 @@ plugins {
     id("caro.kmp.test")
     id("caro.kover")
     alias(libs.plugins.build.konfig)
+    alias(libs.plugins.kmp.spm)
 }
 
 kotlin {
+    listOf(
+        iosX64(),
+        iosArm64(),
+        iosSimulatorArm64()
+    ).forEach { iosTarget ->
+        iosTarget.swiftPackageConfig(cinteropName = "GoogleLoginBridge") {
+            customPackageSourcePath = "../../iosApp"
+            minIos = "15.0"
+
+            dependency {
+                remotePackageVersion(
+                    url = URI("https://github.com/google/GoogleSignIn-iOS"),
+                    version = "9.1.0",
+                    products = { add("GoogleSignIn", "GoogleSignInSwift") }
+                )
+            }
+        }
+    }
+
     android {
         namespace = "com.whatever.caro.feature.login"
     }
