@@ -15,11 +15,13 @@ import com.whatever.caro.core.navigator.contract.NavCommand.To
 import com.whatever.caro.core.navigator.dispatcher.NavigationDispatcher
 import com.whatever.caro.core.navigator.entries.HomeEntry
 import com.whatever.caro.core.navigator.entries.Payload
+import com.whatever.caro.feature.login.model.AppleUser
 import com.whatever.caro.feature.login.model.GoogleUser
 import com.whatever.caro.feature.login.model.LoginError
 import com.whatever.caro.feature.login.model.SocialAuthenticator
 import com.whatever.caro.feature.login.mvi.LoginIntent
 import com.whatever.caro.feature.login.mvi.LoginSideEffect
+import com.whatever.caro.feature.login.provider.AppleAuthProvider
 import com.whatever.caro.feature.login.provider.GoogleAuthProvider
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
@@ -30,6 +32,7 @@ fun LoginRoute(
     viewModel: LoginViewModel,
     navDispatcher: NavigationDispatcher,
     googleAuthenticator: SocialAuthenticator<GoogleUser> = koinInject<GoogleAuthProvider>().get(),
+    appleAuthenticator: SocialAuthenticator<AppleUser> = koinInject<AppleAuthProvider>().get(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackbarHost = LocalSnackbarHostState.current
@@ -45,7 +48,10 @@ fun LoginRoute(
                         viewModel.intent(LoginIntent.ClickGoogleLoginButton(result))
                     }
 
-                    SocialLoginType.APPLE -> TODO()
+                    SocialLoginType.APPLE -> {
+                        val result = appleAuthenticator.authenticate()
+                        viewModel.intent(LoginIntent.ClickAppleLoginButton(result))
+                    }
                 }
             }
         }
