@@ -48,6 +48,8 @@ kotlin {
             implementation(libs.androidx.credentials.credentials)
             implementation(libs.androidx.credentials.auth)
             implementation(libs.android.google.id)
+            implementation(project.dependencies.platform(libs.firebase.bom.android))
+            implementation(libs.firebase.auth)
         }
         commonMain.dependencies {
             implementation(projects.core.model)

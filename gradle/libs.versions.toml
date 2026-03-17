@@ -150,6 +150,7 @@ firebase-bom-android = { group = "com.google.firebase", name = "firebase-bom", v
 firebase-analytics = { group = "com.google.firebase", name = "firebase-analytics" }
 firebase-crashlytics = { group = "com.google.firebase", name = "firebase-crashlytics" }
 firebase-fcm = { group = "com.google.firebase", name = "firebase-messaging" }
+firebase-auth = { group = "com.google.firebase", name = "firebase-auth" }
 
 # Utility
 play-review = { group = "com.google.android.play", name = "review-ktx", version.ref = "play-review" }
