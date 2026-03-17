@@ -39,7 +39,7 @@ private class GoogleAuthenticator(
     override suspend fun authenticate(): SocialLoginResult<GoogleUser> {
         val option = GetGoogleIdOption.Builder()
             .setFilterByAuthorizedAccounts(true)
-            .setServerClientId(BuildKonfig.GOOGLE_CLIENT_ID)
+            .setServerClientId(BuildKonfig.GOOGLE_WEB_CLIENT_ID)
             .setAutoSelectEnabled(true)
             .setNonce(generateNonce())
             .build()

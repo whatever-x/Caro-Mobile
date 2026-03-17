@@ -36,8 +36,8 @@ buildkonfig {
     defaultConfigs {
         buildConfigField(
             FieldSpec.Type.STRING,
-            "GOOGLE_CLIENT_ID",
-            getLocalProperty("GOOGLE_CLIENT_ID") ?: error("CLIENT_ID를 찾을 수 없습니다"),
+            "GOOGLE_WEB_CLIENT_ID",
+            getLocalProperty("GOOGLE_WEB_CLIENT_ID") ?: error("CLIENT_ID를 찾을 수 없습니다"),
         )
     }
 }
