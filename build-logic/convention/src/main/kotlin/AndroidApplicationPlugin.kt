@@ -4,7 +4,6 @@ import com.whatever.caro.version
 import org.gradle.api.JavaVersion
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.jetbrains.compose.internal.utils.getLocalProperty
 import java.io.FileInputStream
 import java.util.Properties
 
@@ -46,16 +45,7 @@ class AndroidApplicationPlugin : Plugin<Project> {
                 }
 
                 signingConfigs {
-                    create(DEV_BUILD_TYPE) {
-                        Properties().run {
-                            load(FileInputStream(rootProject.file("local.properties")))
-                            storeFile = rootProject.file(this["STORE_FILE"] as String)
-                            keyAlias = this["KEY_ALIAS"] as String
-                            keyPassword = this["KEY_PASSWORD"] as String
-                            storePassword = this["STORE_PASSWORD"] as String
-                        }
-                    }
-                    create(PROD_BUILD_TYPE) {
+                    getByName("debug") {
                         Properties().run {
                             load(FileInputStream(rootProject.file("local.properties")))
                             storeFile = rootProject.file(this["STORE_FILE"] as String)
@@ -66,29 +56,37 @@ class AndroidApplicationPlugin : Plugin<Project> {
                     }
                 }
 
-                buildTypes {
-                    getByName("debug") {
-                        signingConfig = signingConfigs.getByName(DEV_BUILD_TYPE)
+                flavorDimensions += "caro"
+                productFlavors {
+                    create(FLAVOR_DEV) {
+                        dimension = "caro"
                         applicationIdSuffix = ".dev"
                         versionNameSuffix = "-dev"
+                        resValue("string", "app_name", "Caro-Dev")
+                    }
+                    create(FLAVOR_QA) {
+                        dimension = "caro"
+                        applicationIdSuffix = ".qa"
+                        versionNameSuffix = "-qa"
+                        resValue("string", "app_name", "Caro-Qa")
+                    }
+                    create(FLAVOR_PRD) {
+                        dimension = "caro"
+                        resValue("string", "app_name", "Caro")
+                    }
+                }
+
+                buildTypes {
+                    debug {
+                        signingConfig = signingConfigs.getByName(BUILD_DEBUG)
                         isDebuggable = true
                         isMinifyEnabled = false
-                        resValue("string", "app_name", "Caro-Dev")
                     }
 
                     release {
-                        signingConfig = signingConfigs.getByName(PROD_BUILD_TYPE)
+                        signingConfig = signingConfigs.getByName(BUILD_DEBUG)
                         isDebuggable = false
                         isMinifyEnabled = true
-                    }
-
-                    create(QA_BUILD_TYPE) {
-                        signingConfig = signingConfigs.getByName(DEV_BUILD_TYPE)
-                        applicationIdSuffix = ".qa"
-                        versionNameSuffix = "-qa"
-                        isDebuggable = true
-                        isMinifyEnabled = false
-                        resValue("string", "app_name", "Caro-Qa")
                     }
                 }
             }
@@ -96,8 +94,9 @@ class AndroidApplicationPlugin : Plugin<Project> {
     }
 
     companion object {
-        private const val QA_BUILD_TYPE = "qa"
-        private const val DEV_BUILD_TYPE = "dev"
-        private const val PROD_BUILD_TYPE = "prod"
+        private const val BUILD_DEBUG = "debug"
+        private const val FLAVOR_QA = "qa"
+        private const val FLAVOR_DEV = "dev"
+        private const val FLAVOR_PRD = "prod"
     }
 }
