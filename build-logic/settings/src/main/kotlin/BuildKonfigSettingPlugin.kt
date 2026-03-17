@@ -27,9 +27,36 @@ class BuildKonfigSettingPlugin : Plugin<Settings> {
             patterns.any { Regex(it, RegexOption.IGNORE_CASE).containsMatchIn(tasks) }
 
         return when {
-            has(""":androidApp:.*\bDev\b""", """\bassembleDev\b""", """\binstallDev\b""", """\btestDev\b""") -> "dev"
-            has(""":androidApp:.*\bQa\b""",  """\bassembleQa\b""",  """\binstallQa\b""",  """\btestQa\b""") -> "qa"
-            has(""":androidApp:.*\bProd\b""", """\bassembleProd\b""", """\binstallProd\b""", """\btestProd\b""") -> "prod"
+            has(
+                """:androidApp:.*\bDev\b""",
+                """\bassembleDevDebug\b""",
+                """\bassembleDevRelease\b""",
+                """\binstallDevDebug\b""",
+                """\binstallDevRelease\b""",
+                """\btestDevDebug\b""",
+                """\btestDevRelease\b""",
+            ) -> "dev"
+
+            has(
+                """:androidApp:.*\bDev\b""",
+                """\bassembleQaDebug\b""",
+                """\bassembleQaRelease\b""",
+                """\binstallQaDebug\b""",
+                """\binstallQaRelease\b""",
+                """\btestQaDebug\b""",
+                """\btestQaRelease\b""",
+            ) -> "qa"
+
+            has(
+                """:androidApp:.*\bProd\b""",
+                """\bassembleProdDebug\b""",
+                """\bassembleProdRelease\b""",
+                """\binstallProdDebug\b""",
+                """\binstallProdRelease\b""",
+                """\btestProdDebug\b""",
+                """\btestProdRelease\b""",
+            ) -> "prod"
+
             else -> null
         }
     }
