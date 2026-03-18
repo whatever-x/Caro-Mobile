@@ -36,40 +36,52 @@ private class GoogleAuthenticator(
     private val credentialManager: CredentialManager,
 ) : SocialAuthenticator<GoogleUser> {
     override suspend fun authenticate(): SocialLoginResult<GoogleUser> {
-        val option = GetGoogleIdOption.Builder()
-            .setFilterByAuthorizedAccounts(true)
-            .setServerClientId(BuildKonfig.GOOGLE_WEB_CLIENT_ID)
-            .setAutoSelectEnabled(true)
-            .setNonce(generateNonce())
-            .build()
+        val option =
+            GetGoogleIdOption
+                .Builder()
+                .setFilterByAuthorizedAccounts(true)
+                .setServerClientId(BuildKonfig.GOOGLE_WEB_CLIENT_ID)
+                .setAutoSelectEnabled(true)
+                .setNonce(generateNonce())
+                .build()
 
-        val request = GetCredentialRequest.Builder()
-            .addCredentialOption(option)
-            .build()
+        val request =
+            GetCredentialRequest
+                .Builder()
+                .addCredentialOption(option)
+                .build()
         return try {
-            val credential = credentialManager.getCredential(
-                context = context,
-                request = request
-            ).credential
+            val credential =
+                credentialManager
+                    .getCredential(
+                        context = context,
+                        request = request,
+                    ).credential
             val user = getGoogleUserFromCredential(credential) ?: return SocialLoginResult.Failed
             SocialLoginResult.Success(user)
         } catch (_: NoCredentialException) {
             // 첫 로그인에 대한 fallback
-            val fallbackOption = GetGoogleIdOption.Builder()
-                .setServerClientId(BuildKonfig.GOOGLE_WEB_CLIENT_ID)
-                .setFilterByAuthorizedAccounts(false)
-                .setAutoSelectEnabled(false)
-                .build()
+            val fallbackOption =
+                GetGoogleIdOption
+                    .Builder()
+                    .setServerClientId(BuildKonfig.GOOGLE_WEB_CLIENT_ID)
+                    .setFilterByAuthorizedAccounts(false)
+                    .setAutoSelectEnabled(false)
+                    .build()
 
-            val fallbackRequest = GetCredentialRequest.Builder()
-                .addCredentialOption(fallbackOption)
-                .build()
+            val fallbackRequest =
+                GetCredentialRequest
+                    .Builder()
+                    .addCredentialOption(fallbackOption)
+                    .build()
 
             try {
-                val credential = credentialManager.getCredential(
-                    request = fallbackRequest,
-                    context = context,
-                ).credential
+                val credential =
+                    credentialManager
+                        .getCredential(
+                            request = fallbackRequest,
+                            context = context,
+                        ).credential
                 val user =
                     getGoogleUserFromCredential(credential) ?: return SocialLoginResult.Failed
                 SocialLoginResult.Success(user)
@@ -79,25 +91,24 @@ private class GoogleAuthenticator(
         }
     }
 
-    private fun getGoogleUserFromCredential(
-        credential: Credential,
-    ): GoogleUser? {
-        return when {
+    private fun getGoogleUserFromCredential(credential: Credential): GoogleUser? =
+        when {
             credential is CustomCredential && credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL -> {
                 try {
                     val googleIdTokenCredential =
                         GoogleIdTokenCredential.createFrom(credential.data)
                     GoogleUser(
-                        idToken = googleIdTokenCredential.idToken
+                        idToken = googleIdTokenCredential.idToken,
                     )
                 } catch (_: GoogleIdTokenParsingException) {
                     null
                 }
             }
 
-            else -> null
+            else -> {
+                null
+            }
         }
-    }
 
     private fun generateNonce(): String {
         val randomBytes = ByteArray(32)

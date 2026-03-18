@@ -12,31 +12,31 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
 
 class GoogleAuthProviderImpl(
-    private val bridge: GoogleLoginBridge
+    private val bridge: GoogleLoginBridge,
 ) : GoogleAuthProvider {
     @Composable
-    override fun get(): SocialAuthenticator<GoogleUser> {
-        return GoogleAuthenticator(bridge = bridge)
-    }
+    override fun get(): SocialAuthenticator<GoogleUser> = GoogleAuthenticator(bridge = bridge)
 }
 
 private class GoogleAuthenticator(
-    private val bridge: GoogleLoginBridge
+    private val bridge: GoogleLoginBridge,
 ) : SocialAuthenticator<GoogleUser> {
-    override suspend fun authenticate(): SocialLoginResult<GoogleUser> {
-        return suspendCancellableCoroutine { coroutine ->
+    override suspend fun authenticate(): SocialLoginResult<GoogleUser> =
+        suspendCancellableCoroutine { coroutine ->
             bridge.requestWithSuccess(
                 success = { idToken ->
-                    if (idToken == null) coroutine.resume(SocialLoginResult.Failed)
-                    else coroutine.resume(SocialLoginResult.Success(authResult = GoogleUser(idToken = idToken)))
+                    if (idToken == null) {
+                        coroutine.resume(SocialLoginResult.Failed)
+                    } else {
+                        coroutine.resume(SocialLoginResult.Success(authResult = GoogleUser(idToken = idToken)))
+                    }
                 },
                 failure = {
                     coroutine.resume(SocialLoginResult.Failed)
                 },
                 cancelled = {
                     coroutine.resume(SocialLoginResult.UserCancelled)
-                }
+                },
             )
         }
-    }
 }

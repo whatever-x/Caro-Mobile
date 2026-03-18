@@ -21,9 +21,7 @@ import org.koin.test.KoinTest
 import org.koin.test.inject
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class LoginViewModelTest :
-    FunSpec(),
-    KoinTest {
+class LoginViewModelTest : FunSpec(), KoinTest {
     init {
         extensions(KoinExtension(LoginModule().module))
 
@@ -42,14 +40,11 @@ class LoginViewModelTest :
             runTest {
                 val vm by inject<LoginViewModel>()
 
-            vm.sideEffect.test {
-                    /**
-                     * 임시 테스트 코드입니다.
-                     * vm.intent(LoginIntent.ClickGoogleLoginButton)
-                     * advanceUntilIdle()
-                     * awaitItem() shouldBe LoginSideEffect.NavigateHome
-                     * cancelAndIgnoreRemainingEvents()
-                     * */
+                vm.sideEffect.test {
+                    // vm.intent(LoginIntent.ClickGoogleLoginButton)
+                    // advanceUntilIdle()
+                    // awaitItem() shouldBe LoginSideEffect.NavigateHome
+                    // cancelAndIgnoreRemainingEvents()
                 }
             }
         }

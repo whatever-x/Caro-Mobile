@@ -31,10 +31,11 @@ private class AppleAuthenticator(
                 return@suspendCancellableCoroutine
             }
 
-            val provider = OAuthProvider.newBuilder("apple.com").apply {
-                scopes = listOf("email", "name")
-                addCustomParameter("locale", "ko_KR")
-            }
+            val provider =
+                OAuthProvider.newBuilder("apple.com").apply {
+                    scopes = listOf("email", "name")
+                    addCustomParameter("locale", "ko_KR")
+                }
 
             val pendingResultTask = auth.pendingAuthResult
             if (pendingResultTask != null) {
@@ -47,12 +48,12 @@ private class AppleAuthenticator(
                         } else {
                             coroutine.resume(SocialLoginResult.Success(AppleUser(idToken = idToken)))
                         }
-                    }
-                    .addOnFailureListener { _ ->
+                    }.addOnFailureListener { _ ->
                         coroutine.resume(SocialLoginResult.Failed)
                     }
             } else {
-                auth.startActivityForSignInWithProvider(activity, provider.build())
+                auth
+                    .startActivityForSignInWithProvider(activity, provider.build())
                     .addOnSuccessListener { authResult ->
                         val credential = authResult.credential as? OAuthCredential
                         val idToken = credential?.idToken ?: ""
@@ -61,8 +62,7 @@ private class AppleAuthenticator(
                         } else {
                             coroutine.resume(SocialLoginResult.Success(AppleUser(idToken = idToken)))
                         }
-                    }
-                    .addOnFailureListener {
+                    }.addOnFailureListener {
                         coroutine.resume(SocialLoginResult.Failed)
                     }
             }

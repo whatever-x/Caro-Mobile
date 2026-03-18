@@ -16,11 +16,11 @@ import com.whatever.caro.feature.login.mvi.LoginState
 internal fun LoginScreen(
     state: LoginState,
     onIntent: (LoginIntent) -> Unit,
-    onLaunch: (SocialLoginType) -> Unit
+    onLaunch: (SocialLoginType) -> Unit,
 ) {
     Column(
         modifier = Modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+        verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         Button(onClick = {
             onLaunch(SocialLoginType.GOOGLE)

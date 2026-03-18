@@ -12,9 +12,10 @@ import io.github.aakira.napier.Napier
 import org.koin.android.annotation.KoinViewModel
 
 @KoinViewModel
-class LoginViewModel : BaseViewModel<LoginState, LoginIntent, LoginSideEffect>(
-    initialState = LoginState(),
-) {
+class LoginViewModel :
+    BaseViewModel<LoginState, LoginIntent, LoginSideEffect>(
+        initialState = LoginState(),
+    ) {
     override fun handleClientException(throwable: Throwable) {
         TODO()
     }
@@ -26,9 +27,7 @@ class LoginViewModel : BaseViewModel<LoginState, LoginIntent, LoginSideEffect>(
         }
     }
 
-    private fun loginWithGoogle(
-        intent: LoginIntent.ClickGoogleLoginButton
-    ) {
+    private fun loginWithGoogle(intent: LoginIntent.ClickGoogleLoginButton) {
         when (intent.result) {
             SocialLoginResult.Failed -> postSideEffect(LoginSideEffect.ShowErrorToast(error = LoginError.UNKNOWN))
             is SocialLoginResult.Success<GoogleUser> -> Napier.e { "idToken : ${intent.result.authResult.idToken}" }
@@ -36,9 +35,7 @@ class LoginViewModel : BaseViewModel<LoginState, LoginIntent, LoginSideEffect>(
         }
     }
 
-    private fun loginWithApple(
-        intent: LoginIntent.ClickAppleLoginButton
-    ) {
+    private fun loginWithApple(intent: LoginIntent.ClickAppleLoginButton) {
         when (intent.result) {
             SocialLoginResult.Failed -> postSideEffect(LoginSideEffect.ShowErrorToast(error = LoginError.UNKNOWN))
             is SocialLoginResult.Success<AppleUser> -> Napier.e { "idToken : ${intent.result.authResult.idToken}" }
