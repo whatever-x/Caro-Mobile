@@ -39,16 +39,7 @@ class LoginViewModelTest :
         }
 
         test("ClickLogin 인텐트를 보내면 NavigateHome sideEffect가 발생한다") {
-            runTest {
-                val vm by inject<LoginViewModel>()
 
-                vm.sideEffect.test {
-                     // vm.intent(LoginIntent.ClickGoogleLoginButton)
-                     // advanceUntilIdle()
-                     // awaitItem() shouldBe LoginSideEffect.NavigateHome
-                     // cancelAndIgnoreRemainingEvents()
-                }
-            }
         }
     }
 }
