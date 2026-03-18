@@ -7,6 +7,8 @@ import androidx.credentials.Credential
 import androidx.credentials.CredentialManager
 import androidx.credentials.CustomCredential
 import androidx.credentials.GetCredentialRequest
+import androidx.credentials.exceptions.GetCredentialCancellationException
+import androidx.credentials.exceptions.GetCredentialException
 import androidx.credentials.exceptions.NoCredentialException
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
@@ -59,6 +61,8 @@ private class GoogleAuthenticator(
                     ).credential
             val user = getGoogleUserFromCredential(credential) ?: return SocialLoginResult.Failed
             SocialLoginResult.Success(user)
+        } catch (_: GetCredentialCancellationException) {
+            SocialLoginResult.UserCancelled
         } catch (_: NoCredentialException) {
             // 첫 로그인에 대한 fallback
             val fallbackOption =
@@ -85,9 +89,11 @@ private class GoogleAuthenticator(
                 val user =
                     getGoogleUserFromCredential(credential) ?: return SocialLoginResult.Failed
                 SocialLoginResult.Success(user)
-            } catch (_: NoCredentialException) {
+            } catch (_: GetCredentialException) {
                 SocialLoginResult.Failed
             }
+        } catch (_: GetCredentialException) {
+            SocialLoginResult.Failed
         }
     }
 
