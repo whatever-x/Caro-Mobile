@@ -4,6 +4,7 @@ import android.app.Activity
 import androidx.activity.compose.LocalActivity
 import androidx.compose.runtime.Composable
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseAuthWebException
 import com.google.firebase.auth.OAuthCredential
 import com.google.firebase.auth.OAuthProvider
 import com.whatever.caro.feature.login.model.AppleUser
@@ -20,6 +21,10 @@ class AppleAuthProviderImpl : AppleAuthProvider {
     }
 }
 
+enum class FirebaseAuthWebExceptionCode {
+    ERROR_WEB_CONTEXT_CANCELED,
+}
+
 private class AppleAuthenticator(
     private val activity: Activity?,
     private val auth: FirebaseAuth,
@@ -34,7 +39,6 @@ private class AppleAuthenticator(
             val provider =
                 OAuthProvider.newBuilder("apple.com").apply {
                     scopes = listOf("email", "name")
-                    addCustomParameter("locale", "ko_KR")
                 }
 
             val pendingResultTask = auth.pendingAuthResult
@@ -48,8 +52,16 @@ private class AppleAuthenticator(
                         } else {
                             coroutine.resume(SocialLoginResult.Success(AppleUser(idToken = idToken)))
                         }
-                    }.addOnFailureListener { _ ->
-                        coroutine.resume(SocialLoginResult.Failed)
+                    }.addOnFailureListener { e ->
+                        val result =
+                            when {
+                                e is FirebaseAuthWebException &&
+                                    e.errorCode == FirebaseAuthWebExceptionCode.ERROR_WEB_CONTEXT_CANCELED.name
+                                -> SocialLoginResult.UserCancelled
+
+                                else -> SocialLoginResult.Failed
+                            }
+                        coroutine.resume(result)
                     }
             } else {
                 auth
@@ -62,8 +74,16 @@ private class AppleAuthenticator(
                         } else {
                             coroutine.resume(SocialLoginResult.Success(AppleUser(idToken = idToken)))
                         }
-                    }.addOnFailureListener {
-                        coroutine.resume(SocialLoginResult.Failed)
+                    }.addOnFailureListener { e ->
+                        val result =
+                            when {
+                                e is FirebaseAuthWebException &&
+                                    e.errorCode == FirebaseAuthWebExceptionCode.ERROR_WEB_CONTEXT_CANCELED.name
+                                -> SocialLoginResult.UserCancelled
+
+                                else -> SocialLoginResult.Failed
+                            }
+                        coroutine.resume(result)
                     }
             }
         }
