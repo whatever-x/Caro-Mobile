@@ -19,7 +19,7 @@ jobs:
 
       - name: Decode google-services.json
         run: |
-          echo '${{ secrets.GOOGLE_SERVICES_JSON }}' >  base64 --decode /home/runner/work/Caro-Mobile/Caro-Mobile/androidApp/google-services.json
+          echo '${{ secrets.GOOGLE_SERVICES_JSON }}' >  base64 --decode > /home/runner/work/Caro-Mobile/Caro-Mobile/androidApp/google-services.json
 
       - name: Decode Keystore
         run: |
@@ -70,7 +70,7 @@ jobs:
 
       - name: Decode google-services.json
         run: |
-          echo '${{ secrets.GOOGLE_SERVICES_JSON }}' >  base64 --decode /home/runner/work/Caro-Mobile/Caro-Mobile/androidApp/google-services.json
+          echo '${{ secrets.GOOGLE_SERVICES_JSON }}' >  base64 --decode > /home/runner/work/Caro-Mobile/Caro-Mobile/androidApp/google-services.json
 
       - name: Decode Keystore
         run: |
