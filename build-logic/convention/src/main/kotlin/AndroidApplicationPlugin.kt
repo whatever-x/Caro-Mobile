@@ -45,7 +45,7 @@ class AndroidApplicationPlugin : Plugin<Project> {
                 }
 
                 signingConfigs {
-                    getByName(BUILD_DEBUG) {
+                    create(DEV) {
                         Properties().run {
                             load(FileInputStream(rootProject.file("local.properties")))
                             storeFile = rootProject.file(this["STORE_FILE"] as String)
@@ -54,7 +54,7 @@ class AndroidApplicationPlugin : Plugin<Project> {
                             storePassword = this["STORE_PASSWORD"] as String
                         }
                     }
-                    create(BUILD_RELEASE) {
+                    create(RELEASE) {
                         Properties().run {
                             load(FileInputStream(rootProject.file("local.properties")))
                             storeFile = rootProject.file(this["STORE_FILE"] as String)
@@ -87,13 +87,16 @@ class AndroidApplicationPlugin : Plugin<Project> {
 
                 buildTypes {
                     debug {
-                        signingConfig = signingConfigs.getByName(BUILD_DEBUG)
+                        signingConfig =
+                            runCatching { signingConfigs.getByName(DEV) }.getOrDefault(
+                                signingConfigs.getByName(DEBUG)
+                            )
                         isDebuggable = true
                         isMinifyEnabled = false
                     }
 
                     release {
-                        signingConfig = signingConfigs.getByName(BUILD_RELEASE)
+                        signingConfig = signingConfigs.getByName(RELEASE)
                         isDebuggable = false
                         isMinifyEnabled = true
                     }
@@ -103,8 +106,9 @@ class AndroidApplicationPlugin : Plugin<Project> {
     }
 
     companion object {
-        private const val BUILD_DEBUG = "debug"
-        private const val BUILD_RELEASE = "release"
+        private const val DEBUG = "debug"
+        private const val DEV = "dev"
+        private const val RELEASE = "release"
         private const val FLAVOR_QA = "qa"
         private const val FLAVOR_DEV = "dev"
         private const val FLAVOR_PRD = "prod"
