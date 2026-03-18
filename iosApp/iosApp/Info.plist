@@ -14,10 +14,6 @@
 				<string>$(RESERVED_CLIENT_ID)</string>
 			</array>
 		</dict>
-		<dict>
-			<key>CFBundleTypeRole</key>
-			<string>Editor</string>
-		</dict>
 	</array>
 	<key>Caro Base Url</key>
 	<string>$(CARO_BASE_URL)</string>
