@@ -46,21 +46,27 @@ class AndroidApplicationPlugin : Plugin<Project> {
 
                 signingConfigs {
                     create(DEV) {
-                        Properties().run {
-                            load(FileInputStream(rootProject.file("local.properties")))
-                            storeFile = rootProject.file(this["STORE_FILE"] as String)
-                            keyAlias = this["KEY_ALIAS"] as String
-                            keyPassword = this["KEY_PASSWORD"] as String
-                            storePassword = this["STORE_PASSWORD"] as String
+                        val localPropsFile = rootProject.file("local.properties")
+                        if (localPropsFile.exists()) {
+                            Properties().run {
+                                load(FileInputStream(localPropsFile))
+                                (this["STORE_FILE"] as? String)?.let { storeFile = rootProject.file(it) }
+                                (this["KEY_ALIAS"] as? String)?.let { keyAlias = it }
+                                (this["KEY_PASSWORD"] as? String)?.let { keyPassword = it }
+                                (this["STORE_PASSWORD"] as? String)?.let { storePassword = it }
+                            }
                         }
                     }
                     create(RELEASE) {
-                        Properties().run {
-                            load(FileInputStream(rootProject.file("local.properties")))
-                            storeFile = rootProject.file(this["STORE_FILE"] as String)
-                            keyAlias = this["KEY_ALIAS"] as String
-                            keyPassword = this["KEY_PASSWORD"] as String
-                            storePassword = this["STORE_PASSWORD"] as String
+                        val localPropsFile = rootProject.file("local.properties")
+                        if (localPropsFile.exists()) {
+                            Properties().run {
+                                load(FileInputStream(localPropsFile))
+                                (this["STORE_FILE"] as? String)?.let { storeFile = rootProject.file(it) }
+                                (this["KEY_ALIAS"] as? String)?.let { keyAlias = it }
+                                (this["KEY_PASSWORD"] as? String)?.let { keyPassword = it }
+                                (this["STORE_PASSWORD"] as? String)?.let { storePassword = it }
+                            }
                         }
                     }
                 }
