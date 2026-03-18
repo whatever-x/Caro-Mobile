@@ -38,7 +38,7 @@ class BuildKonfigSettingPlugin : Plugin<Settings> {
             ) -> "dev"
 
             has(
-                """:androidApp:.*\bDev\b""",
+                """:androidApp:.*\bQa\b""",
                 """\bassembleQaDebug\b""",
                 """\bassembleQaRelease\b""",
                 """\binstallQaDebug\b""",
