@@ -45,7 +45,16 @@ class AndroidApplicationPlugin : Plugin<Project> {
                 }
 
                 signingConfigs {
-                    getByName("debug") {
+                    getByName(BUILD_DEBUG) {
+                        Properties().run {
+                            load(FileInputStream(rootProject.file("local.properties")))
+                            storeFile = rootProject.file(this["STORE_FILE"] as String)
+                            keyAlias = this["KEY_ALIAS"] as String
+                            keyPassword = this["KEY_PASSWORD"] as String
+                            storePassword = this["STORE_PASSWORD"] as String
+                        }
+                    }
+                    create(BUILD_RELEASE) {
                         Properties().run {
                             load(FileInputStream(rootProject.file("local.properties")))
                             storeFile = rootProject.file(this["STORE_FILE"] as String)
@@ -84,7 +93,7 @@ class AndroidApplicationPlugin : Plugin<Project> {
                     }
 
                     release {
-                        signingConfig = signingConfigs.getByName(BUILD_DEBUG)
+                        signingConfig = signingConfigs.getByName(BUILD_RELEASE)
                         isDebuggable = false
                         isMinifyEnabled = true
                     }
@@ -95,6 +104,7 @@ class AndroidApplicationPlugin : Plugin<Project> {
 
     companion object {
         private const val BUILD_DEBUG = "debug"
+        private const val BUILD_RELEASE = "release"
         private const val FLAVOR_QA = "qa"
         private const val FLAVOR_DEV = "dev"
         private const val FLAVOR_PRD = "prod"
