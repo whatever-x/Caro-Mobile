@@ -37,9 +37,5 @@ class LoginViewModelTest :
             Dispatchers.resetMain()
             testDispatcher.cancel()
         }
-
-        test("ClickLogin 인텐트를 보내면 NavigateHome sideEffect가 발생한다") {
-
-        }
     }
 }
