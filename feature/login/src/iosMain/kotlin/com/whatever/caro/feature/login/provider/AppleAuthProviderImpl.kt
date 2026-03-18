@@ -1,43 +1,45 @@
 package com.whatever.caro.feature.login.provider
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.uikit.LocalUIViewController
 import com.whatever.caro.feature.login.model.AppleUser
 import com.whatever.caro.feature.login.model.SocialAuthenticator
 import com.whatever.caro.feature.login.model.SocialLoginResult
 import kotlinx.cinterop.BetaInteropApi
 import kotlinx.coroutines.suspendCancellableCoroutine
-import org.koin.core.component.KoinComponent
 import platform.AuthenticationServices.ASAuthorization
 import platform.AuthenticationServices.ASAuthorizationAppleIDCredential
 import platform.AuthenticationServices.ASAuthorizationAppleIDProvider
 import platform.AuthenticationServices.ASAuthorizationController
 import platform.AuthenticationServices.ASAuthorizationControllerDelegateProtocol
 import platform.AuthenticationServices.ASAuthorizationControllerPresentationContextProvidingProtocol
-import platform.AuthenticationServices.ASAuthorizationErrorCanceled
 import platform.AuthenticationServices.ASAuthorizationScopeEmail
 import platform.AuthenticationServices.ASAuthorizationScopeFullName
-import platform.AuthenticationServices.ASPresentationAnchor
 import platform.Foundation.NSError
 import platform.Foundation.NSString
 import platform.Foundation.NSUTF8StringEncoding
 import platform.Foundation.create
 import platform.UIKit.UIViewController
+import platform.UIKit.UIWindow
 import platform.darwin.NSObject
+import kotlin.coroutines.cancellation.CancellationException
 import kotlin.coroutines.resume
+
 
 internal class AppleAuthProviderImpl : AppleAuthProvider {
     @Composable
     override fun get(): SocialAuthenticator<AppleUser> {
         val viewController = LocalUIViewController.current
-        return AppleAuthenticatorImpl(viewController = viewController)
+        return remember(viewController) {
+            AppleAuthenticatorImpl(viewController = viewController)
+        }
     }
 }
 
 /**
- * Swift에 정의된 인증 실패시 발생 되는 에러 코드 [공식문서](https://developer.apple.com/documentation/authenticationservices/asauthorizationerror-swift.struct/code)
- * @author GunHyung-Ham
- * @since 2025.03.09
+ * Swift에 정의된 인증 실패시 발생 되는 에러 코드
+ * https://developer.apple.com/documentation/authenticationservices/asauthorizationerror-swift.struct/code
  */
 enum class ASAuthorizationErrorCode(
     val code: Int,
@@ -50,31 +52,47 @@ enum class ASAuthorizationErrorCode(
     UNKNOWN(1005),
     CREDENTIAL_EXPORT(1006),
     CREDENTIAL_IMPORT(1007),
+    ;
+
+    companion object {
+        fun fromCode(code: Int): ASAuthorizationErrorCode? =
+            entries.firstOrNull { it.code == code }
+    }
 }
 
 private class AppleAuthenticatorImpl(
     private val viewController: UIViewController,
-) : SocialAuthenticator<AppleUser>,
-    KoinComponent {
-    /**
-     * ASAuthorizationController의 Delegate는 기본적으로 Weak Reference로 저장됩니다.
-     * KMP 환경에서는 Kotlin 객체가 Swift/Objective-C 객체의 Delegate로 지정될 때 예상보다 빨리 해제될 수 있으므로 이를 방지하기 위해
-     * authorizationDelegate 클래스 변수로 유지하여 ARC에 의해 해제되지 않도록 Strong Reference로 유지합니다.
-     * @author GunHyung-Ham
-     * @since 2025.03.12
-     */
+) : SocialAuthenticator<AppleUser> {
     private var authorizationDelegate: ASAuthorizationControllerDelegateProtocol? = null
+    private var presentationContextProvider: ASAuthorizationControllerPresentationContextProvidingProtocol? = null
 
     override suspend fun authenticate(): SocialLoginResult<AppleUser> =
         suspendCancellableCoroutine { continuation ->
             val provider = ASAuthorizationAppleIDProvider()
-            val request = provider.createRequest()
-            request.requestedScopes =
-                listOf(ASAuthorizationScopeFullName, ASAuthorizationScopeEmail)
+            val request = provider.createRequest().apply {
+                requestedScopes = listOf(ASAuthorizationScopeFullName, ASAuthorizationScopeEmail)
+            }
+
             val controller = ASAuthorizationController(listOf(request))
+            var isHandled = false
+
+            fun cleanup() {
+                authorizationDelegate = null
+                presentationContextProvider = null
+            }
+
+            fun resumeOnce(result: SocialLoginResult<AppleUser>) {
+                if (isHandled) return
+                isHandled = true
+                cleanup()
+                if (continuation.isActive) {
+                    continuation.resume(result)
+                }
+            }
 
             authorizationDelegate =
                 object : NSObject(), ASAuthorizationControllerDelegateProtocol {
+
                     @OptIn(BetaInteropApi::class)
                     override fun authorizationController(
                         controller: ASAuthorizationController,
@@ -82,47 +100,62 @@ private class AppleAuthenticatorImpl(
                     ) {
                         val credential =
                             didCompleteWithAuthorization.credential as? ASAuthorizationAppleIDCredential
-                        val idToken =
-                            credential?.identityToken?.let { data ->
-                                NSString.create(data, NSUTF8StringEncoding)?.toString()
-                            }
 
-                        if (idToken.isNullOrEmpty()) {
-                            continuation.resume(SocialLoginResult.Failed)
-                        } else {
-                            continuation.resume(SocialLoginResult.Success(AppleUser(idToken)))
+                        val idToken = credential?.extractIdToken()
+
+                        if (idToken.isNullOrBlank()) {
+                            resumeOnce(SocialLoginResult.Failed)
+                            return
                         }
 
-                        authorizationDelegate = null
+                        resumeOnce(
+                            SocialLoginResult.Success(
+                                AppleUser(idToken = idToken),
+                            ),
+                        )
                     }
 
                     override fun authorizationController(
                         controller: ASAuthorizationController,
                         didCompleteWithError: NSError,
                     ) {
-                        val errorCode = didCompleteWithError.code
-
-                        when (errorCode) {
-                            ASAuthorizationErrorCanceled -> {
-                                continuation.resume(SocialLoginResult.UserCancelled)
+                        when (ASAuthorizationErrorCode.fromCode(didCompleteWithError.code.toInt())) {
+                            ASAuthorizationErrorCode.CANCELED -> {
+                                resumeOnce(SocialLoginResult.UserCancelled)
                             }
-
                             else -> {
-                                continuation.resume(SocialLoginResult.Failed)
+                                resumeOnce(SocialLoginResult.Failed)
                             }
                         }
-
-                        authorizationDelegate = null
                     }
                 }
 
-            controller.delegate = authorizationDelegate
-            controller.presentationContextProvider =
+            presentationContextProvider =
                 object : NSObject(), ASAuthorizationControllerPresentationContextProvidingProtocol {
-                    override fun presentationAnchorForAuthorizationController(controller: ASAuthorizationController): ASPresentationAnchor =
-                        viewController.view.window
+                    override fun presentationAnchorForAuthorizationController(
+                        controller: ASAuthorizationController,
+                    ): UIWindow {
+                        return requireNotNull(viewController.view.window) {
+                            "Apple Sign In presentation window is null."
+                        }
+                    }
                 }
 
+            continuation.invokeOnCancellation { cause ->
+                cleanup()
+                if (cause is CancellationException) {
+                    isHandled = true
+                }
+            }
+
+            controller.delegate = authorizationDelegate
+            controller.presentationContextProvider = presentationContextProvider
             controller.performRequests()
         }
+
+    @OptIn(BetaInteropApi::class)
+    private fun ASAuthorizationAppleIDCredential.extractIdToken(): String? {
+        val tokenData = identityToken ?: return null
+        return NSString.create(tokenData, NSUTF8StringEncoding)?.toString()
+    }
 }
