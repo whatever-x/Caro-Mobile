@@ -10,7 +10,8 @@ import org.koin.core.module.Module
 import org.koin.dsl.module
 
 @OptIn(ExperimentalForeignApi::class)
-actual val loginModule: Module = module {
-    factory<GoogleAuthProvider> { GoogleAuthProviderImpl(bridge = GoogleLoginBridge()) }
-    factory<AppleAuthProvider> { AppleAuthProviderImpl() }
-}
+actual val loginModule: Module =
+    module {
+        factory<GoogleAuthProvider> { GoogleAuthProviderImpl(bridge = GoogleLoginBridge()) }
+        factory<AppleAuthProvider> { AppleAuthProviderImpl() }
+    }

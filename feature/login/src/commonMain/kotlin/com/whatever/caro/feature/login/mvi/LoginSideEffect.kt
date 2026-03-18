@@ -5,5 +5,8 @@ import com.whatever.caro.feature.login.model.LoginError
 
 sealed interface LoginSideEffect : UiSideEffect {
     data object NavigateHome : LoginSideEffect
-    data class ShowErrorToast(val error: LoginError) : LoginSideEffect
+
+    data class ShowErrorToast(
+        val error: LoginError,
+    ) : LoginSideEffect
 }

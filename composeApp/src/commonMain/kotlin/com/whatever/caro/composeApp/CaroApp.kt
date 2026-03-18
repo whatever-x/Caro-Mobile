@@ -81,11 +81,11 @@ fun CaroApp(navDispatcher: NavigationDispatcher = koinInject()) {
                         hostState = LocalSnackbarHostState.current,
                         snackbar = { snackbarData ->
                             CaroSnackbar(
-                                snackbarData = snackbarData
+                                snackbarData = snackbarData,
                             )
-                        }
+                        },
                     )
-                }
+                },
             ) { innerPadding ->
                 Box(
                     modifier =

@@ -6,6 +6,11 @@ import com.whatever.caro.feature.login.model.GoogleUser
 import com.whatever.caro.feature.login.model.SocialLoginResult
 
 sealed interface LoginIntent : UiIntent {
-    data class ClickGoogleLoginButton(val result : SocialLoginResult<GoogleUser>) : LoginIntent
-    data class ClickAppleLoginButton(val result : SocialLoginResult<AppleUser>) : LoginIntent
+    data class ClickGoogleLoginButton(
+        val result: SocialLoginResult<GoogleUser>,
+    ) : LoginIntent
+
+    data class ClickAppleLoginButton(
+        val result: SocialLoginResult<AppleUser>,
+    ) : LoginIntent
 }

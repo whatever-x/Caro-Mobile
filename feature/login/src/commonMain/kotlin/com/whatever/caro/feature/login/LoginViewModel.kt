@@ -8,6 +8,8 @@ import com.whatever.caro.feature.login.model.SocialLoginResult
 import com.whatever.caro.feature.login.mvi.LoginIntent
 import com.whatever.caro.feature.login.mvi.LoginSideEffect
 import com.whatever.caro.feature.login.mvi.LoginState
+import io.github.aakira.napier.Napier
+
 
 class LoginViewModel : BaseViewModel<LoginState, LoginIntent, LoginSideEffect>(
     initialState = LoginState(),
@@ -28,7 +30,7 @@ class LoginViewModel : BaseViewModel<LoginState, LoginIntent, LoginSideEffect>(
     ) {
         when (intent.result) {
             SocialLoginResult.Failed -> postSideEffect(LoginSideEffect.ShowErrorToast(error = LoginError.UNKNOWN))
-            is SocialLoginResult.Success<GoogleUser> -> TODO()
+            is SocialLoginResult.Success<GoogleUser> -> Napier.e { "idToken : ${intent.result.authResult.idToken}" }
             SocialLoginResult.UserCancelled -> postSideEffect(LoginSideEffect.ShowErrorToast(error = LoginError.USER_CANCELLED))
         }
     }
@@ -38,7 +40,7 @@ class LoginViewModel : BaseViewModel<LoginState, LoginIntent, LoginSideEffect>(
     ) {
         when (intent.result) {
             SocialLoginResult.Failed -> postSideEffect(LoginSideEffect.ShowErrorToast(error = LoginError.UNKNOWN))
-            is SocialLoginResult.Success<AppleUser> -> TODO()
+            is SocialLoginResult.Success<AppleUser> -> Napier.e { "idToken : ${intent.result.authResult.idToken}" }
             SocialLoginResult.UserCancelled -> postSideEffect(LoginSideEffect.ShowErrorToast(error = LoginError.USER_CANCELLED))
         }
     }

@@ -39,23 +39,24 @@ fun LoginRoute(
     val coroutineScope = rememberCoroutineScope()
     val loginErrorMessage = stringResource(Res.string.login_error)
     val loginCancelledMessage = stringResource(Res.string.login_cancelled)
-    val socialLoginAuth: (SocialLoginType) -> Unit = remember {
-        { type ->
-            coroutineScope.launch {
-                when (type) {
-                    SocialLoginType.GOOGLE -> {
-                        val result = googleAuthenticator.authenticate()
-                        viewModel.intent(LoginIntent.ClickGoogleLoginButton(result))
-                    }
+    val socialLoginAuth: (SocialLoginType) -> Unit =
+        remember {
+            { type ->
+                coroutineScope.launch {
+                    when (type) {
+                        SocialLoginType.GOOGLE -> {
+                            val result = googleAuthenticator.authenticate()
+                            viewModel.intent(LoginIntent.ClickGoogleLoginButton(result))
+                        }
 
-                    SocialLoginType.APPLE -> {
-                        val result = appleAuthenticator.authenticate()
-                        viewModel.intent(LoginIntent.ClickAppleLoginButton(result))
+                        SocialLoginType.APPLE -> {
+                            val result = appleAuthenticator.authenticate()
+                            viewModel.intent(LoginIntent.ClickAppleLoginButton(result))
+                        }
                     }
                 }
             }
         }
-    }
 
     LaunchedEffect(Unit) {
         viewModel.sideEffect.collect { sideEffect ->
@@ -78,10 +79,11 @@ fun LoginRoute(
 
                 is LoginSideEffect.ShowErrorToast -> {
                     // TODO : 오류 메세지도 전부 design system?
-                    val message = when (sideEffect.error) {
-                        LoginError.UNKNOWN -> loginErrorMessage
-                        LoginError.USER_CANCELLED -> loginCancelledMessage
-                    }
+                    val message =
+                        when (sideEffect.error) {
+                            LoginError.UNKNOWN -> loginErrorMessage
+                            LoginError.USER_CANCELLED -> loginCancelledMessage
+                        }
                     snackbarHost.showSnackbar(message = message)
                 }
             }
@@ -91,6 +93,6 @@ fun LoginRoute(
     LoginScreen(
         state = state,
         onIntent = viewModel::intent,
-        onLaunch = { socialLoginType -> socialLoginAuth(socialLoginType) }
+        onLaunch = { socialLoginType -> socialLoginAuth(socialLoginType) },
     )
 }

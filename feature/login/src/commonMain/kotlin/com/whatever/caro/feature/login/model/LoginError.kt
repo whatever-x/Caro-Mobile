@@ -9,5 +9,4 @@ import org.jetbrains.compose.resources.stringResource
 enum class LoginError {
     UNKNOWN,
     USER_CANCELLED,
-    ;
 }
