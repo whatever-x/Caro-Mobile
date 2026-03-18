@@ -3,10 +3,10 @@ import UIKit
 import GoogleSignIn
 import GoogleSignInSwift
 
-@objc(GoogleLoginBridge) // 명시적으로 이름 고정
+@objc(GoogleLoginBridge)
 @objcMembers public class GoogleLoginBridge : NSObject {
     public func request(
-        success : @escaping (NSString) -> Void, // String -> NSString으로 변경
+        success : @escaping (NSString) -> Void,
         failure : @escaping () -> Void,
         cancelled : @escaping () -> Void
     ) {
@@ -23,13 +23,23 @@ import GoogleSignInSwift
         GIDSignIn.sharedInstance.signIn(
             withPresenting: rootViewController
         ) { signInResult, error in
+            if let error = error as NSError? {
+                if error.code == GIDSignInError.canceled.rawValue {
+                    cancelled()
+                    return
+                }
+                failure()
+                return
+            }
             guard let result = signInResult else {
                 failure()
                 return
             }
-            // tokenString을 NSString으로 캐스팅해서 전달
-            let token = (result.user.idToken?.tokenString ?? "") as NSString
-            success(token)
+            guard let tokenString = result.user.idToken?.tokenString else {
+                failure()
+                return
+            }
+            success(tokenString as NSString)
         }
     }
 }
