@@ -13,14 +13,10 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
 
 class AppleAuthProviderImpl : AppleAuthProvider {
-
-    private lateinit var firebaseAuth: FirebaseAuth
-
     @Composable
     override fun get(): SocialAuthenticator<AppleUser> {
-        firebaseAuth = FirebaseAuth.getInstance()
         val activity = LocalActivity.current
-        return AppleAuthenticator(activity = activity, auth = firebaseAuth)
+        return AppleAuthenticator(activity = activity, auth = FirebaseAuth.getInstance())
     }
 }
 
