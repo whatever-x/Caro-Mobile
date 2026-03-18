@@ -26,7 +26,6 @@ import platform.darwin.NSObject
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.coroutines.resume
 
-
 internal class AppleAuthProviderImpl : AppleAuthProvider {
     @Composable
     override fun get(): SocialAuthenticator<AppleUser> {
@@ -55,8 +54,7 @@ enum class ASAuthorizationErrorCode(
     ;
 
     companion object {
-        fun fromCode(code: Int): ASAuthorizationErrorCode? =
-            entries.firstOrNull { it.code == code }
+        fun fromCode(code: Int): ASAuthorizationErrorCode? = entries.firstOrNull { it.code == code }
     }
 }
 
@@ -69,9 +67,10 @@ private class AppleAuthenticatorImpl(
     override suspend fun authenticate(): SocialLoginResult<AppleUser> =
         suspendCancellableCoroutine { continuation ->
             val provider = ASAuthorizationAppleIDProvider()
-            val request = provider.createRequest().apply {
-                requestedScopes = listOf(ASAuthorizationScopeFullName, ASAuthorizationScopeEmail)
-            }
+            val request =
+                provider.createRequest().apply {
+                    requestedScopes = listOf(ASAuthorizationScopeFullName, ASAuthorizationScopeEmail)
+                }
 
             val controller = ASAuthorizationController(listOf(request))
             var isHandled = false
@@ -92,7 +91,6 @@ private class AppleAuthenticatorImpl(
 
             authorizationDelegate =
                 object : NSObject(), ASAuthorizationControllerDelegateProtocol {
-
                     @OptIn(BetaInteropApi::class)
                     override fun authorizationController(
                         controller: ASAuthorizationController,
@@ -123,6 +121,7 @@ private class AppleAuthenticatorImpl(
                             ASAuthorizationErrorCode.CANCELED -> {
                                 resumeOnce(SocialLoginResult.UserCancelled)
                             }
+
                             else -> {
                                 resumeOnce(SocialLoginResult.Failed)
                             }
@@ -132,13 +131,10 @@ private class AppleAuthenticatorImpl(
 
             presentationContextProvider =
                 object : NSObject(), ASAuthorizationControllerPresentationContextProvidingProtocol {
-                    override fun presentationAnchorForAuthorizationController(
-                        controller: ASAuthorizationController,
-                    ): UIWindow {
-                        return requireNotNull(viewController.view.window) {
+                    override fun presentationAnchorForAuthorizationController(controller: ASAuthorizationController): UIWindow =
+                        requireNotNull(viewController.view.window) {
                             "Apple Sign In presentation window is null."
                         }
-                    }
                 }
 
             continuation.invokeOnCancellation { cause ->
