@@ -1,6 +1,5 @@
 package com.whatever.caro.feature.login.di
 
-import GoogleLoginBridge.GoogleLoginBridge
 import com.whatever.caro.feature.login.provider.AppleAuthProvider
 import com.whatever.caro.feature.login.provider.AppleAuthProviderImpl
 import com.whatever.caro.feature.login.provider.GoogleAuthProvider
@@ -12,6 +11,6 @@ import org.koin.dsl.module
 @OptIn(ExperimentalForeignApi::class)
 actual val loginModule: Module =
     module {
-        factory<GoogleAuthProvider> { GoogleAuthProviderImpl(bridge = GoogleLoginBridge()) }
+        factory<GoogleAuthProvider> { GoogleAuthProviderImpl() }
         factory<AppleAuthProvider> { AppleAuthProviderImpl() }
     }
