@@ -25,15 +25,17 @@ kotlin {
         iosArm64(),
         iosSimulatorArm64(),
     ).forEach { iosTarget ->
-        iosTarget.swiftPackageConfig(cinteropName = "GoogleLoginBridge") {
-            customPackageSourcePath = "../../iosApp"
+        iosTarget.swiftPackageConfig {
             minIos = "15.0"
 
             dependency {
                 remotePackageVersion(
                     url = URI("https://github.com/google/GoogleSignIn-iOS"),
                     version = "9.1.0",
-                    products = { add("GoogleSignIn", "GoogleSignInSwift") },
+                    products = {
+                        add("GoogleSignIn", exportToKotlin = true)
+                        add("GoogleSignInSwift", exportToKotlin = true)
+                    },
                 )
             }
         }
