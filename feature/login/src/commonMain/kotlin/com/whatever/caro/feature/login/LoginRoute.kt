@@ -6,9 +6,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import caromobile.feature.login.generated.resources.Res
-import caromobile.feature.login.generated.resources.login_cancelled
-import caromobile.feature.login.generated.resources.login_error
+import caromobile.core.designsystem.generated.resources.Res
+import caromobile.core.designsystem.generated.resources.login_toast_cancel
+import caromobile.core.designsystem.generated.resources.login_toast_error
 import com.whatever.caro.core.designsystem.components.LocalSnackbarHostState
 import com.whatever.caro.core.model.auth.SocialLoginType
 import com.whatever.caro.core.navigator.contract.NavCommand.To
@@ -37,8 +37,8 @@ fun LoginRoute(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackbarHost = LocalSnackbarHostState.current
     val coroutineScope = rememberCoroutineScope()
-    val loginErrorMessage = stringResource(Res.string.login_error)
-    val loginCancelledMessage = stringResource(Res.string.login_cancelled)
+    val loginErrorMessage = stringResource(Res.string.login_toast_error)
+    val loginCancelledMessage = stringResource(Res.string.login_toast_cancel)
     val socialLoginAuth: (SocialLoginType) -> Unit =
         remember {
             { type ->

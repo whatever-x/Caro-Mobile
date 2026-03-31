@@ -1,4 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <resources>
     <string name="test">테스트</string>
+
+    <!-- login -->
+    <string name="login_toast_cancel">취소되었습니다.</string>
+    <string name="login_toast_error">오류가 발생했습니다.</string>
 </resources>
