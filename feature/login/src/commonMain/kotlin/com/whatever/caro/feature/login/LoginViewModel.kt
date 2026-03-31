@@ -4,7 +4,7 @@ import com.whatever.caro.core.viewmodel.BaseViewModel
 import com.whatever.caro.feature.login.mvi.LoginIntent
 import com.whatever.caro.feature.login.mvi.LoginSideEffect
 import com.whatever.caro.feature.login.mvi.LoginState
-import org.koin.android.annotation.KoinViewModel
+import org.koin.core.annotation.KoinViewModel
 
 @KoinViewModel
 class LoginViewModel :

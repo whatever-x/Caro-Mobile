@@ -6,6 +6,7 @@ import com.whatever.caro.core.remote.network.HttpClientEngineProvider
 import com.whatever.caro.core.remote.network.HttpClientFactory
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.HttpClientEngine
+import org.koin.core.annotation.Configuration
 import org.koin.core.annotation.Module
 import org.koin.core.annotation.Single
 
