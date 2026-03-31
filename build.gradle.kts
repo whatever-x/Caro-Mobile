@@ -18,6 +18,7 @@ plugins {
     alias(libs.plugins.kotest) apply false
     alias(libs.plugins.build.konfig) apply false
     alias(libs.plugins.kover) apply false
+    alias(libs.plugins.koin.compiler) apply false
 }
 
 val ktlintCliVersion = libs.versions.ktlint.cli.get()
