@@ -9,27 +9,23 @@ import com.whatever.caro.feature.profile.usecase.CreateProfileUseCase
 import com.whatever.caro.feature.profile.usecase.GetRandomNicknameUseCase
 import com.whatever.caro.feature.profile.usecase.NicknameValidationResult
 import com.whatever.caro.feature.profile.usecase.ValidateNicknameUseCase
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import org.koin.android.annotation.KoinViewModel
 
 @KoinViewModel
 class CreateProfileViewModel(
     private val validateNicknameUseCase: ValidateNicknameUseCase,
-    checkNicknameUseCase: CheckNicknameUseCase,
+    private val checkNicknameUseCase: CheckNicknameUseCase,
     private val createProfileUseCase: CreateProfileUseCase,
     private val getRandomNicknameUseCase: GetRandomNicknameUseCase,
 ) : BaseViewModel<CreateProfileState, CreateProfileIntent, CreateProfileSideEffect>(
         initialState = CreateProfileState(),
     ) {
-    private val nicknameInput = MutableSharedFlow<String>(extraBufferCapacity = 1)
+    private var nicknameValidationJob: Job? = null
 
     init {
         fetchRandomNickname()
-        launch {
-            checkNicknameUseCase(nicknameInput).collect { result ->
-                reduce { copy(validationResult = result) }
-            }
-        }
     }
 
     override suspend fun handleIntent(intent: CreateProfileIntent) {
@@ -43,15 +39,22 @@ class CreateProfileViewModel(
 
     private fun handleUpdateNickname(nickname: String) {
         val filtered = validateNicknameUseCase.filterInput(nickname)
-        val localValidation = validateNicknameUseCase.validate(filtered)
+        val validation = validateNicknameUseCase.validate(filtered)
 
-        if (localValidation.isValid.not()) {
-            reduce { copy(nickname = filtered, validationResult = localValidation) }
+        if (validation.isValid.not()) {
+            nicknameValidationJob?.cancel()
+            reduce { copy(nickname = filtered, validationResult = validation) }
             return
         }
 
         reduce { copy(nickname = filtered, validationResult = NicknameValidationResult.Checking) }
-        nicknameInput.tryEmit(filtered)
+
+        nicknameValidationJob?.cancel()
+        nicknameValidationJob = launch {
+            delay(DEBOUNCE_MS)
+            val result = checkNicknameUseCase(filtered)
+            reduce { copy(validationResult = result) }
+        }
     }
 
     private fun fetchRandomNickname() {
@@ -75,5 +78,9 @@ class CreateProfileViewModel(
             createProfileUseCase(currentState.nickname)
             postSideEffect(CreateProfileSideEffect.NavigateBack)
         }
+    }
+
+    companion object {
+        private const val DEBOUNCE_MS = 350L
     }
 }
