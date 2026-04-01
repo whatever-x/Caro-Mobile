@@ -4,11 +4,8 @@ import com.whatever.caro.core.data.repository.profile.ProfileRepository
 import org.koin.core.annotation.Single
 
 @Single
-class CreateProfileUseCase(
+class GetRandomNicknameUseCase(
     private val profileRepository: ProfileRepository,
 ) {
-    suspend operator fun invoke(nickname: String): Long {
-        return profileRepository.createProfile(nickname)
-    }
-
+    suspend operator fun invoke(): String = profileRepository.getRandomNickname()
 }

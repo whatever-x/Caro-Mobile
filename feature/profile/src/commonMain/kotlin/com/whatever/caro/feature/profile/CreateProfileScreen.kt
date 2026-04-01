@@ -78,7 +78,7 @@ internal fun CreateProfileScreen(
         }
 
         ConfirmButton(
-            enabled = state.isValid,
+            enabled = state.isConfirmEnabled,
             onClick = { onIntent(CreateProfileIntent.ClickConfirm) },
         )
     }
