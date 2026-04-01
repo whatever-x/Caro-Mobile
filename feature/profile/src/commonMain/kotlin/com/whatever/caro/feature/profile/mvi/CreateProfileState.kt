@@ -9,10 +9,11 @@ data class CreateProfileState(
     val placeholder: String = "자동 생성된 닉네임",
     val validationResult: NicknameValidationResult = NicknameValidationResult.Empty,
     val isLoading: Boolean = false,
+    val isRandomNicknameLoading: Boolean = false,
 ) : UiState {
     val characterCount: String
         get() = "${nickname.length}/${ValidateNicknameUseCase.MAX_LENGTH}"
 
-    val isValid: Boolean
-        get() = validationResult.isValid
+    val isConfirmEnabled: Boolean
+        get() = validationResult.isValid && isLoading.not()
 }

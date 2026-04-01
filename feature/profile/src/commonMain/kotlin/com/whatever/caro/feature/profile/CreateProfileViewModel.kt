@@ -4,53 +4,76 @@ import com.whatever.caro.core.viewmodel.BaseViewModel
 import com.whatever.caro.feature.profile.mvi.CreateProfileIntent
 import com.whatever.caro.feature.profile.mvi.CreateProfileSideEffect
 import com.whatever.caro.feature.profile.mvi.CreateProfileState
-import com.whatever.caro.feature.profile.usecase.CreateProfileResult
+import com.whatever.caro.feature.profile.usecase.CheckNicknameUseCase
 import com.whatever.caro.feature.profile.usecase.CreateProfileUseCase
+import com.whatever.caro.feature.profile.usecase.GetRandomNicknameUseCase
+import com.whatever.caro.feature.profile.usecase.NicknameValidationResult
 import com.whatever.caro.feature.profile.usecase.ValidateNicknameUseCase
+import kotlinx.coroutines.flow.MutableSharedFlow
 import org.koin.android.annotation.KoinViewModel
 
 @KoinViewModel
 class CreateProfileViewModel(
     private val validateNicknameUseCase: ValidateNicknameUseCase,
+    checkNicknameUseCase: CheckNicknameUseCase,
     private val createProfileUseCase: CreateProfileUseCase,
+    private val getRandomNicknameUseCase: GetRandomNicknameUseCase,
 ) : BaseViewModel<CreateProfileState, CreateProfileIntent, CreateProfileSideEffect>(
         initialState = CreateProfileState(),
     ) {
+    private val nicknameInput = MutableSharedFlow<String>(extraBufferCapacity = 1)
+
+    init {
+        fetchRandomNickname()
+        launch {
+            checkNicknameUseCase(nicknameInput).collect { result ->
+                reduce { copy(validationResult = result) }
+            }
+        }
+    }
+
     override suspend fun handleIntent(intent: CreateProfileIntent) {
         when (intent) {
-            is CreateProfileIntent.UpdateNickname -> {
-                val filtered = validateNicknameUseCase.filterInput(intent.nickname)
-                val validation = validateNicknameUseCase.validate(filtered)
-                reduce { copy(nickname = filtered, validationResult = validation) }
-            }
+            is CreateProfileIntent.UpdateNickname -> handleUpdateNickname(intent.nickname)
+            is CreateProfileIntent.ClickRefresh -> fetchRandomNickname()
+            is CreateProfileIntent.ClickConfirm -> handleConfirm()
+            is CreateProfileIntent.ClickBack -> postSideEffect(CreateProfileSideEffect.NavigateBack)
+        }
+    }
 
-            is CreateProfileIntent.ClickRefresh -> {
-                // TODO: 자동 닉네임 생성 API 연동
-                reduce {
-                    val validation = validateNicknameUseCase.validate("")
-                    copy(nickname = "", validationResult = validation)
-                }
-            }
+    private fun handleUpdateNickname(nickname: String) {
+        val filtered = validateNicknameUseCase.filterInput(nickname)
+        val localValidation = validateNicknameUseCase.validate(filtered)
 
-            is CreateProfileIntent.ClickConfirm -> {
-                if (!currentState.isValid) return
-                reduce { copy(isLoading = true) }
-                launch {
-                    when (createProfileUseCase(currentState.nickname)) {
-                        is CreateProfileResult.Success -> {
-                            postSideEffect(CreateProfileSideEffect.NavigateBack)
-                        }
+        if (localValidation.isValid.not()) {
+            reduce { copy(nickname = filtered, validationResult = localValidation) }
+            return
+        }
 
-                        is CreateProfileResult.InvalidNickname -> {
-                            reduce { copy(isLoading = false) }
-                        }
-                    }
-                }
-            }
+        reduce { copy(nickname = filtered, validationResult = NicknameValidationResult.Checking) }
+        nicknameInput.tryEmit(filtered)
+    }
 
-            is CreateProfileIntent.ClickBack -> {
-                postSideEffect(CreateProfileSideEffect.NavigateBack)
+    private fun fetchRandomNickname() {
+        reduce { copy(isRandomNicknameLoading = true) }
+        launch {
+            val nickname = getRandomNicknameUseCase()
+            reduce {
+                copy(
+                    nickname = nickname,
+                    validationResult = NicknameValidationResult.Valid,
+                    isRandomNicknameLoading = false,
+                )
             }
+        }
+    }
+
+    private fun handleConfirm() {
+        if (currentState.isConfirmEnabled.not()) return
+        reduce { copy(isLoading = true) }
+        launch {
+            createProfileUseCase(currentState.nickname)
+            postSideEffect(CreateProfileSideEffect.NavigateBack)
         }
     }
 }
