@@ -49,3 +49,4 @@ include(":core:remote")
 // :Feature
 include(":feature:home")
 include(":feature:login")
+include(":feature:profile")

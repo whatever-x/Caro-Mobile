@@ -1,10 +1,12 @@
 package com.whatever.caro.composeApp.di
 
+import com.whatever.caro.core.navigator.entries.CreateProfileEntry
 import com.whatever.caro.core.navigator.entries.HomeEntry
 import com.whatever.caro.core.navigator.entries.LoginEntry
 import com.whatever.caro.feature.home.HomeViewModel
 import com.whatever.caro.feature.home.route.HomeRoute
 import com.whatever.caro.feature.login.LoginRoute
+import com.whatever.caro.feature.profile.CreateProfileRoute
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.annotation.KoinExperimentalAPI
 import org.koin.core.module.Module
@@ -25,6 +27,13 @@ val navEntryModule: Module =
         navigation<HomeEntry> { navKey ->
             HomeRoute(
                 viewModel = koinViewModel<HomeViewModel> { parametersOf(navKey) },
+                navDispatcher = get(),
+            )
+        }
+
+        navigation<CreateProfileEntry> {
+            CreateProfileRoute(
+                viewModel = koinViewModel(),
                 navDispatcher = get(),
             )
         }
