@@ -15,7 +15,6 @@ class KoinPlugin : Plugin<Project> {
                 sourceSets.getByName("commonMain") {
                     dependencies {
                         implementation(libs.library("koin-core"))
-                        implementation(libs.library("koin-annotation"))
                     }
                 }
             }
