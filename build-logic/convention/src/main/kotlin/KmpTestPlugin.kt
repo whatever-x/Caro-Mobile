@@ -11,6 +11,7 @@ class KmpTestPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
             with(pluginManager) {
+                apply("com.google.devtools.ksp")
                 apply("dev.mokkery")
                 apply("io.kotest")
             }
