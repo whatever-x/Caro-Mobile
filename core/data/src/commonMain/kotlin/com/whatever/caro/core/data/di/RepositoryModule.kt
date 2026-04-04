@@ -1,10 +1,10 @@
 package com.whatever.caro.core.data.di
 
-import org.koin.core.annotation.ComponentScan
-import org.koin.core.annotation.Configuration
-import org.koin.core.annotation.Module
+import com.whatever.caro.core.data.repository.demo.DemoRepository
+import com.whatever.caro.core.data.repository.demo.DemoRepositoryImpl
+import org.koin.dsl.module
 
-@Module
-@ComponentScan("com.whatever.caro.core.data.repository")
-@Configuration
-class RepositoryModule
+val dataModule =
+    module {
+        single<DemoRepository> { DemoRepositoryImpl(get()) }
+    }

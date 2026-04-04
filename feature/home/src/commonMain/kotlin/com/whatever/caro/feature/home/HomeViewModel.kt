@@ -6,12 +6,9 @@ import com.whatever.caro.core.viewmodel.BaseViewModel
 import com.whatever.caro.feature.home.mvi.HomeIntent
 import com.whatever.caro.feature.home.mvi.HomeSideEffect
 import com.whatever.caro.feature.home.mvi.HomeState
-import org.koin.core.annotation.InjectedParam
-import org.koin.core.annotation.KoinViewModel
 
-@KoinViewModel
 class HomeViewModel(
-    @InjectedParam private val navKey: HomeEntry,
+    private val navKey: HomeEntry,
     private val demoRepository: DemoRepository,
 ) : BaseViewModel<HomeState, HomeIntent, HomeSideEffect>(
         initialState = HomeState(),

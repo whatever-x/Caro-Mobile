@@ -5,9 +5,7 @@ import com.whatever.caro.core.model.User
 import com.whatever.caro.core.remote.datasource.demo.DemoDataSource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import org.koin.core.annotation.Single
 
-@Single(binds = [DemoRepository::class])
 internal class DemoRepositoryImpl(
     private val demoDataSource: DemoDataSource,
 ) : DemoRepository {

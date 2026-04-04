@@ -13,7 +13,7 @@ import org.koin.dsl.module
 import org.koin.dsl.navigation3.navigation
 
 @OptIn(KoinExperimentalAPI::class)
-val navigationModule: Module =
+val navEntryModule: Module =
     module {
         navigation<LoginEntry> {
             LoginRoute(

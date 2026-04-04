@@ -1,10 +1,17 @@
 package com.whatever.caro.core.remote.di
 
-import org.koin.core.annotation.ComponentScan
-import org.koin.core.annotation.Configuration
-import org.koin.core.annotation.Module
+import com.whatever.caro.core.remote.datasource.demo.DemoDataSource
+import com.whatever.caro.core.remote.datasource.demo.DemoDataSourceImpl
+import com.whatever.caro.core.remote.di.qualifier.NetworkClient
+import org.koin.core.qualifier.named
+import org.koin.dsl.module
 
-@Module(includes = [NetworkModule::class])
-@ComponentScan("com.whatever.caro.core.remote")
-@Configuration
-class RemoteModule
+val remoteModule =
+    module {
+        single<DemoDataSource> {
+            DemoDataSourceImpl(
+                authClient = get(named(NetworkClient.AUTH)),
+                defaultClient = get(named(NetworkClient.DEFAULT)),
+            )
+        }
+    }

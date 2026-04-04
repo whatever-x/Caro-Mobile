@@ -1,18 +1,29 @@
 package com.whatever.caro.composeApp.di
 
-import org.koin.core.annotation.KoinApplication
+import com.whatever.caro.core.data.di.dataModule
+import com.whatever.caro.core.navigator.di.navigatorModule
+import com.whatever.caro.core.remote.di.networkModule
+import com.whatever.caro.core.remote.di.remoteModule
+import com.whatever.caro.feature.home.di.homeModule
+import com.whatever.caro.feature.login.di.loginModule
+import org.koin.core.context.startKoin
 import org.koin.dsl.KoinAppDeclaration
 import org.koin.dsl.includes
-import org.koin.plugin.module.dsl.startKoin
-
-@KoinApplication
-object KoinApp
 
 fun initKoin(configuration: KoinAppDeclaration? = null) {
-    startKoin<KoinApp> {
+    startKoin {
         includes(configuration)
         modules(
-            navigationModule,
+            // Navigation
+            navEntryModule,
+            navigatorModule,
+            // data
+            dataModule,
+            networkModule,
+            remoteModule,
+            // feature
+            homeModule,
+            loginModule,
         )
     }
 }
