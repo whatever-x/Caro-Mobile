@@ -1,17 +1,13 @@
 package com.whatever.caro.core.remote.datasource.demo
 
-import com.whatever.caro.core.remote.di.qualifier.CaroClient
-import com.whatever.caro.core.remote.di.qualifier.NetworkClient
 import com.whatever.caro.core.remote.model.DemoDto
 import com.whatever.caro.core.remote.model.demo.request.DemoRequest
 import com.whatever.caro.core.remote.model.demo.response.DemoResponse
 import io.ktor.client.HttpClient
-import org.koin.core.annotation.Single
 
-@Single(binds = [DemoDataSource::class])
 internal class DemoDataSourceImpl(
-    @NetworkClient(CaroClient.Auth) private val authClient: HttpClient,
-    @NetworkClient(CaroClient.Default) private val defaultClient: HttpClient,
+    private val authClient: HttpClient,
+    private val defaultClient: HttpClient,
 ) : DemoDataSource {
     private val demoResponse =
         DemoResponse(

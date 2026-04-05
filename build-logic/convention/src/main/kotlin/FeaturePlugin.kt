@@ -19,6 +19,8 @@ class FeaturePlugin : Plugin<Project> {
 
                         implementation(libs.library("kotlinx-collections-immutable"))
                         implementation(libs.library("koin-compose-viewmodel"))
+
+                        implementation(libs.library("jetbrains-androidx-lifecycle-runtime-compose"))
                     }
                 }
             }

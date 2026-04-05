@@ -1,8 +1,10 @@
 package com.whatever.caro.core.navigator.di
 
-import org.koin.core.annotation.ComponentScan
-import org.koin.core.annotation.Module
+import com.whatever.caro.core.navigator.dispatcher.NavigationDispatcher
+import com.whatever.caro.core.navigator.dispatcher.NavigationDispatcherImpl
+import org.koin.dsl.module
 
-@Module
-@ComponentScan("com.whatever.caro.core.navigator")
-class NavigatorModule
+val navigatorModule =
+    module {
+        single<NavigationDispatcher> { NavigationDispatcherImpl() }
+    }

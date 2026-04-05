@@ -1,8 +1,10 @@
 package com.whatever.caro.feature.login.di
 
-import org.koin.core.annotation.ComponentScan
-import org.koin.core.annotation.Module
+import com.whatever.caro.feature.login.LoginViewModel
+import org.koin.core.module.dsl.viewModel
+import org.koin.dsl.module
 
-@Module
-@ComponentScan("com.whatever.caro.feature.login")
-class LoginModule
+val loginModule =
+    module {
+        viewModel { LoginViewModel() }
+    }

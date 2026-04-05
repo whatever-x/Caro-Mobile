@@ -8,7 +8,7 @@ version-name = "0.0.1" # major(1), minor(1), patch(1)
 
 # Multiplatform
 compose-multiplatform = "1.10.0"
-kotlin = "2.3.0"
+kotlin = "2.3.20"
 ksp = "2.3.4"
 
 # androidX
@@ -38,8 +38,8 @@ jetbrains-androidx-navigation3-ui = "1.0.0-alpha06"
 jetbrains-androidx-navigation3-event = "1.0.0"
 
 # DI
-koin = "4.2.0-beta2"
-koin-annotation = "2.3.2-Beta1"
+koin = "4.2.0"
+koin-compiler = "0.4.1"
 
 # Network
 ktor = "3.4.0"
@@ -116,8 +116,6 @@ koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
 koin-compose = { module = "io.insert-koin:koin-compose", version.ref = "koin" }
 koin-compose-viewmodel = { module = "io.insert-koin:koin-compose-viewmodel", version.ref = "koin" }
 koin-compose-navigation3 = { group = "io.insert-koin", name = "koin-compose-navigation3", version.ref = "koin" }
-koin-annotation = { group = "io.insert-koin", name = "koin-annotations", version.ref = "koin-annotation" }
-koin-ksp-compiler = { group = "io.insert-koin", name = "koin-ksp-compiler", version.ref = "koin-annotation" }
 
 # Network
 ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
@@ -197,6 +195,10 @@ mokkery = { id = "dev.mokkery", version.ref = "mokkery" }
 spotless = { id = "com.diffplug.gradle.spotless", version.ref = "spotless" }
 kotest = { id = "io.kotest", version.ref = "kotest" }
 kover = { id = "org.jetbrains.kotlinx.kover", version.ref = "kover" }
+
+# koin
+koin-compiler = { id = "io.insert-koin.compiler.plugin", version.ref = "koin-compiler" }
+
 
 [bundles]
 ktor-client-plugin = [
