@@ -34,8 +34,8 @@ jobs:
           payload: |
             {
               "text": "${{ job.status == 'success'
-                && format('<{0}|#{1}> PR 린트 검사 결과 성공 ✅', github.event.pull_request.html_url, github.event.pull_request.number)
-                || format('<{0}|#{1}> PR 린트 검사 결과 실패 🔥', github.event.pull_request.html_url, github.event.pull_request.number)
+                && format('<{0}|PR #{1}> 린트 검사 결과 성공 ✅', github.event.pull_request.html_url, github.event.pull_request.number)
+                || format('<{0}|PR #{1}> 린트 검사 결과 실패 ❌', github.event.pull_request.html_url, github.event.pull_request.number)
               }}"
             }
 
