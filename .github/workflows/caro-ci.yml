@@ -25,20 +25,6 @@ jobs:
       - name: Spotless check
         run: ./gradlew spotlessCheck --stacktrace
 
-      - name: Slack Notify With Result
-        if: always()
-        uses: slackapi/slack-github-action@v2.1.1
-        with:
-          webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
-          webhook-type: incoming-webhook
-          payload: |
-            {
-              "text": "${{ job.status == 'success'
-                && format('<{0}|PR #{1}> 린트 검사 결과 성공 ✅', github.event.pull_request.html_url, github.event.pull_request.number)
-                || format('<{0}|PR #{1}> 린트 검사 결과 실패 ❌', github.event.pull_request.html_url, github.event.pull_request.number)
-              }}"
-            }
-
   test-coverage:
     name: Kover Test Coverage Measure
     runs-on: ubuntu-latest
@@ -82,20 +68,6 @@ jobs:
           min-coverage-changed-files: 80
           coverage-counter-type: LINE
 
-      - name: Slack Notify Coverage Result
-        if: always()
-        uses: slackapi/slack-github-action@v2.1.1
-        with:
-          webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
-          webhook-type: incoming-webhook
-          payload: |
-            {
-              "text": "${{ job.status == 'success'
-                && format('<{0}|PR #{1}> 테스트 커버리지 통과 ✅', github.event.pull_request.html_url, github.event.pull_request.number)
-                || format('<{0}|PR #{1}> 테스트 커버리지 미달 ❌', github.event.pull_request.html_url, github.event.pull_request.number)
-              }}"
-            }
-
   stability-check:
     name: Compose Stability Check
     runs-on: ubuntu-latest
@@ -123,3 +95,48 @@ jobs:
 
       - name: Stability check
         run: ./gradlew stabilityCheck
+
+  slack-notify:
+    name: Slack Notify CI Result
+    if: always()
+    runs-on: ubuntu-latest
+    needs: [lint-check, test-coverage, stability-check]
+
+    steps:
+      - name: Build Slack message
+        id: message
+        shell: bash
+        run: |
+          reasons=()
+
+          if [[ "${{ needs.lint-check.result }}" != "success" ]]; then
+            reasons+=("Lint 실패")
+          fi
+
+          if [[ "${{ needs.test-coverage.result }}" != "success" ]]; then
+            reasons+=("테스트 커버리지 미달성")
+          fi
+
+          if [[ "${{ needs.stability-check.result }}" != "success" ]]; then
+            reasons+=("Composable 불안정")
+          fi
+
+          if [[ ${#reasons[@]} -eq 0 ]]; then
+            message="PR #${{ github.event.pull_request.number }} CI 통과 ✅"
+          else
+            joined_reasons=$(printf ", %s" "${reasons[@]}")
+            joined_reasons=${joined_reasons:2}
+            message="PR #${{ github.event.pull_request.number }} CI 실패 ❌ (원인 : ${joined_reasons})"
+          fi
+
+          echo "text=${message}" >> "$GITHUB_OUTPUT"
+
+      - name: Send Slack notification
+        uses: slackapi/slack-github-action@v2.1.1
+        with:
+          webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
+          webhook-type: incoming-webhook
+          payload: |
+            {
+              "text": "${{ steps.message.outputs.text }}"
+            }
