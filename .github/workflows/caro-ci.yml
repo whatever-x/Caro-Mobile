@@ -122,11 +122,11 @@ jobs:
           fi
 
           if [[ ${#reasons[@]} -eq 0 ]]; then
-            message="PR #${{ github.event.pull_request.number }} CI 통과 ✅"
+            message="<${{ github.event.pull_request.html_url }}|PR #${{ github.event.pull_request.number }}> CI 통과 ✅"
           else
             joined_reasons=$(printf ", %s" "${reasons[@]}")
             joined_reasons=${joined_reasons:2}
-            message="PR #${{ github.event.pull_request.number }} CI 실패 ❌ (원인 : ${joined_reasons})"
+            message="<${{ github.event.pull_request.html_url }}|PR #${{ github.event.pull_request.number }}> CI 실패 ❌ (원인 : ${joined_reasons})"
           fi
 
           echo "text=${message}" >> "$GITHUB_OUTPUT"
@@ -138,5 +138,28 @@ jobs:
           webhook-type: incoming-webhook
           payload: |
             {
-              "text": "${{ steps.message.outputs.text }}"
+              "text": "${{ steps.message.outputs.text }}",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "${{ steps.message.outputs.text }}"
+                  }
+                },
+                {
+                  "type": "actions",
+                  "elements": [
+                    {
+                      "type": "button",
+                      "text": {
+                        "type": "plain_text",
+                        "text": "PR #${{ github.event.pull_request.number }} 바로가기",
+                        "emoji": true
+                      },
+                      "url": "${{ github.event.pull_request.html_url }}"
+                    }
+                  ]
+                }
+              ]
             }
