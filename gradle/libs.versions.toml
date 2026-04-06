@@ -73,7 +73,7 @@ kover = "0.9.6"
 # Lint
 spotless = "8.2.1"
 ktlint-cli = "1.8.0"
-stability-analyzer = "0.6.7"
+stability-analyzer = "0.7.2"
 
 [libraries]
 # androidX
