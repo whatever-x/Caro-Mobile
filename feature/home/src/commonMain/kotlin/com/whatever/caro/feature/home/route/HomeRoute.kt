@@ -1,10 +1,12 @@
-package com.whatever.caro.feature.home
+package com.whatever.caro.feature.home.route
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.whatever.caro.core.navigator.dispatcher.NavigationDispatcher
+import com.whatever.caro.feature.home.HomeScreen
+import com.whatever.caro.feature.home.HomeViewModel
 
 @Composable
 fun HomeRoute(

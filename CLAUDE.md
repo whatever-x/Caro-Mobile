@@ -68,15 +68,16 @@ ViewModels extend `BaseViewModel<State, Intent, SideEffect>` and follow the MVI 
 
 ```
 feature/<name>/
-├── <Name>Route.kt          # Composable entry point (collects state, handles side effects)
-├── <Name>Screen.kt          # Pure UI composable (receives state + intent callback)
-├── <Name>ViewModel.kt       # @KoinViewModel, extends BaseViewModel
-├── di/
-│   └── <Name>Module.kt      # @Module @ComponentScan (auto-discovers annotated classes)
-└── mvi/
-    ├── <Name>Intent.kt       # Sealed interface of user actions
-    ├── <Name>State.kt        # Data class representing UI state
-    └── <Name>SideEffect.kt   # Sealed interface for one-shot events
+|-- route/
+|   |-- <Name>Route.kt          # Composable entry point (collects state, handles side effects)
+|-- <Name>Screen.kt             # Pure UI composable (receives state + intent callback)
+|-- <Name>ViewModel.kt          # @KoinViewModel, extends BaseViewModel
+|-- di/
+|   |-- <Name>Module.kt         # @Module @ComponentScan (auto-discovers annotated classes)
+|-- mvi/
+    |-- <Name>Intent.kt         # Sealed interface of user actions
+    |-- <Name>State.kt          # Data class representing UI state
+    |-- <Name>SideEffect.kt     # Sealed interface for one-shot events
 ```
 
 Key ViewModel helpers:
