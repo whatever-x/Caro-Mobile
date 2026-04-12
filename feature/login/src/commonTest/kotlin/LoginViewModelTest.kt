@@ -1,6 +1,8 @@
 import app.cash.turbine.test
 import com.whatever.caro.feature.login.LoginViewModel
 import com.whatever.caro.feature.login.di.LoginModule
+import com.whatever.caro.feature.login.model.GoogleUser
+import com.whatever.caro.feature.login.model.SocialLoginResult
 import com.whatever.caro.feature.login.mvi.LoginIntent
 import com.whatever.caro.feature.login.mvi.LoginSideEffect
 import io.kotest.core.spec.style.FunSpec
@@ -34,21 +36,6 @@ class LoginViewModelTest :
         afterTest {
             Dispatchers.resetMain()
             testDispatcher.cancel()
-        }
-
-        test("ClickLogin 인텐트를 보내면 NavigateHome sideEffect가 발생한다") {
-            runTest {
-                val vm by inject<LoginViewModel>()
-
-                vm.sideEffect.test {
-                    vm.intent(LoginIntent.ClickLogin)
-
-                    advanceUntilIdle()
-
-                    awaitItem() shouldBe LoginSideEffect.NavigateHome
-                    cancelAndIgnoreRemainingEvents()
-                }
-            }
         }
     }
 }

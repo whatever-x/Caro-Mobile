@@ -16,7 +16,7 @@ Kotlin Multiplatform (KMP) mobile app targeting Android and iOS, using Compose M
 ./gradlew spotlessApply
 
 # Build Android app
-./gradlew :androidApp:assembleDebug
+./gradlew :androidApp:assembleDevDebug
 
 # Run tests (all modules)
 ./gradlew allTests

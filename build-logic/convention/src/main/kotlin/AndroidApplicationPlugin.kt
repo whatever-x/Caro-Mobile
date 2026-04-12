@@ -4,7 +4,6 @@ import com.whatever.caro.version
 import org.gradle.api.JavaVersion
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.jetbrains.compose.internal.utils.getLocalProperty
 import java.io.FileInputStream
 import java.util.Properties
 
@@ -45,36 +44,67 @@ class AndroidApplicationPlugin : Plugin<Project> {
                     targetCompatibility = JavaVersion.VERSION_17
                 }
 
-                signingConfigs { // TODO : keystore 관리 논의 필요
-                    create("release") { }
-                    create(DEV_BUILD_TYPE) { }
-                    create(QA_BUILD_TYPE) { }
-                    create(PROD_BUILD_TYPE) { } // TODO : keyStore 생성 및 등록
+                signingConfigs {
+                    create(DEV) {
+                        val localPropsFile = rootProject.file("local.properties")
+                        if (localPropsFile.exists()) {
+                            Properties().run {
+                                load(FileInputStream(localPropsFile))
+                                (this["STORE_FILE"] as? String)?.let { storeFile = rootProject.file(it) }
+                                (this["KEY_ALIAS"] as? String)?.let { keyAlias = it }
+                                (this["KEY_PASSWORD"] as? String)?.let { keyPassword = it }
+                                (this["STORE_PASSWORD"] as? String)?.let { storePassword = it }
+                            }
+                        }
+                    }
+                    create(RELEASE) {
+                        val localPropsFile = rootProject.file("local.properties")
+                        if (localPropsFile.exists()) {
+                            Properties().run {
+                                load(FileInputStream(localPropsFile))
+                                (this["STORE_FILE"] as? String)?.let { storeFile = rootProject.file(it) }
+                                (this["KEY_ALIAS"] as? String)?.let { keyAlias = it }
+                                (this["KEY_PASSWORD"] as? String)?.let { keyPassword = it }
+                                (this["STORE_PASSWORD"] as? String)?.let { storePassword = it }
+                            }
+                        }
+                    }
+                }
+
+                flavorDimensions += "caro"
+                productFlavors {
+                    create(FLAVOR_DEV) {
+                        dimension = "caro"
+                        applicationIdSuffix = ".dev"
+                        versionNameSuffix = "-dev"
+                        resValue("string", "app_name", "Caro-Dev")
+                    }
+                    create(FLAVOR_QA) {
+                        dimension = "caro"
+                        applicationIdSuffix = ".qa"
+                        versionNameSuffix = "-qa"
+                        resValue("string", "app_name", "Caro-Qa")
+                    }
+                    create(FLAVOR_PRD) {
+                        dimension = "caro"
+                        resValue("string", "app_name", "Caro")
+                    }
                 }
 
                 buildTypes {
-                    create(PROD_BUILD_TYPE) {
-                        signingConfig = signingConfigs.getByName("release") // TODO : keystore 생성 후 변경
+                    debug {
+                        signingConfig =
+                            runCatching { signingConfigs.getByName(DEV) }.getOrDefault(
+                                signingConfigs.getByName(DEBUG)
+                            )
+                        isDebuggable = true
+                        isMinifyEnabled = false
+                    }
+
+                    release {
+                        signingConfig = signingConfigs.getByName(RELEASE)
                         isDebuggable = false
                         isMinifyEnabled = true
-                    }
-
-                    create(DEV_BUILD_TYPE) {
-                        initWith(getByName("debug")) // TODO : keystore 생성 후 변경
-                        applicationIdSuffix = ".dev"
-                        versionNameSuffix = "-dev"
-                        isDebuggable = true
-                        isMinifyEnabled = false
-                        resValue("string", "app_name", "Caro-Dev")
-                    }
-
-                    create(QA_BUILD_TYPE) {
-                        initWith(getByName("debug")) // TODO : keystore 생성 후 변경
-                        applicationIdSuffix = ".qa"
-                        versionNameSuffix = "-qa"
-                        isDebuggable = true
-                        isMinifyEnabled = false
-                        resValue("string", "app_name", "Caro-Qa")
                     }
                 }
             }
@@ -82,8 +112,11 @@ class AndroidApplicationPlugin : Plugin<Project> {
     }
 
     companion object {
-        private const val QA_BUILD_TYPE = "qa"
-        private const val DEV_BUILD_TYPE = "dev"
-        private const val PROD_BUILD_TYPE = "prod"
+        private const val DEBUG = "debug"
+        private const val DEV = "dev"
+        private const val RELEASE = "release"
+        private const val FLAVOR_QA = "qa"
+        private const val FLAVOR_DEV = "dev"
+        private const val FLAVOR_PRD = "prod"
     }
 }

@@ -4,7 +4,7 @@ import com.whatever.caro.core.navigator.entries.HomeEntry
 import com.whatever.caro.core.navigator.entries.LoginEntry
 import com.whatever.caro.feature.home.HomeViewModel
 import com.whatever.caro.feature.home.route.HomeRoute
-import com.whatever.caro.feature.login.route.LoginRoute
+import com.whatever.caro.feature.login.LoginRoute
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.annotation.KoinExperimentalAPI
 import org.koin.core.module.Module
