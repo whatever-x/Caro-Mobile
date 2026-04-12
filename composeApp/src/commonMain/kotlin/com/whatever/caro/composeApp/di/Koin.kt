@@ -25,7 +25,7 @@ fun initKoin(configuration: KoinAppDeclaration? = null) {
             // feature
             homeModule,
             loginModule,
-            socialModule
+            socialModule,
         )
     }
 }

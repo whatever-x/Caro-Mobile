@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <resources>
-    <!-- login -->
-    <string name="login_toast_cancel">Cancelled.</string>
-    <string name="login_toast_error">An error occurred.</string>
+	<!-- login -->
+	<string name="login_toast_cancel">Cancelled.</string>
+	<string name="login_toast_error">An error occurred.</string>
 </resources>
