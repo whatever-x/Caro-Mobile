@@ -78,7 +78,6 @@ fun LoginRoute(
                 }
 
                 is LoginSideEffect.ShowErrorToast -> {
-                    // TODO : 오류 메세지도 전부 design system?
                     val message =
                         when (sideEffect.error) {
                             LoginError.UNKNOWN -> loginErrorMessage

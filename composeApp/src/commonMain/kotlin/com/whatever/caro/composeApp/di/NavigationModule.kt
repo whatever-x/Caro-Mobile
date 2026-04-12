@@ -2,8 +2,8 @@ package com.whatever.caro.composeApp.di
 
 import com.whatever.caro.core.navigator.entries.HomeEntry
 import com.whatever.caro.core.navigator.entries.LoginEntry
-import com.whatever.caro.feature.home.HomeRoute
 import com.whatever.caro.feature.home.HomeViewModel
+import com.whatever.caro.feature.home.route.HomeRoute
 import com.whatever.caro.feature.login.LoginRoute
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.annotation.KoinExperimentalAPI

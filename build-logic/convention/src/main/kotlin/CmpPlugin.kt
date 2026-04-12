@@ -1,3 +1,4 @@
+import com.whatever.caro.composeStabilityAnalyzer
 import com.whatever.caro.kotlin
 import com.whatever.caro.library
 import com.whatever.caro.libs
@@ -11,6 +12,7 @@ class CmpPlugin : Plugin<Project> {
             with(pluginManager) {
                 apply("org.jetbrains.compose")
                 apply("org.jetbrains.kotlin.plugin.compose")
+                apply("com.github.skydoves.compose.stability.analyzer")
             }
 
             kotlin {
@@ -26,10 +28,23 @@ class CmpPlugin : Plugin<Project> {
                         implementation(libs.library("jetbrains-compose-resources"))
                     }
                 }
+
             }
 
             dependencies {
                 "androidRuntimeClasspath"(libs.library("jetbrains-compose-ui-tooling"))
+            }
+
+            composeStabilityAnalyzer {
+                stabilityValidation {
+                    enabled.set(true)
+                    ignoredPackages.set(
+                        listOf(
+                            "com.whatever.caro.feature.${name}.route",
+                        )
+                    )
+                    ignoreNonRegressiveChanges.set(true) // 안정성 저하가 발생하지 않으면 통과
+                }
             }
         }
     }
