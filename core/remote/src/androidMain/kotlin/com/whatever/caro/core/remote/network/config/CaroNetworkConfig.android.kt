@@ -1,6 +1,8 @@
 package com.whatever.caro.core.remote.network.config
 
-actual object CaroNetworkConfig { // TODO : BuildConfig 대체 찾아보기
-    actual val BASE_URL: String = ""
-    actual val isDebug: Boolean = true
+import com.whatever.caro.core.remote.generated.BuildKonfig
+
+actual object CaroNetworkConfig {
+    actual val BASE_URL: String = BuildKonfig.SERVER_BASE_URL
+    actual val isDebug: Boolean = BuildKonfig.IS_DEBUG
 }
