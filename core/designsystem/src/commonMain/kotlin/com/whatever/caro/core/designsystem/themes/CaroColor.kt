@@ -130,16 +130,17 @@ data class CaroColor(
     )
 
     companion object {
-        fun defaultColor() = CaroColor(
-            text = TextColor(),
-            icon = IconColor(),
-            background = BackgroundColor(),
-            surface = SurfaceColor(),
-            border = BorderColor(),
-            divider = DividerColor(),
-            overlay = OverlayColor(),
-            skeleton = SkeletonColor(),
-            gradient = GradientColor(),
-        )
+        fun defaultColor() =
+            CaroColor(
+                text = TextColor(),
+                icon = IconColor(),
+                background = BackgroundColor(),
+                surface = SurfaceColor(),
+                border = BorderColor(),
+                divider = DividerColor(),
+                overlay = OverlayColor(),
+                skeleton = SkeletonColor(),
+                gradient = GradientColor(),
+            )
     }
 }

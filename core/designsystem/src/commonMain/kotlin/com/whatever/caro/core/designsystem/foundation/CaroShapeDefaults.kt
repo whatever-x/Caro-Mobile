@@ -5,7 +5,7 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.dp
 
 internal enum class CaroShapeDefaults(
-    val shape: Shape
+    val shape: Shape,
 ) {
     RADIUS_XXS(shape = RoundedCornerShape(2.dp)),
     RADIUS_XS(shape = RoundedCornerShape(4.dp)),
@@ -14,5 +14,4 @@ internal enum class CaroShapeDefaults(
     RADIUS_L(shape = RoundedCornerShape(16.dp)),
     RADIUS_XL(shape = RoundedCornerShape(24.dp)),
     RADIUS_XXL(shape = RoundedCornerShape(100.dp)),
-    ;
 }

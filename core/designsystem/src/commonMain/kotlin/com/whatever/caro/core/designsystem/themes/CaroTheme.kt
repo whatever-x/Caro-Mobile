@@ -18,10 +18,11 @@ val LocalCaroColor = compositionLocalOf<CaroColor> { error("Color Error") }
 @Composable
 fun CaroTheme(
     color: CaroColor = CaroColor.defaultColor(),
-    typography: CaroTypography = CaroTypography.defaultTypography(
-        pretendard = Pretendard(),
-        roboto = Roboto(),
-    ),
+    typography: CaroTypography =
+        CaroTypography.defaultTypography(
+            pretendard = Pretendard(),
+            roboto = Roboto(),
+        ),
     shape: CaroShape = CaroShape.defaultShape(),
     spacing: CaroSpacing = CaroSpacing.defaultSpacing(),
     content: @Composable () -> Unit,

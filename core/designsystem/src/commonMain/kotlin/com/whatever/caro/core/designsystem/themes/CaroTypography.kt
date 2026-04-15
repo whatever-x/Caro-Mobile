@@ -33,109 +33,137 @@ data class CaroTypography(
         val regular: TextStyle
     }
 
-    interface Body2Type : RegularStyle, ReadingStyle
-    interface Label1Type : BoldStyle, RegularStyle
-    interface Caption2Type : BoldStyle, RegularStyle
+    interface Body2Type :
+        RegularStyle,
+        ReadingStyle
+
+    interface Label1Type :
+        BoldStyle,
+        RegularStyle
+
+    interface Caption2Type :
+        BoldStyle,
+        RegularStyle
 
     @Immutable
     data class Body2Style(
         override val regular: TextStyle,
-        override val reading: TextStyle
+        override val reading: TextStyle,
     ) : Body2Type
 
     @Immutable
     data class Label1Style(
         override val bold: TextStyle,
-        override val regular: TextStyle
+        override val regular: TextStyle,
     ) : Label1Type
 
     @Immutable
     data class Caption2Style(
         override val bold: TextStyle,
-        override val regular: TextStyle
+        override val regular: TextStyle,
     ) : Caption2Type
 
     companion object {
-        fun defaultTypography(pretendard: FontFamily, roboto: FontFamily) = CaraTypography(
-            watermark = TextStyle(
-                fontFamily = pretendard,
-                fontWeight = FontWeight.W900,
-                fontSize = 75.sp,
-                letterSpacing = (-0.09).em
-            ),
-            display = TextStyle(
-                fontFamily = pretendard,
-                fontWeight = FontWeight.W700,
-                fontSize = 28.sp,
-            ),
-            heading1 = TextStyle(
-                fontFamily = pretendard,
-                fontWeight = FontWeight.W700,
-                fontSize = 22.sp,
-            ),
-            heading2 = TextStyle(
-                fontFamily = pretendard,
-                fontWeight = FontWeight.W700,
-                fontSize = 18.sp,
-            ),
-            heading3 = TextStyle(
-                fontFamily = pretendard,
-                fontWeight = FontWeight.W700,
-                fontSize = 16.sp,
-            ),
-            body1 = TextStyle(
-                fontFamily = pretendard,
-                fontWeight = FontWeight.W500,
-                fontSize = 16.sp,
-            ),
-            body2 = Body2Style(
-                regular = TextStyle(
+        fun defaultTypography(
+            pretendard: FontFamily,
+            roboto: FontFamily,
+        ) = CaraTypography(
+            watermark =
+                TextStyle(
+                    fontFamily = pretendard,
+                    fontWeight = FontWeight.W900,
+                    fontSize = 75.sp,
+                    letterSpacing = (-0.09).em,
+                ),
+            display =
+                TextStyle(
+                    fontFamily = pretendard,
+                    fontWeight = FontWeight.W700,
+                    fontSize = 28.sp,
+                ),
+            heading1 =
+                TextStyle(
+                    fontFamily = pretendard,
+                    fontWeight = FontWeight.W700,
+                    fontSize = 22.sp,
+                ),
+            heading2 =
+                TextStyle(
+                    fontFamily = pretendard,
+                    fontWeight = FontWeight.W700,
+                    fontSize = 18.sp,
+                ),
+            heading3 =
+                TextStyle(
+                    fontFamily = pretendard,
+                    fontWeight = FontWeight.W700,
+                    fontSize = 16.sp,
+                ),
+            body1 =
+                TextStyle(
                     fontFamily = pretendard,
                     fontWeight = FontWeight.W500,
-                    fontSize = 14.sp,
+                    fontSize = 16.sp,
                 ),
-                reading = TextStyle(
+            body2 =
+                Body2Style(
+                    regular =
+                        TextStyle(
+                            fontFamily = pretendard,
+                            fontWeight = FontWeight.W500,
+                            fontSize = 14.sp,
+                        ),
+                    reading =
+                        TextStyle(
+                            fontFamily = pretendard,
+                            fontWeight = FontWeight.W500,
+                            fontSize = 14.sp,
+                            lineHeight = 22.sp,
+                        ),
+                ),
+            label1 =
+                Label1Style(
+                    bold =
+                        TextStyle(
+                            fontFamily = pretendard,
+                            fontWeight = FontWeight.W600,
+                            fontSize = 14.sp,
+                        ),
+                    regular =
+                        TextStyle(
+                            fontFamily = pretendard,
+                            fontWeight = FontWeight.W500,
+                            fontSize = 14.sp,
+                        ),
+                ),
+            caption1 =
+                TextStyle(
                     fontFamily = pretendard,
                     fontWeight = FontWeight.W500,
-                    fontSize = 14.sp,
-                    lineHeight = 22.sp,
+                    fontSize = 12.sp,
                 ),
-            ),
-            label1 = Label1Style(
-                bold = TextStyle(
-                    fontFamily = pretendard,
-                    fontWeight = FontWeight.W600,
-                    fontSize = 14.sp,
+            caption2 =
+                Caption2Style(
+                    bold =
+                        TextStyle(
+                            fontFamily = pretendard,
+                            fontWeight = FontWeight.W600,
+                            fontSize = 10.sp,
+                        ),
+                    regular =
+                        TextStyle(
+                            fontFamily = pretendard,
+                            fontWeight = FontWeight.W500,
+                            fontSize = 10.sp,
+                        ),
                 ),
-                regular = TextStyle(
-                    fontFamily = pretendard,
+            robotoLabel1 =
+                TextStyle(
+                    fontFamily = roboto,
                     fontWeight = FontWeight.W500,
                     fontSize = 14.sp,
+                    lineHeight = 20.sp,
                 ),
-            ),
-            caption1 = TextStyle(
-                fontFamily = pretendard,
-                fontWeight = FontWeight.W500,
-                fontSize = 12.sp,
-            ),
-            caption2 = Caption2Style(
-                bold = TextStyle(
-                    fontFamily = pretendard,
-                    fontWeight = FontWeight.W600,
-                    fontSize = 10.sp,
-                ),
-                regular = TextStyle(
-                    fontFamily = pretendard,
-                    fontWeight = FontWeight.W500,
-                    fontSize = 10.sp,
-                ),
-            ),
-            robotoLabel1 = TextStyle(
-                fontFamily = roboto,
-                fontWeight = FontWeight.W500,
-                fontSize = 14.sp,
-                lineHeight = 20.sp
-            )
         )
     }
 }

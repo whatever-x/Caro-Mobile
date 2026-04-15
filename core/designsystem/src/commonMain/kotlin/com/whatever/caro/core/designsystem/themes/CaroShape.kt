@@ -15,8 +15,8 @@ data class CaroShape(
     val xxl: Shape,
 ) {
     companion object {
-        fun defaultShape(): CaroShape {
-            return CaroShape(
+        fun defaultShape(): CaroShape =
+            CaroShape(
                 xxs = CaroShapeDefaults.RADIUS_XXS.shape,
                 xs = CaroShapeDefaults.RADIUS_XS.shape,
                 s = CaroShapeDefaults.RADIUS_S.shape,
@@ -25,6 +25,5 @@ data class CaroShape(
                 xl = CaroShapeDefaults.RADIUS_XL.shape,
                 xxl = CaroShapeDefaults.RADIUS_XXL.shape,
             )
-        }
     }
 }

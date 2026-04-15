@@ -4,7 +4,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 internal enum class CaroSpacingDefaults(
-    val spacing: Dp
+    val spacing: Dp,
 ) {
     SPACING_2XS(spacing = 2.dp),
     SPACING_XS(spacing = 4.dp),
@@ -16,5 +16,4 @@ internal enum class CaroSpacingDefaults(
     SPACING_3XL(spacing = 32.dp),
     SPACING_4XL(spacing = 40.dp),
     SPACING_5XL(spacing = 48.dp),
-    ;
 }

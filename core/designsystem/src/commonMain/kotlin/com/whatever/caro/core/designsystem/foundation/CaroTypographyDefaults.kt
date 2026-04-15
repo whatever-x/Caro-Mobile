@@ -12,41 +12,42 @@ import caromobile.core.designsystem.generated.resources.pretendard_regular
 import caromobile.core.designsystem.generated.resources.pretendard_semiBold
 import org.jetbrains.compose.resources.Font
 
+@Composable
+internal fun Pretendard(): FontFamily =
+    FontFamily(
+        Font(
+            resource = Res.font.pretendard_black,
+            weight = FontWeight.W900,
+            style = FontStyle.Normal,
+        ),
+        Font(
+            resource = Res.font.pretendard_bold,
+            weight = FontWeight.W700,
+            style = FontStyle.Normal,
+        ),
+        Font(
+            resource = Res.font.pretendard_semiBold,
+            weight = FontWeight.W600,
+            style = FontStyle.Normal,
+        ),
+        Font(
+            resource = Res.font.pretendard_regular,
+            weight = FontWeight.W500,
+            style = FontStyle.Normal,
+        ),
+        Font(
+            resource = Res.font.pretendard_medium,
+            weight = FontWeight.W500,
+            style = FontStyle.Normal,
+        ),
+    )
 
 @Composable
-internal fun Pretendard(): FontFamily = FontFamily(
-    Font(
-        resource = Res.font.pretendard_black,
-        weight = FontWeight.W900,
-        style = FontStyle.Normal
-    ),
-    Font(
-        resource = Res.font.pretendard_bold,
-        weight = FontWeight.W700,
-        style = FontStyle.Normal
-    ),
-    Font(
-        resource = Res.font.pretendard_semiBold,
-        weight = FontWeight.W600,
-        style = FontStyle.Normal
-    ),
-    Font(
-        resource = Res.font.pretendard_regular,
-        weight = FontWeight.W500,
-        style = FontStyle.Normal
-    ),
-    Font(
-        resource = Res.font.pretendard_medium,
-        weight = FontWeight.W500,
-        style = FontStyle.Normal
+internal fun Roboto(): FontFamily =
+    FontFamily(
+        Font(
+            resource = Res.font.roboto_medium,
+            weight = FontWeight.W500,
+            style = FontStyle.Normal,
+        ),
     )
-)
-
-@Composable
-internal fun Roboto(): FontFamily = FontFamily(
-    Font(
-        resource = Res.font.roboto_medium,
-        weight = FontWeight.W500,
-        style = FontStyle.Normal
-    )
-)
