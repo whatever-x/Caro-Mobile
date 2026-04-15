@@ -44,7 +44,10 @@ kotlin {
 buildkonfig {
     packageName = "com.whatever.caro.core.remote.generated"
 
-    defaultConfigs { }
+    defaultConfigs {
+        buildConfigField(FieldSpec.Type.STRING, "SERVER_BASE_URL", "")
+        buildConfigField(FieldSpec.Type.BOOLEAN, "IS_DEBUG", "true")
+    }
 
     targetConfigs("qa") {
         create("android") {
