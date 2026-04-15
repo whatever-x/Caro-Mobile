@@ -9,7 +9,7 @@ import org.koin.dsl.module
 
 val networkModule =
     module {
-        single<HttpClientEngine> { HttpClientEngineProvider().createEngine() }
+        single<HttpClientEngine> { HttpClientEngineProvider.provide() }
 
         single(named(NetworkClient.AUTH)) {
             HttpClientFactory
