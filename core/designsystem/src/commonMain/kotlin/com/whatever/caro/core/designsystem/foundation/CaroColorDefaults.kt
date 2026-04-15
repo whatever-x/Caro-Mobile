@@ -1,0 +1,55 @@
+package com.whatever.caro.core.designsystem.foundation
+
+import androidx.compose.ui.graphics.Color
+import caromobile.core.designsystem.generated.resources.Res
+
+internal val White100 = Color(0xFFFFFFFF)
+internal val Black100 = Color(0x00000000)
+
+internal val Alpha5 = Color(0x0DFFFFFF)
+internal val Alpha10 = Color(0x1AFFFFFF)
+internal val Alpha20 = Color(0x33FFFFFF)
+internal val Alpha40 = Color(0x66FFFFFF)
+internal val Alpha60 = Color(0x99FFFFFF)
+internal val Alpha80 = Color(0xCCFFFFFF)
+internal val Alpha100 = Color(0xFFFFFFFF)
+
+internal val Gray100 = Color(0xFFF8FBFD)
+internal val Gray200 = Color(0xFFEFF4F8)
+internal val Gray300 = Color(0xFFE3EAF0)
+internal val Gray400 = Color(0xFFD2DAE2)
+internal val Gray500 = Color(0xFFBCC6D1)
+internal val Gray600 = Color(0xFFA1ACB8)
+internal val Gray700 = Color(0xFF818D9A)
+internal val Gray800 = Color(0xFF65717E)
+internal val Gray900 = Color(0xFF4A5563)
+
+internal val Blue100 = Color(0xFFF4FAFF)
+internal val Blue200 = Color(0xFFE6F2FF)
+internal val Blue300 = Color(0xFFCEE3FF)
+internal val Blue400 = Color(0xFFADD0FF)
+internal val Blue500 = Color(0xFF7DB4FF)
+internal val Blue600 = Color(0xFF5495F5)
+internal val Blue700 = Color(0xFF3B79D8)
+internal val Blue800 = Color(0xFF2E61B3)
+internal val Blue900 = Color(0xFF224A8D)
+
+internal val Red100 = Color(0xFFFFF5F4)
+internal val Red200 = Color(0xFFFFE6E2)
+internal val Red300 = Color(0xFFFFCFC8)
+internal val Red400 = Color(0xFFFFACA1)
+internal val Red500 = Color(0xFFFF7F6E)
+internal val Red600 = Color(0xFFEA5C4A)
+internal val Red700 = Color(0xFFC94235)
+internal val Red800 = Color(0xFFA43127)
+internal val Red900 = Color(0xFF7D241E)
+
+internal val Yellow100 = Color(0xFFFFFBEA)
+internal val Yellow200 = Color(0xFFFFF2C7)
+internal val Yellow300 = Color(0xFFFFE494)
+internal val Yellow400 = Color(0xFFFFD35B)
+internal val Yellow500 = Color(0xFFF1BB22)
+internal val Yellow600 = Color(0xFFD39C05)
+internal val Yellow700 = Color(0xFFB07F00)
+internal val Yellow800 = Color(0xFF8D6500)
+internal val Yellow900 = Color(0xFF6A4C00)
