@@ -7,6 +7,7 @@ plugins {
     id("caro.kmp.ios")
     id("caro.koin")
     id("caro.kotlin.serialization")
+    id("caro.kmp.test")
     alias(libs.plugins.build.konfig)
 }
 
@@ -30,6 +31,9 @@ kotlin {
             implementation(libs.kotlinx.coroutines.core)
 
             implementation(libs.bundles.ktor.client.plugin)
+        }
+        commonTest.dependencies {
+            implementation(libs.ktor.client.mock)
         }
         iosMain.dependencies {
             implementation(libs.ktor.client.darwin)
