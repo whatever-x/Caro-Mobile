@@ -1,7 +1,6 @@
 package com.whatever.caro.core.designsystem.foundation
 
 import androidx.compose.ui.graphics.Color
-import caromobile.core.designsystem.generated.resources.Res
 
 internal val White100 = Color(0xFFFFFFFF)
 internal val Black100 = Color(0x00000000)

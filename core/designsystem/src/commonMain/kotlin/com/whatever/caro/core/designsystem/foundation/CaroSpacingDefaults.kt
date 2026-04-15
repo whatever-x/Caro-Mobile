@@ -6,7 +6,7 @@ import androidx.compose.ui.unit.dp
 internal enum class CaroSpacingDefaults(
     val spacing: Dp
 ) {
-    SPACING_XXS(spacing = 2.dp),
+    SPACING_2XS(spacing = 2.dp),
     SPACING_XS(spacing = 4.dp),
     SPACING_S(spacing = 8.dp),
     SPACING_M(spacing = 12.dp),
