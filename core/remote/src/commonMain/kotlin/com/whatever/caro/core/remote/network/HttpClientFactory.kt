@@ -34,11 +34,13 @@ object HttpClientFactory {
                         },
                 )
             }
+
             install(HttpTimeout) {
                 requestTimeoutMillis = 30_000
                 connectTimeoutMillis = 10_000
                 socketTimeoutMillis = 10_000
             }
+
             install(Logging) {
                 logger = Logger.SIMPLE
                 level = if (CaroNetworkConfig.isDebug) LogLevel.ALL else LogLevel.NONE
