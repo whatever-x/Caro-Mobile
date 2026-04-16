@@ -24,7 +24,5 @@ internal class DemoRepositoryImpl(
             emit(value = result.toUser())
         }
 
-    override suspend fun getString(): String {
-        return sampleDataSource.getString()
-    }
+    override suspend fun getString(): String = sampleDataSource.getString()
 }

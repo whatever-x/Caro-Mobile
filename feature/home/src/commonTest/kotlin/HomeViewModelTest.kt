@@ -71,7 +71,7 @@ class HomeViewModelTest :
                     HomeState(
                         screenName = "HomeScreen",
                         name = "건형",
-                        sampleString = "sample-string"
+                        sampleString = "sample-string",
                     )
             }
         }

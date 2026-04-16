@@ -30,7 +30,7 @@ class HomeViewModel(
                 copy(
                     screenName = "HomeScreen",
                     name = userData.name,
-                    sampleString = sampleString
+                    sampleString = sampleString,
                 )
             }
         }

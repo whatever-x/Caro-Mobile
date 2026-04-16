@@ -6,9 +6,6 @@ import io.ktor.client.request.get
 
 class SampleDataSourceImpl(
     private val httpClient: HttpClient,
-): SampleDataSource {
-
-    override suspend fun getString(): String =
-        httpClient.get("/sample/sample").body()
-
+) : SampleDataSource {
+    override suspend fun getString(): String = httpClient.get("/sample/sample").body()
 }

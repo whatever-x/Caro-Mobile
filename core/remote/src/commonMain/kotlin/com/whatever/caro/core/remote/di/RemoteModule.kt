@@ -19,8 +19,7 @@ val remoteModule =
 
         single<SampleDataSource> {
             SampleDataSourceImpl(
-                httpClient = get(named(NetworkClient.DEFAULT))
+                httpClient = get(named(NetworkClient.DEFAULT)),
             )
         }
     }
-
