@@ -32,13 +32,13 @@ internal fun Pretendard(): FontFamily =
             style = FontStyle.Normal,
         ),
         Font(
-            resource = Res.font.pretendard_regular,
+            resource = Res.font.pretendard_medium,
             weight = FontWeight.W500,
             style = FontStyle.Normal,
         ),
         Font(
-            resource = Res.font.pretendard_medium,
-            weight = FontWeight.W500,
+            resource = Res.font.pretendard_regular,
+            weight = FontWeight.W400,
             style = FontStyle.Normal,
         ),
     )

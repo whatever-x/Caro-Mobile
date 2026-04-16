@@ -110,7 +110,7 @@ data class CaroTypography(
                     regular =
                         TextStyle(
                             fontFamily = pretendard,
-                            fontWeight = FontWeight.W500,
+                            fontWeight = FontWeight.W400,
                             fontSize = 14.sp,
                         ),
                     reading =
@@ -132,7 +132,7 @@ data class CaroTypography(
                     regular =
                         TextStyle(
                             fontFamily = pretendard,
-                            fontWeight = FontWeight.W500,
+                            fontWeight = FontWeight.W400,
                             fontSize = 14.sp,
                         ),
                 ),
@@ -153,7 +153,7 @@ data class CaroTypography(
                     regular =
                         TextStyle(
                             fontFamily = pretendard,
-                            fontWeight = FontWeight.W500,
+                            fontWeight = FontWeight.W400,
                             fontSize = 10.sp,
                         ),
                 ),
