@@ -7,4 +7,6 @@ interface DemoRepository {
     suspend fun getData(id: Long): User
 
     fun getDataFlow(id: Long): Flow<User>
+
+    suspend fun getString(): String
 }

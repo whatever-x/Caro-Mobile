@@ -3,7 +3,7 @@ import com.whatever.caro.core.model.User
 import com.whatever.caro.core.navigator.entries.HomeEntry
 import com.whatever.caro.core.navigator.entries.Payload
 import com.whatever.caro.feature.home.HomeViewModel
-import com.whatever.caro.feature.home.di.HomeModule
+import com.whatever.caro.feature.home.di.homeModule
 import com.whatever.caro.feature.home.mvi.HomeState
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
@@ -24,7 +24,6 @@ import org.koin.core.context.unloadKoinModules
 import org.koin.core.module.Module
 import org.koin.core.parameter.parametersOf
 import org.koin.dsl.module
-import org.koin.ksp.generated.module
 import org.koin.test.KoinTest
 import org.koin.test.get
 
@@ -35,7 +34,7 @@ class HomeViewModelTest :
     private lateinit var overrideModule: Module
 
     init {
-        extensions(KoinExtension(HomeModule().module))
+        extensions(KoinExtension(listOf(homeModule)))
 
         val dispatcher = StandardTestDispatcher()
 
@@ -60,6 +59,7 @@ class HomeViewModelTest :
                 loadKoinModules(overrideModule)
 
                 everySuspend { demoRepositoryMock.getData(1L) } returns User(1L, "건형")
+                everySuspend { demoRepositoryMock.getString() } returns "sample-string"
 
                 val navKey = HomeEntry(Payload(1, "테스터"))
                 val vm: HomeViewModel = get { parametersOf(navKey) }
@@ -71,6 +71,7 @@ class HomeViewModelTest :
                     HomeState(
                         screenName = "HomeScreen",
                         name = "건형",
+                        sampleString = "sample-string"
                     )
             }
         }

@@ -24,11 +24,13 @@ class HomeViewModel(
     fun init() {
         launch {
             val userData = demoRepository.getData(id = navKey.payload.id.toLong())
+            val sampleString = demoRepository.getString()
 
             reduce {
                 copy(
                     screenName = "HomeScreen",
                     name = userData.name,
+                    sampleString = sampleString
                 )
             }
         }
