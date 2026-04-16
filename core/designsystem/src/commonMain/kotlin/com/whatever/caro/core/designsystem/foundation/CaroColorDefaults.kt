@@ -3,7 +3,7 @@ package com.whatever.caro.core.designsystem.foundation
 import androidx.compose.ui.graphics.Color
 
 internal val White100 = Color(0xFFFFFFFF)
-internal val Black100 = Color(0x00000000)
+internal val Black100 = Color(0xFF000000)
 
 internal val Alpha5 = Color(0x0DFFFFFF)
 internal val Alpha10 = Color(0x1AFFFFFF)
