@@ -3,7 +3,6 @@ package com.whatever.caro.composeApp
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
@@ -17,6 +16,7 @@ import androidx.savedstate.serialization.SavedStateConfiguration
 import com.whatever.caro.core.designsystem.components.CaroSnackBarHost
 import com.whatever.caro.core.designsystem.components.CaroSnackbar
 import com.whatever.caro.core.designsystem.components.LocalSnackbarHostState
+import com.whatever.caro.core.designsystem.themes.CaroTheme
 import com.whatever.caro.core.navigator.contract.NavCommand
 import com.whatever.caro.core.navigator.dispatcher.NavigationDispatcher
 import com.whatever.caro.core.navigator.entries.HomeEntry
@@ -65,9 +65,7 @@ fun CaroApp(navDispatcher: NavigationDispatcher = koinInject()) {
             }
         }
     }
-
-    // TODO : CaroTheme 생성 후 교체
-    MaterialTheme {
+    CaroTheme {
         val snackBarHostState = remember { SnackbarHostState() }
 
         CompositionLocalProvider(

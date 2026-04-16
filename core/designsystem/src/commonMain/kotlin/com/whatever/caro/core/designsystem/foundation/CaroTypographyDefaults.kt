@@ -10,6 +10,7 @@ import caromobile.core.designsystem.generated.resources.pretendard_bold
 import caromobile.core.designsystem.generated.resources.pretendard_medium
 import caromobile.core.designsystem.generated.resources.pretendard_regular
 import caromobile.core.designsystem.generated.resources.pretendard_semiBold
+import caromobile.core.designsystem.generated.resources.roboto_medium
 import org.jetbrains.compose.resources.Font
 
 @Composable

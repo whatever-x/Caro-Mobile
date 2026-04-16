@@ -10,6 +10,7 @@ import caromobile.core.designsystem.generated.resources.Res
 import caromobile.core.designsystem.generated.resources.login_toast_cancel
 import caromobile.core.designsystem.generated.resources.login_toast_error
 import com.whatever.caro.core.designsystem.components.LocalSnackbarHostState
+import com.whatever.caro.core.designsystem.components.showSnackbarMessage
 import com.whatever.caro.core.model.auth.SocialLoginType
 import com.whatever.caro.core.navigator.contract.NavCommand.To
 import com.whatever.caro.core.navigator.dispatcher.NavigationDispatcher
@@ -23,6 +24,7 @@ import com.whatever.caro.feature.login.mvi.LoginIntent
 import com.whatever.caro.feature.login.mvi.LoginSideEffect
 import com.whatever.caro.feature.login.provider.AppleAuthProvider
 import com.whatever.caro.feature.login.provider.GoogleAuthProvider
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
@@ -83,7 +85,13 @@ fun LoginRoute(
                             LoginError.UNKNOWN -> loginErrorMessage
                             LoginError.USER_CANCELLED -> loginCancelledMessage
                         }
-                    snackbarHost.showSnackbar(message = message)
+                    coroutineScope {
+                        showSnackbarMessage(
+                            coroutineScope = this,
+                            snackbarHostState = snackbarHost,
+                            message = message,
+                        )
+                    }
                 }
             }
         }

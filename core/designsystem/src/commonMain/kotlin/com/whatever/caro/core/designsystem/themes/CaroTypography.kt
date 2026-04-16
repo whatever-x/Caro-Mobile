@@ -67,7 +67,7 @@ data class CaroTypography(
         fun defaultTypography(
             pretendard: FontFamily,
             roboto: FontFamily,
-        ) = CaraTypography(
+        ) = CaroTypography(
             watermark =
                 TextStyle(
                     fontFamily = pretendard,
