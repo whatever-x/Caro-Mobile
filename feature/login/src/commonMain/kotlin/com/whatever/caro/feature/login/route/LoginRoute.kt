@@ -85,13 +85,11 @@ fun LoginRoute(
                             LoginError.UNKNOWN -> loginErrorMessage
                             LoginError.USER_CANCELLED -> loginCancelledMessage
                         }
-                    coroutineScope {
-                        showSnackbarMessage(
-                            coroutineScope = this,
-                            snackbarHostState = snackbarHost,
-                            message = message,
-                        )
-                    }
+                    showSnackbarMessage(
+                        coroutineScope = this,
+                        snackbarHostState = snackbarHost,
+                        message = message,
+                    )
                 }
             }
         }
