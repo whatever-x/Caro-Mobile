@@ -31,7 +31,7 @@ class CaroResponseHandlerTest :
                             """
                             {
                               "success": false,
-                              "data": { }
+                              "data": { },
                               "error": {
                                 "code": "SERVER-500",
                                 "message": "server exploded",
