@@ -29,17 +29,17 @@ class CaroResponseHandlerTest :
                         status = HttpStatusCode.InternalServerError,
                         responseBody =
                             """
-                        {
-                          "success": false,
-                          "data": { }
-                          "error": {
-                            "code": "SERVER-500",
-                            "message": "server exploded",
-                            "debugMessage": "stacktrace",
-                            "description": "retry later"
-                          }
-                        }
-                        """.trimIndent(),
+                            {
+                              "success": false,
+                              "data": { }
+                              "error": {
+                                "code": "SERVER-500",
+                                "message": "server exploded",
+                                "debugMessage": "stacktrace",
+                                "description": "retry later"
+                              }
+                            }
+                            """.trimIndent(),
                     )
 
                 val exception =
@@ -83,7 +83,7 @@ class CaroResponseHandlerTest :
                     client.get("https://caro.test/sample").body<String>() shouldBe "ok"
                 }
             }
-        }
+        },
     ) {
     companion object {
         private val json =

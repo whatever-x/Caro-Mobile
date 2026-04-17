@@ -20,7 +20,9 @@ internal fun HttpCallValidatorConfig.installCaroResponseHandler() {
         val errorResponse = baseResponse?.error
 
         throw NetworkException(
-            code = errorResponse?.code ?: responseException.response.status.value.toString(),
+            code =
+                errorResponse?.code ?: responseException.response.status.value
+                    .toString(),
             message = errorResponse?.message ?: "Server error",
             debugMessage = errorResponse?.debugMessage ?: cause.message.orEmpty(),
             description = errorResponse?.description,

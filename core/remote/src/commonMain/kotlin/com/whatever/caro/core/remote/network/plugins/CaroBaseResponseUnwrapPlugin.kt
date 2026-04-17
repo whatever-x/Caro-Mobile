@@ -19,7 +19,7 @@ internal class CaroBaseResponseUnwrapConfig {
 internal val CaroBaseResponseUnwrap: ClientPlugin<CaroBaseResponseUnwrapConfig> =
     createClientPlugin(
         name = "CaroBaseResponseUnwrap",
-        createConfiguration = ::CaroBaseResponseUnwrapConfig
+        createConfiguration = ::CaroBaseResponseUnwrapConfig,
     ) {
         val json: Json = pluginConfig.json
 

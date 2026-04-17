@@ -21,11 +21,10 @@ import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 
 object HttpClientFactory {
-
     fun createCaroClient(
         engine: HttpClientEngine,
         json: Json,
-        configure: HttpClientConfig<*>.() -> Unit = { }
+        configure: HttpClientConfig<*>.() -> Unit = { },
     ): HttpClient =
         HttpClient(engine) {
             expectSuccess = true
@@ -60,5 +59,4 @@ object HttpClientFactory {
 
             configure()
         }
-
 }
