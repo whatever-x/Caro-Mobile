@@ -21,101 +21,100 @@ import io.ktor.http.headersOf
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 
-class CaroResponseHandlerTest :
-    FunSpec(
-        {
-            test("에러 응답의 Caro error body를 NetworkException으로 변환한다") {
-                val client =
-                    createClient(
-                        status = HttpStatusCode.InternalServerError,
-                        responseBody =
-                            """
-                            {
-                              "success": false,
-                              "data": { },
-                              "error": {
-                                "code": "SERVER-500",
-                                "message": "server exploded",
-                                "debugMessage": "stacktrace",
-                                "description": "retry later"
-                              }
-                            }
-                            """.trimIndent(),
-                    )
+class CaroResponseHandlerTest : FunSpec() {
+    init {
+        test("에러 응답의 Caro error body를 NetworkException으로 변환한다") {
+            val client =
+                createClient(
+                    status = HttpStatusCode.InternalServerError,
+                    responseBody =
+                        """
+                        {
+                          "success": false,
+                          "data": { },
+                          "error": {
+                            "code": "SERVER-500",
+                            "message": "server exploded",
+                            "debugMessage": "stacktrace",
+                            "description": "retry later"
+                          }
+                        }
+                        """.trimIndent(),
+                )
 
-                val exception =
-                    shouldThrow<NetworkException> {
-                        client.get("https://caro.test/sample").body<String>()
-                    }
-
-                exception.code shouldBe "SERVER-500"
-                exception.message shouldBe "server exploded"
-                exception.debugMessage shouldBe "stacktrace"
-                exception.description shouldBe "retry later"
-            }
-
-            test("unwrap 플러그인이 함께 설치되어도 에러 상세를 유지한다") {
-                val client =
-                    createClient(
-                        status = HttpStatusCode.InternalServerError,
-                        responseBody =
-                            """
-                            {
-                              "success": false,
-                              "data": null,
-                              "error": {
-                                "code": "SERVER-500",
-                                "message": "server exploded",
-                                "debugMessage": "stacktrace",
-                                "description": "retry later"
-                              }
-                            }
-                            """.trimIndent(),
-                    )
-
-                val exception =
-                    shouldThrow<NetworkException> {
-                        client.get("https://caro.test/sample").body<String>()
-                    }
-
-                exception.code shouldBe "SERVER-500"
-                exception.message shouldBe "server exploded"
-                exception.debugMessage shouldBe "stacktrace"
-                exception.description shouldBe "retry later"
-            }
-
-            test("에러 응답 body 파싱에 실패하면 status code와 기본 메시지로 NetworkException을 만든다") {
-                val client =
-                    createClient(
-                        status = HttpStatusCode.BadGateway,
-                        responseBody = "not-json",
-                        contentType = ContentType.Text.Plain,
-                    )
-
-                val exception =
-                    shouldThrow<NetworkException> {
-                        client.get("https://caro.test/sample").body<String>()
-                    }
-
-                exception.code shouldBe HttpStatusCode.BadGateway.value.toString()
-                exception.message shouldBe "Server error"
-                exception.description shouldBe null
-            }
-
-            test("정상 응답이면 NetworkException을 던지지 않는다") {
-                val client =
-                    createClient(
-                        status = HttpStatusCode.OK,
-                        responseBody = "ok",
-                        contentType = ContentType.Text.Plain,
-                    )
-
-                shouldNotThrowAny {
-                    client.get("https://caro.test/sample").body<String>() shouldBe "ok"
+            val exception =
+                shouldThrow<NetworkException> {
+                    client.get("https://caro.test/sample").body<String>()
                 }
+
+            exception.code shouldBe "SERVER-500"
+            exception.message shouldBe "server exploded"
+            exception.debugMessage shouldBe "stacktrace"
+            exception.description shouldBe "retry later"
+        }
+
+        test("unwrap 플러그인이 함께 설치되어도 에러 상세를 유지한다") {
+            val client =
+                createClient(
+                    status = HttpStatusCode.InternalServerError,
+                    responseBody =
+                        """
+                        {
+                          "success": false,
+                          "data": null,
+                          "error": {
+                            "code": "SERVER-500",
+                            "message": "server exploded",
+                            "debugMessage": "stacktrace",
+                            "description": "retry later"
+                          }
+                        }
+                        """.trimIndent(),
+                )
+
+            val exception =
+                shouldThrow<NetworkException> {
+                    client.get("https://caro.test/sample").body<String>()
+                }
+
+            exception.code shouldBe "SERVER-500"
+            exception.message shouldBe "server exploded"
+            exception.debugMessage shouldBe "stacktrace"
+            exception.description shouldBe "retry later"
+        }
+
+        test("에러 응답 body 파싱에 실패하면 status code와 기본 메시지로 NetworkException을 만든다") {
+            val client =
+                createClient(
+                    status = HttpStatusCode.BadGateway,
+                    responseBody = "not-json",
+                    contentType = ContentType.Text.Plain,
+                )
+
+            val exception =
+                shouldThrow<NetworkException> {
+                    client.get("https://caro.test/sample").body<String>()
+                }
+
+            exception.code shouldBe HttpStatusCode.BadGateway.value.toString()
+            exception.message shouldBe "Server error"
+            exception.description shouldBe null
+        }
+
+        test("정상 응답이면 NetworkException을 던지지 않는다") {
+            val client =
+                createClient(
+                    status = HttpStatusCode.OK,
+                    responseBody = "ok",
+                    contentType = ContentType.Text.Plain,
+                )
+
+            shouldNotThrowAny {
+                client.get("https://caro.test/sample").body<String>() shouldBe "ok"
             }
-        },
-    ) {
+        }
+    }
+
     companion object {
         private val jsonParser =
             Json {
