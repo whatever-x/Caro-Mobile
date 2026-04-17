@@ -12,14 +12,14 @@ val remoteModule =
     module {
         single<DemoDataSource> {
             DemoDataSourceImpl(
-                authClient = get(named(NetworkClient.AUTH)),
-                defaultClient = get(named(NetworkClient.DEFAULT)),
+                authClient = get(named(NetworkClient.Caro.AUTH)),
+                defaultClient = get(named(NetworkClient.Caro.NON_AUTH)),
             )
         }
 
         single<SampleDataSource> {
             SampleDataSourceImpl(
-                httpClient = get(named(NetworkClient.DEFAULT)),
+                httpClient = get(named(NetworkClient.Caro.NON_AUTH)),
             )
         }
     }

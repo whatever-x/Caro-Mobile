@@ -1,7 +1,11 @@
 package com.whatever.caro.core.remote.network
 
+import com.whatever.caro.core.remote.generated.BuildKonfig
 import com.whatever.caro.core.remote.network.config.CaroNetworkConfig
+import com.whatever.caro.core.remote.network.plugins.CaroBaseResponseUnwrap
+import com.whatever.caro.core.remote.network.plugins.CaroResponseValidator
 import io.ktor.client.HttpClient
+import io.ktor.client.HttpClientConfig
 import io.ktor.client.engine.HttpClientEngine
 import io.ktor.client.plugins.DefaultRequest
 import io.ktor.client.plugins.HttpTimeout
@@ -16,7 +20,12 @@ import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 
 object HttpClientFactory {
-    fun create(engine: HttpClientEngine): HttpClient =
+
+    fun createCaroClient(
+        engine: HttpClientEngine,
+        json: Json,
+        configure: HttpClientConfig<*>.() -> Unit = { }
+    ): HttpClient =
         HttpClient(engine) {
             expectSuccess = true
 
@@ -26,13 +35,7 @@ object HttpClientFactory {
             }
 
             install(ContentNegotiation) {
-                json(
-                    json =
-                        Json {
-                            ignoreUnknownKeys = true
-                            prettyPrint = true
-                        },
-                )
+                json(json = json)
             }
 
             install(HttpTimeout) {
@@ -43,7 +46,16 @@ object HttpClientFactory {
 
             install(Logging) {
                 logger = Logger.SIMPLE
-                level = if (CaroNetworkConfig.isDebug) LogLevel.ALL else LogLevel.NONE
+                level = if (BuildKonfig.IS_DEBUG) LogLevel.ALL else LogLevel.NONE
             }
+
+            install(CaroResponseValidator)
+
+            install(CaroBaseResponseUnwrap) {
+                this.json = json
+            }
+
+            configure()
         }
+
 }

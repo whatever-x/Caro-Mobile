@@ -4,7 +4,7 @@ import com.whatever.caro.core.data.repository.demo.DemoRepository
 import com.whatever.caro.core.remote.datasource.demo.DemoDataSource
 import com.whatever.caro.core.remote.di.NetworkModule
 import com.whatever.caro.core.remote.di.RemoteModule
-import com.whatever.caro.core.remote.model.DemoDto
+import com.whatever.caro.core.remote.model.demo.DemoDto
 import com.whatever.caro.core.remote.model.demo.response.DemoResponse
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
