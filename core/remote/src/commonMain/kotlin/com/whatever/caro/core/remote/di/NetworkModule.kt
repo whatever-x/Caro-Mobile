@@ -22,7 +22,7 @@ val networkModule =
         single<HttpClient>(named(NetworkClient.Caro.AUTH)) {
             HttpClientFactory.createCaroClient(
                 engine = get(),
-                json = get(),
+                jsonParser = get(),
             ) {
                 // TODO : AUTH 전용 플러그인 추가
             }
@@ -31,7 +31,7 @@ val networkModule =
         single<HttpClient>(named(NetworkClient.Caro.NON_AUTH)) {
             HttpClientFactory.createCaroClient(
                 engine = get(),
-                json = get(),
+                jsonParser = get(),
             ) {
                 // TODO : NON_AUTH 전용 플러그인 추가
             }

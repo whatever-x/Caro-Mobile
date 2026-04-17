@@ -1,6 +1,7 @@
 package com.whatever.caro.core.test.plugin
 
 import com.whatever.caro.core.remote.model.NetworkException
+import com.whatever.caro.core.remote.network.plugins.CaroBaseResponseUnwrap
 import com.whatever.caro.core.remote.network.plugins.installCaroResponseHandler
 import io.kotest.assertions.throwables.shouldNotThrowAny
 import io.kotest.assertions.throwables.shouldThrow
@@ -32,6 +33,36 @@ class CaroResponseHandlerTest :
                             {
                               "success": false,
                               "data": { },
+                              "error": {
+                                "code": "SERVER-500",
+                                "message": "server exploded",
+                                "debugMessage": "stacktrace",
+                                "description": "retry later"
+                              }
+                            }
+                            """.trimIndent(),
+                    )
+
+                val exception =
+                    shouldThrow<NetworkException> {
+                        client.get("https://caro.test/sample").body<String>()
+                    }
+
+                exception.code shouldBe "SERVER-500"
+                exception.message shouldBe "server exploded"
+                exception.debugMessage shouldBe "stacktrace"
+                exception.description shouldBe "retry later"
+            }
+
+            test("unwrap 플러그인이 함께 설치되어도 에러 상세를 유지한다") {
+                val client =
+                    createClient(
+                        status = HttpStatusCode.InternalServerError,
+                        responseBody =
+                            """
+                            {
+                              "success": false,
+                              "data": null,
                               "error": {
                                 "code": "SERVER-500",
                                 "message": "server exploded",
@@ -86,7 +117,7 @@ class CaroResponseHandlerTest :
         },
     ) {
     companion object {
-        private val json =
+        private val jsonParser =
             Json {
                 ignoreUnknownKeys = true
                 prettyPrint = true
@@ -109,11 +140,15 @@ class CaroResponseHandlerTest :
                 expectSuccess = true
 
                 install(ContentNegotiation) {
-                    json(json)
+                    json(jsonParser)
                 }
 
                 install(HttpCallValidator) {
-                    installCaroResponseHandler()
+                    installCaroResponseHandler(jsonParser)
+                }
+
+                install(CaroBaseResponseUnwrap) {
+                    this.json = jsonParser
                 }
             }
     }

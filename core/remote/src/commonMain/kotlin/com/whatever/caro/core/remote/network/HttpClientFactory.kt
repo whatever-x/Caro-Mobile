@@ -22,7 +22,7 @@ import kotlinx.serialization.json.Json
 object HttpClientFactory {
     fun createCaroClient(
         engine: HttpClientEngine,
-        json: Json,
+        jsonParser: Json,
         configure: HttpClientConfig<*>.() -> Unit = { },
     ): HttpClient =
         HttpClient(engine) {
@@ -34,7 +34,7 @@ object HttpClientFactory {
             }
 
             install(ContentNegotiation) {
-                json(json = json)
+                json(json = jsonParser)
             }
 
             install(HttpTimeout) {
@@ -49,11 +49,11 @@ object HttpClientFactory {
             }
 
             install(HttpCallValidator) {
-                installCaroResponseHandler()
+                installCaroResponseHandler(jsonParser)
             }
 
             install(CaroBaseResponseUnwrap) {
-                this.json = json
+                this.json = jsonParser
             }
 
             configure()
