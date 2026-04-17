@@ -1,6 +1,5 @@
 package com.whatever.caro.core.remote.network
 
-import com.whatever.caro.core.remote.generated.BuildKonfig
 import com.whatever.caro.core.remote.network.config.CaroNetworkConfig
 import com.whatever.caro.core.remote.network.plugins.CaroBaseResponseUnwrap
 import com.whatever.caro.core.remote.network.plugins.installCaroResponseHandler
@@ -46,7 +45,7 @@ object HttpClientFactory {
 
             install(Logging) {
                 logger = Logger.SIMPLE
-                level = if (BuildKonfig.IS_DEBUG) LogLevel.ALL else LogLevel.NONE
+                level = if (CaroNetworkConfig.isDebug) LogLevel.ALL else LogLevel.NONE
             }
 
             install(HttpCallValidator) {
