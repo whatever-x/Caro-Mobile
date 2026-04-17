@@ -3,11 +3,12 @@ package com.whatever.caro.core.remote.network
 import com.whatever.caro.core.remote.generated.BuildKonfig
 import com.whatever.caro.core.remote.network.config.CaroNetworkConfig
 import com.whatever.caro.core.remote.network.plugins.CaroBaseResponseUnwrap
-import com.whatever.caro.core.remote.network.plugins.CaroResponseValidator
+import com.whatever.caro.core.remote.network.plugins.installCaroResponseHandler
 import io.ktor.client.HttpClient
 import io.ktor.client.HttpClientConfig
 import io.ktor.client.engine.HttpClientEngine
 import io.ktor.client.plugins.DefaultRequest
+import io.ktor.client.plugins.HttpCallValidator
 import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.logging.LogLevel
@@ -49,7 +50,9 @@ object HttpClientFactory {
                 level = if (BuildKonfig.IS_DEBUG) LogLevel.ALL else LogLevel.NONE
             }
 
-            install(CaroResponseValidator)
+            install(HttpCallValidator) {
+                installCaroResponseHandler()
+            }
 
             install(CaroBaseResponseUnwrap) {
                 this.json = json
