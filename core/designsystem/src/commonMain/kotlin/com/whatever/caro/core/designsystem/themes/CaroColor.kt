@@ -11,6 +11,7 @@ import com.whatever.caro.core.designsystem.foundation.Blue400
 import com.whatever.caro.core.designsystem.foundation.Blue500
 import com.whatever.caro.core.designsystem.foundation.Blue600
 import com.whatever.caro.core.designsystem.foundation.Blue700
+import com.whatever.caro.core.designsystem.foundation.Blue800
 import com.whatever.caro.core.designsystem.foundation.Blue900
 import com.whatever.caro.core.designsystem.foundation.Gray100
 import com.whatever.caro.core.designsystem.foundation.Gray200
@@ -18,15 +19,20 @@ import com.whatever.caro.core.designsystem.foundation.Gray300
 import com.whatever.caro.core.designsystem.foundation.Gray400
 import com.whatever.caro.core.designsystem.foundation.Gray500
 import com.whatever.caro.core.designsystem.foundation.Gray700
+import com.whatever.caro.core.designsystem.foundation.Gray800
 import com.whatever.caro.core.designsystem.foundation.Gray900
 import com.whatever.caro.core.designsystem.foundation.Red100
 import com.whatever.caro.core.designsystem.foundation.Red300
 import com.whatever.caro.core.designsystem.foundation.Red500
+import com.whatever.caro.core.designsystem.foundation.Red600
 import com.whatever.caro.core.designsystem.foundation.Red700
+import com.whatever.caro.core.designsystem.foundation.Red800
 import com.whatever.caro.core.designsystem.foundation.White100
 import com.whatever.caro.core.designsystem.foundation.Yellow100
 import com.whatever.caro.core.designsystem.foundation.Yellow300
+import com.whatever.caro.core.designsystem.foundation.Yellow600
 import com.whatever.caro.core.designsystem.foundation.Yellow700
+import com.whatever.caro.core.designsystem.foundation.Yellow800
 
 @Immutable
 data class CaroColor(
@@ -39,6 +45,8 @@ data class CaroColor(
     val overlay: OverlayColor,
     val skeleton: SkeletonColor,
     val gradient: GradientColor,
+    val badge: BadgeColor,
+    val button: ButtonColor,
 ) {
     @Immutable
     data class TextColor(
@@ -129,18 +137,79 @@ data class CaroColor(
         val secondaryEnd: Color = Blue600,
     )
 
+    @Immutable
+    data class BadgeColor(
+        val surface: BadgeSurfaceColor,
+        val text: BadgeTextColor,
+    ) {
+        @Immutable
+        data class BadgeSurfaceColor(
+            val error: Color,
+            val info: Color,
+            val warning: Color,
+        )
+
+        @Immutable
+        data class BadgeTextColor(
+            val error: Color,
+            val info: Color,
+            val warning: Color,
+        )
+    }
+
+    @Immutable
+    data class ButtonColor(
+        val surface: ButtonSurfaceDefaultColor = ButtonSurfaceDefaultColor(),
+        val pressed: ButtonSurfacePressedColor = ButtonSurfacePressedColor(),
+        val floating: Color = Gray800,
+    ) {
+        @Immutable
+        data class ButtonSurfaceDefaultColor(
+            val easy: Color = Blue600,
+            val fair: Color = Yellow600,
+            val hard: Color = Red600,
+        )
+
+        @Immutable
+        data class ButtonSurfacePressedColor(
+            val easy: Color = Blue800,
+            val fair: Color = Yellow800,
+            val hard: Color = Red800,
+        )
+    }
+
     companion object {
-        fun defaultColor() =
-            CaroColor(
-                text = TextColor(),
+        fun defaultColor(): CaroColor {
+            val textColor = TextColor()
+            val surfaceColor = SurfaceColor()
+
+            return CaroColor(
+                text = textColor,
                 icon = IconColor(),
                 background = BackgroundColor(),
-                surface = SurfaceColor(),
+                surface = surfaceColor,
                 border = BorderColor(),
                 divider = DividerColor(),
                 overlay = OverlayColor(),
                 skeleton = SkeletonColor(),
                 gradient = GradientColor(),
+                badge =
+                    BadgeColor(
+                        surface =
+                            BadgeColor.BadgeSurfaceColor(
+                                error = surfaceColor.error,
+                                info = surfaceColor.info,
+                                warning = surfaceColor.warning,
+                            ),
+                        text =
+                            BadgeColor.BadgeTextColor(
+                                error = textColor.error,
+                                info = textColor.info,
+                                warning = textColor.warning,
+                            ),
+                    ),
+                button = ButtonColor(),
             )
+        }
     }
 }
