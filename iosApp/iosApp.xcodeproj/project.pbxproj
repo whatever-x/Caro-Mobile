@@ -9,6 +9,10 @@
 /* Begin PBXBuildFile section */
 		BAAA4FE12F686AE40069538E /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = BAAA4FE02F686AE40069538E /* GoogleSignIn */; };
 		BAAA4FE32F686AE40069538E /* GoogleSignInSwift in Frameworks */ = {isa = PBXBuildFile; productRef = BAAA4FE22F686AE40069538E /* GoogleSignInSwift */; };
+		E9890E2B2F96353D00C7B318 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = E9890E2A2F96353D00C7B318 /* FirebaseAnalytics */; };
+		E9890E2D2F96353D00C7B318 /* FirebaseAnalyticsCore in Frameworks */ = {isa = PBXBuildFile; productRef = E9890E2C2F96353D00C7B318 /* FirebaseAnalyticsCore */; };
+		E9890E2F2F96353D00C7B318 /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = E9890E2E2F96353D00C7B318 /* FirebaseCore */; };
+		E9890E312F96353D00C7B318 /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = E9890E302F96353D00C7B318 /* FirebaseCrashlytics */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -22,6 +26,9 @@
 				Config/Dev.xcconfig,
 				Config/Prod.xcconfig,
 				Config/Qa.xcconfig,
+				"FirebaseConfig/GoogleService-Info-Dev.plist",
+				"FirebaseConfig/GoogleService-Info-Prod.plist",
+				"FirebaseConfig/GoogleService-Info-Qa.plist",
 				Info.plist,
 			);
 			target = 4648218809E5AE90BF60B44C /* iosApp */;
@@ -45,7 +52,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				BAAA4FE12F686AE40069538E /* GoogleSignIn in Frameworks */,
+				E9890E2F2F96353D00C7B318 /* FirebaseCore in Frameworks */,
 				BAAA4FE32F686AE40069538E /* GoogleSignInSwift in Frameworks */,
+				E9890E312F96353D00C7B318 /* FirebaseCrashlytics in Frameworks */,
+				E9890E2B2F96353D00C7B318 /* FirebaseAnalytics in Frameworks */,
+				E9890E2D2F96353D00C7B318 /* FirebaseAnalyticsCore in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -80,6 +91,7 @@
 				93D351359868C2117AA3B653 /* Sources */,
 				2635DAEAD9BE729AAE3F244F /* Frameworks */,
 				8C58B56CFA16FE7E4B33EED6 /* Resources */,
+				E9890E3B2F9646BB00C7B318 /* Copy Firebase Config */,
 			);
 			buildRules = (
 			);
@@ -92,6 +104,10 @@
 			packageProductDependencies = (
 				BAAA4FE02F686AE40069538E /* GoogleSignIn */,
 				BAAA4FE22F686AE40069538E /* GoogleSignInSwift */,
+				E9890E2A2F96353D00C7B318 /* FirebaseAnalytics */,
+				E9890E2C2F96353D00C7B318 /* FirebaseAnalyticsCore */,
+				E9890E2E2F96353D00C7B318 /* FirebaseCore */,
+				E9890E302F96353D00C7B318 /* FirebaseCrashlytics */,
 			);
 			productName = iosApp;
 			productReference = 3E06E91E468A67CBE7F646FC /* iosApp.app */;
@@ -123,6 +139,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				BAAA4FDF2F686AE40069538E /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */,
+				E9890E292F96353D00C7B318 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = FA83853C7BB573C5EFE88810 /* Products */;
@@ -177,6 +194,25 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "if [ \"YES\" = \"$OVERRIDE_KOTLIN_BUILD_IDE_SUPPORTED\" ]; then\n  echo \"Skipping Gradle build task invocation due to OVERRIDE_KOTLIN_BUILD_IDE_SUPPORTED environment variable set to \\\"YES\\\"\"\n  exit 0\nfi\ncd \"$SRCROOT/..\"\n./gradlew :composeApp:embedAndSignAppleFrameworkForXcode\n";
+		};
+		E9890E3B2F9646BB00C7B318 /* Copy Firebase Config */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Copy Firebase Config";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "set -euo pipefail\n\nif [ ! -f \"${FIREBASE_PLIST_PATH}\" ]; then\n  echo \"Missing Firebase plist: ${FIREBASE_PLIST_PATH}\"\n  exit 1\nfi\n\nDEST_PLIST=\"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/GoogleService-Info.plist\"\ncp \"${FIREBASE_PLIST_PATH}\" \"${DEST_PLIST}\"\n\necho \"Copied ${FIREBASE_PLIST_PATH} -> ${DEST_PLIST}\"\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -520,6 +556,14 @@
 				minimumVersion = 9.1.0;
 			};
 		};
+		E9890E292F96353D00C7B318 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 12.12.1;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -532,6 +576,26 @@
 			isa = XCSwiftPackageProductDependency;
 			package = BAAA4FDF2F686AE40069538E /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
 			productName = GoogleSignInSwift;
+		};
+		E9890E2A2F96353D00C7B318 /* FirebaseAnalytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E9890E292F96353D00C7B318 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAnalytics;
+		};
+		E9890E2C2F96353D00C7B318 /* FirebaseAnalyticsCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E9890E292F96353D00C7B318 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAnalyticsCore;
+		};
+		E9890E2E2F96353D00C7B318 /* FirebaseCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E9890E292F96353D00C7B318 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseCore;
+		};
+		E9890E302F96353D00C7B318 /* FirebaseCrashlytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E9890E292F96353D00C7B318 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseCrashlytics;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
