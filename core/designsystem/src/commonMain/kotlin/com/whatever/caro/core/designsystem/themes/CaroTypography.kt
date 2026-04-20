@@ -33,35 +33,23 @@ data class CaroTypography(
         val regular: TextStyle
     }
 
-    interface Body2Type :
-        RegularStyle,
-        ReadingStyle
-
-    interface Label1Type :
-        BoldStyle,
-        RegularStyle
-
-    interface Caption2Type :
-        BoldStyle,
-        RegularStyle
-
     @Immutable
     data class Body2Style(
         override val regular: TextStyle,
         override val reading: TextStyle,
-    ) : Body2Type
+    ) : ReadingStyle, RegularStyle
 
     @Immutable
     data class Label1Style(
         override val bold: TextStyle,
         override val regular: TextStyle,
-    ) : Label1Type
+    ) : BoldStyle, RegularStyle
 
     @Immutable
     data class Caption2Style(
         override val bold: TextStyle,
         override val regular: TextStyle,
-    ) : Caption2Type
+    ) : BoldStyle, RegularStyle
 
     companion object {
         fun defaultTypography(
