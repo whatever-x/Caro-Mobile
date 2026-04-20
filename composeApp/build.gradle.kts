@@ -34,6 +34,7 @@ kotlin {
             implementation(projects.core.model)
             implementation(projects.core.remote)
             implementation(projects.core.analytics)
+            implementation(projects.core.crashlytics)
 
             implementation(projects.feature.home)
             implementation(projects.feature.login)

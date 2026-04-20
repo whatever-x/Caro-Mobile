@@ -46,6 +46,7 @@ include(":core:navigator")
 include(":core:viewmodel")
 include(":core:remote")
 include(":core:analytics")
+include(":core:crashlytics")
 
 // :Feature
 include(":feature:home")
