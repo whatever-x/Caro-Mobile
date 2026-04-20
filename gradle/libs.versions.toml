@@ -61,7 +61,7 @@ firebase-bom = "34.8.0"
 firebase-crahslytics = "3.0.6"
 
 # Utility
-kmp-spm = "1.4.12"
+kmp-spm = "1.8.0"
 play-review = "2.0.2"
 compose-stable-marker = "1.0.7"
 build-konfig = "0.17.1"
