@@ -1,5 +1,6 @@
 package com.whatever.caro.composeApp.di
 
+import com.whatever.caro.core.analytics.di.analyticsModule
 import com.whatever.caro.core.data.di.dataModule
 import com.whatever.caro.core.navigator.di.navigatorModule
 import com.whatever.caro.core.remote.di.networkModule
@@ -22,6 +23,7 @@ fun initKoin(configuration: KoinAppDeclaration? = null) {
             dataModule,
             networkModule,
             remoteModule,
+            analyticsModule,
             // feature
             homeModule,
             loginModule,
