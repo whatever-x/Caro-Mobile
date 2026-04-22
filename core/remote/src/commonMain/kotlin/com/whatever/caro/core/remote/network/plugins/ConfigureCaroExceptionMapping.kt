@@ -16,7 +16,7 @@ import kotlinx.io.IOException
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 
-internal fun HttpCallValidatorConfig.installCaroResponseHandler(jsonParser: Json) {
+internal fun HttpCallValidatorConfig.configureCaroExceptionMapping(jsonParser: Json) {
     handleResponseExceptionWithRequest { cause, _ ->
         val serverResponseException = cause as? ResponseException
         if (serverResponseException != null) {
