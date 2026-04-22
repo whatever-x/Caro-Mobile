@@ -12,11 +12,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import com.whatever.caro.core.designsystem.animation.SlideInSlideOutSnackbarHost
+import com.whatever.caro.core.designsystem.themes.CaroTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -26,7 +24,8 @@ import kotlinx.coroutines.launch
  * @author GunHyung-Ham
  * @since 2025.03.31
  */
-val LocalSnackbarHostState = compositionLocalOf<SnackbarHostState> { error("No SnackbarHostState provided") }
+val LocalSnackbarHostState =
+    compositionLocalOf<SnackbarHostState> { error("No SnackbarHostState provided") }
 
 /**
  * 스낵바를 제어하기 위한 호스트 컴포저블입니다.
@@ -63,7 +62,6 @@ fun CaroSnackBarHost(
     )
 }
 
-// TODO : 디자인 적용 필요
 @Composable
 fun CaroSnackbar(
     modifier: Modifier = Modifier,
@@ -73,18 +71,19 @@ fun CaroSnackbar(
         modifier =
             modifier
                 .background(
-                    color = Color.Red,
-                    shape = RectangleShape,
+                    color = CaroTheme.color.surface.inverse,
+                    shape = CaroTheme.shape.s,
                 ).padding(
-                    horizontal = 3.dp,
-                    vertical = 3.dp,
+                    horizontal = CaroTheme.spacing.m,
+                    vertical = CaroTheme.spacing.l,
                 ),
         contentAlignment = Alignment.Center,
     ) {
         Text(
+            style = CaroTheme.typography.body2.regular,
             text = snackbarData.visuals.message,
-            color = Color.Red,
             textAlign = TextAlign.Center,
+            color = CaroTheme.color.text.inverse,
         )
     }
 }
