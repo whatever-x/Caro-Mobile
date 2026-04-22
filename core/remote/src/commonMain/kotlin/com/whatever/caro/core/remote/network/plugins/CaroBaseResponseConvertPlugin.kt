@@ -43,7 +43,7 @@ internal val CaroBaseResponseConverter: ClientPlugin<CaroBaseResponseConverterCo
                 val error = baseResponse.error
 
                 throw CaroServerException(
-                    code = error?.code ?: "9999",
+                    code = error?.code ?: UNKNOWN_001,
                     message = error?.message ?: "Unknown Error",
                     debugMessage = error?.debugMessage ?: "서버로부터 받은 debug 메세지가 비어있습니다.",
                     description = error?.description,
