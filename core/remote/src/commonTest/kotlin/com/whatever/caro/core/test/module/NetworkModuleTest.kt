@@ -2,7 +2,7 @@ package com.whatever.caro.core.test.module
 
 import com.whatever.caro.core.remote.di.networkModule
 import com.whatever.caro.core.remote.di.qualifier.NetworkClient
-import com.whatever.caro.core.remote.network.plugins.CaroBaseResponseUnwrap
+import com.whatever.caro.core.remote.network.plugins.CaroBaseResponseConverter
 import io.kotest.assertions.throwables.shouldNotThrowAny
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.koin.KoinExtension
@@ -47,7 +47,7 @@ class NetworkModuleTest :
             shouldNotThrowAny { authClient.plugin(HttpTimeout) }
             shouldNotThrowAny { authClient.plugin(Logging) }
             shouldNotThrowAny { authClient.plugin(HttpCallValidator) }
-            shouldNotThrowAny { authClient.plugin(CaroBaseResponseUnwrap) }
+            shouldNotThrowAny { authClient.plugin(CaroBaseResponseConverter) }
         }
 
         test("Caro NON_AUTH 클라이언트는 공통 네트워크 플러그인을 install 해야한다.") {
@@ -57,7 +57,7 @@ class NetworkModuleTest :
             shouldNotThrowAny { nonAuthClient.plugin(HttpTimeout) }
             shouldNotThrowAny { nonAuthClient.plugin(Logging) }
             shouldNotThrowAny { nonAuthClient.plugin(HttpCallValidator) }
-            shouldNotThrowAny { nonAuthClient.plugin(CaroBaseResponseUnwrap) }
+            shouldNotThrowAny { nonAuthClient.plugin(CaroBaseResponseConverter) }
         }
 
         test("networkModule은 공통 Json 설정을 제공한다.") {
