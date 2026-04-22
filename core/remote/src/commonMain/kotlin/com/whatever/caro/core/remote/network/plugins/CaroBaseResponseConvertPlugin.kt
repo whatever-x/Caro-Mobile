@@ -1,8 +1,8 @@
 package com.whatever.caro.core.remote.network.plugins
 
-import com.whatever.caro.core.model.exception.CaroClientException
+import com.whatever.caro.core.model.exception.CaroInvalidResponseException
 import com.whatever.caro.core.model.exception.CaroServerException
-import com.whatever.caro.core.model.exception.ErrorCode.UNKNOWN_001
+import com.whatever.caro.core.model.exception.ErrorCode.INVALID_RESPONSE
 import com.whatever.caro.core.remote.model.CaroBaseResponse
 import io.ktor.client.plugins.api.ClientPlugin
 import io.ktor.client.plugins.api.createClientPlugin
@@ -34,19 +34,64 @@ internal val CaroBaseResponseConverter: ClientPlugin<CaroBaseResponseConverterCo
             val kotlinType = requestedType.kotlinType ?: return@transformResponseBody null
             val payloadText = content.readRemaining().readText(Charsets.UTF_8)
 
-            val requestedSerializer = json.serializersModule.serializer(kotlinType)
+            val requestedSerializer =
+                runCatching {
+                    json.serializersModule.serializer(kotlinType)
+                }.getOrElse { throwable ->
+                    throw CaroInvalidResponseException(
+                        code = INVALID_RESPONSE,
+                        message = "Invalid Response Error",
+                        debugMessage =
+                            buildDebugMessage(
+                                reason = "요청 타입에 대한 serializer를 찾지 못했습니다.",
+                                kotlinType = kotlinType,
+                                responseStatus = response.status.value,
+                                contentType = contentType,
+                                payloadText = payloadText,
+                                causeMessage = throwable.message,
+                            ),
+                    )
+                }
 
             val envelopeSerializer = CaroBaseResponse.serializer(requestedSerializer)
-            val baseResponse = json.decodeFromString(envelopeSerializer, payloadText)
+            val baseResponse =
+                runCatching {
+                    json.decodeFromString(envelopeSerializer, payloadText)
+                }.getOrElse { throwable ->
+                    throw CaroInvalidResponseException(
+                        code = INVALID_RESPONSE,
+                        message = "Invalid Response Error",
+                        debugMessage =
+                            buildDebugMessage(
+                                reason = "Response Body Decode 과정에서 실패 했습니다.",
+                                kotlinType = kotlinType,
+                                responseStatus = response.status.value,
+                                contentType = contentType,
+                                payloadText = payloadText,
+                                causeMessage = throwable.message,
+                            ),
+                    )
+                }
 
             if (!baseResponse.success) {
-                val error = baseResponse.error
+                val error = baseResponse.error ?: throw CaroInvalidResponseException(
+                    code = INVALID_RESPONSE,
+                    message = "Invalid Response Error",
+                    debugMessage =
+                        buildDebugMessage(
+                            reason = "success=false 이지만 error 페이로드가 null 입니다.",
+                            kotlinType = kotlinType,
+                            responseStatus = response.status.value,
+                            contentType = contentType,
+                            payloadText = payloadText,
+                        ),
+                )
 
                 throw CaroServerException(
-                    code = error?.code ?: UNKNOWN_001,
-                    message = error?.message ?: "Unknown Error",
-                    debugMessage = error?.debugMessage ?: "서버로부터 받은 debug 메세지가 비어있습니다.",
-                    description = error?.description,
+                    code = error.code,
+                    message = error.message,
+                    debugMessage = error.debugMessage ?: "서버로부터 받은 debug 메세지가 비어있습니다.",
+                    description = error.description,
                 )
             }
 
@@ -60,21 +105,42 @@ internal val CaroBaseResponseConverter: ClientPlugin<CaroBaseResponseConverterCo
                 return@transformResponseBody Unit
             }
 
-            throw CaroClientException(
-                code = UNKNOWN_001,
-                message = "Unknown Error",
+            throw CaroInvalidResponseException(
+                code = INVALID_RESPONSE,
+                message = "Invalid Response Error",
                 debugMessage =
-                    buildString {
-                        append("Response unwrap failed: expected non-null data but got null")
-                        append(", requestedType=")
-                        append(kotlinType)
-                        append(", responseStatus=")
-                        append(response.status.value)
-                        append(", contentType=")
-                        append(contentType)
-                        append(", payloadPreview=")
-                        append(payloadText.take(300))
-                    },
+                    buildDebugMessage(
+                        reason = "success=true 이지만 non-Unit 응답의 data가 null입니다",
+                        kotlinType = kotlinType,
+                        responseStatus = response.status.value,
+                        contentType = contentType,
+                        payloadText = payloadText,
+                    ),
             )
         }
+    }
+
+private fun buildDebugMessage(
+    reason: String,
+    kotlinType: Any,
+    responseStatus: Int,
+    contentType: ContentType?,
+    payloadText: String,
+    causeMessage: String? = null,
+): String =
+    buildString {
+        append("Response Converter failed: ")
+        append(reason)
+        append(", requestedType=")
+        append(kotlinType)
+        append(", responseStatus=")
+        append(responseStatus)
+        append(", contentType=")
+        append(contentType ?: "unknown")
+        if (!causeMessage.isNullOrBlank()) {
+            append(", cause=")
+            append(causeMessage)
+        }
+        append(", payloadPreview=")
+        append(payloadText.take(300))
     }

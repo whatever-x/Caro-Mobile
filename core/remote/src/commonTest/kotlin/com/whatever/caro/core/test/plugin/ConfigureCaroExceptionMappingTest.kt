@@ -1,6 +1,9 @@
 package com.whatever.caro.core.test.plugin
 
+import com.whatever.caro.core.model.exception.CaroInvalidResponseException
 import com.whatever.caro.core.model.exception.CaroServerException
+import com.whatever.caro.core.model.exception.ErrorCode
+import com.whatever.caro.core.model.exception.NetworkException
 import com.whatever.caro.core.remote.network.plugins.configureCaroExceptionMapping
 import io.kotest.assertions.throwables.shouldNotThrowAny
 import io.kotest.assertions.throwables.shouldThrow
@@ -63,14 +66,40 @@ class ConfigureCaroExceptionMappingTest : FunSpec() {
                 )
 
             val exception =
-                shouldThrow<CaroServerException> {
+                shouldThrow<CaroInvalidResponseException> {
                     client.get("https://caro.test/sample").body<Unit>()
                 }
 
-            exception.code shouldBe HttpStatusCode.BadGateway.value.toString()
-            exception.message shouldBe "Caro Server error"
-            exception.debugMessage shouldBe "Caro Server error"
-            exception.description shouldBe null
+            exception.code shouldBe ErrorCode.INVALID_RESPONSE
+            exception.message shouldBe "Invalid Response Error"
+        }
+
+        test("응답이 없는 네트워크 오류는 NetworkException으로 변환한다") {
+            val client =
+                HttpClient(
+                    MockEngine {
+                        throw io.ktor.util.network
+                            .UnresolvedAddressException()
+                    },
+                ) {
+                    expectSuccess = true
+
+                    install(ContentNegotiation) {
+                        json(jsonParser)
+                    }
+
+                    install(HttpCallValidator) {
+                        configureCaroExceptionMapping(jsonParser)
+                    }
+                }
+
+            val exception =
+                shouldThrow<NetworkException> {
+                    client.get("https://caro.test/sample").body<Unit>()
+                }
+
+            exception.code shouldBe ErrorCode.NETWORK_001
+            exception.message shouldBe "Network Error"
         }
 
         test("정상 응답이면 NetworkException을 던지지 않는다") {

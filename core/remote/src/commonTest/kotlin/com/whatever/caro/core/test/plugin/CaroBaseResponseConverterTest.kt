@@ -1,6 +1,6 @@
 package com.whatever.caro.core.test.plugin
 
-import com.whatever.caro.core.model.exception.CaroClientException
+import com.whatever.caro.core.model.exception.CaroInvalidResponseException
 import com.whatever.caro.core.model.exception.CaroServerException
 import com.whatever.caro.core.model.exception.ErrorCode
 import com.whatever.caro.core.remote.model.demo.DemoDto
@@ -25,7 +25,7 @@ import kotlinx.serialization.json.Json
 
 class CaroBaseResponseConverterTest : FunSpec() {
     init {
-        test("success=true 이면 data payload 를 요청 타입으로 언랩한다") {
+        test("success=true 이면 data payload 를 요청 타입으로 변환한다") {
             val client =
                 createClient(
                     responseBody =
@@ -95,7 +95,7 @@ class CaroBaseResponseConverterTest : FunSpec() {
             exception.description shouldBe "login again"
         }
 
-        test("success=false 인데 error 가 없으면 code가 UNKNOWN_001인 CaroServerException 예외를 던진다") {
+        test("success=false 인데 error 가 없으면 INVALID_RESPONSE인 CaroInvalidResponseException 예외를 던진다") {
             val client =
                 createClient(
                     responseBody =
@@ -109,15 +109,15 @@ class CaroBaseResponseConverterTest : FunSpec() {
                 )
 
             val exception =
-                shouldThrow<CaroServerException> {
+                shouldThrow<CaroInvalidResponseException> {
                     client.get("https://caro.test/demo").body<DemoResponse>()
                 }
 
-            exception.code shouldBe ErrorCode.UNKNOWN_001
-            exception.debugMessage shouldBe "서버로부터 받은 debug 메세지가 비어있습니다."
+            exception.code shouldBe ErrorCode.INVALID_RESPONSE
+            exception.message shouldBe "Invalid Response Error"
         }
 
-        test("success=true 인데 data=null 이면 code가 UNKNOWN_001인 CaroClientException 예외를 던진다") {
+        test("success=true 인데 data=null 이면 INVALID_RESPONSE인 CaroInvalidResponseException 예외를 던진다") {
             val client =
                 createClient(
                     responseBody =
@@ -131,14 +131,37 @@ class CaroBaseResponseConverterTest : FunSpec() {
                 )
 
             val exception =
-                shouldThrow<CaroClientException> {
+                shouldThrow<CaroInvalidResponseException> {
                     client.get("https://caro.test/demo").body<DemoResponse>()
                 }
 
-            exception.code shouldBe ErrorCode.UNKNOWN_001
+            exception.code shouldBe ErrorCode.INVALID_RESPONSE
+            exception.message shouldBe "Invalid Response Error"
         }
 
-        test("JSON 이 아닌 응답은 unwrap 하지 않고 그대로 전달한다") {
+        test("응답 decode에 실패하면 INVALID_RESPONSE인 CaroInvalidResponseException 예외를 던진다") {
+            val client =
+                createClient(
+                    responseBody =
+                        """
+                        {
+                          "success": true,
+                          "data": "invalid-shape",
+                          "error": null
+                        }
+                        """.trimIndent(),
+                )
+
+            val exception =
+                shouldThrow<CaroInvalidResponseException> {
+                    client.get("https://caro.test/demo").body<DemoResponse>()
+                }
+
+            exception.code shouldBe ErrorCode.INVALID_RESPONSE
+            exception.message shouldBe "Invalid Response Error"
+        }
+
+        test("JSON 이 아닌 응답이면 converter가 개입하지 않는다") {
             val client =
                 createClient(
                     responseBody = "plain-text",
