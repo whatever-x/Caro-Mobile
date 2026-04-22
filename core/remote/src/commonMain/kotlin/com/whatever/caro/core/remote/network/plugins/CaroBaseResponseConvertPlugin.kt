@@ -14,14 +14,14 @@ import io.ktor.utils.io.readRemaining
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.serializer
 
-internal class CaroBaseResponseUnwrapConfig {
+internal class CaroBaseResponseConverterConfig {
     lateinit var json: Json
 }
 
-internal val CaroBaseResponseUnwrap: ClientPlugin<CaroBaseResponseUnwrapConfig> =
+internal val CaroBaseResponseConverter: ClientPlugin<CaroBaseResponseConverterConfig> =
     createClientPlugin(
-        name = "CaroBaseResponseUnwrap",
-        createConfiguration = ::CaroBaseResponseUnwrapConfig,
+        name = "CaroBaseResponseConverter",
+        createConfiguration = ::CaroBaseResponseConverterConfig,
     ) {
         val json: Json = pluginConfig.json
 

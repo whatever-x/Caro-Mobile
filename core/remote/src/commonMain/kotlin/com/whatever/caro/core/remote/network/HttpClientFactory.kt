@@ -1,7 +1,7 @@
 package com.whatever.caro.core.remote.network
 
 import com.whatever.caro.core.remote.network.config.CaroNetworkConfig
-import com.whatever.caro.core.remote.network.plugins.CaroBaseResponseUnwrap
+import com.whatever.caro.core.remote.network.plugins.CaroBaseResponseConverter
 import com.whatever.caro.core.remote.network.plugins.installCaroResponseHandler
 import io.ktor.client.HttpClient
 import io.ktor.client.HttpClientConfig
@@ -52,7 +52,7 @@ object HttpClientFactory {
                 installCaroResponseHandler(jsonParser)
             }
 
-            install(CaroBaseResponseUnwrap) {
+            install(CaroBaseResponseConverter) {
                 this.json = jsonParser
             }
 
