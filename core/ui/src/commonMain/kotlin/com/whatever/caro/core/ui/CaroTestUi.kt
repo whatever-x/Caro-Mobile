@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import caromobile.core.designsystem.generated.resources.Res
 import caromobile.core.designsystem.generated.resources.test
-import com.whatever.caro.core.designsystem.CaroButton
+import com.whatever.caro.core.designsystem.components.CaroButton
 import org.jetbrains.compose.resources.stringResource
 
 @Composable

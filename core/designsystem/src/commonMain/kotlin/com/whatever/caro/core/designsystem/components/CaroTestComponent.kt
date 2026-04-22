@@ -1,4 +1,4 @@
-package com.whatever.caro.core.designsystem
+package com.whatever.caro.core.designsystem.components
 
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
