@@ -23,7 +23,7 @@ private val allDrawables = Res.allDrawableResources.values.chunked(10)
 
 @Preview(showBackground = true)
 @Composable
-fun IconPreviewGrid(
+private fun IconPreviewGrid(
     modifier: Modifier = Modifier,
     iconSize: Dp = 32.dp,
     horizontalSpacing: Dp = 4.dp,
