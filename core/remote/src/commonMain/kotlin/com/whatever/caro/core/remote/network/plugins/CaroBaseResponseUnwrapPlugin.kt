@@ -1,7 +1,9 @@
 package com.whatever.caro.core.remote.network.plugins
 
+import com.whatever.caro.core.model.exception.CaroClientException
+import com.whatever.caro.core.model.exception.CaroServerException
+import com.whatever.caro.core.model.exception.ErrorCode.UNKNOWN_001
 import com.whatever.caro.core.remote.model.CaroBaseResponse
-import com.whatever.caro.core.remote.model.NetworkException
 import io.ktor.client.plugins.api.ClientPlugin
 import io.ktor.client.plugins.api.createClientPlugin
 import io.ktor.http.ContentType
@@ -40,10 +42,10 @@ internal val CaroBaseResponseUnwrap: ClientPlugin<CaroBaseResponseUnwrapConfig> 
             if (!baseResponse.success) {
                 val error = baseResponse.error
 
-                throw NetworkException(
-                    code = error?.code ?: "Unknown",
+                throw CaroServerException(
+                    code = error?.code ?: "9999",
                     message = error?.message ?: "Unknown Error",
-                    debugMessage = error?.debugMessage ?: "Unknown Error",
+                    debugMessage = error?.debugMessage ?: "서버로부터 받은 debug 메세지가 비어있습니다.",
                     description = error?.description,
                 )
             }
@@ -58,11 +60,21 @@ internal val CaroBaseResponseUnwrap: ClientPlugin<CaroBaseResponseUnwrapConfig> 
                 return@transformResponseBody Unit
             }
 
-            throw NetworkException(
-                code = "Unknown",
-                message = "예상치 못한 에러가 발생했습니다.",
-                debugMessage = "Data is null",
-                description = null,
+            throw CaroClientException(
+                code = UNKNOWN_001,
+                message = "Unknown Error",
+                debugMessage =
+                    buildString {
+                        append("Response unwrap failed: expected non-null data but got null")
+                        append(", requestedType=")
+                        append(kotlinType)
+                        append(", responseStatus=")
+                        append(response.status.value)
+                        append(", contentType=")
+                        append(contentType)
+                        append(", payloadPreview=")
+                        append(payloadText.take(300))
+                    },
             )
         }
     }
