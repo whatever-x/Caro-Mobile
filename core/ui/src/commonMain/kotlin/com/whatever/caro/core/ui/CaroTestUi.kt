@@ -3,7 +3,6 @@ package com.whatever.caro.core.ui
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import caromobile.core.designsystem.generated.resources.Res
-import caromobile.core.designsystem.generated.resources.test
 import com.whatever.caro.core.designsystem.components.CaroButton
 import org.jetbrains.compose.resources.stringResource
 
@@ -22,7 +21,7 @@ fun CaroTestUi(
 @Preview
 private fun CaroTestUiPreview() {
     CaroTestUi(
-        text = stringResource(resource = Res.string.test),
+        text = "",
         onClick = {},
     )
 }

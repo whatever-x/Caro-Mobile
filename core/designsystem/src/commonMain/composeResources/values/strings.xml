@@ -3,4 +3,11 @@
 	<!-- login -->
 	<string name="login_toast_cancel">Cancelled.</string>
 	<string name="login_toast_error">An error occurred.</string>
+    <string name="login_text_logo_description">Build your daily study habit\nwith just one card</string>
+    <string name="login_text_bottom_terms_of_service">By continuing, you agree to the Terms of Service and Privacy Policy.</string>
+    <string name="login_button_google">Sign in with Google</string>
+    <string name="login_button_apple">Sign in with Apple</string>
+    <string name="login_card_button">Tap to flip</string>
+    <string name="login_card_text_descriptoin">[ˈæpəl]</string>
+    <string name="login_card_text_title">Apple</string>
 </resources>

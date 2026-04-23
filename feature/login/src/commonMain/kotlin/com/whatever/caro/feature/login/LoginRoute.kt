@@ -24,7 +24,6 @@ import com.whatever.caro.feature.login.mvi.LoginIntent
 import com.whatever.caro.feature.login.mvi.LoginSideEffect
 import com.whatever.caro.feature.login.provider.AppleAuthProvider
 import com.whatever.caro.feature.login.provider.GoogleAuthProvider
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
