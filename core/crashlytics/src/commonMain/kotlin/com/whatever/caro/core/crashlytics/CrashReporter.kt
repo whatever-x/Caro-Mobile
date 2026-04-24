@@ -7,10 +7,5 @@ interface CrashReporter {
 
     fun setUserId(userId: String?)
 
-    fun setCustomKey(
-        key: String,
-        value: CrashValue,
-    )
-
-    fun setCollectionEnabled(enabled: Boolean)
+    fun setCustomKeys(keys: CrashKeys)
 }
