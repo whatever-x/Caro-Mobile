@@ -30,7 +30,7 @@ private fun AnalyticsParameters.toBundle(): Bundle =
         this@toBundle.values.forEach { (key, value) ->
             when (value) {
                 is String -> putString(key, value)
-                is Boolean -> putBoolean(key, value)
+                is Boolean -> putString(key, value.toString())
                 is Double -> putDouble(key, value)
                 is Long -> putLong(key, value)
             }
