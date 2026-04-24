@@ -4,7 +4,7 @@ import android.content.Context
 import android.os.Bundle
 import com.google.firebase.analytics.FirebaseAnalytics
 
-internal class FirebaseAnalyticsTrackerImpl(
+internal class FirebaseAnalyticsTracker(
     context: Context,
 ) : AnalyticsTracker {
 
