@@ -6,7 +6,6 @@ import com.google.firebase.FirebaseApp
 import io.github.aakira.napier.Napier
 
 class FirebaseAppInitializer : Initializer<FirebaseApp> {
-
     override fun create(context: Context): FirebaseApp {
         val firebaseApp =
             requireNotNull(FirebaseApp.initializeApp(context)) {
@@ -17,7 +16,5 @@ class FirebaseAppInitializer : Initializer<FirebaseApp> {
         return firebaseApp
     }
 
-    override fun dependencies(): List<Class<out Initializer<*>>> =
-        listOf(NapierInitializer::class.java)
-
+    override fun dependencies(): List<Class<out Initializer<*>>> = listOf(NapierInitializer::class.java)
 }

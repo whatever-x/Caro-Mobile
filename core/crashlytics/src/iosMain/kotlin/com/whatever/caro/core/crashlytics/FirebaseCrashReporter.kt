@@ -24,14 +24,12 @@ internal class FirebaseCrashReporter : CrashReporter {
     override fun setCustomKeys(keys: CrashKeys) {
         crashlytics.setCustomKeysAndValues(keysAndValues = keys.toKeysAndValues())
     }
-
 }
 
-private fun CrashKeys.toKeysAndValues(): Map<Any?, Any> {
-    return values.mapKeys { (key, _) ->
+private fun CrashKeys.toKeysAndValues(): Map<Any?, Any> =
+    values.mapKeys { (key, _) ->
         key as Any?
     }
-}
 
 private fun Throwable.toNSError(): NSError =
     NSError.errorWithDomain(

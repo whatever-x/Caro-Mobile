@@ -4,12 +4,12 @@ import FirebaseAnalytics.FIRAnalytics
 import kotlinx.cinterop.ExperimentalForeignApi
 
 internal class FirebaseAnalyticsTracker : AnalyticsTracker {
-
     @OptIn(ExperimentalForeignApi::class)
     override fun logEvent(event: AnalyticsEvent) {
         FIRAnalytics.logEventWithName(
             name = event.name,
-            parameters = event.parameters.values.toMap())
+            parameters = event.parameters.values.toMap(),
+        )
     }
 
     @OptIn(ExperimentalForeignApi::class)
@@ -18,8 +18,10 @@ internal class FirebaseAnalyticsTracker : AnalyticsTracker {
     }
 
     @OptIn(ExperimentalForeignApi::class)
-    override fun setUserProperty(name: String, value: String?) {
+    override fun setUserProperty(
+        name: String,
+        value: String?,
+    ) {
         FIRAnalytics.setUserPropertyString(value = value, forName = name)
     }
-
 }

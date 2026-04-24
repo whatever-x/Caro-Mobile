@@ -11,10 +11,33 @@ annotation class CrashlyticsDsl
 class CrashKeyValues internal constructor() {
     internal val values = mutableMapOf<String, Any>()
 
-    fun put(key: String, value: String) { values[key] = value }
-    fun put(key: String, value: Long) { values[key] = value }
-    fun put(key: String, value: Double) { values[key] = value }
-    fun put(key: String, value: Boolean) { values[key] = value }
+    fun put(
+        key: String,
+        value: String,
+    ) {
+        values[key] = value
+    }
+
+    fun put(
+        key: String,
+        value: Long,
+    ) {
+        values[key] = value
+    }
+
+    fun put(
+        key: String,
+        value: Double,
+    ) {
+        values[key] = value
+    }
+
+    fun put(
+        key: String,
+        value: Boolean,
+    ) {
+        values[key] = value
+    }
 }
 
 fun crashKeys(values: CrashKeyValues.() -> Unit): CrashKeys =

@@ -12,16 +12,40 @@ annotation class AnalyticsDsl
 class AnalyticsParameters internal constructor() {
     internal val values = mutableMapOf<String, Any>()
 
-    fun put(key: String, value: String) { values[key] = value }
-    fun put(key: String, value: Long) { values[key] = value }
-    fun put(key: String, value: Double) { values[key] = value }
-    fun put(key: String, value: Boolean) { values[key] = value }
+    fun put(
+        key: String,
+        value: String,
+    ) {
+        values[key] = value
+    }
 
+    fun put(
+        key: String,
+        value: Long,
+    ) {
+        values[key] = value
+    }
+
+    fun put(
+        key: String,
+        value: Double,
+    ) {
+        values[key] = value
+    }
+
+    fun put(
+        key: String,
+        value: Boolean,
+    ) {
+        values[key] = value
+    }
 }
 
-fun analyticsEvent(name: String, parameters: AnalyticsParameters.() -> Unit = {}): AnalyticsEvent {
-    return AnalyticsEvent(
+fun analyticsEvent(
+    name: String,
+    parameters: AnalyticsParameters.() -> Unit = {},
+): AnalyticsEvent =
+    AnalyticsEvent(
         name = name,
         parameters = AnalyticsParameters().apply(parameters),
     )
-}
