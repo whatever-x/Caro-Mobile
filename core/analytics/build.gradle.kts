@@ -1,3 +1,6 @@
+import io.github.frankois944.spmForKmp.swiftPackageConfig
+import java.net.URI
+
 plugins {
     id("caro.kmp")
     id("caro.kmp.android")
@@ -7,6 +10,26 @@ plugins {
 }
 
 kotlin {
+    listOf(
+        iosX64(),
+        iosArm64(),
+        iosSimulatorArm64(),
+    ).forEach { iosTarget ->
+        iosTarget.swiftPackageConfig {
+            minIos = "15.0"
+
+            dependency {
+                remotePackageVersion(
+                    url = URI("https://github.com/firebase/firebase-ios-sdk"),
+                    version = "12.12.1",
+                    products = {
+                        add("FirebaseAnalytics", exportToKotlin = true)
+                    },
+                )
+            }
+        }
+    }
+
     android {
         namespace = "com.whatever.caro.core.analytics"
     }

@@ -10,8 +10,12 @@ struct iOSApp: App {
     
     init() {
         FirebaseApp.configure()
-        Analytics.setAnalyticsCollectionEnabled(true)
-        Crashlytics.crashlytics().setCrashlyticsCollectionEnabled(true)
+        
+        #if DEBUG
+            Analytics.setAnalyticsCollectionEnabled(false)
+            Crashlytics.crashlytics().setCrashlyticsCollectionEnabled(false)
+        #endif
+        
         KoinKt.doInitKoin()
         NapierInitializerKt.doInitNapier()
     }
