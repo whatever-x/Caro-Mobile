@@ -32,6 +32,7 @@ kotlin {
             implementation(projects.feature.splash)
             implementation(projects.feature.profile)
             implementation(projects.feature.deck)
+            implementation(projects.feature.deck.detail)
             implementation(projects.feature.setting)
 
             implementation(libs.koin.compose.viewmodel)
