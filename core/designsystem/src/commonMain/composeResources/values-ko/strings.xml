@@ -34,6 +34,8 @@
     <string name="deck_tip_max_cards">한 덱에 최대 200장의 카드를 담을 수 있어요.</string>
     <string name="deck_button_create">만들기</string>
     <string name="deck_snackbar_create_error">덱 만들기에 실패했어요. 잠시 후 다시 시도해주세요.</string>
+    <!-- deck detail -->
+    <string name="deck_detail_screen_name">덱 상세</string>
     <!-- home -->
     <string name="home_banner_title">%1$s님, 안녕하세요!</string>
     <string name="home_learning_days">%1$d일 연속 학습중</string>

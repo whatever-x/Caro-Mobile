@@ -22,8 +22,6 @@
 	<string name="profile_field_rule_nickname">2-20 characters. Korean, English, numbers, -, and _ only</string>
 	<string name="profile_button_create">Create</string>
 	<string name="profile_button_done">Done</string>
-
-
 	<!-- deck -->
 	<string name="deck_title_create">Create Deck</string>
 	<string name="deck_content_description_back">Go back</string>
@@ -37,6 +35,8 @@
 	<string name="deck_tip_max_cards">You can add up to 200 cards per deck.</string>
 	<string name="deck_button_create">Create</string>
 	<string name="deck_snackbar_create_error">Failed to create the deck. Please try again.</string>
+	<!-- deck detail -->
+	<string name="deck_detail_screen_name">Deck Detail</string>
 	<!-- home -->
 	<string name="home_banner_title">Hello, %1$s!</string>
 	<string name="home_learning_days">Learning Streak: %1$d Days</string>
