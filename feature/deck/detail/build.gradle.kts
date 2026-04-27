@@ -13,4 +13,10 @@ kotlin {
     android {
         namespace = "com.whatever.caro.feature.deck.detail"
     }
+
+    sourceSets {
+        commonMain.dependencies {
+            implementation(libs.compottie.lite)
+        }
+    }
 }
