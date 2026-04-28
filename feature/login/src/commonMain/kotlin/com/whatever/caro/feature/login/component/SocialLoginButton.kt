@@ -13,6 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import com.whatever.caro.core.designsystem.themes.CaroTheme
+import com.whatever.caro.core.ui.noRippleClickable
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.painterResource
@@ -24,17 +25,18 @@ internal fun SocialLoginButton(
     iconRes: DrawableResource,
     contentRes: StringResource,
     textColor: Color,
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
     Box(
-        modifier = modifier
-            .padding(vertical = CaroTheme.spacing.xs)
-            .clickable(onClick = onClick),
-        contentAlignment = Alignment.Center
+        modifier =
+            modifier
+                .padding(vertical = CaroTheme.spacing.xs)
+                .noRippleClickable(onClick = onClick),
+        contentAlignment = Alignment.Center,
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center
+            horizontalArrangement = Arrangement.Center,
         ) {
             Icon(
                 painter = painterResource(iconRes),
@@ -44,10 +46,8 @@ internal fun SocialLoginButton(
             Text(
                 text = stringResource(resource = contentRes),
                 style = CaroTheme.typography.robotoLabel1,
-                color = textColor
+                color = textColor,
             )
         }
     }
 }
-
-

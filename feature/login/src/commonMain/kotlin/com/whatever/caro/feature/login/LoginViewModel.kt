@@ -22,12 +22,7 @@ class LoginViewModel :
         when (intent) {
             is LoginIntent.ClickGoogleLoginButton -> loginWithGoogle(intent)
             is LoginIntent.ClickAppleLoginButton -> loginWithApple(intent)
-            LoginIntent.ClickFlipCard -> flipCard()
         }
-    }
-
-    private fun flipCard() {
-        reduce { copy(isFlip = !isFlip) }
     }
 
     private fun loginWithGoogle(intent: LoginIntent.ClickGoogleLoginButton) {

@@ -1,22 +1,16 @@
 package com.whatever.caro.feature.login.component
 
-import androidx.compose.animation.core.Animatable
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -28,8 +22,7 @@ import caromobile.core.designsystem.generated.resources.login_card_button
 import caromobile.core.designsystem.generated.resources.login_card_text_description
 import caromobile.core.designsystem.generated.resources.login_card_text_title
 import com.whatever.caro.core.designsystem.themes.CaroTheme
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.filter
+import com.whatever.caro.core.ui.noRippleClickable
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
@@ -42,20 +35,20 @@ fun FlipCard(
     Column(
         modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        verticalArrangement = Arrangement.Center,
     ) {
         if (isFlipped) {
-            Column (
-                modifier = Modifier
-                    .fillMaxSize()
-                    .graphicsLayer {
-                        this.rotationX = 180f
-                    },
-                horizontalAlignment = Alignment.CenterHorizontally
+            Column(
+                modifier =
+                    Modifier
+                        .graphicsLayer {
+                            this.rotationX = 180f
+                        },
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Column(
                     verticalArrangement = Arrangement.spacedBy(space = CaroTheme.spacing.m),
-                    horizontalAlignment = Alignment.CenterHorizontally
+                    horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     Text(
                         text = stringResource(Res.string.login_card_text_title),
@@ -63,10 +56,12 @@ fun FlipCard(
                         color = CaroTheme.color.text.brand,
                     )
                     HorizontalDivider(
-                        modifier = Modifier.size(
-                            width = 40.dp, height = 2.dp
-                        ),
-                        color = CaroTheme.color.divider.primary
+                        modifier =
+                            Modifier.size(
+                                width = 40.dp,
+                                height = 2.dp,
+                            ),
+                        color = CaroTheme.color.divider.primary,
                     )
                     Text(
                         text = stringResource(Res.string.login_card_text_description),
@@ -80,13 +75,12 @@ fun FlipCard(
             }
         } else {
             Column(
-                modifier = Modifier,
-                horizontalAlignment = Alignment.CenterHorizontally
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Text(
                     text = stringResource(Res.string.login_card_text_title),
                     style = CaroTheme.typography.heading1,
-                    color = CaroTheme.color.text.brand
+                    color = CaroTheme.color.text.brand,
                 )
                 Spacer(modifier = Modifier.size(size = CaroTheme.spacing.xl))
                 FlipButton(isFlipped = isFlipped, onClick = onClick)
@@ -100,28 +94,30 @@ private fun FlipButton(
     isFlipped: Boolean,
     onClick: () -> Unit,
 ) {
-    val (backgroundColor, iconColor, textColor) = if (isFlipped) {
-        Triple(
-            CaroTheme.color.surface.secondary,
-            CaroTheme.color.icon.brand,
-            CaroTheme.color.text.brand
-        )
-    } else {
-        Triple(
-            CaroTheme.color.surface.tertiary,
-            CaroTheme.color.icon.tertiary,
-            CaroTheme.color.text.tertiary
-        )
-    }
+    val (backgroundColor, iconColor, textColor) =
+        if (isFlipped) {
+            Triple(
+                CaroTheme.color.surface.secondary,
+                CaroTheme.color.icon.brand,
+                CaroTheme.color.text.brand,
+            )
+        } else {
+            Triple(
+                CaroTheme.color.surface.tertiary,
+                CaroTheme.color.icon.tertiary,
+                CaroTheme.color.text.tertiary,
+            )
+        }
 
     Row(
-        modifier = Modifier
-            .clip(shape = CaroTheme.shape.xxl)
-            .background(color = backgroundColor)
-            .clickable { onClick() }
-            .padding(horizontal = 12.dp, vertical = 6.dp),
+        modifier =
+            Modifier
+                .clip(shape = CaroTheme.shape.xxl)
+                .background(color = backgroundColor)
+                .noRippleClickable { onClick() }
+                .padding(horizontal = 12.dp, vertical = 6.dp),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Center
+        horizontalArrangement = Arrangement.Center,
     ) {
         Icon(
             painter = painterResource(Res.drawable.ic_renew_16),
