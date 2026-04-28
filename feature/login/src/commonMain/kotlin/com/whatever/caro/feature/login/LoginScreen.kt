@@ -1,26 +1,33 @@
 package com.whatever.caro.feature.login
 
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -35,8 +42,10 @@ import caromobile.core.designsystem.generated.resources.login_text_logo_descript
 import com.whatever.caro.core.designsystem.themes.CaroTheme
 import com.whatever.caro.core.model.auth.SocialLoginType
 import com.whatever.caro.feature.login.component.FlipCard
+import com.whatever.caro.feature.login.component.SocialLoginButton
 import com.whatever.caro.feature.login.mvi.LoginIntent
 import com.whatever.caro.feature.login.mvi.LoginState
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
@@ -46,6 +55,10 @@ internal fun LoginScreen(
     onIntent: (LoginIntent) -> Unit,
     onLaunch: (SocialLoginType) -> Unit,
 ) {
+    var isFlipped by remember { mutableStateOf(false) }
+    val rotation = remember { Animatable(initialValue = 0f) }
+    val coroutineScope = rememberCoroutineScope()
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -55,13 +68,13 @@ internal fun LoginScreen(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(height = 350.dp)
+                    .aspectRatio(ratio = 1.25f)
                     .background(
                         brush = Brush.verticalGradient(
                             colors = listOf(
                                 Color(0xFF7FA8E8),
                                 Color(0xFFAFC6F2),
-                                Color(0xFFFFFFFF)
+                                Color(0xFFFFFFFF),
                             )
                         )
                     ),
@@ -69,11 +82,18 @@ internal fun LoginScreen(
             ) {
                 FlipCard(
                     modifier = Modifier
-                        .size(width = 300.dp, height = 180.dp)
+                        .fillMaxWidth()
+                        .graphicsLayer {
+                            this.rotationX = rotation.value
+                            cameraDistance = 8 * density
+                        }
+                        .padding(horizontal = 55.dp)
+                        .aspectRatio(ratio = 1.6f)
+                        .heightIn(min = 300.dp)
                         .shadow(
                             elevation = 4.dp,
-                            shape =  CaroTheme.shape.xl,
-                            ambientColor = Color(0x0000000),
+                            shape = CaroTheme.shape.xl,
+                            ambientColor = Color(0x00000000),
                             spotColor = Color(0x40000000)
                         )
                         .background(
@@ -81,8 +101,21 @@ internal fun LoginScreen(
                             shape = CaroTheme.shape.xl,
                         )
                         .padding(vertical = 15.dp),
-                    isFlipped = state.isFlip,
-                    onClick = { onIntent(LoginIntent.ClickFlipCard) }
+                    isFlipped = isFlipped,
+                    onClick = {
+                        coroutineScope.launch {
+                            val target = rotation.value + 180f
+                            rotation.animateTo(
+                                targetValue = rotation.value + 90f,
+                                animationSpec = tween(200)
+                            )
+                            isFlipped = !isFlipped
+                            rotation.animateTo(
+                                targetValue = target,
+                                animationSpec = tween(200)
+                            )
+                        }
+                    }
                 )
             }
 
@@ -109,68 +142,36 @@ internal fun LoginScreen(
                 .padding(horizontal = CaroTheme.spacing.xl)
                 .padding(bottom = CaroTheme.spacing.l)
                 .align(alignment = Alignment.BottomCenter),
-            verticalArrangement = Arrangement.spacedBy(space = CaroTheme.spacing.m)
+            verticalArrangement = Arrangement.spacedBy(space = CaroTheme.spacing.m),
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Box(
+
+            SocialLoginButton(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .border(width = 1.dp, color = Color(0xFF000000), shape = CaroTheme.shape.xxl)
-                    .background(
-                        color = Color(0xFFFFFFFF),
+                    .border(
+                        width = 1.dp,
+                        color = Color(0xFF000000),
                         shape = CaroTheme.shape.xxl
                     )
-                    .padding(vertical = CaroTheme.spacing.xs)
-                    .clickable {
-                        onLaunch(SocialLoginType.GOOGLE)
-                    },
-                contentAlignment = Alignment.Center
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    Image(
-                        painter = painterResource(Res.drawable.ic_logo_google),
-                        contentDescription = null
-                    )
-                    Text(
-                        text = stringResource(resource = Res.string.login_button_google),
-                        style = CaroTheme.typography.robotoLabel1,
-                        color = CaroTheme.color.text.primary
-                    )
-                }
-            }
+                    .clip(CaroTheme.shape.xxl)
+                    .background(color = Color(0xFFFFFFFF)),
+                iconRes = Res.drawable.ic_logo_google,
+                contentRes = Res.string.login_button_google,
+                textColor = Color(0xFF000000),
+                onClick = { onLaunch(SocialLoginType.GOOGLE) }
+            )
 
-            Box(
+            SocialLoginButton(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(
-                        color = Color(0xFF000000),
-                        shape = CaroTheme.shape.xxl,
-                    )
-                    .border(width = 1.dp, color = CaroTheme.color.border.secondary)
-                    .padding(vertical = CaroTheme.spacing.xs)
-                    .clickable {
-                        onLaunch(SocialLoginType.GOOGLE)
-                    },
-                contentAlignment = Alignment.Center
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    Icon(
-                        painter = painterResource(Res.drawable.ic_logo_apple),
-                        contentDescription = null,
-                        tint = Color.Unspecified,
-                    )
-                    Text(
-                        text = stringResource(resource = Res.string.login_button_apple),
-                        style = CaroTheme.typography.robotoLabel1,
-                        color = Color(0xFFFFFFFF)
-                    )
-                }
-            }
+                    .clip(shape = CaroTheme.shape.xxl)
+                    .background(color = Color(0xFF000000)),
+                iconRes = Res.drawable.ic_logo_apple,
+                contentRes = Res.string.login_button_apple,
+                textColor = Color(0xFFFFFFFF),
+                onClick = { onLaunch(SocialLoginType.APPLE) }
+            )
 
             Text(
                 text = stringResource(resource = Res.string.login_text_bottom_terms_of_service),

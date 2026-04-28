@@ -1,26 +1,35 @@
 package com.whatever.caro.feature.login.component
 
+import androidx.compose.animation.core.Animatable
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 import caromobile.core.designsystem.generated.resources.Res
 import caromobile.core.designsystem.generated.resources.ic_renew_16
 import caromobile.core.designsystem.generated.resources.login_card_button
-import caromobile.core.designsystem.generated.resources.login_card_text_descriptoin
+import caromobile.core.designsystem.generated.resources.login_card_text_description
 import caromobile.core.designsystem.generated.resources.login_card_text_title
 import com.whatever.caro.core.designsystem.themes.CaroTheme
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
@@ -36,10 +45,44 @@ fun FlipCard(
         verticalArrangement = Arrangement.Center
     ) {
         if (isFlipped) {
-            Column(
+            Column (
+                modifier = Modifier
+                    .fillMaxSize()
+                    .graphicsLayer {
+                        this.rotationX = 180f
+                    },
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // FIXME : Heading0이 존재
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(space = CaroTheme.spacing.m),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = stringResource(Res.string.login_card_text_title),
+                        style = CaroTheme.typography.heading1,
+                        color = CaroTheme.color.text.brand,
+                    )
+                    HorizontalDivider(
+                        modifier = Modifier.size(
+                            width = 40.dp, height = 2.dp
+                        ),
+                        color = CaroTheme.color.divider.primary
+                    )
+                    Text(
+                        text = stringResource(Res.string.login_card_text_description),
+                        style = CaroTheme.typography.heading1,
+                        color = CaroTheme.color.text.secondary,
+                    )
+                }
+
+                Spacer(modifier = Modifier.size(size = CaroTheme.spacing.xl))
+                FlipButton(isFlipped = isFlipped, onClick = onClick)
+            }
+        } else {
+            Column(
+                modifier = Modifier,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
                 Text(
                     text = stringResource(Res.string.login_card_text_title),
                     style = CaroTheme.typography.heading1,
@@ -48,32 +91,6 @@ fun FlipCard(
                 Spacer(modifier = Modifier.size(size = CaroTheme.spacing.xl))
                 FlipButton(isFlipped = isFlipped, onClick = onClick)
             }
-        } else {
-            Column(
-                modifier = Modifier,
-                verticalArrangement = Arrangement.spacedBy(space = CaroTheme.spacing.m),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                // FIXME: Heading0이 존재
-                Text(
-                    text = stringResource(Res.string.login_card_text_title),
-                    style = CaroTheme.typography.heading1,
-                    color = CaroTheme.color.text.brand,
-                )
-                HorizontalDivider(
-                    modifier = Modifier.size(
-                        width = 40.dp, height = 2.dp
-                    ),
-                    color = CaroTheme.color.divider.primary
-                )
-                Text(
-                    text = stringResource(Res.string.login_card_text_descriptoin),
-                    style = CaroTheme.typography.heading1,
-                    color = CaroTheme.color.text.secondary,
-                )
-            }
-            Spacer(modifier = Modifier.size(size = CaroTheme.spacing.xl))
-            FlipButton(isFlipped = isFlipped, onClick = onClick)
         }
     }
 }
@@ -85,24 +102,22 @@ private fun FlipButton(
 ) {
     val (backgroundColor, iconColor, textColor) = if (isFlipped) {
         Triple(
-            CaroTheme.color.surface.tertiary,
-            CaroTheme.color.icon.tertiary,
-            CaroTheme.color.text.tertiary
-        )
-    } else {
-        Triple(
             CaroTheme.color.surface.secondary,
             CaroTheme.color.icon.brand,
             CaroTheme.color.text.brand
+        )
+    } else {
+        Triple(
+            CaroTheme.color.surface.tertiary,
+            CaroTheme.color.icon.tertiary,
+            CaroTheme.color.text.tertiary
         )
     }
 
     Row(
         modifier = Modifier
-            .background(
-                color = backgroundColor,
-                shape = CaroTheme.shape.xxl
-            )
+            .clip(shape = CaroTheme.shape.xxl)
+            .background(color = backgroundColor)
             .clickable { onClick() }
             .padding(horizontal = 12.dp, vertical = 6.dp),
         verticalAlignment = Alignment.CenterVertically,

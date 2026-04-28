@@ -8,6 +8,6 @@
     <string name="login_button_google">Sign in with Google</string>
     <string name="login_button_apple">Sign in with Apple</string>
     <string name="login_card_button">Tap to flip</string>
-    <string name="login_card_text_descriptoin">[ˈæpəl]</string>
+    <string name="login_card_text_description">[ˈæpəl]</string>
     <string name="login_card_text_title">Apple</string>
 </resources>
