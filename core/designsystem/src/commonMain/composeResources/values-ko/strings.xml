@@ -43,12 +43,12 @@
     <string name="deck_detail_title_daily_learning">오늘의 학습</string>
     <string name="deck_detail_sub_title_daily_learning">학습한 카드</string>
     <string name="deck_detail_caption_daily_learning_ready">일일 학습을 시작해봐요 🌱</string>
-    <string name="deck_detail_caption_daily_learning_in_progress">오늘 목표의 절반을 넘겼어요! 🎉</string>
+    <string name="deck_detail_caption_daily_learning_in_progress">이어서 학습을 완료해봐요! ⚡️</string>
     <string name="deck_detail_caption_daily_learning_completed">오늘 목표를 달성했어요! 🔥</string>
-    <string name="deck_detail_caption_daily_learning_unvailable">오늘은 학습할 카드가 없어요</string>
+    <string name="deck_detail_caption_daily_learning_unavailable">오늘은 학습할 카드가 없어요</string>
     <string name="deck_detail_label_daily_learning_in_progress">진행중</string>
     <string name="deck_detail_label_daily_learning_completed">완료</string>
-    <string name="deck_detail_label_daily_learning_unvailable">휴식</string>
+    <string name="deck_detail_label_daily_learning_unavailable">휴식</string>
     <string name="deck_detail_button_daily_learning">일일학습</string>
     <string name="deck_detail_button_all_learning">전체 학습(벼락치기)</string>
     <string name="deck_detail_label_total_count">전체 %d</string>

@@ -39,17 +39,18 @@
 	<string name="deck_detail_screen_name">Deck Detail</string>
 	<string name="deck_detail_label_screen_name">Deck Detail</string>
 	<string name="deck_detail_title_empty_guid">Create your first card\nto start learning</string>
-	<string name="deck_detail_sub_title_empty_guid">Add cards and a daily study\nschedule will becreated automatically</string>
+	<string name="deck_detail_sub_title_empty_guid">Add cards and a daily study\nschedule will
+		becreated automatically</string>
 	<string name="deck_detail_button_empty_guid">Add your first card</string>
 	<string name="deck_detail_title_daily_learning">Today's Study</string>
 	<string name="deck_detail_sub_title_daily_learning">Cards studied</string>
 	<string name="deck_detail_caption_daily_learning_ready">Start today's study 🌱</string>
-	<string name="deck_detail_caption_daily_learning_in_progress">You're over halfway to today's goal! 🎉</string>
+	<string name="deck_detail_caption_daily_learning_in_progress">Let’s finish your learning streak! ⚡️</string>
 	<string name="deck_detail_caption_daily_learning_completed">You reached today's goal! 🔥</string>
-	<string name="deck_detail_caption_daily_learning_unvailable">No cards to study today</string>
+	<string name="deck_detail_caption_daily_learning_unavailable">No cards to study today</string>
 	<string name="deck_detail_label_daily_learning_in_progress">In progress</string>
 	<string name="deck_detail_label_daily_learning_completed">Completed</string>
-	<string name="deck_detail_label_daily_learning_unvailable">Rest</string>
+	<string name="deck_detail_label_daily_learning_unavailable">Rest</string>
 	<string name="deck_detail_button_daily_learning">Daily study</string>
 	<string name="deck_detail_button_all_learning">Study all cards</string>
 	<string name="deck_detail_label_total_count">Total %d</string>
