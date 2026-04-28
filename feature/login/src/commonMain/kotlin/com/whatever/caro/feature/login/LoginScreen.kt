@@ -57,6 +57,7 @@ internal fun LoginScreen(
     onLaunch: (SocialLoginType) -> Unit,
 ) {
     var isFlipped by remember { mutableStateOf(false) }
+    var isAnimating by remember { mutableStateOf(false) }
     val rotation = remember { Animatable(initialValue = 0f) }
     val coroutineScope = rememberCoroutineScope()
 
@@ -104,17 +105,23 @@ internal fun LoginScreen(
                         ).padding(vertical = 15.dp),
                 isFlipped = isFlipped,
                 onClick = {
+                    if (isAnimating) return@FlipCard
+                    isAnimating = true
                     coroutineScope.launch {
-                        val target = rotation.value + 180f
-                        rotation.animateTo(
-                            targetValue = rotation.value + 90f,
-                            animationSpec = tween(200),
-                        )
-                        isFlipped = !isFlipped
-                        rotation.animateTo(
-                            targetValue = target,
-                            animationSpec = tween(200),
-                        )
+                        try {
+                            val target = rotation.value + 180f
+                            rotation.animateTo(
+                                targetValue = rotation.value + 90f,
+                                animationSpec = tween(200),
+                            )
+                            isFlipped = !isFlipped
+                            rotation.animateTo(
+                                targetValue = target,
+                                animationSpec = tween(200),
+                            )
+                        } finally {
+                            isAnimating = false
+                        }
                     }
                 },
             )
