@@ -3,7 +3,6 @@ package com.whatever.caro.core.data.di
 import com.whatever.caro.core.data.repository.demo.DemoRepository
 import com.whatever.caro.core.data.repository.demo.DemoRepositoryImpl
 import org.koin.dsl.bind
-import org.koin.dsl.binds
 import org.koin.dsl.module
 import org.koin.plugin.module.dsl.single
 
