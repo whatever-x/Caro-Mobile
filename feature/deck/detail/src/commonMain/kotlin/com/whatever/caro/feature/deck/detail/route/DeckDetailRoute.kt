@@ -18,7 +18,6 @@ fun DeckDetailRoute(
     val state by viewModel.state.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
-        viewModel.init()
     }
 
     LaunchedEffect(Unit) {
