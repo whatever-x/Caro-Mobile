@@ -3,6 +3,7 @@ package com.whatever.caro.core.remote.network.plugins
 import com.whatever.caro.core.model.exception.CaroClientException
 import com.whatever.caro.core.model.exception.CaroInvalidResponseException
 import com.whatever.caro.core.model.exception.CaroServerException
+import com.whatever.caro.core.model.exception.ErrorCode.CANCELLED
 import com.whatever.caro.core.model.exception.ErrorCode.INVALID_RESPONSE
 import com.whatever.caro.core.model.exception.ErrorCode.NETWORK_001
 import com.whatever.caro.core.model.exception.ErrorCode.NETWORK_002
@@ -82,7 +83,12 @@ internal fun HttpCallValidatorConfig.configureCaroExceptionMapping(jsonParser: J
 
         throw when (cause) {
             is CancellationException -> {
-                cause
+                CaroClientException(
+                    code = CANCELLED,
+                    message = "Network Request Cancelled",
+                    debugMessage = "네트워크 요청이 취소되었습니다. cause=${cause.message.orEmpty()}",
+                    throwable = cause,
+                )
             }
 
             is HttpRequestTimeoutException,
