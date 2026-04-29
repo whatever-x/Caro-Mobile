@@ -48,7 +48,7 @@ import com.whatever.caro.core.designsystem.themes.CaroTheme
 import com.whatever.caro.feature.deck.detail.model.LearningStatus
 import org.jetbrains.compose.resources.stringResource
 
-internal fun LazyListScope.DailyLearningCard(
+internal fun LazyListScope.dailyLearningCard(
     learningCardCount: Int,
     learningCardTotal: Int,
     learningProgress: Int,
@@ -302,7 +302,7 @@ private fun DailyLearningCardContentPreview() {
                     .fillMaxSize()
                     .padding(top = 20.dp),
         ) {
-            DailyLearningCard(
+            dailyLearningCard(
                 learningCardCount = 0,
                 learningCardTotal = 1000,
                 learningProgress = 0,

@@ -13,14 +13,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.whatever.caro.core.designsystem.themes.CaroTheme
 import com.whatever.caro.feature.deck.detail.components.AddCardButtonItem
-import com.whatever.caro.feature.deck.detail.components.DailyLearningCard
 import com.whatever.caro.feature.deck.detail.components.DeckCardItem
 import com.whatever.caro.feature.deck.detail.components.DeckDetailGuid
 import com.whatever.caro.feature.deck.detail.components.DeckDetailHeader
 import com.whatever.caro.feature.deck.detail.components.DeckDetailTopBar
 import com.whatever.caro.feature.deck.detail.components.DeckEditBottomSheet
 import com.whatever.caro.feature.deck.detail.components.SortBottomSheet
-import com.whatever.caro.feature.deck.detail.components.FilterAndSortStickyHeader
+import com.whatever.caro.feature.deck.detail.components.dailyLearningCard
+import com.whatever.caro.feature.deck.detail.components.filterAndSortStickyHeader
 import com.whatever.caro.feature.deck.detail.model.DeckUiModel
 import com.whatever.caro.feature.deck.detail.model.LearningUiModel
 import com.whatever.caro.feature.deck.detail.mvi.DeckDetailIntent
@@ -65,7 +65,7 @@ internal fun DeckDetailScreen(
                     )
                 }
 
-                DailyLearningCard(
+                dailyLearningCard(
                     learningCardCount = state.learningUiModel.reviewedCardCount,
                     learningCardTotal = state.learningUiModel.learningCardTotal,
                     learningProgress = state.learningUiModel.learningProgress,
@@ -74,7 +74,7 @@ internal fun DeckDetailScreen(
                     onDailyStudy = { onIntent(DeckDetailIntent.ClickDailyStudy) },
                 )
 
-                FilterAndSortStickyHeader(
+                filterAndSortStickyHeader(
                     deckCardTotal = state.deckUiModel.deckCardTotal,
                     selectedSortOption = state.selectedSortOption,
                     onSortCardList = { onIntent(DeckDetailIntent.ClickSortCardList) },

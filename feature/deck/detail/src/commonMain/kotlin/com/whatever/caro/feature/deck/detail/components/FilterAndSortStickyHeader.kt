@@ -26,7 +26,7 @@ import com.whatever.caro.core.designsystem.themes.CaroTheme
 import com.whatever.caro.feature.deck.detail.mvi.DeckDetailSortOption
 import org.jetbrains.compose.resources.stringResource
 
-internal fun LazyListScope.FilterAndSortStickyHeader(
+internal fun LazyListScope.filterAndSortStickyHeader(
     deckCardTotal: Int,
     selectedSortOption: DeckDetailSortOption,
     onSortCardList: () -> Unit,
