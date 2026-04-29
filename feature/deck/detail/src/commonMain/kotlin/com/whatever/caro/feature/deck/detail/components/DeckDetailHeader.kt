@@ -4,11 +4,24 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import com.whatever.caro.core.designsystem.themes.CaroTheme
+
+internal fun LazyListScope.DeckInfoSection(
+    title: String,
+    description: String,
+) {
+    item {
+        DeckInfo(
+            title = title,
+            description = description,
+        )
+    }
+}
 
 @Composable
 internal fun DeckInfo(

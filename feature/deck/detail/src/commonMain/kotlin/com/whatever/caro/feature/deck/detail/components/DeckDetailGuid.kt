@@ -34,16 +34,16 @@ import io.github.alexzhirkevich.compottie.rememberLottiePainter
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
-private const val Lottie_Empty_Card_Path = "files/lottie_empty_card.json"
+private const val LOTTIE_EMPTY_CARD_PATH = "files/lottie_empty_card.json"
 
 @Composable
-internal fun EmptyCard(
+internal fun Guid(
     onAddFirstCard: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val composition by rememberLottieComposition {
         LottieCompositionSpec.JsonString(
-            Res.readBytes(path = Lottie_Empty_Card_Path).decodeToString(),
+            Res.readBytes(path = LOTTIE_EMPTY_CARD_PATH).decodeToString(),
         )
     }
 
@@ -62,13 +62,14 @@ internal fun EmptyCard(
                         iterations = Compottie.IterateForever,
                     ),
                 contentDescription = null,
-                contentScale = ContentScale.Crop
+                contentScale = ContentScale.Crop,
             )
 
             Text(
-                text = stringResource(
-                    resource = Res.string.deck_detail_title_empty_guid
-                ),
+                text =
+                    stringResource(
+                        resource = Res.string.deck_detail_title_empty_guid,
+                    ),
                 style = CaroTheme.typography.heading2,
                 color = CaroTheme.color.text.primary,
                 textAlign = TextAlign.Center,
@@ -77,9 +78,10 @@ internal fun EmptyCard(
             Spacer(modifier = Modifier.height(height = CaroTheme.spacing.l))
 
             Text(
-                text = stringResource(
-                    resource = Res.string.deck_detail_sub_title_empty_guid
-                ),
+                text =
+                    stringResource(
+                        resource = Res.string.deck_detail_sub_title_empty_guid,
+                    ),
                 style = CaroTheme.typography.body2.reading,
                 color = CaroTheme.color.text.secondary,
                 textAlign = TextAlign.Center,
@@ -88,36 +90,37 @@ internal fun EmptyCard(
             Spacer(modifier = Modifier.height(height = CaroTheme.spacing.l))
 
             Row( // TODO : CTA 버튼 컴포넌트 교체
-                modifier = Modifier
-                    .background(
-                        color = CaroTheme.color.surface.brand,
-                        shape = CaroTheme.shape.xxl
-                    )
-                    .clip(shape = CaroTheme.shape.xxl)
-                    .clickable(
-                        onClick = onAddFirstCard
-                    )
-                    .padding(
-                        horizontal = CaroTheme.spacing.l,
-                        vertical = CaroTheme.spacing.m,
+                modifier =
+                    Modifier
+                        .background(
+                            color = CaroTheme.color.surface.brand,
+                            shape = CaroTheme.shape.xxl,
+                        ).clip(shape = CaroTheme.shape.xxl)
+                        .clickable(
+                            onClick = onAddFirstCard,
+                        ).padding(
+                            horizontal = CaroTheme.spacing.l,
+                            vertical = CaroTheme.spacing.m,
+                        ),
+                horizontalArrangement =
+                    Arrangement.spacedBy(
+                        space = CaroTheme.spacing.xs,
                     ),
-                horizontalArrangement = Arrangement.spacedBy(
-                    space = CaroTheme.spacing.xs
-                ),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Icon(
                     painter = painterResource(resource = Res.drawable.ic_add_16),
                     tint = CaroTheme.color.icon.inverse,
-                    contentDescription = null
+                    contentDescription = null,
                 )
 
                 Text(
-                    text = stringResource(
-                        resource = Res.string.deck_detail_button_empty_guid
-                    ),
+                    text =
+                        stringResource(
+                            resource = Res.string.deck_detail_button_empty_guid,
+                        ),
                     style = CaroTheme.typography.caption1,
-                    color = CaroTheme.color.text.inverse
+                    color = CaroTheme.color.text.inverse,
                 )
             }
         }
