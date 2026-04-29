@@ -4,4 +4,5 @@ sealed class CaroException(
     open val code: String,
     override val message: String,
     open val debugMessage: String,
-) : Exception(message)
+    open val throwable: Throwable?,
+) : Exception(message, throwable)

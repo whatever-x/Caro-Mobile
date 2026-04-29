@@ -39,6 +39,7 @@ internal fun HttpCallValidatorConfig.configureCaroExceptionMapping(jsonParser: J
                                 statusCode = response.status.value,
                                 causeMessage = throwable.message,
                             ),
+                        throwable = throwable,
                     )
                 }
 
@@ -56,6 +57,7 @@ internal fun HttpCallValidatorConfig.configureCaroExceptionMapping(jsonParser: J
                                 payloadText = responseText,
                                 causeMessage = throwable.message,
                             ),
+                        throwable = throwable,
                     )
                 }
 
@@ -91,6 +93,7 @@ internal fun HttpCallValidatorConfig.configureCaroExceptionMapping(jsonParser: J
                     code = NETWORK_002,
                     message = "Network Timeout Error",
                     debugMessage = "네트워크 타임아웃 발생: ${cause.message.orEmpty()}",
+                    throwable = cause,
                 )
             }
 
@@ -101,6 +104,7 @@ internal fun HttpCallValidatorConfig.configureCaroExceptionMapping(jsonParser: J
                     code = NETWORK_001,
                     message = "Network Error",
                     debugMessage = "네트워크 연결 오류 발생: ${cause.message.orEmpty()}",
+                    throwable = cause,
                 )
             }
 
@@ -109,6 +113,7 @@ internal fun HttpCallValidatorConfig.configureCaroExceptionMapping(jsonParser: J
                     code = UNKNOWN,
                     message = "Unknown Error",
                     debugMessage = "알 수 없는 예외가 발생했습니다. cause=${cause.message.orEmpty()}",
+                    throwable = cause,
                 )
             }
         }

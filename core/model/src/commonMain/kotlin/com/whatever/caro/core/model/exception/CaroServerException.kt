@@ -5,4 +5,5 @@ data class CaroServerException(
     override val message: String,
     override val debugMessage: String,
     val description: String? = null,
-) : CaroException(code, message, debugMessage)
+    override val throwable: Throwable? = null
+) : CaroException(code, message, debugMessage, throwable)

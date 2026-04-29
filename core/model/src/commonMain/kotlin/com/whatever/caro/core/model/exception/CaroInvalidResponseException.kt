@@ -4,4 +4,5 @@ data class CaroInvalidResponseException(
     override val code: String,
     override val message: String,
     override val debugMessage: String,
-) : CaroException(code, message, debugMessage)
+    override val throwable: Throwable? = null,
+) : CaroException(code, message, debugMessage, throwable)

@@ -50,6 +50,7 @@ internal val CaroBaseResponseConverter: ClientPlugin<CaroBaseResponseConverterCo
                                 payloadText = payloadText,
                                 causeMessage = throwable.message,
                             ),
+                        throwable = throwable,
                     )
                 }
 
@@ -70,6 +71,7 @@ internal val CaroBaseResponseConverter: ClientPlugin<CaroBaseResponseConverterCo
                                 payloadText = payloadText,
                                 causeMessage = throwable.message,
                             ),
+                        throwable = throwable,
                     )
                 }
 
