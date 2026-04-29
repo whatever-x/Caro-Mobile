@@ -37,7 +37,7 @@ import org.jetbrains.compose.resources.stringResource
 private const val LOTTIE_EMPTY_CARD_PATH = "files/lottie_empty_card.json"
 
 @Composable
-internal fun Guid(
+internal fun DeckDetailGuid(
     onAddFirstCard: () -> Unit,
     modifier: Modifier = Modifier,
 ) {

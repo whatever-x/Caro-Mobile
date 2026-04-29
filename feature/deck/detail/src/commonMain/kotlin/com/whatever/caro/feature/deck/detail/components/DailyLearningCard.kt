@@ -45,14 +45,14 @@ import caromobile.core.designsystem.generated.resources.deck_detail_label_daily_
 import caromobile.core.designsystem.generated.resources.deck_detail_sub_title_daily_learning
 import caromobile.core.designsystem.generated.resources.deck_detail_title_daily_learning
 import com.whatever.caro.core.designsystem.themes.CaroTheme
-import com.whatever.caro.feature.deck.detail.mvi.LearningState
+import com.whatever.caro.feature.deck.detail.model.LearningStatus
 import org.jetbrains.compose.resources.stringResource
 
 internal fun LazyListScope.DailyLearningCard(
     learningCardCount: Int,
     learningCardTotal: Int,
     learningProgress: Int,
-    currentLearningState: LearningState,
+    currentLearningStatus: LearningStatus,
     onDailyStudy: () -> Unit,
     onAllStudy: () -> Unit,
     modifier: Modifier = Modifier,
@@ -62,7 +62,7 @@ internal fun LazyListScope.DailyLearningCard(
             counting = learningCardCount,
             total = learningCardTotal,
             learningProgress = learningProgress,
-            learningState = currentLearningState,
+            learningStatus = currentLearningStatus,
             onDailyStudy = onDailyStudy,
             onAllStudy = onAllStudy,
             modifier =
@@ -81,36 +81,36 @@ private fun DailyLearningCardContent(
     counting: Int,
     total: Int,
     learningProgress: Int,
-    learningState: LearningState,
+    learningStatus: LearningStatus,
     onDailyStudy: () -> Unit,
     onAllStudy: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val motivationalMessage =
-        when (learningState) {
-            LearningState.UNAVAILABLE -> stringResource(Res.string.deck_detail_caption_daily_learning_unavailable)
-            LearningState.COMPLETED -> stringResource(Res.string.deck_detail_caption_daily_learning_completed)
-            LearningState.IN_PROGRESS -> stringResource(Res.string.deck_detail_caption_daily_learning_in_progress)
-            LearningState.READY -> stringResource(Res.string.deck_detail_caption_daily_learning_ready)
+        when (learningStatus) {
+            LearningStatus.UNAVAILABLE -> stringResource(Res.string.deck_detail_caption_daily_learning_unavailable)
+            LearningStatus.COMPLETED -> stringResource(Res.string.deck_detail_caption_daily_learning_completed)
+            LearningStatus.IN_PROGRESS -> stringResource(Res.string.deck_detail_caption_daily_learning_in_progress)
+            LearningStatus.READY -> stringResource(Res.string.deck_detail_caption_daily_learning_ready)
         }
 
-    val learningStateLabelText =
-        when (learningState) {
-            LearningState.UNAVAILABLE -> stringResource(Res.string.deck_detail_label_daily_learning_unavailable)
-            LearningState.COMPLETED -> stringResource(Res.string.deck_detail_label_daily_learning_completed)
-            LearningState.IN_PROGRESS -> stringResource(Res.string.deck_detail_label_daily_learning_in_progress)
-            LearningState.READY -> ""
+    val learningStatusLabelText =
+        when (learningStatus) {
+            LearningStatus.UNAVAILABLE -> stringResource(Res.string.deck_detail_label_daily_learning_unavailable)
+            LearningStatus.COMPLETED -> stringResource(Res.string.deck_detail_label_daily_learning_completed)
+            LearningStatus.IN_PROGRESS -> stringResource(Res.string.deck_detail_label_daily_learning_in_progress)
+            LearningStatus.READY -> ""
         }
 
-    val learningStateLabelTextColor =
-        when (learningState) {
-            LearningState.COMPLETED,
-            LearningState.IN_PROGRESS,
+    val learningStatusLabelTextColor =
+        when (learningStatus) {
+            LearningStatus.COMPLETED,
+            LearningStatus.IN_PROGRESS,
             -> CaroTheme.color.text.brand
 
-            LearningState.UNAVAILABLE -> CaroTheme.color.text.brand
+            LearningStatus.UNAVAILABLE -> CaroTheme.color.text.brand
 
-            LearningState.READY -> Color.Unspecified
+            LearningStatus.READY -> Color.Unspecified
         }
 
     Column(
@@ -154,7 +154,7 @@ private fun DailyLearningCardContent(
                                 Modifier
                                     .size(size = 8.dp)
                                     .background(
-                                        color = learningStateLabelTextColor,
+                                        color = learningStatusLabelTextColor,
                                         shape = CircleShape,
                                     ),
                         )
@@ -162,8 +162,8 @@ private fun DailyLearningCardContent(
                         Spacer(modifier = Modifier.width(width = CaroTheme.spacing.xs))
 
                         Text(
-                            text = learningStateLabelText,
-                            color = learningStateLabelTextColor,
+                            text = learningStatusLabelText,
+                            color = learningStatusLabelTextColor,
                             style = CaroTheme.typography.caption1,
                         )
                     }
@@ -236,7 +236,7 @@ private fun DailyLearningCardContent(
                     }
                 }
 
-                Box(
+                Box( // TODO : CTA 버튼 컴포넌트 구현시 교체
                     modifier =
                         Modifier
                             .fillMaxWidth()
@@ -306,7 +306,9 @@ private fun DailyLearningCardContentPreview() {
                 learningCardCount = 0,
                 learningCardTotal = 1000,
                 learningProgress = 0,
-                currentLearningState = LearningState.IN_PROGRESS,
+                currentLearningStatus = LearningStatus.IN_PROGRESS,
+                onDailyStudy = { },
+                onAllStudy = { },
             )
         }
     }
