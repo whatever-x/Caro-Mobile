@@ -51,10 +51,10 @@
     <string name="deck_detail_label_daily_learning_unavailable">휴식</string>
     <string name="deck_detail_button_daily_learning">일일학습</string>
     <string name="deck_detail_button_all_learning">전체 학습(벼락치기)</string>
-    <string name="deck_detail_label_total_count">전체 %d</string>
+    <string name="deck_detail_label_total_count">전체 %1$d</string>
     <string name="deck_detail_button_add_card">카드 추가하기</string>
     <string name="deck_detail_button_edit">편집</string>
-    <string name="deck_detail_caption_review_count">%d회 학습</string>
+    <string name="deck_detail_caption_review_count">%1$d회 학습</string>
     <string name="deck_detail_label_bottom_sheet">정렬</string>
     <string name="deck_detail_button_bottom_sheet_created">생성일</string>
     <string name="deck_detail_button_bottom_sheet_last_reviewed">최근 학습</string>

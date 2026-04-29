@@ -53,10 +53,10 @@
 	<string name="deck_detail_label_daily_learning_unavailable">Rest</string>
 	<string name="deck_detail_button_daily_learning">Daily study</string>
 	<string name="deck_detail_button_all_learning">Study all cards</string>
-	<string name="deck_detail_label_total_count">Total %d</string>
+	<string name="deck_detail_label_total_count">Total %1$d</string>
 	<string name="deck_detail_button_add_card">Add card</string>
 	<string name="deck_detail_button_edit">Edit</string>
-	<string name="deck_detail_caption_review_count">Studied %d times</string>
+	<string name="deck_detail_caption_review_count">Studied %1$d times</string>
 	<string name="deck_detail_label_bottom_sheet">Sort</string>
 	<string name="deck_detail_button_bottom_sheet_created">Created date</string>
 	<string name="deck_detail_button_bottom_sheet_last_reviewed">Recently studied</string>
