@@ -83,12 +83,7 @@ internal fun HttpCallValidatorConfig.configureCaroExceptionMapping(jsonParser: J
 
         throw when (cause) {
             is CancellationException -> {
-                CaroClientException(
-                    code = CANCELLED,
-                    message = "Network Request Cancelled",
-                    debugMessage = "네트워크 요청이 취소되었습니다. cause=${cause.message.orEmpty()}",
-                    throwable = cause,
-                )
+                cause
             }
 
             is HttpRequestTimeoutException,
