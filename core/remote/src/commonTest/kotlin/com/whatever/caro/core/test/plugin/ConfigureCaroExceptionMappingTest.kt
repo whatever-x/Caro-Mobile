@@ -56,7 +56,7 @@ class ConfigureCaroExceptionMappingTest : FunSpec() {
             exception.description shouldBe "retry later"
         }
 
-        test("에러 응답 body 파싱에 실패하면 status code와 기본 메시지로 NetworkException을 만든다") {
+        test("에러 응답 body 파싱에 실패하면 status code와 기본 메시지로 CaroInvalidResponseException을 만든다") {
             val errorStatus = HttpStatusCode.BadGateway
             val client =
                 createClient(
