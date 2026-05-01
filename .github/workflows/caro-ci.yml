@@ -46,7 +46,7 @@ jobs:
           keystore_base64: ${{ secrets.KEYSTORE_BASE64 }}
 
       - name: Run test
-        run: ./gradlew test --build-cache --parallel
+        run: ./gradlew allTests --build-cache --parallel
 
       - name: Generate Kover XML
         run: ./gradlew koverAllXmlReport --build-cache --parallel
@@ -89,14 +89,6 @@ jobs:
           local_properties: ${{ secrets.LOCAL_PROPERTIES }}
           google_services_json: ${{ secrets.GOOGLE_SERVICES_JSON }}
           keystore_base64: ${{ secrets.KEYSTORE_BASE64 }}
-
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3.2.2
-
-      - name: Append sdk.dir to local.properties
-        shell: bash
-        run: |
-          echo "sdk.dir=${ANDROID_SDK_ROOT:-$ANDROID_HOME}" >> local.properties
 
       - name: Build Project
         run: ./gradlew :androidApp:assembleDebug --build-cache

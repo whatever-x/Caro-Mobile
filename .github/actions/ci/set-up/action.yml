@@ -47,6 +47,14 @@ runs:
         java-version: 17
         distribution: temurin
 
+    - name: Setup Android SDK
+      uses: android-actions/setup-android@v3.2.2
+
+    - name: Append sdk.dir to local.properties
+      shell: bash
+      run: |
+        echo "sdk.dir=${ANDROID_SDK_ROOT:-$ANDROID_HOME}" >> local.properties
+
     - name: Set Up Gradle
       uses: gradle/actions/setup-gradle@v5
       with:
