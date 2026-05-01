@@ -76,18 +76,19 @@ internal val CaroBaseResponseConverter: ClientPlugin<CaroBaseResponseConverterCo
                 }
 
             if (!baseResponse.success) {
-                val error = baseResponse.error ?: throw CaroInvalidResponseException(
-                    code = INVALID_RESPONSE,
-                    message = "Invalid Response Error",
-                    debugMessage =
-                        buildDebugMessage(
-                            reason = "success=false 이지만 error 페이로드가 null 입니다.",
-                            kotlinType = kotlinType,
-                            responseStatus = response.status.value,
-                            contentType = contentType,
-                            payloadText = payloadText,
-                        ),
-                )
+                val error =
+                    baseResponse.error ?: throw CaroInvalidResponseException(
+                        code = INVALID_RESPONSE,
+                        message = "Invalid Response Error",
+                        debugMessage =
+                            buildDebugMessage(
+                                reason = "success=false 이지만 error 페이로드가 null 입니다.",
+                                kotlinType = kotlinType,
+                                responseStatus = response.status.value,
+                                contentType = contentType,
+                                payloadText = payloadText,
+                            ),
+                    )
 
                 throw CaroServerException(
                     code = error.code,

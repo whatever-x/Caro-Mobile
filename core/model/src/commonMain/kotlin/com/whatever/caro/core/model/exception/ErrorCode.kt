@@ -6,5 +6,4 @@ object ErrorCode {
     const val CANCELLED = "CANCELLED"
     const val NETWORK_001 = "NETWORK_001"
     const val NETWORK_002 = "NETWORK_002"
-
 }

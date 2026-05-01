@@ -62,16 +62,17 @@ internal fun HttpCallValidatorConfig.configureCaroExceptionMapping(jsonParser: J
                     )
                 }
 
-            val errorResponse = baseResponse.error ?: throw CaroInvalidResponseException(
-                code = INVALID_RESPONSE,
-                message = "Invalid Response Error",
-                debugMessage =
-                    buildResponseDebugMessage(
-                        reason = "Error Response가 null 입니다.",
-                        statusCode = response.status.value,
-                        payloadText = responseText,
-                    ),
-            )
+            val errorResponse =
+                baseResponse.error ?: throw CaroInvalidResponseException(
+                    code = INVALID_RESPONSE,
+                    message = "Invalid Response Error",
+                    debugMessage =
+                        buildResponseDebugMessage(
+                            reason = "Error Response가 null 입니다.",
+                            statusCode = response.status.value,
+                            payloadText = responseText,
+                        ),
+                )
 
             throw CaroServerException(
                 code = errorResponse.code,

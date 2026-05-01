@@ -4,5 +4,5 @@ data class NetworkException(
     override val code: String,
     override val message: String,
     override val debugMessage: String,
-    override val throwable: Throwable? = null
+    override val throwable: Throwable? = null,
 ) : CaroException(code, message, debugMessage, throwable)
