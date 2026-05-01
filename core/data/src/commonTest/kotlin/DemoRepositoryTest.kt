@@ -52,16 +52,16 @@ class DemoRepositoryTest :
                 everySuspend {
                     demoDataSourceMock.getRestWithQuery(query = 123)
                 } returns
-                        DemoResponse(
-                            user = DemoDto(id = 123L, name = "테스터"),
-                        )
+                    DemoResponse(
+                        user = DemoDto(id = 123L, name = "테스터"),
+                    )
 
                 val repo: DemoRepository = get()
 
                 repo.getData(123L) shouldBe
-                        DemoResponse(
-                            user = DemoDto(id = 123L, name = "테스터"),
-                        ).toUser()
+                    DemoResponse(
+                        user = DemoDto(id = 123L, name = "테스터"),
+                    ).toUser()
             }
         }
 
