@@ -1,8 +1,8 @@
 package com.whatever.caro.core.remote.network
 
 import com.whatever.caro.core.remote.network.config.CaroNetworkConfig
-import com.whatever.caro.core.remote.network.plugins.CaroBaseResponseUnwrap
-import com.whatever.caro.core.remote.network.plugins.installCaroResponseHandler
+import com.whatever.caro.core.remote.network.plugins.CaroBaseResponseConverter
+import com.whatever.caro.core.remote.network.plugins.configureCaroExceptionMapping
 import io.ktor.client.HttpClient
 import io.ktor.client.HttpClientConfig
 import io.ktor.client.engine.HttpClientEngine
@@ -49,10 +49,10 @@ object HttpClientFactory {
             }
 
             install(HttpCallValidator) {
-                installCaroResponseHandler(jsonParser)
+                configureCaroExceptionMapping(jsonParser)
             }
 
-            install(CaroBaseResponseUnwrap) {
+            install(CaroBaseResponseConverter) {
                 this.json = jsonParser
             }
 

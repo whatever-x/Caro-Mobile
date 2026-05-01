@@ -1,8 +1,10 @@
 package com.whatever.caro.core.test.plugin
 
-import com.whatever.caro.core.remote.model.NetworkException
-import com.whatever.caro.core.remote.network.plugins.CaroBaseResponseUnwrap
-import com.whatever.caro.core.remote.network.plugins.installCaroResponseHandler
+import com.whatever.caro.core.model.exception.CaroInvalidResponseException
+import com.whatever.caro.core.model.exception.CaroServerException
+import com.whatever.caro.core.model.exception.ErrorCode
+import com.whatever.caro.core.model.exception.NetworkException
+import com.whatever.caro.core.remote.network.plugins.configureCaroExceptionMapping
 import io.kotest.assertions.throwables.shouldNotThrowAny
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
@@ -21,42 +23,13 @@ import io.ktor.http.headersOf
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 
-class CaroResponseHandlerTest : FunSpec() {
+class ConfigureCaroExceptionMappingTest : FunSpec() {
     init {
-        test("에러 응답의 Caro error body를 NetworkException으로 변환한다") {
+        test("InternalServerError 발생시 Caro error body를 CaroServerException으로 변환한다") {
+            val errorStatus = HttpStatusCode.InternalServerError
             val client =
                 createClient(
-                    status = HttpStatusCode.InternalServerError,
-                    responseBody =
-                        """
-                        {
-                          "success": false,
-                          "data": { },
-                          "error": {
-                            "code": "SERVER-500",
-                            "message": "server exploded",
-                            "debugMessage": "stacktrace",
-                            "description": "retry later"
-                          }
-                        }
-                        """.trimIndent(),
-                )
-
-            val exception =
-                shouldThrow<NetworkException> {
-                    client.get("https://caro.test/sample").body<String>()
-                }
-
-            exception.code shouldBe "SERVER-500"
-            exception.message shouldBe "server exploded"
-            exception.debugMessage shouldBe "stacktrace"
-            exception.description shouldBe "retry later"
-        }
-
-        test("unwrap 플러그인이 함께 설치되어도 에러 상세를 유지한다") {
-            val client =
-                createClient(
-                    status = HttpStatusCode.InternalServerError,
+                    status = errorStatus,
                     responseBody =
                         """
                         {
@@ -73,7 +46,7 @@ class CaroResponseHandlerTest : FunSpec() {
                 )
 
             val exception =
-                shouldThrow<NetworkException> {
+                shouldThrow<CaroServerException> {
                     client.get("https://caro.test/sample").body<String>()
                 }
 
@@ -83,22 +56,50 @@ class CaroResponseHandlerTest : FunSpec() {
             exception.description shouldBe "retry later"
         }
 
-        test("에러 응답 body 파싱에 실패하면 status code와 기본 메시지로 NetworkException을 만든다") {
+        test("에러 응답 body 파싱에 실패하면 status code와 기본 메시지로 CaroInvalidResponseException을 만든다") {
+            val errorStatus = HttpStatusCode.BadGateway
             val client =
                 createClient(
-                    status = HttpStatusCode.BadGateway,
+                    status = errorStatus,
                     responseBody = "not-json",
                     contentType = ContentType.Text.Plain,
                 )
 
             val exception =
-                shouldThrow<NetworkException> {
-                    client.get("https://caro.test/sample").body<String>()
+                shouldThrow<CaroInvalidResponseException> {
+                    client.get("https://caro.test/sample").body<Unit>()
                 }
 
-            exception.code shouldBe HttpStatusCode.BadGateway.value.toString()
-            exception.message shouldBe "Server error"
-            exception.description shouldBe null
+            exception.code shouldBe ErrorCode.INVALID_RESPONSE
+            exception.message shouldBe "Invalid Response Error"
+        }
+
+        test("응답이 없는 네트워크 오류는 NetworkException으로 변환한다") {
+            val client =
+                HttpClient(
+                    MockEngine {
+                        throw io.ktor.util.network
+                            .UnresolvedAddressException()
+                    },
+                ) {
+                    expectSuccess = true
+
+                    install(ContentNegotiation) {
+                        json(jsonParser)
+                    }
+
+                    install(HttpCallValidator) {
+                        configureCaroExceptionMapping(jsonParser)
+                    }
+                }
+
+            val exception =
+                shouldThrow<NetworkException> {
+                    client.get("https://caro.test/sample").body<Unit>()
+                }
+
+            exception.code shouldBe ErrorCode.NETWORK_001
+            exception.message shouldBe "Network Error"
         }
 
         test("정상 응답이면 NetworkException을 던지지 않는다") {
@@ -143,11 +144,7 @@ class CaroResponseHandlerTest : FunSpec() {
                 }
 
                 install(HttpCallValidator) {
-                    installCaroResponseHandler(jsonParser)
-                }
-
-                install(CaroBaseResponseUnwrap) {
-                    this.json = jsonParser
+                    configureCaroExceptionMapping(jsonParser)
                 }
             }
     }
