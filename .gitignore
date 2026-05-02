@@ -23,8 +23,7 @@ core/database/schemas
 */*/exported*/*
 
 # Xcode
-**/GoogleService-Info.plist
-**/GoogleService-Info-Qa.plist
+**/FirebaseConfig/*
 *.xcworkspace
 *.xcuserdata/
 !*.xcworkspace/contents.xcworkspacedata
