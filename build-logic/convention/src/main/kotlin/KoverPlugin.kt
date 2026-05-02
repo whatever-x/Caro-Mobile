@@ -1,8 +1,8 @@
 import com.whatever.caro.kover
-import org.gradle.api.Plugin
-import org.gradle.api.Project
 import kotlinx.kover.gradle.plugin.dsl.CoverageUnit
 import org.gradle.api.GradleException
+import org.gradle.api.Plugin
+import org.gradle.api.Project
 
 class KoverPlugin : Plugin<Project> {
 
