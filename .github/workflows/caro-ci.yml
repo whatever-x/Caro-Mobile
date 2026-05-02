@@ -110,26 +110,31 @@ jobs:
           reasons=()
 
           if [[ "${{ needs.lint-check.result }}" != "success" ]]; then
-            reasons+=("lint failed")
+            reasons+=("Lint 실패")
           fi
 
           if [[ "${{ needs.test-coverage.result }}" != "success" ]]; then
-            reasons+=("test coverage failed")
+            reasons+=("테스트 커버리지 미달성")
           fi
 
           if [[ "${{ needs.stability-check.result }}" != "success" ]]; then
-            reasons+=("compose stability failed")
+            reasons+=("Composable 불안정")
           fi
 
           if [[ ${#reasons[@]} -eq 0 ]]; then
-            message="<${{ github.event.pull_request.html_url }}|PR #${{ github.event.pull_request.number }}> CI passed"
+            title="PR #${{ github.event.pull_request.number }} CI 통과 :white_check_mark:"
+            reason_text="*결과*\\n모든 검사 통과"
           else
-            joined_reasons=$(printf ", %s" "${reasons[@]}")
-            joined_reasons=${joined_reasons:2}
-            message="<${{ github.event.pull_request.html_url }}|PR #${{ github.event.pull_request.number }}> CI failed (${joined_reasons})"
+            title="PR #${{ github.event.pull_request.number }} CI 실패 :x:"
+            reason_text="*원인*"
+
+            for reason in "${reasons[@]}"; do
+              reason_text+="\\n- ${reason}"
+            done
           fi
 
-          echo "text=${message}" >> "$GITHUB_OUTPUT"
+          echo "title=${title}" >> "$GITHUB_OUTPUT"
+          echo "reason_text=${reason_text}" >> "$GITHUB_OUTPUT"
 
       - name: Send Slack notification
         uses: slackapi/slack-github-action@v2.1.1
@@ -138,13 +143,24 @@ jobs:
           webhook-type: incoming-webhook
           payload: |
             {
-              "text": "${{ steps.message.outputs.text }}",
+              "text": "${{ steps.message.outputs.title }}",
               "blocks": [
+                {
+                  "type": "header",
+                  "text": {
+                    "type": "plain_text",
+                    "text": "${{ steps.message.outputs.title }}",
+                    "emoji": true
+                  }
+                },
+                {
+                  "type": "divider"
+                },
                 {
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "${{ steps.message.outputs.text }}"
+                    "text": "${{ steps.message.outputs.reason_text }}"
                   }
                 },
                 {
