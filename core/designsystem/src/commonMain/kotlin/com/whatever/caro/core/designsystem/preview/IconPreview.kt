@@ -27,32 +27,33 @@ private fun IconPreviewGrid(
     modifier: Modifier = Modifier,
     iconSize: Dp = 32.dp,
     horizontalSpacing: Dp = 4.dp,
-    verticalSpacing: Dp = 4.dp
+    verticalSpacing: Dp = 4.dp,
 ) {
     Box(
         modifier = modifier.fillMaxWidth(),
-        contentAlignment = Alignment.Center
+        contentAlignment = Alignment.Center,
     ) {
         LazyColumn(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(verticalSpacing),
-            modifier = Modifier.wrapContentWidth()
+            modifier = Modifier.wrapContentWidth(),
         ) {
             items(allDrawables) { rowIcons ->
                 Row(
-                    horizontalArrangement = Arrangement.spacedBy(
-                        horizontalSpacing,
-                        Alignment.CenterHorizontally
-                    )
+                    horizontalArrangement =
+                        Arrangement.spacedBy(
+                            horizontalSpacing,
+                            Alignment.CenterHorizontally,
+                        ),
                 ) {
                     rowIcons.forEach { icon ->
                         Box(
                             modifier = Modifier.size(iconSize),
-                            contentAlignment = Alignment.Center
+                            contentAlignment = Alignment.Center,
                         ) {
                             Icon(
                                 painter = painterResource(icon),
-                                contentDescription = null
+                                contentDescription = null,
                             )
                         }
                     }

@@ -39,11 +39,11 @@ jetbrains-androidx-navigation3-ui = "1.0.0-alpha06"
 jetbrains-androidx-navigation3-event = "1.0.0"
 
 # DI
-koin = "4.2.0"
-koin-compiler = "0.6.2"
+koin = "4.2.1"
+koin-compiler = "1.0.0-RC1"
 
 # Network
-ktor = "3.4.0"
+ktor = "3.4.2"
 
 # Image Loader
 coil3 = "3.3.0"
@@ -67,7 +67,7 @@ build-konfig = "0.17.1"
 
 # Test
 turbine = "1.2.1"
-mokkery = "3.1.1"
+mokkery = "3.3.0"
 kotest = "6.1.1"
 kover = "0.9.6"
 
@@ -165,6 +165,7 @@ kotest-runner-junit5 = { group = "io.kotest", name = "kotest-runner-junit5", ver
 kotest-extensions-koin = { group = "io.kotest", name = "kotest-extensions-koin", version.ref = "kotest" }
 kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "kotlinx-coroutines" }
 koin-test = { group = "io.insert-koin", name = "koin-test", version.ref = "koin" }
+ktor-client-mock = { group = "io.ktor", name = "ktor-client-mock", version.ref = "ktor" }
 
 # Gradle-Plugin
 kotlin-gradleplugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }

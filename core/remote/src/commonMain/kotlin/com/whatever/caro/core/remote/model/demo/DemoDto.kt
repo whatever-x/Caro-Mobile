@@ -1,4 +1,4 @@
-package com.whatever.caro.core.remote.model
+package com.whatever.caro.core.remote.model.demo
 
 import kotlinx.serialization.Serializable
 

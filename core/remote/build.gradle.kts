@@ -7,6 +7,7 @@ plugins {
     id("caro.kmp.ios")
     id("caro.koin")
     id("caro.kotlin.serialization")
+    id("caro.kmp.test")
     alias(libs.plugins.build.konfig)
 }
 
@@ -25,11 +26,16 @@ kotlin {
             implementation(libs.kotlinx.coroutines.android)
         }
         commonMain.dependencies {
+            implementation(projects.core.model)
+
             implementation(libs.ktor.client.core)
             implementation(libs.ktor.serialization.kotlinx.json)
             implementation(libs.kotlinx.coroutines.core)
 
             implementation(libs.bundles.ktor.client.plugin)
+        }
+        commonTest.dependencies {
+            implementation(libs.ktor.client.mock)
         }
         iosMain.dependencies {
             implementation(libs.ktor.client.darwin)
@@ -40,7 +46,10 @@ kotlin {
 buildkonfig {
     packageName = "com.whatever.caro.core.remote.generated"
 
-    defaultConfigs { }
+    defaultConfigs {
+        buildConfigField(FieldSpec.Type.STRING, "SERVER_BASE_URL", "")
+        buildConfigField(FieldSpec.Type.BOOLEAN, "IS_DEBUG", "true")
+    }
 
     targetConfigs("qa") {
         create("android") {
