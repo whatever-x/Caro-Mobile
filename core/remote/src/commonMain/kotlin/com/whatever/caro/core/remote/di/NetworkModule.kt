@@ -5,6 +5,7 @@ import com.whatever.caro.core.remote.network.HttpClientEngineProvider
 import com.whatever.caro.core.remote.network.HttpClientFactory
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.HttpClientEngine
+import io.ktor.client.plugins.auth.Auth
 import kotlinx.serialization.json.Json
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
@@ -24,7 +25,7 @@ val networkModule =
                 engine = get(),
                 jsonParser = get(),
             ) {
-                // TODO : AUTH 전용 플러그인 추가
+                install(Auth)
             }
         }
 
