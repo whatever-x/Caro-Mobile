@@ -19,6 +19,7 @@ androidx-datastore = "1.2.0"
 androidx-sqlite = "2.6.2"
 androidx-room = "2.8.4"
 androidx-credentials = "1.5.0"
+androidx-startup = "1.2.0"
 
 # org.jetbrains.kotlinx
 kotlinx-coroutines = "1.10.2"
@@ -39,11 +40,11 @@ jetbrains-androidx-navigation3-ui = "1.0.0-alpha06"
 jetbrains-androidx-navigation3-event = "1.0.0"
 
 # DI
-koin = "4.2.0"
-koin-compiler = "0.6.2"
+koin = "4.2.1"
+koin-compiler = "1.0.0-RC1"
 
 # Network
-ktor = "3.4.0"
+ktor = "3.4.2"
 
 # Image Loader
 coil3 = "3.3.0"
@@ -60,14 +61,14 @@ firebase-bom = "34.8.0"
 firebase-crahslytics = "3.0.6"
 
 # Utility
-kmp-spm = "1.4.12"
+kmp-spm = "1.8.0"
 play-review = "2.0.2"
 compose-stable-marker = "1.0.7"
 build-konfig = "0.17.1"
 
 # Test
 turbine = "1.2.1"
-mokkery = "3.1.1"
+mokkery = "3.3.0"
 kotest = "6.1.1"
 kover = "0.9.6"
 
@@ -91,6 +92,7 @@ androidx-room-runtime = { group = "androidx.room", name = "room-runtime", versio
 androidx-sqlite-bundled = { group = "androidx.sqlite", name = "sqlite-bundled", version.ref = "androidx-sqlite" }
 androidx-credentials-credentials = { group = "androidx.credentials", name = "credentials", version.ref = "androidx-credentials" }
 androidx-credentials-auth = { group = "androidx.credentials", name = "credentials-play-services-auth", version.ref = "androidx-credentials" }
+androidx-startup = { group = "androidx.startup", name = "startup-runtime", version.ref = "androidx-startup" }
 
 # org.jetbrains.kotlinx
 kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
@@ -165,6 +167,7 @@ kotest-runner-junit5 = { group = "io.kotest", name = "kotest-runner-junit5", ver
 kotest-extensions-koin = { group = "io.kotest", name = "kotest-extensions-koin", version.ref = "kotest" }
 kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "kotlinx-coroutines" }
 koin-test = { group = "io.insert-koin", name = "koin-test", version.ref = "koin" }
+ktor-client-mock = { group = "io.ktor", name = "ktor-client-mock", version.ref = "ktor" }
 
 # Gradle-Plugin
 kotlin-gradleplugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }

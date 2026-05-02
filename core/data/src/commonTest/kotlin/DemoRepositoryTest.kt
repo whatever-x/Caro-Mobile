@@ -1,10 +1,10 @@
-import com.whatever.caro.core.data.di.RepositoryModule
+import com.whatever.caro.core.data.di.dataModule
 import com.whatever.caro.core.data.mapper.toUser
 import com.whatever.caro.core.data.repository.demo.DemoRepository
 import com.whatever.caro.core.remote.datasource.demo.DemoDataSource
-import com.whatever.caro.core.remote.di.NetworkModule
-import com.whatever.caro.core.remote.di.RemoteModule
-import com.whatever.caro.core.remote.model.DemoDto
+import com.whatever.caro.core.remote.di.networkModule
+import com.whatever.caro.core.remote.di.remoteModule
+import com.whatever.caro.core.remote.model.demo.DemoDto
 import com.whatever.caro.core.remote.model.demo.response.DemoResponse
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
@@ -18,7 +18,6 @@ import org.koin.core.context.loadKoinModules
 import org.koin.core.context.unloadKoinModules
 import org.koin.core.module.Module
 import org.koin.dsl.module
-import org.koin.ksp.generated.module
 import org.koin.test.KoinTest
 import org.koin.test.get
 
@@ -32,9 +31,9 @@ class DemoRepositoryTest :
         extensions(
             KoinExtension(
                 listOf(
-                    RepositoryModule().module,
-                    RemoteModule().module,
-                    NetworkModule().module,
+                    dataModule,
+                    remoteModule,
+                    networkModule,
                 ),
             ),
         )

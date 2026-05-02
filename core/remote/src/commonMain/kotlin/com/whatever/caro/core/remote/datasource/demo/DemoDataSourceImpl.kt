@@ -1,6 +1,6 @@
 package com.whatever.caro.core.remote.datasource.demo
 
-import com.whatever.caro.core.remote.model.DemoDto
+import com.whatever.caro.core.remote.model.demo.DemoDto
 import com.whatever.caro.core.remote.model.demo.request.DemoRequest
 import com.whatever.caro.core.remote.model.demo.response.DemoResponse
 import io.ktor.client.HttpClient

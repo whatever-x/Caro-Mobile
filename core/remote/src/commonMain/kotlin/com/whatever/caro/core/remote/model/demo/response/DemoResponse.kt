@@ -1,6 +1,6 @@
 package com.whatever.caro.core.remote.model.demo.response
 
-import com.whatever.caro.core.remote.model.DemoDto
+import com.whatever.caro.core.remote.model.demo.DemoDto
 import kotlinx.serialization.Serializable
 
 @Serializable

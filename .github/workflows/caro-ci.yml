@@ -2,7 +2,7 @@ name: Caro Mobile CI
 
 on:
   pull_request:
-    branches: [ main, develop ]
+    branches: [main, develop]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -17,23 +17,12 @@ jobs:
       - name: Check Out
         uses: actions/checkout@v6
 
-      - name: Decode google-services.json
-        run: |
-          echo '${{ secrets.GOOGLE_SERVICES_JSON }}' | base64 --decode > androidApp/google-services.json
-
-      - name: Decode Keystore
-        run: |
-          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > caro_key_store.jks
-
-      - name: Generate Local Properties File
-        run: |
-          echo "${{ secrets.LOCAL_PROPERTIES }}" > local.properties
-          echo "sdk.dir=$ANDROID_HOME" >> local.properties
-
       - name: Set Up
         uses: ./.github/actions/ci/set-up
         with:
           local_properties: ${{ secrets.LOCAL_PROPERTIES }}
+          google_services_json: ${{ secrets.GOOGLE_SERVICES_JSON }}
+          keystore_base64: ${{ secrets.KEYSTORE_BASE64 }}
 
       - name: Spotless check
         run: ./gradlew spotlessCheck --stacktrace
@@ -49,12 +38,15 @@ jobs:
       - name: Check Out
         uses: actions/checkout@v6
 
-      - uses: ./.github/actions/ci/set-up
+      - name: Set Up
+        uses: ./.github/actions/ci/set-up
         with:
           local_properties: ${{ secrets.LOCAL_PROPERTIES }}
+          google_services_json: ${{ secrets.GOOGLE_SERVICES_JSON }}
+          keystore_base64: ${{ secrets.KEYSTORE_BASE64 }}
 
       - name: Run test
-        run: ./gradlew test --build-cache --parallel
+        run: ./gradlew allTests --build-cache --parallel
 
       - name: Generate Kover XML
         run: ./gradlew koverAllXmlReport --build-cache --parallel
@@ -66,9 +58,9 @@ jobs:
         id: report-paths
         if: always()
         run: |
-          echo "paths<<EOF" >> $GITHUB_OUTPUT
-          find . -path "*/build/reports/kover/report.xml" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
+          echo "paths<<EOF" >> "$GITHUB_OUTPUT"
+          find . -path "*/build/reports/kover/report.xml" >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
 
       - name: Comment coverage on PR
         if: always()
@@ -91,17 +83,12 @@ jobs:
       - name: Check Out
         uses: actions/checkout@v6
 
-      - uses: ./.github/actions/ci/set-up
+      - name: Set Up
+        uses: ./.github/actions/ci/set-up
         with:
           local_properties: ${{ secrets.LOCAL_PROPERTIES }}
-
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3.2.2
-
-      - name: Append "sdk.dir" to local.properties
-        shell: bash
-        run: |
-          echo "sdk.dir=${ANDROID_SDK_ROOT:-$ANDROID_HOME}" >> local.properties
+          google_services_json: ${{ secrets.GOOGLE_SERVICES_JSON }}
+          keystore_base64: ${{ secrets.KEYSTORE_BASE64 }}
 
       - name: Build Project
         run: ./gradlew :androidApp:assembleDebug --build-cache
@@ -135,14 +122,19 @@ jobs:
           fi
 
           if [[ ${#reasons[@]} -eq 0 ]]; then
-            message="<${{ github.event.pull_request.html_url }}|PR #${{ github.event.pull_request.number }}> CI 통과 ✅"
+            title="PR #${{ github.event.pull_request.number }} CI 통과 :white_check_mark:"
+            reason_text="*결과*\\n모든 검사 통과"
           else
-            joined_reasons=$(printf ", %s" "${reasons[@]}")
-            joined_reasons=${joined_reasons:2}
-            message="<${{ github.event.pull_request.html_url }}|PR #${{ github.event.pull_request.number }}> CI 실패 ❌ (원인 : ${joined_reasons})"
+            title="PR #${{ github.event.pull_request.number }} CI 실패 :x:"
+            reason_text="*원인*"
+
+            for reason in "${reasons[@]}"; do
+              reason_text+="\\n- ${reason}"
+            done
           fi
 
-          echo "text=${message}" >> "$GITHUB_OUTPUT"
+          echo "title=${title}" >> "$GITHUB_OUTPUT"
+          echo "reason_text=${reason_text}" >> "$GITHUB_OUTPUT"
 
       - name: Send Slack notification
         uses: slackapi/slack-github-action@v2.1.1
@@ -151,13 +143,24 @@ jobs:
           webhook-type: incoming-webhook
           payload: |
             {
-              "text": "${{ steps.message.outputs.text }}",
+              "text": "${{ steps.message.outputs.title }}",
               "blocks": [
+                {
+                  "type": "header",
+                  "text": {
+                    "type": "plain_text",
+                    "text": "${{ steps.message.outputs.title }}",
+                    "emoji": true
+                  }
+                },
+                {
+                  "type": "divider"
+                },
                 {
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "${{ steps.message.outputs.text }}"
+                    "text": "${{ steps.message.outputs.reason_text }}"
                   }
                 },
                 {
@@ -167,7 +170,7 @@ jobs:
                       "type": "button",
                       "text": {
                         "type": "plain_text",
-                        "text": "PR #${{ github.event.pull_request.number }} 바로가기",
+                        "text": "Open PR #${{ github.event.pull_request.number }}",
                         "emoji": true
                       },
                       "url": "${{ github.event.pull_request.html_url }}"
