@@ -25,31 +25,35 @@ plugins {
 val ktlintCliVersion = libs.versions.ktlint.cli.get()
 
 subprojects {
+    if (!buildFile.isFile) return@subprojects
+
     apply(plugin = "com.diffplug.spotless")
 
     configure<SpotlessExtension> {
         kotlin {
-            target("**/*.kt")
-            targetExclude(
-                "**/build/**",
-                "**/generated/**"
+            target(
+                fileTree("src") {
+                    include("**/*.kt")
+                    exclude("**/generated/**")
+                }
             )
             ktlint(ktlintCliVersion)
         }
 
         kotlinGradle {
-            target("**/*.gradle.kts")
+            target("*.gradle.kts")
             ktlint(ktlintCliVersion)
         }
 
         format("xml") {
             target(
-                "src/**/values/*.xml",
-                "src/**/AndroidManifest.xml"
-            )
-            targetExclude(
-                "**/build/**",
-                "**/generated/**"
+                fileTree("src") {
+                    include(
+                        "**/values/*.xml",
+                        "**/AndroidManifest.xml"
+                    )
+                    exclude("**/generated/**")
+                }
             )
 
             eclipseWtp(EclipseWtpFormatterStep.XML)
