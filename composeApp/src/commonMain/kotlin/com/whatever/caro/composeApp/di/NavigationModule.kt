@@ -2,9 +2,11 @@ package com.whatever.caro.composeApp.di
 
 import com.whatever.caro.core.navigator.entries.HomeEntry
 import com.whatever.caro.core.navigator.entries.LoginEntry
+import com.whatever.caro.core.navigator.entries.SplashEntry
 import com.whatever.caro.feature.home.HomeViewModel
 import com.whatever.caro.feature.home.route.HomeRoute
 import com.whatever.caro.feature.login.LoginRoute
+import com.whatever.caro.feature.splash.route.SplashRoute
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.annotation.KoinExperimentalAPI
 import org.koin.core.module.Module
@@ -15,6 +17,13 @@ import org.koin.dsl.navigation3.navigation
 @OptIn(KoinExperimentalAPI::class)
 val navEntryModule: Module =
     module {
+        navigation<SplashEntry> {
+            SplashRoute(
+                viewModel = koinViewModel(),
+                navDispatcher = get(),
+            )
+        }
+
         navigation<LoginEntry> {
             LoginRoute(
                 viewModel = koinViewModel(),
