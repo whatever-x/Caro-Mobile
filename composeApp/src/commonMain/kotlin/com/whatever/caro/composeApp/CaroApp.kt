@@ -21,6 +21,7 @@ import com.whatever.caro.core.navigator.contract.NavCommand
 import com.whatever.caro.core.navigator.dispatcher.NavigationDispatcher
 import com.whatever.caro.core.navigator.entries.HomeEntry
 import com.whatever.caro.core.navigator.entries.LoginEntry
+import com.whatever.caro.core.ui.image.ConfigureCaroImageLoader
 import io.github.aakira.napier.Napier
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
@@ -28,18 +29,22 @@ import org.koin.compose.koinInject
 
 @Composable
 fun CaroApp(navDispatcher: NavigationDispatcher = koinInject()) {
-    val config =
-        SavedStateConfiguration {
-            serializersModule =
-                SerializersModule {
-                    polymorphic(NavKey::class) {
-                        subclass(LoginEntry::class, LoginEntry.serializer())
-                        subclass(HomeEntry::class, HomeEntry.serializer())
+    ConfigureCaroImageLoader()
+
+    val savedStateConfiguration =
+        remember {
+            SavedStateConfiguration {
+                serializersModule =
+                    SerializersModule {
+                        polymorphic(NavKey::class) {
+                            subclass(LoginEntry::class, LoginEntry.serializer())
+                            subclass(HomeEntry::class, HomeEntry.serializer())
+                        }
                     }
-                }
+            }
         }
 
-    val backStack = rememberNavBackStack(config, LoginEntry)
+    val backStack = rememberNavBackStack(savedStateConfiguration, LoginEntry)
 
     LaunchedEffect(navDispatcher) {
         navDispatcher.commands.collect { command ->
