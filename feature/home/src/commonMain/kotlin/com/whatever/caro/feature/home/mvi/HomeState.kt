@@ -6,4 +6,5 @@ data class HomeState(
     val screenName: String = "",
     val name: String = "",
     val sampleString: String = "",
+    val deckId: String? = null,
 ) : UiState

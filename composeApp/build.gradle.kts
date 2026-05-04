@@ -35,9 +35,11 @@ kotlin {
             implementation(projects.core.remote)
             implementation(projects.core.analytics)
             implementation(projects.core.crashlytics)
+            implementation(projects.core.messaging)
 
             implementation(projects.feature.home)
             implementation(projects.feature.login)
+            implementation(projects.feature.splash)
 
             implementation(libs.koin.compose.viewmodel)
             implementation(libs.koin.compose.navigation3)

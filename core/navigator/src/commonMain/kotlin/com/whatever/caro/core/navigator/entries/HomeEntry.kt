@@ -12,4 +12,5 @@ data class HomeEntry(
 data class Payload(
     val id: Int,
     val name: String,
+    val deckId: String? = null,
 )

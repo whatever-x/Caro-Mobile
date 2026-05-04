@@ -19,5 +19,11 @@
 	<string>$(CARO_BASE_URL)</string>
 	<key>GIDClientID</key>
 	<string>$(GID_CLIENT_ID)</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>remote-notification</string>
+	</array>
+	<key>FirebaseAppDelegateProxyEnabled</key>
+	<false/>
 </dict>
 </plist>

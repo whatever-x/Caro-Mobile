@@ -31,6 +31,7 @@ class HomeViewModel(
                     screenName = "HomeScreen",
                     name = userData.name,
                     sampleString = sampleString,
+                    deckId = navKey.payload.deckId,
                 )
             }
         }
