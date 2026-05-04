@@ -13,7 +13,6 @@ class CaroAppDelegate: NSObject, UIApplicationDelegate {
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
     ) -> Bool {
         CaroFcmBridge.shared.attach(application: application)
-        CaroFcmBridge.shared.requestAuthorization()
         return true
     }
 

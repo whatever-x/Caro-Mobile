@@ -17,6 +17,7 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             implementation(projects.core.messaging)
+            implementation(libs.bundles.moko)
         }
     }
 }

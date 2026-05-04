@@ -8,4 +8,8 @@ sealed interface SplashSideEffect : UiSideEffect {
     data class NavigateHome(
         val deckId: String,
     ) : SplashSideEffect
+
+    data object ShowNotificationPermissionDeniedDialog : SplashSideEffect
+
+    data object ShowNotificationPermissionDeniedAlwaysDialog : SplashSideEffect
 }

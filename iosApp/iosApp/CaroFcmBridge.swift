@@ -20,12 +20,6 @@ final class CaroFcmBridge: NSObject, IosMessagingBridge, MessagingDelegate, UNUs
         IosMessagingBridgeHolderKt.registerIosMessagingBridge(bridge: self)
     }
 
-    func requestAuthorization() {
-        UNUserNotificationCenter.current().requestAuthorization(
-            options: [.alert, .badge, .sound]
-        ) { _, _ in }
-    }
-
     // MARK: IosMessagingBridge
 
     func fetchToken(callback: @escaping (String?, String?) -> Void) {
@@ -79,25 +73,12 @@ final class CaroFcmBridge: NSObject, IosMessagingBridge, MessagingDelegate, UNUs
         didReceive response: UNNotificationResponse,
         withCompletionHandler completionHandler: @escaping () -> Void
     ) {
-        publish(userInfo: response.notification.request.content.userInfo, fallback: response.notification.request.content)
+        publish(userInfo: response.notification.request.content.userInfo)
         completionHandler()
     }
 
-    private func publish(userInfo: [AnyHashable: Any], fallback content: UNNotificationContent) {
-        let dataMap = userInfo.reduce(into: [String: String]()) { result, entry in
-            if let key = entry.key as? String {
-                result[key] = "\(entry.value)"
-            }
-        }
-        let messageId = userInfo["gcm.message_id"] as? String
-        let sentTime = (userInfo["google.c.sender.id"] as? String).flatMap { _ in nil as Int64? } ?? Int64(Date().timeIntervalSince1970 * 1000)
-
-        IosMessagingEvents.shared.onMessageReceived(
-            messageId: messageId,
-            title: content.title.isEmpty ? nil : content.title,
-            body: content.body.isEmpty ? nil : content.body,
-            data: dataMap,
-            sentTime: sentTime
-        )
+    private func publish(userInfo: [AnyHashable: Any]) {
+        let deckId = userInfo["deck_id"] as? String
+        IosMessagingEvents.shared.onMessageReceived(deckId: deckId)
     }
 }

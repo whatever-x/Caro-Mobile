@@ -27,21 +27,7 @@ object IosMessagingEvents {
         mutableTokenFlow.tryEmit(token)
     }
 
-    fun onMessageReceived(
-        messageId: String?,
-        title: String?,
-        body: String?,
-        data: Map<String, String>,
-        sentTime: Long,
-    ) {
-        mutableMessageFlow.tryEmit(
-            RemoteMessage(
-                messageId = messageId,
-                title = title,
-                body = body,
-                data = data,
-                sentTime = sentTime,
-            ),
-        )
+    fun onMessageReceived(deckId: String?) {
+        mutableMessageFlow.tryEmit(RemoteMessage(deckId = deckId))
     }
 }
