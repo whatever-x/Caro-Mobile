@@ -24,6 +24,10 @@ core/database/schemas
 
 # Xcode
 **/FirebaseConfig/*
+**/GoogleService-Info.plist
+**/GoogleService-Info-Dev.plist
+**/GoogleService-Info-Qa.plist
+**/GoogleService-Info-Prod.plist
 *.xcworkspace
 *.xcuserdata/
 !*.xcworkspace/contents.xcworkspacedata
