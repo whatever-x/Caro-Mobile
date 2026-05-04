@@ -1,0 +1,52 @@
+package com.whatever.caro.core.ui.image
+
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.DefaultAlpha
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.layout.ContentScale
+import coil3.SingletonImageLoader
+import coil3.compose.AsyncImage
+import coil3.compose.LocalPlatformContext
+import coil3.request.ImageRequest
+import coil3.request.crossfade
+
+@Composable
+fun CaroAsyncImage(
+    imageUrl: String?,
+    contentDescription: String?,
+    modifier: Modifier = Modifier,
+    placeholder: Painter? = null,
+    error: Painter? = null,
+    fallback: Painter? = error,
+    contentScale: ContentScale = ContentScale.Fit,
+    alignment: Alignment = Alignment.Center,
+    alpha: Float = DefaultAlpha,
+    colorFilter: ColorFilter? = null,
+) {
+    val context = LocalPlatformContext.current
+    val imageLoader = remember(context) { SingletonImageLoader.get(context) }
+    val imageRequest =
+        ImageRequest
+            .Builder(context)
+            .data(imageUrl)
+            .crossfade(true)
+            .build()
+
+    AsyncImage(
+        model = imageRequest,
+        contentDescription = contentDescription,
+        imageLoader = imageLoader,
+        modifier = modifier,
+        placeholder = placeholder,
+        error = error,
+        fallback = fallback,
+        contentScale = contentScale,
+        alignment = alignment,
+        alpha = alpha,
+        colorFilter = colorFilter,
+    )
+}
