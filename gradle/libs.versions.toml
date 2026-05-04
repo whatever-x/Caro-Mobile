@@ -47,7 +47,7 @@ koin-compiler = "1.0.0-RC1"
 ktor = "3.4.2"
 
 # Image Loader
-coil3 = "3.3.0"
+coil3 = "3.4.0"
 
 # Permission
 moko = "0.20.1"
