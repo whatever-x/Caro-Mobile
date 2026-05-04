@@ -27,7 +27,8 @@ class SplashViewModel(
         launch {
             ensureNotificationPermission(permissionsController)
 
-            val deckId = withTimeoutOrNull(SPLASH_DELAY_MS) {
+            val deckId =
+                withTimeoutOrNull(SPLASH_DELAY_MS) {
                     messagingClient.messageFlow.firstOrNull()
                 }?.deckId
             if (deckId != null) {
