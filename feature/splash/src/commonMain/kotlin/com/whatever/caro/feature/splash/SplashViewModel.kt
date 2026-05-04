@@ -40,6 +40,7 @@ class SplashViewModel(
     }
 
     private suspend fun ensureNotificationPermission(controller: PermissionsController) {
+        // TODO : 알림정책 필요
         if (controller.getPermissionState(Permission.REMOTE_NOTIFICATION) == PermissionState.Granted) return
         try {
             controller.providePermission(Permission.REMOTE_NOTIFICATION)

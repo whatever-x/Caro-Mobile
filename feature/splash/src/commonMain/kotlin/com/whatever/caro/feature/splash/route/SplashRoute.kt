@@ -2,7 +2,9 @@ package com.whatever.caro.feature.splash.route
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.whatever.caro.core.navigator.contract.NavCommand
 import com.whatever.caro.core.navigator.dispatcher.NavigationDispatcher
 import com.whatever.caro.core.navigator.entries.HomeEntry
@@ -19,6 +21,7 @@ fun SplashRoute(
     viewModel: SplashViewModel,
     navDispatcher: NavigationDispatcher,
 ) {
+    val state by viewModel.state.collectAsStateWithLifecycle()
     val factory = rememberPermissionsControllerFactory()
     val permissionsController = remember(factory) { factory.createPermissionsController() }
     BindEffect(permissionsController)
@@ -60,5 +63,5 @@ fun SplashRoute(
         }
     }
 
-    SplashScreen()
+    SplashScreen(state = state)
 }
