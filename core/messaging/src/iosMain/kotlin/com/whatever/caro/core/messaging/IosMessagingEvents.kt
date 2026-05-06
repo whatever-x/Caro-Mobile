@@ -1,33 +1,24 @@
 package com.whatever.caro.core.messaging
 
-import kotlinx.coroutines.channels.BufferOverflow
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.ReceiveChannel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
 object IosMessagingEvents {
-    private val mutableTokenFlow =
-        MutableSharedFlow<String>(
-            replay = 1,
-            extraBufferCapacity = 1,
-            onBufferOverflow = BufferOverflow.DROP_OLDEST,
-        )
+    private val mutableTokenFlow = MutableStateFlow("")
 
-    private val mutableMessageFlow =
-        MutableSharedFlow<RemoteMessage>(
-            replay = 1,
-            extraBufferCapacity = 64,
-            onBufferOverflow = BufferOverflow.DROP_OLDEST,
-        )
+    private val mutableMessages = Channel<RemoteMessage>(capacity = Channel.CONFLATED)
 
-    internal val tokenFlow: SharedFlow<String> = mutableTokenFlow.asSharedFlow()
-    internal val messageFlow: SharedFlow<RemoteMessage> = mutableMessageFlow.asSharedFlow()
+    internal val tokenFlow: StateFlow<String> = mutableTokenFlow.asStateFlow()
+    internal val messages: ReceiveChannel<RemoteMessage> = mutableMessages
 
     fun onTokenRefreshed(token: String) {
         mutableTokenFlow.tryEmit(token)
     }
 
     fun onMessageReceived(deckId: String?) {
-        mutableMessageFlow.tryEmit(RemoteMessage(deckId = deckId))
+        mutableMessages.trySend(RemoteMessage(deckId = deckId))
     }
 }

@@ -1,4 +1,4 @@
-package com.whatever.caro.feature.splash.route
+package com.whatever.caro.feature.splash
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -10,8 +10,6 @@ import com.whatever.caro.core.navigator.dispatcher.NavigationDispatcher
 import com.whatever.caro.core.navigator.entries.HomeEntry
 import com.whatever.caro.core.navigator.entries.LoginEntry
 import com.whatever.caro.core.navigator.entries.Payload
-import com.whatever.caro.feature.splash.SplashScreen
-import com.whatever.caro.feature.splash.SplashViewModel
 import com.whatever.caro.feature.splash.mvi.SplashSideEffect
 import dev.icerock.moko.permissions.compose.BindEffect
 import dev.icerock.moko.permissions.compose.rememberPermissionsControllerFactory

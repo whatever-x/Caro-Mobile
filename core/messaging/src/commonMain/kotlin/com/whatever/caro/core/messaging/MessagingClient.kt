@@ -1,9 +1,10 @@
 package com.whatever.caro.core.messaging
 
-import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.channels.ReceiveChannel
+import kotlinx.coroutines.flow.StateFlow
 
 interface MessagingClient {
-    val tokenFlow: SharedFlow<String>
+    val tokenFlow: StateFlow<String>
 
-    val messageFlow: SharedFlow<RemoteMessage>
+    val messages: ReceiveChannel<RemoteMessage>
 }

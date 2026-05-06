@@ -10,19 +10,12 @@ import kotlin.random.Random
 @OptIn(ExperimentalCoroutinesApi::class)
 class MessagingEventBusTest :
     FunSpec({
-
-        // MessagingEventBus는 process-wide singleton(object)이므로 테스트 간 replay 슬롯이 공유됨.
-        // 각 테스트는 sentinel을 먼저 publish하여 이전 상태를 덮어쓴 뒤 검증.
-
-        test("publishToken 후 새 구독자는 마지막 토큰을 replay 받는다") {
+        test("publishToken 후 tokenFlow.value는 마지막 토큰을 노출한다") {
             runTest {
                 val token = "token-${Random.nextLong()}"
                 MessagingEventBus.publishToken(token)
 
-                MessagingEventBus.tokenFlow.test {
-                    awaitItem() shouldBe token
-                    cancel()
-                }
+                MessagingEventBus.tokenFlow.value shouldBe token
             }
         }
 
@@ -43,70 +36,52 @@ class MessagingEventBusTest :
             }
         }
 
-        test("tokenFlow는 가장 최신 토큰만 replay한다 (replay = 1)") {
+        test("tokenFlow는 conflation으로 마지막 토큰만 노출한다") {
             runTest {
                 MessagingEventBus.publishToken("a")
                 MessagingEventBus.publishToken("b")
                 MessagingEventBus.publishToken("c")
 
-                MessagingEventBus.tokenFlow.test {
-                    awaitItem() shouldBe "c"
-                    cancel()
-                }
+                MessagingEventBus.tokenFlow.value shouldBe "c"
             }
         }
 
-        test("publishMessage 후 새 구독자는 마지막 메시지를 replay 받는다") {
+        test("publishMessage 후 messages.receive()로 메시지를 받는다") {
             runTest {
                 val message = RemoteMessage(deckId = "deck-${Random.nextLong()}")
                 MessagingEventBus.publishMessage(message)
 
-                MessagingEventBus.messageFlow.test {
-                    awaitItem() shouldBe message
-                    cancel()
-                }
+                MessagingEventBus.messages.receive() shouldBe message
             }
         }
 
-        test("활성 구독자는 publishMessage 호출마다 새 메시지를 받는다") {
+        test("publishMessage 호출마다 receive로 새 메시지를 받을 수 있다") {
             runTest {
-                val sentinel = RemoteMessage(deckId = "sentinel-${Random.nextLong()}")
-                MessagingEventBus.publishMessage(sentinel)
+                val first = RemoteMessage(deckId = "first-${Random.nextLong()}")
+                MessagingEventBus.publishMessage(first)
+                MessagingEventBus.messages.receive() shouldBe first
 
-                MessagingEventBus.messageFlow.test {
-                    awaitItem() shouldBe sentinel
-
-                    val next = RemoteMessage(deckId = "next-${Random.nextLong()}")
-                    MessagingEventBus.publishMessage(next)
-                    awaitItem() shouldBe next
-
-                    cancel()
-                }
+                val second = RemoteMessage(deckId = "second-${Random.nextLong()}")
+                MessagingEventBus.publishMessage(second)
+                MessagingEventBus.messages.receive() shouldBe second
             }
         }
 
-        test("messageFlow는 buffer를 초과하는 burst에도 throw하지 않고 최신만 replay한다 (DROP_OLDEST)") {
+        test("CONFLATED Channel은 burst에도 publishMessage가 실패하지 않고 최신만 보관한다") {
             runTest {
-                // extraBufferCapacity = 64. 구독자 없는 상태로 100건 publish해도 예외 없이 처리되어야 한다.
                 repeat(100) { i ->
                     MessagingEventBus.publishMessage(RemoteMessage(deckId = "deck-$i"))
                 }
 
-                MessagingEventBus.messageFlow.test {
-                    awaitItem() shouldBe RemoteMessage(deckId = "deck-99")
-                    cancel()
-                }
+                MessagingEventBus.messages.receive() shouldBe RemoteMessage(deckId = "deck-99")
             }
         }
 
-        test("deckId가 null인 RemoteMessage도 publish/replay 가능하다") {
+        test("deckId가 null인 RemoteMessage도 publish/receive 가능하다") {
             runTest {
                 MessagingEventBus.publishMessage(RemoteMessage(deckId = null))
 
-                MessagingEventBus.messageFlow.test {
-                    awaitItem() shouldBe RemoteMessage(deckId = null)
-                    cancel()
-                }
+                MessagingEventBus.messages.receive() shouldBe RemoteMessage(deckId = null)
             }
         }
     })

@@ -32,7 +32,7 @@ class SplashViewModel(
             syncFcmToken()
             val deckId =
                 withTimeoutOrNull(SPLASH_DELAY_MS) {
-                    messagingClient.messageFlow.firstOrNull()
+                    messagingClient.messages.receive()
                 }?.deckId
             Napier.d { "SplashViewModel -> deckId: $deckId" }
             if (deckId != null) {
@@ -48,9 +48,9 @@ class SplashViewModel(
         launch {
             val token =
                 withTimeoutOrNull(TOKEN_FETCH_TIMEOUT_MS) {
-                    messagingClient.tokenFlow.firstOrNull()
+                    messagingClient.tokenFlow.firstOrNull { it.isNotEmpty() }
                 }
-            if (token != null) {
+            if (!token.isNullOrEmpty()) {
                 fcmTokenRepository.syncToken(token)
             } else {
                 Napier.w { "SplashViewModel -> FCM token unavailable within timeout" }

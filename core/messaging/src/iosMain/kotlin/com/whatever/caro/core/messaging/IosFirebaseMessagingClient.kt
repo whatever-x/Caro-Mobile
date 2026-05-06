@@ -1,8 +1,9 @@
 package com.whatever.caro.core.messaging
 
-import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.channels.ReceiveChannel
+import kotlinx.coroutines.flow.StateFlow
 
 internal class IosFirebaseMessagingClient : MessagingClient {
-    override val tokenFlow: SharedFlow<String> = IosMessagingEvents.tokenFlow
-    override val messageFlow: SharedFlow<RemoteMessage> = IosMessagingEvents.messageFlow
+    override val tokenFlow: StateFlow<String> = IosMessagingEvents.tokenFlow
+    override val messages: ReceiveChannel<RemoteMessage> = IosMessagingEvents.messages
 }

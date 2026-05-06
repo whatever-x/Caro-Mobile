@@ -2,14 +2,14 @@ package com.whatever.caro.core.messaging
 
 import com.google.firebase.messaging.FirebaseMessaging
 import io.github.aakira.napier.Napier
-import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.channels.ReceiveChannel
+import kotlinx.coroutines.flow.StateFlow
 
 internal class AndroidFirebaseMessagingClient : MessagingClient {
-    override val tokenFlow: SharedFlow<String> = MessagingEventBus.tokenFlow
-    override val messageFlow: SharedFlow<RemoteMessage> = MessagingEventBus.messageFlow
+    override val tokenFlow: StateFlow<String> = MessagingEventBus.tokenFlow
+    override val messages: ReceiveChannel<RemoteMessage> = MessagingEventBus.messages
 
     init {
-        // onNewToken은 토큰 변경 시에만 호출되므로, 앱 실행 시 캐시된 토큰을 한 번 push.
         FirebaseMessaging
             .getInstance()
             .token
