@@ -1,5 +1,6 @@
 package com.whatever.caro.feature.splash
 
+import com.whatever.caro.core.data.repository.fcm.FcmTokenRepository
 import com.whatever.caro.core.messaging.MessagingClient
 import com.whatever.caro.core.viewmodel.BaseViewModel
 import com.whatever.caro.feature.splash.mvi.SplashIntent
@@ -12,11 +13,13 @@ import dev.icerock.moko.permissions.PermissionState
 import dev.icerock.moko.permissions.PermissionsController
 import dev.icerock.moko.permissions.RequestCanceledException
 import dev.icerock.moko.permissions.notifications.REMOTE_NOTIFICATION
+import io.github.aakira.napier.Napier
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.withTimeoutOrNull
 
 class SplashViewModel(
     private val messagingClient: MessagingClient,
+    private val fcmTokenRepository: FcmTokenRepository,
 ) : BaseViewModel<SplashState, SplashIntent, SplashSideEffect>(
         initialState = SplashState(),
     ) {
@@ -26,17 +29,32 @@ class SplashViewModel(
     fun start(permissionsController: PermissionsController) {
         launch {
             ensureNotificationPermission(permissionsController)
-
+            syncFcmToken()
             val deckId =
                 withTimeoutOrNull(SPLASH_DELAY_MS) {
                     messagingClient.messageFlow.firstOrNull()
                 }?.deckId
+            Napier.d { "SplashViewModel -> deckId: $deckId" }
             if (deckId != null) {
                 postSideEffect(SplashSideEffect.NavigateHome(deckId = deckId))
             } else {
                 postSideEffect(SplashSideEffect.NavigateLogin)
             }
             reduce { copy(isLoading = false) }
+        }
+    }
+
+    private fun syncFcmToken() {
+        launch {
+            val token =
+                withTimeoutOrNull(TOKEN_FETCH_TIMEOUT_MS) {
+                    messagingClient.tokenFlow.firstOrNull()
+                }
+            if (token != null) {
+                fcmTokenRepository.syncToken(token)
+            } else {
+                Napier.w { "SplashViewModel -> FCM token unavailable within timeout" }
+            }
         }
     }
 
@@ -55,5 +73,6 @@ class SplashViewModel(
 
     companion object {
         private const val SPLASH_DELAY_MS = 1_000L
+        private const val TOKEN_FETCH_TIMEOUT_MS = 3_000L
     }
 }
