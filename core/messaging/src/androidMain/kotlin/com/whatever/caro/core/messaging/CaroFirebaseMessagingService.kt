@@ -7,12 +7,14 @@ import android.content.Intent
 import androidx.core.app.NotificationCompat
 import androidx.core.content.getSystemService
 import com.google.firebase.messaging.FirebaseMessagingService
+import io.github.aakira.napier.Napier
 import kotlin.random.Random
 import com.google.firebase.messaging.RemoteMessage as FcmRemoteMessage
 
 class CaroFirebaseMessagingService : FirebaseMessagingService() {
     override fun onNewToken(token: String) {
         super.onNewToken(token)
+        Napier.d { "token: $token" }
         MessagingEventBus.publishToken(token)
     }
 

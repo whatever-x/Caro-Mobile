@@ -4,7 +4,7 @@ import UserNotifications
 import FirebaseMessaging
 import ComposeApp
 
-final class CaroFcmBridge: NSObject, IosMessagingBridge, MessagingDelegate, UNUserNotificationCenterDelegate {
+final class CaroFcmBridge: NSObject, MessagingDelegate, UNUserNotificationCenterDelegate {
 
     static let shared = CaroFcmBridge()
 
@@ -16,38 +16,6 @@ final class CaroFcmBridge: NSObject, IosMessagingBridge, MessagingDelegate, UNUs
         Messaging.messaging().delegate = self
         UNUserNotificationCenter.current().delegate = self
         application.registerForRemoteNotifications()
-
-        IosMessagingBridgeHolderKt.registerIosMessagingBridge(bridge: self)
-    }
-
-    // MARK: IosMessagingBridge
-
-    func fetchToken(callback: @escaping (String?, String?) -> Void) {
-        Messaging.messaging().token { token, error in
-            if let error = error {
-                callback(nil, error.localizedDescription)
-            } else {
-                callback(token, nil)
-            }
-        }
-    }
-
-    func deleteToken(callback: @escaping (String?) -> Void) {
-        Messaging.messaging().deleteToken { error in
-            callback(error?.localizedDescription)
-        }
-    }
-
-    func subscribe(topic: String, callback: @escaping (String?) -> Void) {
-        Messaging.messaging().subscribe(toTopic: topic) { error in
-            callback(error?.localizedDescription)
-        }
-    }
-
-    func unsubscribe(topic: String, callback: @escaping (String?) -> Void) {
-        Messaging.messaging().unsubscribe(fromTopic: topic) { error in
-            callback(error?.localizedDescription)
-        }
     }
 
     // MARK: MessagingDelegate

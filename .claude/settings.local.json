@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(./gradlew spotlessApply *)",
+      "Bash(JAVA_HOME=\"/c/Users/TEST HP/.jdks/azul-17.0.12\" PATH=\"/c/Users/TEST HP/.jdks/azul-17.0.12/bin:$PATH\" ./gradlew :androidApp:assembleDevDebug *)",
+      "Read(//tmp/**)",
+      "Bash(javap -p -classpath classes.jar dev.icerock.moko.permissions.DeniedException dev.icerock.moko.permissions.DeniedAlwaysException dev.icerock.moko.permissions.RequestCanceledException dev.icerock.moko.permissions.Permission)"
+    ]
+  }
+}

@@ -6,6 +6,7 @@ import com.whatever.caro.core.viewmodel.BaseViewModel
 import com.whatever.caro.feature.home.mvi.HomeIntent
 import com.whatever.caro.feature.home.mvi.HomeSideEffect
 import com.whatever.caro.feature.home.mvi.HomeState
+import io.github.aakira.napier.Napier
 
 class HomeViewModel(
     private val navKey: HomeEntry,
@@ -25,7 +26,6 @@ class HomeViewModel(
         launch {
             val userData = demoRepository.getData(id = navKey.payload.id.toLong())
             val sampleString = demoRepository.getString()
-
             reduce {
                 copy(
                     screenName = "HomeScreen",
