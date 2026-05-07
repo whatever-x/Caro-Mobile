@@ -17,7 +17,7 @@ import coil3.request.crossfade
 @Composable
 fun CaroAsyncImage(
     imageUrl: String?,
-    contentDescription: String?,
+    contentDescription: String? = null,
     modifier: Modifier = Modifier,
     placeholder: Painter? = null,
     error: Painter? = null,
