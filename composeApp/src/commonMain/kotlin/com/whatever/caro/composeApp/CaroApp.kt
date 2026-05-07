@@ -21,8 +21,8 @@ import com.whatever.caro.core.navigator.contract.NavCommand
 import com.whatever.caro.core.navigator.dispatcher.NavigationDispatcher
 import com.whatever.caro.core.navigator.entries.HomeEntry
 import com.whatever.caro.core.navigator.entries.LoginEntry
-import com.whatever.caro.core.ui.image.ConfigureCaroImageLoader
 import com.whatever.caro.core.navigator.entries.SplashEntry
+import com.whatever.caro.core.ui.image.ConfigureCaroImageLoader
 import io.github.aakira.napier.Napier
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic

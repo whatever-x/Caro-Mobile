@@ -33,13 +33,14 @@ fun CaroAsyncImage(
 ) {
     val context = LocalPlatformContext.current
     val imageLoader = remember(context) { SingletonImageLoader.get(context) }
-    val imageRequest = remember(context, imageUrl) {
-        ImageRequest
-            .Builder(context)
-            .data(imageUrl)
-            .crossfade(true)
-            .build()
-    }
+    val imageRequest =
+        remember(context, imageUrl) {
+            ImageRequest
+                .Builder(context)
+                .data(imageUrl)
+                .crossfade(true)
+                .build()
+        }
 
     AsyncImage(
         model = imageRequest,
