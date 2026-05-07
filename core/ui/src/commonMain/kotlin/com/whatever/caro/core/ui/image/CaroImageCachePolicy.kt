@@ -54,12 +54,12 @@ data class CaroImageCacheConfig(
     }
 
     companion object {
-        val None: CaroImageCacheConfig =
+        val Default: CaroImageCacheConfig =
             CaroImageCacheConfig(
                 diskCacheDirectoryPath = null,
                 diskCacheMaxSizePercent = null,
-                memoryCacheMaxSizePercent = null,
-                memoryCachePolicy = CaroImageCachePolicy.Disabled,
+                memoryCacheMaxSizePercent = 12.5,
+                memoryCachePolicy = CaroImageCachePolicy.Enabled,
                 diskCachePolicy = CaroImageCachePolicy.Disabled,
                 networkCachePolicy = CaroImageCachePolicy.Enabled,
             )
@@ -74,7 +74,7 @@ enum class CaroImageCachePolicy {
 }
 
 @Composable
-fun ConfigureCaroImageLoader(config: CaroImageCacheConfig = CaroImageCacheConfig.None) {
+fun ConfigureCaroImageLoader(config: CaroImageCacheConfig = CaroImageCacheConfig.Default) {
     setSingletonImageLoaderFactory { context ->
         ImageLoader
             .Builder(context)
