@@ -58,7 +58,7 @@ data class CaroImageCacheConfig(
             CaroImageCacheConfig(
                 diskCacheDirectoryPath = null,
                 diskCacheMaxSizePercent = null,
-                memoryCacheMaxSizePercent = 12.5,
+                memoryCacheMaxSizePercent = 0.125,
                 memoryCachePolicy = CaroImageCachePolicy.Enabled,
                 diskCachePolicy = CaroImageCachePolicy.Disabled,
                 networkCachePolicy = CaroImageCachePolicy.Enabled,
