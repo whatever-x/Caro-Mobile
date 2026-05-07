@@ -8,20 +8,24 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.DefaultAlpha
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
+import caromobile.core.designsystem.generated.resources.Res
+import caromobile.core.designsystem.generated.resources.ic_log_out_16
 import coil3.SingletonImageLoader
 import coil3.compose.AsyncImage
 import coil3.compose.LocalPlatformContext
 import coil3.request.ImageRequest
 import coil3.request.crossfade
+import org.jetbrains.compose.resources.DrawableResource
+import org.jetbrains.compose.resources.painterResource
 
 @Composable
 fun CaroAsyncImage(
     imageUrl: String?,
     contentDescription: String? = null,
     modifier: Modifier = Modifier,
-    placeholder: Painter? = null,
-    error: Painter? = null,
-    fallback: Painter? = error,
+    placeholder: DrawableResource,
+    error: DrawableResource,
+    fallback: DrawableResource = error,
     contentScale: ContentScale = ContentScale.Fit,
     alignment: Alignment = Alignment.Center,
     alpha: Float = DefaultAlpha,
@@ -42,9 +46,9 @@ fun CaroAsyncImage(
         contentDescription = contentDescription,
         imageLoader = imageLoader,
         modifier = modifier,
-        placeholder = placeholder,
-        error = error,
-        fallback = fallback,
+        placeholder = painterResource(placeholder),
+        error = painterResource(error),
+        fallback = painterResource(fallback),
         contentScale = contentScale,
         alignment = alignment,
         alpha = alpha,

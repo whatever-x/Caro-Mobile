@@ -16,7 +16,6 @@ import caromobile.core.designsystem.generated.resources.ic_logo_apple
 import caromobile.core.designsystem.generated.resources.ic_logo_google
 import com.whatever.caro.core.designsystem.themes.CaroTheme
 import com.whatever.caro.core.ui.image.CaroAsyncImage
-import org.jetbrains.compose.resources.painterResource
 
 @Preview
 @Composable
@@ -35,9 +34,9 @@ private fun CaroAsyncImagePreview() {
                     Modifier
                         .size(120.dp)
                         .clip(shape = CaroTheme.shape.xl),
-                placeholder = painterResource(Res.drawable.ic_logo_google),
-                error = painterResource(Res.drawable.ic_logo),
-                fallback = painterResource(Res.drawable.ic_logo_apple),
+                placeholder = Res.drawable.ic_logo_google,
+                error = Res.drawable.ic_logo,
+                fallback = Res.drawable.ic_logo_apple,
                 contentScale = ContentScale.Fit,
             )
         }
