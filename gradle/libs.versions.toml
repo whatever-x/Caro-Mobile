@@ -222,12 +222,6 @@ ktor-client-plugin = [
     "ktor-client-auth",
     "ktor-client-logging",
 ]
-coil = [
-    "coil-compose",
-    "coil-compose-core",
-    "coil-network-ktor3",
-    "coil-mp"
-]
 moko = [
     "moko-permission-compose",
     "moko-permission-notifications"
