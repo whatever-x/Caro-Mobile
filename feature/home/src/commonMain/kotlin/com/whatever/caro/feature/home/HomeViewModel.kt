@@ -15,14 +15,15 @@ class HomeViewModel(
         initialState = HomeState(),
     ) {
     override fun handleClientException(throwable: Throwable) {
-        TODO()
+        Napier.e { "handleClientException: $throwable" }
     }
 
     override suspend fun handleIntent(intent: HomeIntent) {
-        TODO()
+        Napier.d { "handleIntent: $intent" }
     }
 
     fun init() {
+        Napier.d { "navKey: $navKey" }
         launch {
             val userData = demoRepository.getData(id = navKey.payload.id.toLong())
             val sampleString = demoRepository.getString()

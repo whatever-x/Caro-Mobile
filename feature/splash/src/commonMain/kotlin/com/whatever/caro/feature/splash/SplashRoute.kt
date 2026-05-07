@@ -13,6 +13,7 @@ import com.whatever.caro.core.navigator.entries.Payload
 import com.whatever.caro.feature.splash.mvi.SplashSideEffect
 import dev.icerock.moko.permissions.compose.BindEffect
 import dev.icerock.moko.permissions.compose.rememberPermissionsControllerFactory
+import io.github.aakira.napier.Napier
 
 @Composable
 fun SplashRoute(
@@ -25,10 +26,8 @@ fun SplashRoute(
     BindEffect(permissionsController)
 
     LaunchedEffect(Unit) {
+        Napier.d { "start sideEffect collect" }
         viewModel.start(permissionsController)
-    }
-
-    LaunchedEffect(Unit) {
         viewModel.sideEffect.collect { sideEffect ->
             when (sideEffect) {
                 is SplashSideEffect.NavigateLogin -> {
@@ -36,8 +35,9 @@ fun SplashRoute(
                 }
 
                 is SplashSideEffect.NavigateHome -> {
+                    Napier.d { "SplashSideEffect.NavigateHome: ${sideEffect.deckId}" }
                     navDispatcher.emit(
-                        NavCommand.ResetTo(
+                        NavCommand.To(
                             HomeEntry(
                                 payload =
                                     Payload(

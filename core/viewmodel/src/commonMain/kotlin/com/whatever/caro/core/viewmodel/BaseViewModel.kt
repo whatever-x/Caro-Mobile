@@ -10,10 +10,11 @@ import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
@@ -26,8 +27,12 @@ abstract class BaseViewModel<S : UiState, I : UiIntent, SE : UiSideEffect>(
     private val _state = MutableStateFlow(initialState)
     val state = _state.asStateFlow()
 
-    private val _sideEffect: MutableSharedFlow<SE> = MutableSharedFlow()
-    val sideEffect = _sideEffect.asSharedFlow()
+    private val _sideEffect =
+        Channel<SE>(
+            capacity = Channel.BUFFERED,
+            onBufferOverflow = BufferOverflow.SUSPEND,
+        )
+    val sideEffect = _sideEffect.receiveAsFlow()
 
     protected val currentState: S
         get() = _state.value
@@ -49,7 +54,7 @@ abstract class BaseViewModel<S : UiState, I : UiIntent, SE : UiSideEffect>(
     }
 
     protected fun postSideEffect(sideEffect: SE) {
-        viewModelScope.launch { _sideEffect.emit(sideEffect) }
+        viewModelScope.launch { _sideEffect.send(sideEffect) }
     }
 
     protected inline fun launch(
