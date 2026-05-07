@@ -13,15 +13,6 @@ kotlin {
         namespace = "com.whatever.caro.composeApp"
     }
 
-    targets.withType<KotlinNativeTarget>().configureEach {
-        if (konanTarget.family.isAppleFamily) {
-            binaries.framework {
-                baseName = "ComposeApp"
-                isStatic = true
-            }
-        }
-    }
-
     sourceSets {
         androidMain.dependencies {
         }
@@ -35,7 +26,7 @@ kotlin {
             implementation(projects.core.remote)
             implementation(projects.core.analytics)
             implementation(projects.core.crashlytics)
-            implementation(projects.core.messaging)
+            api(projects.core.messaging)
 
             implementation(projects.feature.home)
             implementation(projects.feature.login)
