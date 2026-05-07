@@ -5,10 +5,183 @@
 //   ./gradlew :designsystem:stabilityDump
 
 @Composable
-public fun com.whatever.caro.core.designsystem.CaroButton(text: kotlin.String, onClick: kotlin.Function0<kotlin.Unit>): kotlin.Unit
+public fun com.whatever.caro.core.designsystem.animation.SlideInSlideOutSnackbarHost(current: androidx.compose.material3.SnackbarData?, modifier: androidx.compose.ui.Modifier, content: @[Composable] androidx.compose.runtime.internal.ComposableFunction1<androidx.compose.material3.SnackbarData, kotlin.Unit>): kotlin.Unit
   skippable: true
   restartable: true
   params:
-    - text: STABLE (String is immutable)
-    - onClick: STABLE (function type)
+    - current: STABLE (marked @Stable or @Immutable)
+    - modifier: STABLE (marked @Stable or @Immutable)
+    - content: STABLE (composable function type)
+
+@Composable
+private fun com.whatever.caro.core.designsystem.animation.animatedOpacity(animation: androidx.compose.animation.core.AnimationSpec<kotlin.Float>, visible: kotlin.Boolean, onAnimationFinish: kotlin.Function0<kotlin.Unit>): androidx.compose.runtime.State<kotlin.Float>
+  skippable: false
+  restartable: true
+  params:
+    - animation: RUNTIME (requires runtime check)
+    - visible: STABLE (primitive type)
+    - onAnimationFinish: STABLE (function type)
+
+@Composable
+private fun com.whatever.caro.core.designsystem.animation.animatedSlideOffsetY(animation: androidx.compose.animation.core.AnimationSpec<kotlin.Float>, visible: kotlin.Boolean, onAnimationFinish: kotlin.Function0<kotlin.Unit>): androidx.compose.runtime.State<kotlin.Float>
+  skippable: false
+  restartable: true
+  params:
+    - animation: RUNTIME (requires runtime check)
+    - visible: STABLE (primitive type)
+    - onAnimationFinish: STABLE (function type)
+
+@Composable
+public fun com.whatever.caro.core.designsystem.components.CaroSnackBarHost(modifier: androidx.compose.ui.Modifier, hostState: androidx.compose.material3.SnackbarHostState, snackbar: @[Composable] androidx.compose.runtime.internal.ComposableFunction1<androidx.compose.material3.SnackbarData, kotlin.Unit>): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - modifier: STABLE (marked @Stable or @Immutable)
+    - hostState: STABLE (marked @Stable or @Immutable)
+    - snackbar: STABLE (composable function type)
+
+@Composable
+public fun com.whatever.caro.core.designsystem.components.CaroSnackbar(modifier: androidx.compose.ui.Modifier, snackbarData: androidx.compose.material3.SnackbarData): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - modifier: STABLE (marked @Stable or @Immutable)
+    - snackbarData: STABLE (marked @Stable or @Immutable)
+
+@Composable
+public fun com.whatever.caro.core.designsystem.components.CaroTextArea(value: kotlin.String, onValueChange: kotlin.Function1<kotlin.String, kotlin.Unit>, modifier: androidx.compose.ui.Modifier, header: @[Composable] androidx.compose.runtime.internal.ComposableFunction0<kotlin.Unit>?, footer: @[Composable] androidx.compose.runtime.internal.ComposableFunction0<kotlin.Unit>?, placeholder: kotlin.String?, enabled: kotlin.Boolean, readOnly: kotlin.Boolean, keyboardOptions: androidx.compose.foundation.text.KeyboardOptions, keyboardActions: androidx.compose.foundation.text.KeyboardActions, interactionSource: androidx.compose.foundation.interaction.MutableInteractionSource): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - value: STABLE (String is immutable)
+    - onValueChange: STABLE (function type)
+    - modifier: STABLE (marked @Stable or @Immutable)
+    - header: STABLE (composable function type)
+    - footer: STABLE (composable function type)
+    - placeholder: STABLE (class with no mutable properties)
+    - enabled: STABLE (primitive type)
+    - readOnly: STABLE (primitive type)
+    - keyboardOptions: STABLE (marked @Stable or @Immutable)
+    - keyboardActions: STABLE (marked @Stable or @Immutable)
+    - interactionSource: STABLE (marked @Stable or @Immutable)
+
+@Composable
+public fun com.whatever.caro.core.designsystem.components.CaroTopBar(modifier: androidx.compose.ui.Modifier, leadingContent: @[Composable] @[ExtensionFunctionType] androidx.compose.runtime.internal.ComposableFunction1<androidx.compose.foundation.layout.BoxScope, kotlin.Unit>?, centerContent: @[Composable] @[ExtensionFunctionType] androidx.compose.runtime.internal.ComposableFunction1<androidx.compose.foundation.layout.BoxScope, kotlin.Unit>?, trailingContent: @[Composable] @[ExtensionFunctionType] androidx.compose.runtime.internal.ComposableFunction1<androidx.compose.foundation.layout.BoxScope, kotlin.Unit>?): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - modifier: STABLE (marked @Stable or @Immutable)
+    - leadingContent: STABLE (composable function type)
+    - centerContent: STABLE (composable function type)
+    - trailingContent: STABLE (composable function type)
+
+@Composable
+private fun com.whatever.caro.core.designsystem.components.PreviewAddIcon(): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+
+@Composable
+private fun com.whatever.caro.core.designsystem.components.PreviewArrowLeftIcon(): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+
+@Composable
+private fun com.whatever.caro.core.designsystem.components.PreviewCenterComponent(): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+
+@Composable
+private fun com.whatever.caro.core.designsystem.components.PreviewContainer(content: @[Composable] androidx.compose.runtime.internal.ComposableFunction0<kotlin.Unit>): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - content: STABLE (composable function type)
+
+@Composable
+private fun com.whatever.caro.core.designsystem.components.PreviewLeadingIconText(): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+
+@Composable
+private fun com.whatever.caro.core.designsystem.components.PreviewMoreIcon(): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+
+@Composable
+private fun com.whatever.caro.core.designsystem.components.PreviewText(): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+
+@Composable
+private fun com.whatever.caro.core.designsystem.components.PreviewTrailing2Icon(): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+
+@Composable
+private fun com.whatever.caro.core.designsystem.components.TextAreaBox(value: kotlin.String, onValueChange: kotlin.Function1<kotlin.String, kotlin.Unit>, placeholder: kotlin.String?, enabled: kotlin.Boolean, readOnly: kotlin.Boolean, keyboardOptions: androidx.compose.foundation.text.KeyboardOptions, keyboardActions: androidx.compose.foundation.text.KeyboardActions, interactionSource: androidx.compose.foundation.interaction.MutableInteractionSource): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - value: STABLE (String is immutable)
+    - onValueChange: STABLE (function type)
+    - placeholder: STABLE (class with no mutable properties)
+    - enabled: STABLE (primitive type)
+    - readOnly: STABLE (primitive type)
+    - keyboardOptions: STABLE (marked @Stable or @Immutable)
+    - keyboardActions: STABLE (marked @Stable or @Immutable)
+    - interactionSource: STABLE (marked @Stable or @Immutable)
+
+@Composable
+internal fun com.whatever.caro.core.designsystem.foundation.Pretendard(): androidx.compose.ui.text.font.FontFamily
+  skippable: true
+  restartable: true
+  params:
+
+@Composable
+internal fun com.whatever.caro.core.designsystem.foundation.Roboto(): androidx.compose.ui.text.font.FontFamily
+  skippable: true
+  restartable: true
+  params:
+
+@Composable
+public fun com.whatever.caro.core.designsystem.themes.CaroTheme(color: com.whatever.caro.core.designsystem.themes.CaroColor, typography: com.whatever.caro.core.designsystem.themes.CaroTypography, shape: com.whatever.caro.core.designsystem.themes.CaroShape, spacing: com.whatever.caro.core.designsystem.themes.CaroSpacing, content: @[Composable] androidx.compose.runtime.internal.ComposableFunction0<kotlin.Unit>): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - color: STABLE (marked @Stable or @Immutable)
+    - typography: STABLE (marked @Stable or @Immutable)
+    - shape: STABLE (marked @Stable or @Immutable)
+    - spacing: STABLE (marked @Stable or @Immutable)
+    - content: STABLE (composable function type)
+
+@Composable
+public fun com.whatever.caro.core.designsystem.themes.CaroTheme.color(): com.whatever.caro.core.designsystem.themes.CaroColor
+  skippable: true
+  restartable: true
+  params:
+
+@Composable
+public fun com.whatever.caro.core.designsystem.themes.CaroTheme.shape(): com.whatever.caro.core.designsystem.themes.CaroShape
+  skippable: true
+  restartable: true
+  params:
+
+@Composable
+public fun com.whatever.caro.core.designsystem.themes.CaroTheme.spacing(): com.whatever.caro.core.designsystem.themes.CaroSpacing
+  skippable: true
+  restartable: true
+  params:
+
+@Composable
+public fun com.whatever.caro.core.designsystem.themes.CaroTheme.typography(): com.whatever.caro.core.designsystem.themes.CaroTypography
+  skippable: true
+  restartable: true
+  params:
 

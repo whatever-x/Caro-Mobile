@@ -51,3 +51,4 @@ include(":core:crashlytics")
 // :Feature
 include(":feature:home")
 include(":feature:login")
+include(":feature:splash")
