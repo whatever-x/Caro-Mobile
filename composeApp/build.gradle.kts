@@ -1,5 +1,3 @@
-import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
-
 plugins {
     id("caro.kmp")
     id("caro.kmp.android")
@@ -11,15 +9,6 @@ plugins {
 kotlin {
     android {
         namespace = "com.whatever.caro.composeApp"
-    }
-
-    targets.withType<KotlinNativeTarget>().configureEach {
-        if (konanTarget.family.isAppleFamily) {
-            binaries.framework {
-                baseName = "ComposeApp"
-                isStatic = true
-            }
-        }
     }
 
     sourceSets {
@@ -35,6 +24,7 @@ kotlin {
             implementation(projects.core.remote)
             implementation(projects.core.analytics)
             implementation(projects.core.crashlytics)
+            api(projects.core.messaging)
 
             implementation(projects.feature.home)
             implementation(projects.feature.login)

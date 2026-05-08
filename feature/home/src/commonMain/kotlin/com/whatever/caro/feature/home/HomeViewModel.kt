@@ -14,18 +14,15 @@ class HomeViewModel(
         initialState = HomeState(),
     ) {
     override fun handleClientException(throwable: Throwable) {
-        TODO()
     }
 
     override suspend fun handleIntent(intent: HomeIntent) {
-        TODO()
     }
 
     fun init() {
         launch {
             val userData = demoRepository.getData(id = navKey.payload.id.toLong())
             val sampleString = demoRepository.getString()
-
             reduce {
                 copy(
                     screenName = "HomeScreen",

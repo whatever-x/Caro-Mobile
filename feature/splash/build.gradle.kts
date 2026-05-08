@@ -13,4 +13,10 @@ kotlin {
     android {
         namespace = "com.whatever.caro.feature.splash"
     }
+
+    sourceSets {
+        commonMain.dependencies {
+            implementation(libs.bundles.moko)
+        }
+    }
 }

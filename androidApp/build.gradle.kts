@@ -8,6 +8,7 @@ android.namespace = "com.whatever.caro.app"
 
 dependencies {
     implementation(projects.composeApp)
+    implementation(projects.core.messaging)
 
     implementation(libs.koin.android)
     implementation(libs.androidx.activity.compose)

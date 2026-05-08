@@ -3,6 +3,7 @@ package com.whatever.caro.composeApp.di
 import com.whatever.caro.core.analytics.di.analyticsModule
 import com.whatever.caro.core.crashlytics.di.crashlyticsModule
 import com.whatever.caro.core.data.di.dataModule
+import com.whatever.caro.core.messaging.di.messagingModule
 import com.whatever.caro.core.navigator.di.navigatorModule
 import com.whatever.caro.core.remote.di.networkModule
 import com.whatever.caro.core.remote.di.remoteModule
@@ -27,6 +28,7 @@ fun initKoin(configuration: KoinAppDeclaration? = null) {
             remoteModule,
             analyticsModule,
             crashlyticsModule,
+            messagingModule,
             // feature
             homeModule,
             loginModule,

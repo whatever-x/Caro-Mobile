@@ -3,7 +3,6 @@ package com.whatever.caro.core.remote.network.plugins
 import com.whatever.caro.core.model.exception.CaroClientException
 import com.whatever.caro.core.model.exception.CaroInvalidResponseException
 import com.whatever.caro.core.model.exception.CaroServerException
-import com.whatever.caro.core.model.exception.ErrorCode.CANCELLED
 import com.whatever.caro.core.model.exception.ErrorCode.INVALID_RESPONSE
 import com.whatever.caro.core.model.exception.ErrorCode.NETWORK_001
 import com.whatever.caro.core.model.exception.ErrorCode.NETWORK_002

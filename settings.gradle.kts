@@ -47,6 +47,7 @@ include(":core:viewmodel")
 include(":core:remote")
 include(":core:analytics")
 include(":core:crashlytics")
+include(":core:messaging")
 
 // :Feature
 include(":feature:home")

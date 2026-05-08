@@ -21,7 +21,6 @@ fun HomeRoute(
 
     LaunchedEffect(Unit) {
         viewModel.sideEffect.collect { sideEffect ->
-            TODO()
         }
     }
 
