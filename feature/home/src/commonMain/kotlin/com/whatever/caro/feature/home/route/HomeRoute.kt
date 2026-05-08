@@ -7,7 +7,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.whatever.caro.core.navigator.dispatcher.NavigationDispatcher
 import com.whatever.caro.feature.home.HomeScreen
 import com.whatever.caro.feature.home.HomeViewModel
-import io.github.aakira.napier.Napier
 
 @Composable
 fun HomeRoute(
@@ -22,7 +21,6 @@ fun HomeRoute(
 
     LaunchedEffect(Unit) {
         viewModel.sideEffect.collect { sideEffect ->
-            Napier.d { "sideEffect: $sideEffect" }
         }
     }
 

@@ -23,9 +23,5 @@ internal fun HomeScreen(
         Text(
             text = state.name,
         )
-
-        Text(
-            text = state.deckId ?: "null",
-        )
     }
 }

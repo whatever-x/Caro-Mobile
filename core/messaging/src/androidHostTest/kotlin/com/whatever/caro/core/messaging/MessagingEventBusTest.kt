@@ -48,7 +48,7 @@ class MessagingEventBusTest :
 
         test("publishMessage 후 messages.receive()로 메시지를 받는다") {
             runTest {
-                val message = RemoteMessage(deckId = "deck-${Random.nextLong()}")
+                val message = CloudMessage(anyValue = "TestValue")
                 MessagingEventBus.publishMessage(message)
 
                 MessagingEventBus.messages.receive() shouldBe message
@@ -57,11 +57,11 @@ class MessagingEventBusTest :
 
         test("publishMessage 호출마다 receive로 새 메시지를 받을 수 있다") {
             runTest {
-                val first = RemoteMessage(deckId = "first-${Random.nextLong()}")
+                val first = CloudMessage(anyValue = "TestValue-1")
                 MessagingEventBus.publishMessage(first)
                 MessagingEventBus.messages.receive() shouldBe first
 
-                val second = RemoteMessage(deckId = "second-${Random.nextLong()}")
+                val second = CloudMessage(anyValue = "TestValue-2")
                 MessagingEventBus.publishMessage(second)
                 MessagingEventBus.messages.receive() shouldBe second
             }
@@ -70,18 +70,10 @@ class MessagingEventBusTest :
         test("CONFLATED Channel은 burst에도 publishMessage가 실패하지 않고 최신만 보관한다") {
             runTest {
                 repeat(100) { i ->
-                    MessagingEventBus.publishMessage(RemoteMessage(deckId = "deck-$i"))
+                    MessagingEventBus.publishMessage(CloudMessage(anyValue = "TestValue-$i"))
                 }
 
-                MessagingEventBus.messages.receive() shouldBe RemoteMessage(deckId = "deck-99")
-            }
-        }
-
-        test("deckId가 null인 RemoteMessage도 publish/receive 가능하다") {
-            runTest {
-                MessagingEventBus.publishMessage(RemoteMessage(deckId = null))
-
-                MessagingEventBus.messages.receive() shouldBe RemoteMessage(deckId = null)
+                MessagingEventBus.messages.receive() shouldBe CloudMessage(anyValue = "TestValue-99")
             }
         }
     })

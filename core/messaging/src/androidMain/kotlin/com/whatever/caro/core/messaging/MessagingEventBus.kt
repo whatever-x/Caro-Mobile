@@ -9,16 +9,16 @@ import kotlinx.coroutines.flow.asStateFlow
 internal object MessagingEventBus {
     private val mutableTokenFlow = MutableStateFlow("")
 
-    private val mutableMessages = Channel<RemoteMessage>(capacity = Channel.CONFLATED)
+    private val mutableMessages = Channel<CloudMessage>(capacity = Channel.CONFLATED)
 
     val tokenFlow: StateFlow<String> = mutableTokenFlow.asStateFlow()
-    val messages: ReceiveChannel<RemoteMessage> = mutableMessages
+    val messages: ReceiveChannel<CloudMessage> = mutableMessages
 
     fun publishToken(token: String) {
         mutableTokenFlow.tryEmit(token)
     }
 
-    fun publishMessage(message: RemoteMessage) {
+    fun publishMessage(message: CloudMessage) {
         mutableMessages.trySend(message)
     }
 }

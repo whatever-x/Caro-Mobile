@@ -6,5 +6,5 @@ import kotlinx.coroutines.flow.StateFlow
 interface MessagingClient {
     val tokenFlow: StateFlow<String>
 
-    val messages: ReceiveChannel<RemoteMessage>
+    val messages: ReceiveChannel<CloudMessage>
 }

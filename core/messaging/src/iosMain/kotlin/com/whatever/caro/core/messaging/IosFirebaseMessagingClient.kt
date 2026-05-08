@@ -5,5 +5,5 @@ import kotlinx.coroutines.flow.StateFlow
 
 internal class IosFirebaseMessagingClient : MessagingClient {
     override val tokenFlow: StateFlow<String> = IosMessagingEvents.tokenFlow
-    override val messages: ReceiveChannel<RemoteMessage> = IosMessagingEvents.messages
+    override val messages: ReceiveChannel<CloudMessage> = IosMessagingEvents.messages
 }

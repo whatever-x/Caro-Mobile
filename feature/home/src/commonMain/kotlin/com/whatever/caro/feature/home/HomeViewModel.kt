@@ -6,7 +6,6 @@ import com.whatever.caro.core.viewmodel.BaseViewModel
 import com.whatever.caro.feature.home.mvi.HomeIntent
 import com.whatever.caro.feature.home.mvi.HomeSideEffect
 import com.whatever.caro.feature.home.mvi.HomeState
-import io.github.aakira.napier.Napier
 
 class HomeViewModel(
     private val navKey: HomeEntry,
@@ -15,15 +14,12 @@ class HomeViewModel(
         initialState = HomeState(),
     ) {
     override fun handleClientException(throwable: Throwable) {
-        Napier.e { "handleClientException: $throwable" }
     }
 
     override suspend fun handleIntent(intent: HomeIntent) {
-        Napier.d { "handleIntent: $intent" }
     }
 
     fun init() {
-        Napier.d { "navKey: $navKey" }
         launch {
             val userData = demoRepository.getData(id = navKey.payload.id.toLong())
             val sampleString = demoRepository.getString()
@@ -32,7 +28,6 @@ class HomeViewModel(
                     screenName = "HomeScreen",
                     name = userData.name,
                     sampleString = sampleString,
-                    deckId = navKey.payload.deckId,
                 )
             }
         }

@@ -13,7 +13,6 @@ import com.whatever.caro.core.navigator.entries.Payload
 import com.whatever.caro.feature.splash.mvi.SplashSideEffect
 import dev.icerock.moko.permissions.compose.BindEffect
 import dev.icerock.moko.permissions.compose.rememberPermissionsControllerFactory
-import io.github.aakira.napier.Napier
 
 @Composable
 fun SplashRoute(
@@ -26,7 +25,6 @@ fun SplashRoute(
     BindEffect(permissionsController)
 
     LaunchedEffect(Unit) {
-        Napier.d { "start sideEffect collect" }
         viewModel.start(permissionsController)
         viewModel.sideEffect.collect { sideEffect ->
             when (sideEffect) {
@@ -34,28 +32,18 @@ fun SplashRoute(
                     navDispatcher.emit(NavCommand.ResetTo(LoginEntry))
                 }
 
-                is SplashSideEffect.NavigateHome -> {
-                    Napier.d { "SplashSideEffect.NavigateHome: ${sideEffect.deckId}" }
+                SplashSideEffect.NavigateHome -> {
                     navDispatcher.emit(
                         NavCommand.To(
                             HomeEntry(
                                 payload =
                                     Payload(
                                         id = 1,
-                                        name = "push",
-                                        deckId = sideEffect.deckId,
+                                        name = "caro",
                                     ),
                             ),
                         ),
                     )
-                }
-
-                is SplashSideEffect.ShowNotificationPermissionDeniedDialog -> {
-                    // TODO: 알림 권한 거부 안내 Dialog 노출
-                }
-
-                is SplashSideEffect.ShowNotificationPermissionDeniedAlwaysDialog -> {
-                    // TODO: 설정 화면 이동 안내 Dialog 노출
                 }
             }
         }

@@ -1,6 +1,5 @@
 package com.whatever.caro.feature.login.component
 
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -29,7 +28,6 @@ import caromobile.core.designsystem.generated.resources.login_card_text_descript
 import caromobile.core.designsystem.generated.resources.login_card_text_title
 import com.whatever.caro.core.designsystem.themes.CaroTheme
 import com.whatever.caro.core.ui.noRippleClickable
-import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
