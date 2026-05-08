@@ -7,7 +7,7 @@ import org.koin.dsl.module
 
 val loginModule =
     module {
-        viewModel { LoginViewModel() }
+        viewModel { LoginViewModel(authRepository = get()) }
     }
 
 expect val socialModule: Module

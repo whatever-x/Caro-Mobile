@@ -3,7 +3,7 @@ package com.whatever.caro.core.remote.network.plugins
 import com.whatever.caro.core.model.exception.CaroInvalidResponseException
 import com.whatever.caro.core.model.exception.CaroServerException
 import com.whatever.caro.core.model.exception.ErrorCode.INVALID_RESPONSE
-import com.whatever.caro.core.remote.model.CaroBaseResponse
+import com.whatever.caro.core.remote.dto.base.ApiResponseObjectDto
 import io.ktor.client.plugins.api.ClientPlugin
 import io.ktor.client.plugins.api.createClientPlugin
 import io.ktor.http.ContentType
@@ -54,7 +54,7 @@ internal val CaroBaseResponseConverter: ClientPlugin<CaroBaseResponseConverterCo
                     )
                 }
 
-            val envelopeSerializer = CaroBaseResponse.serializer(requestedSerializer)
+            val envelopeSerializer = ApiResponseObjectDto.serializer(requestedSerializer)
             val baseResponse =
                 runCatching {
                     json.decodeFromString(envelopeSerializer, payloadText)

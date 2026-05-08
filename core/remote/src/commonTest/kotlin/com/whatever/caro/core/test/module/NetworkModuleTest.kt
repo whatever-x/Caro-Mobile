@@ -1,7 +1,12 @@
 package com.whatever.caro.core.test.module
 
+import com.whatever.caro.core.remote.datasource.auth.RemoteAuthDataSource
+import com.whatever.caro.core.remote.device.DeviceIdProvider
 import com.whatever.caro.core.remote.di.networkModule
 import com.whatever.caro.core.remote.di.qualifier.NetworkClient
+import com.whatever.caro.core.remote.dto.auth.request.SocialLoginRequest
+import com.whatever.caro.core.remote.dto.auth.request.TokenRefreshRequest
+import com.whatever.caro.core.remote.dto.auth.response.LoginResponse
 import com.whatever.caro.core.remote.network.plugins.CaroBaseResponseConverter
 import io.kotest.assertions.throwables.shouldNotThrowAny
 import io.kotest.core.spec.style.FunSpec
@@ -16,6 +21,7 @@ import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.plugins.plugin
 import kotlinx.serialization.json.Json
 import org.koin.core.qualifier.named
+import org.koin.dsl.module
 import org.koin.test.KoinTest
 import org.koin.test.get
 
@@ -23,7 +29,25 @@ class NetworkModuleTest :
     FunSpec(),
     KoinTest {
     init {
-        extensions(KoinExtension(listOf(networkModule)))
+        val testDependenciesModule =
+            module {
+                single<DeviceIdProvider> {
+                    object : DeviceIdProvider {
+                        override fun get(): String = "test-device-id"
+                    }
+                }
+                single<RemoteAuthDataSource> {
+                    object : RemoteAuthDataSource {
+                        override suspend fun login(request: SocialLoginRequest): LoginResponse =
+                            LoginResponse(accessToken = "", refreshToken = "")
+
+                        override suspend fun refresh(request: TokenRefreshRequest): LoginResponse =
+                            LoginResponse(accessToken = "", refreshToken = "")
+                    }
+                }
+            }
+
+        extensions(KoinExtension(listOf(networkModule, testDependenciesModule)))
 
         test("AUTH 클라이언트와 NON_AUTH 클라이언트는 서로 다른 인스턴스를 가진다.") {
             val authClient: HttpClient = get(qualifier = named(NetworkClient.Caro.AUTH))
