@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		BA292D112FAB8911009FEE04 /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = BA292D102FAB8911009FEE04 /* FirebaseMessaging */; };
 		BAAA4FE12F686AE40069538E /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = BAAA4FE02F686AE40069538E /* GoogleSignIn */; };
 		BAAA4FE32F686AE40069538E /* GoogleSignInSwift in Frameworks */ = {isa = PBXBuildFile; productRef = BAAA4FE22F686AE40069538E /* GoogleSignInSwift */; };
 		E9890E2B2F96353D00C7B318 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = E9890E2A2F96353D00C7B318 /* FirebaseAnalytics */; };
@@ -24,9 +23,15 @@
 		A4264C761917DADE87ECE59B /* Exceptions for "iosApp" folder in "iosApp" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				Config/Dev.xcconfig,
-				Config/Prod.xcconfig,
-				Config/Qa.xcconfig,
+				Config/DevDebug.xcconfig,
+				Config/DevRelease.xcconfig,
+				Config/ProdDebug.xcconfig,
+				Config/ProdRelease.xcconfig,
+				Config/QaDebug.xcconfig,
+				Config/QaRelease.xcconfig,
+				"FirebaseConfig/GoogleService-Info-Dev.plist",
+				"FirebaseConfig/GoogleService-Info-Prod.plist",
+				"FirebaseConfig/GoogleService-Info-Qa.plist",
 				Info.plist,
 			);
 			target = 4648218809E5AE90BF60B44C /* iosApp */;
@@ -42,11 +47,6 @@
 			path = iosApp;
 			sourceTree = "<group>";
 		};
-		BA292D152FABA07A009FEE04 /* FirebaseConfig */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = FirebaseConfig;
-			sourceTree = "<group>";
-		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -56,7 +56,6 @@
 			files = (
 				BAAA4FE12F686AE40069538E /* GoogleSignIn in Frameworks */,
 				E9890E2F2F96353D00C7B318 /* FirebaseCore in Frameworks */,
-				BA292D112FAB8911009FEE04 /* FirebaseMessaging in Frameworks */,
 				BAAA4FE32F686AE40069538E /* GoogleSignInSwift in Frameworks */,
 				E9890E312F96353D00C7B318 /* FirebaseCrashlytics in Frameworks */,
 				E9890E2B2F96353D00C7B318 /* FirebaseAnalytics in Frameworks */,
@@ -71,17 +70,8 @@
 			isa = PBXGroup;
 			children = (
 				2354A1345C967ECDF360E8CE /* iosApp */,
-				BA292D0F2FAB8911009FEE04 /* Frameworks */,
 				FA83853C7BB573C5EFE88810 /* Products */,
-				BA292D152FABA07A009FEE04 /* FirebaseConfig */,
 			);
-			sourceTree = "<group>";
-		};
-		BA292D0F2FAB8911009FEE04 /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			name = Frameworks;
 			sourceTree = "<group>";
 		};
 		FA83853C7BB573C5EFE88810 /* Products */ = {
@@ -103,8 +93,8 @@
 				C152F0DBA6B8A43E606B0E23 /* Compile Kotlin Framework */,
 				93D351359868C2117AA3B653 /* Sources */,
 				2635DAEAD9BE729AAE3F244F /* Frameworks */,
-				E9890E3B2F9646BB00C7B318 /* Copy Firebase Config */,
 				8C58B56CFA16FE7E4B33EED6 /* Resources */,
+				E9890E3B2F9646BB00C7B318 /* Copy Firebase Config */,
 			);
 			buildRules = (
 			);
@@ -112,7 +102,6 @@
 			);
 			fileSystemSynchronizedGroups = (
 				2354A1345C967ECDF360E8CE /* iosApp */,
-				BA292D152FABA07A009FEE04 /* FirebaseConfig */,
 			);
 			name = iosApp;
 			packageProductDependencies = (
@@ -122,7 +111,6 @@
 				E9890E2C2F96353D00C7B318 /* FirebaseAnalyticsCore */,
 				E9890E2E2F96353D00C7B318 /* FirebaseCore */,
 				E9890E302F96353D00C7B318 /* FirebaseCrashlytics */,
-				BA292D102FAB8911009FEE04 /* FirebaseMessaging */,
 			);
 			productName = iosApp;
 			productReference = 3E06E91E468A67CBE7F646FC /* iosApp.app */;
@@ -227,7 +215,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "set -euo pipefail\n\necho \"Current configuration: ${CONFIGURATION}\"\n\ncase \"${CONFIGURATION}\" in\n  \"Debug\" | \"Dev\")\n    FIREBASE_PLIST_PATH=\"${PROJECT_DIR}/FirebaseConfig/GoogleService-Info-Dev.plist\"\n    ;;\n  \"QA\")\n    FIREBASE_PLIST_PATH=\"${PROJECT_DIR}/FirebaseConfig/GoogleService-Info-Qa.plist\"\n    ;;\n  \"Release\" | \"Prod\")\n    FIREBASE_PLIST_PATH=\"${PROJECT_DIR}/FirebaseConfig/GoogleService-Info-Prod.plist\"\n    ;;\n  *)\n    echo \"Unknown configuration: ${CONFIGURATION}\"\n    exit 1\n    ;;\nesac\n\nif [ ! -f \"${FIREBASE_PLIST_PATH}\" ]; then\n  echo \"Missing Firebase plist: ${FIREBASE_PLIST_PATH}\"\n  exit 1\nfi\n\nDEST_PLIST=\"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/GoogleService-Info.plist\"\n\ncp \"${FIREBASE_PLIST_PATH}\" \"${DEST_PLIST}\"\n\necho \"Copied ${FIREBASE_PLIST_PATH} -> ${DEST_PLIST}\"\n";
+			shellScript = "set -euo pipefail\n\nif [ ! -f \"${FIREBASE_PLIST_PATH}\" ]; then\n  echo \"Missing Firebase plist: ${FIREBASE_PLIST_PATH}\"\n  exit 1\nfi\n\nDEST_PLIST=\"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/GoogleService-Info.plist\"\ncp \"${FIREBASE_PLIST_PATH}\" \"${DEST_PLIST}\"\n\necho \"Copied ${FIREBASE_PLIST_PATH} -> ${DEST_PLIST}\"\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -242,10 +230,10 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
-		0D38C17F125911FB3285E39C /* Debug */ = {
+		0D38C17F125911FB3285E39C /* DevDebug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReferenceAnchor = 2354A1345C967ECDF360E8CE /* iosApp */;
-			baseConfigurationReferenceRelativePath = Config/Dev.xcconfig;
+			baseConfigurationReferenceRelativePath = Config/DevDebug.xcconfig;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -277,12 +265,12 @@
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
-			name = Debug;
+			name = DevDebug;
 		};
-		1A08946E153E1203139756A3 /* Debug */ = {
+		1A08946E153E1203139756A3 /* DevDebug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReferenceAnchor = 2354A1345C967ECDF360E8CE /* iosApp */;
-			baseConfigurationReferenceRelativePath = Config/Dev.xcconfig;
+			baseConfigurationReferenceRelativePath = Config/DevDebug.xcconfig;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -343,12 +331,12 @@
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
-			name = Debug;
+			name = DevDebug;
 		};
-		1F78A817429C5ABB10B25626 /* Release */ = {
+		1F78A817429C5ABB10B25626 /* ProdRelease */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReferenceAnchor = 2354A1345C967ECDF360E8CE /* iosApp */;
-			baseConfigurationReferenceRelativePath = Config/Prod.xcconfig;
+			baseConfigurationReferenceRelativePath = Config/ProdRelease.xcconfig;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -380,12 +368,218 @@
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
-			name = Release;
+			name = ProdRelease;
 		};
-		B3C66612CEE7C172985EAB6E /* Release */ = {
+		A1A1A1A1A1A1A1A1A1A1A401 /* QaDebug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReferenceAnchor = 2354A1345C967ECDF360E8CE /* iosApp */;
-			baseConfigurationReferenceRelativePath = Config/Prod.xcconfig;
+			baseConfigurationReferenceRelativePath = Config/QaDebug.xcconfig;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = QaDebug;
+		};
+		A1A1A1A1A1A1A1A1A1A1A402 /* QaDebug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = 2354A1345C967ECDF360E8CE /* iosApp */;
+			baseConfigurationReferenceRelativePath = Config/QaDebug.xcconfig;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = iosApp/iosApp.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_STYLE = Manual;
+				DEVELOPMENT_ASSET_PATHS = "\"iosApp/Preview Content\"";
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = AR6HWFH5V3;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = iosApp/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "$(APP_DISPLAY_NAME)";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.whatever.caro.qa;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "match Development com.whatever.caro.qa";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = QaDebug;
+		};
+		B2B2B2B2B2B2B2B2B2B2B501 /* ProdDebug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = 2354A1345C967ECDF360E8CE /* iosApp */;
+			baseConfigurationReferenceRelativePath = Config/ProdDebug.xcconfig;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = ProdDebug;
+		};
+		B2B2B2B2B2B2B2B2B2B2B502 /* ProdDebug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = 2354A1345C967ECDF360E8CE /* iosApp */;
+			baseConfigurationReferenceRelativePath = Config/ProdDebug.xcconfig;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = iosApp/iosApp.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_STYLE = Manual;
+				DEVELOPMENT_ASSET_PATHS = "\"iosApp/Preview Content\"";
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = AR6HWFH5V3;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = iosApp/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "$(APP_DISPLAY_NAME)";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.whatever.caro;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "match Development com.whatever.caro";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = ProdDebug;
+		};
+		B3C66612CEE7C172985EAB6E /* ProdRelease */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = 2354A1345C967ECDF360E8CE /* iosApp */;
+			baseConfigurationReferenceRelativePath = Config/ProdRelease.xcconfig;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -439,12 +633,12 @@
 				SWIFT_COMPILATION_MODE = wholemodule;
 				VALIDATE_PRODUCT = YES;
 			};
-			name = Release;
+			name = ProdRelease;
 		};
-		E93BE8652F1E02DD007CC1AC /* Qa */ = {
+		D3D3D3D3D3D3D3D3D3D3D301 /* DevRelease */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReferenceAnchor = 2354A1345C967ECDF360E8CE /* iosApp */;
-			baseConfigurationReferenceRelativePath = Config/Qa.xcconfig;
+			baseConfigurationReferenceRelativePath = Config/DevRelease.xcconfig;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -498,12 +692,108 @@
 				SWIFT_COMPILATION_MODE = wholemodule;
 				VALIDATE_PRODUCT = YES;
 			};
-			name = Qa;
+			name = DevRelease;
 		};
-		E93BE8662F1E02DD007CC1AC /* Qa */ = {
+		D3D3D3D3D3D3D3D3D3D3D302 /* DevRelease */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReferenceAnchor = 2354A1345C967ECDF360E8CE /* iosApp */;
-			baseConfigurationReferenceRelativePath = Config/Qa.xcconfig;
+			baseConfigurationReferenceRelativePath = Config/DevRelease.xcconfig;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = iosApp/iosApp.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_STYLE = Manual;
+				DEVELOPMENT_ASSET_PATHS = "\"iosApp/Preview Content\"";
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = AR6HWFH5V3;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = iosApp/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "$(APP_DISPLAY_NAME)";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.whatever.caro.dev;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "match Development com.whatever.caro.dev";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = DevRelease;
+		};
+		E93BE8652F1E02DD007CC1AC /* QaRelease */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = 2354A1345C967ECDF360E8CE /* iosApp */;
+			baseConfigurationReferenceRelativePath = Config/QaRelease.xcconfig;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = QaRelease;
+		};
+		E93BE8662F1E02DD007CC1AC /* QaRelease */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = 2354A1345C967ECDF360E8CE /* iosApp */;
+			baseConfigurationReferenceRelativePath = Config/QaRelease.xcconfig;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -535,7 +825,7 @@
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
-			name = Qa;
+			name = QaRelease;
 		};
 /* End XCBuildConfiguration section */
 
@@ -543,22 +833,28 @@
 		CBC1E59488DA86B3B9612F08 /* Build configuration list for PBXProject "iosApp" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				1A08946E153E1203139756A3 /* Debug */,
-				B3C66612CEE7C172985EAB6E /* Release */,
-				E93BE8652F1E02DD007CC1AC /* Qa */,
+				1A08946E153E1203139756A3 /* DevDebug */,
+				D3D3D3D3D3D3D3D3D3D3D301 /* DevRelease */,
+				A1A1A1A1A1A1A1A1A1A1A401 /* QaDebug */,
+				E93BE8652F1E02DD007CC1AC /* QaRelease */,
+				B2B2B2B2B2B2B2B2B2B2B501 /* ProdDebug */,
+				B3C66612CEE7C172985EAB6E /* ProdRelease */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = ProdRelease;
 		};
 		EBF6459A93FE8F75078BEB1C /* Build configuration list for PBXNativeTarget "iosApp" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				0D38C17F125911FB3285E39C /* Debug */,
-				1F78A817429C5ABB10B25626 /* Release */,
-				E93BE8662F1E02DD007CC1AC /* Qa */,
+				0D38C17F125911FB3285E39C /* DevDebug */,
+				D3D3D3D3D3D3D3D3D3D3D302 /* DevRelease */,
+				A1A1A1A1A1A1A1A1A1A1A402 /* QaDebug */,
+				E93BE8662F1E02DD007CC1AC /* QaRelease */,
+				B2B2B2B2B2B2B2B2B2B2B502 /* ProdDebug */,
+				1F78A817429C5ABB10B25626 /* ProdRelease */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = ProdRelease;
 		};
 /* End XCConfigurationList section */
 
@@ -582,11 +878,6 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		BA292D102FAB8911009FEE04 /* FirebaseMessaging */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = E9890E292F96353D00C7B318 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
-			productName = FirebaseMessaging;
-		};
 		BAAA4FE02F686AE40069538E /* GoogleSignIn */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = BAAA4FDF2F686AE40069538E /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;

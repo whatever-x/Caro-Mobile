@@ -11,14 +11,22 @@ import dev.icerock.moko.permissions.PermissionState
 import dev.icerock.moko.permissions.PermissionsController
 import dev.icerock.moko.permissions.RequestCanceledException
 import dev.icerock.moko.permissions.notifications.REMOTE_NOTIFICATION
+import kotlinx.coroutines.delay
 
-class SplashViewModel : BaseViewModel<SplashState, SplashIntent, SplashSideEffect>(initialState = SplashState()) {
-    override suspend fun handleIntent(intent: SplashIntent) = Unit
-
-    fun start(permissionsController: PermissionsController) {
-        launch {
-            ensureNotificationPermission(permissionsController)
+class SplashViewModel :
+    BaseViewModel<SplashState, SplashIntent, SplashSideEffect>(
+        initialState = SplashState(),
+    ) {
+    override suspend fun handleIntent(intent: SplashIntent) {
+        when (intent) {
+            SplashIntent.Initialize -> initialize()
         }
+    }
+
+    private suspend fun initialize() {
+        delay(MINIMUM_SPLASH_DURATION_MILLIS)
+        reduce { copy(isInitializing = false) }
+        postSideEffect(SplashSideEffect.NavigateLogin)
     }
 
     private suspend fun ensureNotificationPermission(controller: PermissionsController) {
@@ -32,5 +40,9 @@ class SplashViewModel : BaseViewModel<SplashState, SplashIntent, SplashSideEffec
         } catch (_: RequestCanceledException) {
             // TODO : 권한이 취소 됨
         }
+    }
+
+    companion object {
+        private const val MINIMUM_SPLASH_DURATION_MILLIS = 800L
     }
 }
