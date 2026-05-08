@@ -1,4 +1,4 @@
-package com.whatever.caro.core.data.repository.fcm
+package com.whatever.caro.core.data.repository
 
 import io.github.aakira.napier.Napier
 
