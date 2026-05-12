@@ -46,6 +46,7 @@ koin-compiler = "1.0.0-RC1"
 
 # Network
 ktor = "3.4.2"
+ktorfit = "2.7.1"
 
 # Image Loader
 coil3 = "3.4.0"
@@ -136,6 +137,11 @@ ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negoti
 ktor-client-logging = { module = "io.ktor:ktor-client-logging", version.ref = "ktor" }
 ktor-client-auth = { module = "io.ktor:ktor-client-auth", version.ref = "ktor" }
 ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
+
+# Ktorfit
+ktorfit-lib = { module = "de.jensklingenberg.ktorfit:ktorfit-lib", version.ref = "ktorfit" }
+ktorfit-converters-response = { module = "de.jensklingenberg.ktorfit:ktorfit-converters-response", version.ref = "ktorfit" }
+ktorfit-ksp = { module = "de.jensklingenberg.ktorfit:ktorfit-ksp", version.ref = "ktorfit" }
 
 # Image Loader
 coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil3" }

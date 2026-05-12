@@ -4,21 +4,20 @@ plugins {
     id("caro.kmp.ios")
     id("caro.koin")
     id("caro.kmp.test")
-    id("caro.kover")
 }
 
 kotlin {
     android {
-        namespace = "com.whatever.caro.core.data"
+        namespace = "com.whatever.caro.core.datastore"
     }
 
     sourceSets {
         commonMain.dependencies {
-            implementation(projects.core.remote)
-            implementation(projects.core.datastore)
-            implementation(projects.core.model)
-
+            implementation(libs.bundles.datastore)
             implementation(libs.kotlinx.coroutines.core)
+        }
+        androidMain.dependencies {
+            implementation(libs.kotlinx.coroutines.android)
         }
     }
 }
