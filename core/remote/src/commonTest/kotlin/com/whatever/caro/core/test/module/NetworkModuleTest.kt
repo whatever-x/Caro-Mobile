@@ -1,21 +1,19 @@
 package com.whatever.caro.core.test.module
 
-import com.whatever.caro.core.remote.datasource.auth.RemoteAuthDataSource
+import com.whatever.caro.core.remote.auth.AuthTokenProvider
 import com.whatever.caro.core.remote.device.DeviceIdProvider
 import com.whatever.caro.core.remote.di.networkModule
 import com.whatever.caro.core.remote.di.qualifier.NetworkClient
-import com.whatever.caro.core.remote.dto.auth.request.SocialLoginRequest
-import com.whatever.caro.core.remote.dto.auth.request.TokenRefreshRequest
-import com.whatever.caro.core.remote.dto.auth.response.LoginResponse
+import com.whatever.caro.core.remote.network.plugins.AuthInterceptorPlugin
 import com.whatever.caro.core.remote.network.plugins.CaroBaseResponseConverter
 import io.kotest.assertions.throwables.shouldNotThrowAny
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.koin.KoinExtension
 import io.kotest.matchers.shouldBe
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.HttpCallValidator
 import io.ktor.client.plugins.HttpTimeout
-import io.ktor.client.plugins.auth.Auth
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.plugins.plugin
@@ -36,13 +34,15 @@ class NetworkModuleTest :
                         override fun get(): String = "test-device-id"
                     }
                 }
-                single<RemoteAuthDataSource> {
-                    object : RemoteAuthDataSource {
-                        override suspend fun login(request: SocialLoginRequest): LoginResponse =
-                            LoginResponse(accessToken = "", refreshToken = "")
+                single<AuthTokenProvider> {
+                    object : AuthTokenProvider {
+                        override suspend fun getAccessToken(): String? = null
 
-                        override suspend fun refresh(request: TokenRefreshRequest): LoginResponse =
-                            LoginResponse(accessToken = "", refreshToken = "")
+                        override suspend fun getRefreshToken(): String? = null
+
+                        override suspend fun refresh(): String = ""
+
+                        override suspend fun clearTokens() = Unit
                     }
                 }
             }
@@ -56,11 +56,19 @@ class NetworkModuleTest :
             (authClient === nonAuthClient) shouldBe false
         }
 
-        test("Caro AUTH 클라이언트는 Auth 플러그인을 install 해야한다.") {
+        test("Caro AUTH 클라이언트는 AuthInterceptor 플러그인을 install 해야한다.") {
             val authClient: HttpClient = get(qualifier = named(NetworkClient.Caro.AUTH))
 
             shouldNotThrowAny {
-                authClient.plugin(Auth)
+                authClient.plugin(AuthInterceptorPlugin)
+            }
+        }
+
+        test("Caro NON_AUTH 클라이언트는 AuthInterceptor 플러그인을 install 하지 않아야 한다.") {
+            val nonAuthClient: HttpClient = get(qualifier = named(NetworkClient.Caro.NON_AUTH))
+
+            shouldThrow<IllegalStateException> {
+                nonAuthClient.plugin(AuthInterceptorPlugin)
             }
         }
 
