@@ -5,14 +5,13 @@ import GoogleSignIn
 import FirebaseCore
 import FirebaseAnalytics
 import FirebaseCrashlytics
-import FirebaseMessaging
 
 class CaroAppDelegate: NSObject, UIApplicationDelegate {
     func application(
         _ application: UIApplication,
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
     ) -> Bool {
-        CaroFcmBridge.shared.attach(application: application)
+        IosMessagingAttacherKt.attachMessaging(application: application)
         return true
     }
 
@@ -20,7 +19,7 @@ class CaroAppDelegate: NSObject, UIApplicationDelegate {
         _ application: UIApplication,
         didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data
     ) {
-        Messaging.messaging().apnsToken = deviceToken
+        IosMessagingAttacherKt.applyApnsToken(deviceToken: deviceToken)
     }
 }
 
