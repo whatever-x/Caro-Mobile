@@ -4,34 +4,32 @@ import com.whatever.caro.core.datastore.auth.TokenLocalDataSource
 import com.whatever.caro.core.model.exception.CaroClientException
 import com.whatever.caro.core.model.exception.CaroServerException
 import com.whatever.caro.core.model.exception.ErrorCode
-import com.whatever.caro.core.model.exception.TokenRefreshException
 import com.whatever.caro.core.remote.auth.AuthTokenProvider
-import com.whatever.caro.core.remote.auth.TokenPair
-import com.whatever.caro.core.remote.datasource.auth.RemoteAuthDataSource
+import com.whatever.caro.core.remote.datasource.auth.TokenRefreshDataSource
 import com.whatever.caro.core.remote.dto.auth.request.TokenRefreshRequest
 import kotlinx.coroutines.CancellationException
 
 internal class AuthTokenProviderImpl(
     private val tokenLocalDataSource: TokenLocalDataSource,
-    private val remoteAuthDataSource: RemoteAuthDataSource,
+    private val tokenRefreshDataSource: TokenRefreshDataSource,
 ) : AuthTokenProvider {
-    override suspend fun getAccessToken(): String? = tokenLocalDataSource.getAccessToken()
+    override suspend fun getAccessToken(): String? = tokenLocalDataSource.fetchAccessToken()
 
-    override suspend fun getRefreshToken(): String? = tokenLocalDataSource.getRefreshToken()
+    override suspend fun getRefreshToken(): String? = tokenLocalDataSource.fetchRefreshToken()
 
     override suspend fun refresh(): String {
         val currentRefresh =
-            tokenLocalDataSource.getRefreshToken()
+            tokenLocalDataSource.fetchRefreshToken()
                 ?: throw CaroClientException(
                     code = ErrorCode.AUTH_REFRESH_FAILED,
                     message = "Token refresh failed",
                     debugMessage = "RefreshToken이 존재하지 않습니다.",
                 )
-        val currentAccess = tokenLocalDataSource.getAccessToken().orEmpty()
+        val currentAccess = tokenLocalDataSource.fetchAccessToken().orEmpty()
 
         val refreshed =
             try {
-                remoteAuthDataSource.refresh(
+                tokenRefreshDataSource.refreshToken(
                     request =
                         TokenRefreshRequest(
                             accessToken = currentAccess,

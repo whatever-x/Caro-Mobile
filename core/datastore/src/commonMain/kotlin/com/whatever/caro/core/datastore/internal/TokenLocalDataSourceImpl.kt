@@ -11,12 +11,12 @@ import kotlinx.coroutines.flow.map
 internal class TokenLocalDataSourceImpl(
     private val dataStore: DataStore<Preferences>,
 ) : TokenLocalDataSource {
-    override suspend fun getAccessToken(): String? =
+    override suspend fun fetchAccessToken(): String? =
         dataStore.data
             .map { it[KEY_ACCESS_TOKEN] }
             .firstOrNull()
 
-    override suspend fun getRefreshToken(): String? =
+    override suspend fun fetchRefreshToken(): String? =
         dataStore.data
             .map { it[KEY_REFRESH_TOKEN] }
             .firstOrNull()

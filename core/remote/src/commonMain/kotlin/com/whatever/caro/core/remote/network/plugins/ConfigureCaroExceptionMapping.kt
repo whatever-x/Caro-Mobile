@@ -9,7 +9,7 @@ import com.whatever.caro.core.model.exception.ErrorCode.NETWORK_001
 import com.whatever.caro.core.model.exception.ErrorCode.NETWORK_002
 import com.whatever.caro.core.model.exception.ErrorCode.UNKNOWN
 import com.whatever.caro.core.model.exception.NetworkException
-import com.whatever.caro.core.remote.dto.base.ApiResponseObjectDto
+import com.whatever.caro.core.remote.dto.base.ApiResponseDto
 import io.ktor.client.network.sockets.ConnectTimeoutException
 import io.ktor.client.network.sockets.SocketTimeoutException
 import io.ktor.client.plugins.HttpCallValidatorConfig
@@ -48,7 +48,7 @@ internal fun HttpCallValidatorConfig.configureCaroExceptionMapping(jsonParser: J
 
             val baseResponse =
                 runCatching {
-                    jsonParser.decodeFromString<ApiResponseObjectDto<JsonElement>>(responseText)
+                    jsonParser.decodeFromString<ApiResponseDto<JsonElement>>(responseText)
                 }.getOrElse { throwable ->
                     throw CaroInvalidResponseException(
                         code = INVALID_RESPONSE,

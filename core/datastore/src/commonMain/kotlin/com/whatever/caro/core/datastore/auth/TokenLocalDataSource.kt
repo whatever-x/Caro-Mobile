@@ -1,9 +1,9 @@
 package com.whatever.caro.core.datastore.auth
 
 interface TokenLocalDataSource {
-    suspend fun getAccessToken(): String?
+    suspend fun fetchAccessToken(): String?
 
-    suspend fun getRefreshToken(): String?
+    suspend fun fetchRefreshToken(): String?
 
     suspend fun saveTokens(
         accessToken: String,

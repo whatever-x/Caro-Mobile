@@ -47,7 +47,8 @@ internal val AuthInterceptorPlugin =
                 return@on call
             }
 
-            val refreshedAccessToken = refreshMutex.withLock {
+            val refreshedAccessToken =
+                refreshMutex.withLock {
                     val current = tokenProvider.getAccessToken()
                     if (!current.isNullOrEmpty() && current != accessTokenSnapshot) {
                         current

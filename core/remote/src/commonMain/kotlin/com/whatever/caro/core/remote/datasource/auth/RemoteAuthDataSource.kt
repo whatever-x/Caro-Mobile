@@ -1,19 +1,14 @@
 package com.whatever.caro.core.remote.datasource.auth
 
+import com.whatever.caro.core.remote.dto.auth.request.CompleteRegistrationRequest
 import com.whatever.caro.core.remote.dto.auth.request.SocialLoginRequest
-import com.whatever.caro.core.remote.dto.auth.request.TokenRefreshRequest
-import com.whatever.caro.core.remote.dto.auth.response.LoginResponse
-import de.jensklingenberg.ktorfit.http.Body
-import de.jensklingenberg.ktorfit.http.POST
+import com.whatever.caro.core.remote.dto.auth.response.SocialLoginResponse
+import com.whatever.caro.core.remote.dto.auth.response.TokenResponse
 
 interface RemoteAuthDataSource {
-    @POST("v1/auth/social-login")
-    suspend fun login(
-        @Body request: SocialLoginRequest,
-    ): LoginResponse
+    suspend fun socialLogin(request: SocialLoginRequest): SocialLoginResponse
 
-    @POST("v1/auth/refresh")
-    suspend fun refresh(
-        @Body request: TokenRefreshRequest,
-    ): LoginResponse
+    suspend fun completeRegistration(request: CompleteRegistrationRequest): TokenResponse
+
+    suspend fun logout()
 }

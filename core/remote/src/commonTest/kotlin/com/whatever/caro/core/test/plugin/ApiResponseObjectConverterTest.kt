@@ -3,7 +3,7 @@ package com.whatever.caro.core.test.plugin
 import com.whatever.caro.core.model.exception.CaroInvalidResponseException
 import com.whatever.caro.core.model.exception.CaroServerException
 import com.whatever.caro.core.model.exception.ErrorCode
-import com.whatever.caro.core.remote.dto.auth.response.LoginResponse
+import com.whatever.caro.core.remote.dto.auth.response.SocialLoginResponse
 import com.whatever.caro.core.remote.network.plugins.CaroBaseResponseConverter
 import io.kotest.assertions.throwables.shouldNotThrowAny
 import io.kotest.assertions.throwables.shouldThrow
@@ -40,9 +40,9 @@ class ApiResponseObjectConverterTest : FunSpec() {
                         """.trimIndent(),
                 )
 
-            val body = shouldNotThrowAny { client.get("https://caro.test/auth/login").body<LoginResponse>() }
+            val body = shouldNotThrowAny { client.get("https://caro.test/auth/login").body<SocialLoginResponse>() }
 
-            body shouldBe LoginResponse(accessToken = "access-token", refreshToken = "refresh-token")
+            body shouldBe SocialLoginResponse(accessToken = "access-token", refreshToken = "refresh-token")
         }
 
         test("success=true 이고 data=null 일 때 Unit 요청은 성공 처리한다") {
@@ -83,7 +83,7 @@ class ApiResponseObjectConverterTest : FunSpec() {
 
             val exception =
                 shouldThrow<CaroServerException> {
-                    client.get("https://caro.test/auth/login").body<LoginResponse>()
+                    client.get("https://caro.test/auth/login").body<SocialLoginResponse>()
                 }
 
             exception.code shouldBe "AUTH-401"
@@ -107,7 +107,7 @@ class ApiResponseObjectConverterTest : FunSpec() {
 
             val exception =
                 shouldThrow<CaroInvalidResponseException> {
-                    client.get("https://caro.test/auth/login").body<LoginResponse>()
+                    client.get("https://caro.test/auth/login").body<SocialLoginResponse>()
                 }
 
             exception.code shouldBe ErrorCode.INVALID_RESPONSE
@@ -129,7 +129,7 @@ class ApiResponseObjectConverterTest : FunSpec() {
 
             val exception =
                 shouldThrow<CaroInvalidResponseException> {
-                    client.get("https://caro.test/auth/login").body<LoginResponse>()
+                    client.get("https://caro.test/auth/login").body<SocialLoginResponse>()
                 }
 
             exception.code shouldBe ErrorCode.INVALID_RESPONSE
@@ -151,7 +151,7 @@ class ApiResponseObjectConverterTest : FunSpec() {
 
             val exception =
                 shouldThrow<CaroInvalidResponseException> {
-                    client.get("https://caro.test/auth/login").body<LoginResponse>()
+                    client.get("https://caro.test/auth/login").body<SocialLoginResponse>()
                 }
 
             exception.code shouldBe ErrorCode.INVALID_RESPONSE

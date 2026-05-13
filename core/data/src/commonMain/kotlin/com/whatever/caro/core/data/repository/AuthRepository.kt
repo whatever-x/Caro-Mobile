@@ -8,4 +8,11 @@ interface AuthRepository {
         provider: SocialLoginType,
         idToken: String,
     ): AuthSession
+
+    suspend fun logout()
+
+    suspend fun completeRegistration(
+        nickname: String,
+        termsAgreed: Boolean,
+    ): AuthSession
 }
