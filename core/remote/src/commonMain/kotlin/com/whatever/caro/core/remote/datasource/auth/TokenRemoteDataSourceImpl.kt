@@ -4,8 +4,8 @@ import com.whatever.caro.core.remote.api.AuthApi
 import com.whatever.caro.core.remote.dto.auth.request.TokenRefreshRequest
 import com.whatever.caro.core.remote.dto.auth.response.TokenResponse
 
-internal class TokenRefreshDataSourceImpl(
+internal class TokenRemoteDataSourceImpl(
     private val authApi: AuthApi,
-) : TokenRefreshDataSource {
+) : TokenRemoteDataSource {
     override suspend fun refreshToken(request: TokenRefreshRequest): TokenResponse = authApi.requestTokenRefresh(request = request)
 }

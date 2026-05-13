@@ -1,7 +1,7 @@
 package com.whatever.caro.core.data.repository
 
 import com.whatever.caro.core.data.mapper.toAuthSession
-import com.whatever.caro.core.datastore.auth.TokenLocalDataSource
+import com.whatever.caro.core.datastore.datasource.TokenLocalDataSource
 import com.whatever.caro.core.model.auth.AuthSession
 import com.whatever.caro.core.model.auth.SocialLoginType
 import com.whatever.caro.core.remote.datasource.auth.RemoteAuthDataSource

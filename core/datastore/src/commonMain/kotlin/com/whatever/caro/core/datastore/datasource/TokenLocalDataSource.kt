@@ -1,4 +1,4 @@
-package com.whatever.caro.core.datastore.auth
+package com.whatever.caro.core.datastore.datasource
 
 interface TokenLocalDataSource {
     suspend fun fetchAccessToken(): String?

@@ -1,17 +1,17 @@
 package com.whatever.caro.core.data.auth
 
-import com.whatever.caro.core.datastore.auth.TokenLocalDataSource
+import com.whatever.caro.core.datastore.datasource.TokenLocalDataSource
 import com.whatever.caro.core.model.exception.CaroClientException
 import com.whatever.caro.core.model.exception.CaroServerException
 import com.whatever.caro.core.model.exception.ErrorCode
 import com.whatever.caro.core.remote.auth.AuthTokenProvider
-import com.whatever.caro.core.remote.datasource.auth.TokenRefreshDataSource
+import com.whatever.caro.core.remote.datasource.auth.TokenRemoteDataSource
 import com.whatever.caro.core.remote.dto.auth.request.TokenRefreshRequest
 import kotlinx.coroutines.CancellationException
 
 internal class AuthTokenProviderImpl(
     private val tokenLocalDataSource: TokenLocalDataSource,
-    private val tokenRefreshDataSource: TokenRefreshDataSource,
+    private val tokenRemoteDataSource: TokenRemoteDataSource,
 ) : AuthTokenProvider {
     override suspend fun getAccessToken(): String? = tokenLocalDataSource.fetchAccessToken()
 
@@ -29,7 +29,7 @@ internal class AuthTokenProviderImpl(
 
         val refreshed =
             try {
-                tokenRefreshDataSource.refreshToken(
+                tokenRemoteDataSource.refreshToken(
                     request =
                         TokenRefreshRequest(
                             accessToken = currentAccess,

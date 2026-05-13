@@ -20,7 +20,7 @@ val dataModule =
         single<AuthTokenProvider> {
             AuthTokenProviderImpl(
                 tokenLocalDataSource = get(),
-                tokenRefreshDataSource = get(),
+                tokenRemoteDataSource = get(),
             )
         }
     }

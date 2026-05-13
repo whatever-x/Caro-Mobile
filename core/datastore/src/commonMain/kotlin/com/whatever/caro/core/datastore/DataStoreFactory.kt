@@ -1,4 +1,4 @@
-package com.whatever.caro.core.datastore.internal
+package com.whatever.caro.core.datastore
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
