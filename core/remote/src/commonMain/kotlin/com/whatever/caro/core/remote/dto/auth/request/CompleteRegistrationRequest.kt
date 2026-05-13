@@ -5,5 +5,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class CompleteRegistrationRequest(
     val nickname: String,
-    val termsAgreed: Boolean,
+    val isTermsAgreed: Boolean,
 )

@@ -26,7 +26,7 @@ import kotlinx.serialization.json.Json
 object HttpClientFactory {
     private const val CLIENT_TIMEZONE_HEADER = "Client-Timezone"
     private const val ACCEPT_LANGUAGE_HEADER = "Accept-Language"
-    private const val CLIENT_DEVICE_ID_HEADER = "Client-Device-Id"
+    private const val CLIENT_DEVICE_ID_HEADER = "Device-Id"
 
     fun createCaroClient(
         engine: HttpClientEngine,
@@ -46,6 +46,10 @@ object HttpClientFactory {
                 headers.append(CLIENT_DEVICE_ID_HEADER, deviceIdProvider.get())
             }
 
+            install(CaroBaseResponseConverter) {
+                this.json = jsonParser
+            }
+
             install(ContentNegotiation) {
                 json(json = jsonParser)
             }
@@ -63,10 +67,6 @@ object HttpClientFactory {
 
             install(HttpCallValidator) {
                 configureCaroExceptionMapping(jsonParser)
-            }
-
-            install(CaroBaseResponseConverter) {
-                this.json = jsonParser
             }
 
             if (authTokenProvider != null) {

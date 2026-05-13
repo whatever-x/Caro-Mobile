@@ -41,7 +41,7 @@ internal class AuthRepositoryImpl(
         val request =
             CompleteRegistrationRequest(
                 nickname = nickname,
-                termsAgreed = termsAgreed,
+                isTermsAgreed = termsAgreed,
             )
         val response = remoteAuthDataSource.completeRegistration(request = request)
         return response.toAuthSession()

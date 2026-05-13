@@ -1,4 +1,4 @@
-package com.whatever.caro.core.datastore.internal
+package com.whatever.caro.core.datastore
 
 import kotlinx.cinterop.ExperimentalForeignApi
 import platform.Foundation.NSDocumentDirectory
