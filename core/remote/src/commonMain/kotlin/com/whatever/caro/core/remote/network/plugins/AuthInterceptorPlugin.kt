@@ -15,8 +15,6 @@ internal class AuthInterceptorConfig {
     lateinit var tokenProvider: () -> AuthTokenProvider
 }
 
-internal val SkipAuthAttributeKey: AttributeKey<Unit> = AttributeKey("CaroSkipAuth")
-
 internal val AuthInterceptorPlugin =
     createClientPlugin(
         name = "CaroAuthInterceptor",
@@ -27,15 +25,8 @@ internal val AuthInterceptorPlugin =
 
         on(Send) { request ->
             val tokenProvider = tokenProviderFactory()
-            val skipAuth = request.attributes.contains(SkipAuthAttributeKey)
 
-            val accessTokenSnapshot =
-                if (skipAuth) {
-                    null
-                } else {
-                    tokenProvider.getAccessToken()
-                }
-
+            val accessTokenSnapshot = tokenProvider.getAccessToken()
             if (!accessTokenSnapshot.isNullOrEmpty()) {
                 request.headers {
                     set(HttpHeaders.Authorization, "Bearer $accessTokenSnapshot")
@@ -43,8 +34,7 @@ internal val AuthInterceptorPlugin =
             }
 
             var call = proceed(request)
-
-            if (skipAuth || call.response.status != HttpStatusCode.Unauthorized) {
+            if (call.response.status != HttpStatusCode.Unauthorized) {
                 return@on call
             }
 
