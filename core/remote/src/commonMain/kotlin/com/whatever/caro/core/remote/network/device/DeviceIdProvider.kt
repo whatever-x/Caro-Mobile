@@ -1,4 +1,4 @@
-package com.whatever.caro.core.remote.device
+package com.whatever.caro.core.remote.network.device
 
 interface DeviceIdProvider {
     fun get(): String

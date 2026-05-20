@@ -28,13 +28,10 @@ kotlin {
         }
         commonMain.dependencies {
             implementation(projects.core.model)
-
             implementation(libs.ktor.client.core)
             implementation(libs.ktor.serialization.kotlinx.json)
             implementation(libs.kotlinx.coroutines.core)
-
             implementation(libs.bundles.ktor.client.plugin)
-
             implementation(libs.ktorfit.lib)
         }
         commonTest.dependencies {

@@ -1,9 +1,9 @@
 package com.whatever.caro.core.test.module
 
 import com.whatever.caro.core.remote.auth.AuthTokenProvider
-import com.whatever.caro.core.remote.device.DeviceIdProvider
 import com.whatever.caro.core.remote.di.networkModule
 import com.whatever.caro.core.remote.di.qualifier.NetworkClient
+import com.whatever.caro.core.remote.network.device.DeviceIdProvider
 import com.whatever.caro.core.remote.network.plugins.AuthInterceptorPlugin
 import com.whatever.caro.core.remote.network.plugins.CaroBaseResponseConverter
 import io.kotest.assertions.throwables.shouldNotThrowAny

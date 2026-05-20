@@ -1,4 +1,4 @@
-package com.whatever.caro.app
+package com.whatever.caro
 
 import android.app.Application
 import com.whatever.caro.composeApp.di.initKoin

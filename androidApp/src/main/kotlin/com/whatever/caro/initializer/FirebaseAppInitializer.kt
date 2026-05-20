@@ -1,4 +1,4 @@
-package com.whatever.caro.app.initializer
+package com.whatever.caro.initializer
 
 import android.content.Context
 import androidx.startup.Initializer

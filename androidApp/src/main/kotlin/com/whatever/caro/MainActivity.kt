@@ -1,4 +1,4 @@
-package com.whatever.caro.app
+package com.whatever.caro
 
 import android.content.Intent
 import android.os.Bundle

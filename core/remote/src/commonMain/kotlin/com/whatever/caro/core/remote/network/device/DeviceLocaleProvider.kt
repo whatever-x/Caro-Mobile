@@ -1,4 +1,4 @@
-package com.whatever.caro.core.remote.network.locale
+package com.whatever.caro.core.remote.network.device
 
 expect object DeviceLocaleProvider {
     fun acceptLanguage(): String

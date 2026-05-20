@@ -1,9 +1,9 @@
 package com.whatever.caro.core.remote.network
 
 import com.whatever.caro.core.remote.auth.AuthTokenProvider
-import com.whatever.caro.core.remote.device.DeviceIdProvider
 import com.whatever.caro.core.remote.network.config.CaroNetworkConfig
-import com.whatever.caro.core.remote.network.locale.DeviceLocaleProvider
+import com.whatever.caro.core.remote.network.device.DeviceIdProvider
+import com.whatever.caro.core.remote.network.device.DeviceLocaleProvider
 import com.whatever.caro.core.remote.network.plugins.AuthInterceptorPlugin
 import com.whatever.caro.core.remote.network.plugins.CaroBaseResponseConverter
 import com.whatever.caro.core.remote.network.plugins.configureCaroExceptionMapping
@@ -32,7 +32,7 @@ object HttpClientFactory {
         engine: HttpClientEngine,
         jsonParser: Json,
         deviceIdProvider: DeviceIdProvider,
-        authTokenProvider: AuthTokenProvider? = null,
+        authTokenProvider: (() -> AuthTokenProvider)? = null,
         configure: HttpClientConfig<*>.() -> Unit = { },
     ): HttpClient =
         HttpClient(engine) {

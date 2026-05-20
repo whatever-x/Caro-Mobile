@@ -1,4 +1,4 @@
-package com.whatever.caro.core.remote.device
+package com.whatever.caro.core.remote.network.device
 
 import android.annotation.SuppressLint
 import android.content.Context

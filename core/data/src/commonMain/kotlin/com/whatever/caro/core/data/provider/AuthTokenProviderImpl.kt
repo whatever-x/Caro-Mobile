@@ -1,35 +1,35 @@
-package com.whatever.caro.core.data.auth
+package com.whatever.caro.core.data.provider
 
-import com.whatever.caro.core.datastore.datasource.TokenLocalDataSource
+import com.whatever.caro.core.datastore.datasource.LocalAuthDataSource
 import com.whatever.caro.core.model.exception.CaroClientException
 import com.whatever.caro.core.model.exception.CaroServerException
 import com.whatever.caro.core.model.exception.ErrorCode
 import com.whatever.caro.core.remote.auth.AuthTokenProvider
-import com.whatever.caro.core.remote.datasource.auth.TokenRemoteDataSource
+import com.whatever.caro.core.remote.datasource.RemoteAuthDataSource
 import com.whatever.caro.core.remote.dto.auth.request.TokenRefreshRequest
 import kotlinx.coroutines.CancellationException
 
 internal class AuthTokenProviderImpl(
-    private val tokenLocalDataSource: TokenLocalDataSource,
-    private val tokenRemoteDataSource: TokenRemoteDataSource,
+    private val localAuthDataSource: LocalAuthDataSource,
+    private val remoteAuthDataSource: RemoteAuthDataSource,
 ) : AuthTokenProvider {
-    override suspend fun getAccessToken(): String? = tokenLocalDataSource.fetchAccessToken()
+    override suspend fun getAccessToken(): String? = localAuthDataSource.fetchAccessToken()
 
-    override suspend fun getRefreshToken(): String? = tokenLocalDataSource.fetchRefreshToken()
+    override suspend fun getRefreshToken(): String? = localAuthDataSource.fetchRefreshToken()
 
     override suspend fun refresh(): String {
         val currentRefresh =
-            tokenLocalDataSource.fetchRefreshToken()
+            localAuthDataSource.fetchRefreshToken()
                 ?: throw CaroClientException(
                     code = ErrorCode.AUTH_REFRESH_FAILED,
                     message = "Token refresh failed",
                     debugMessage = "RefreshToken이 존재하지 않습니다.",
                 )
-        val currentAccess = tokenLocalDataSource.fetchAccessToken().orEmpty()
+        val currentAccess = localAuthDataSource.fetchAccessToken().orEmpty()
 
         val refreshed =
             try {
-                tokenRemoteDataSource.refreshToken(
+                remoteAuthDataSource.refreshToken(
                     request =
                         TokenRefreshRequest(
                             accessToken = currentAccess,
@@ -39,7 +39,7 @@ internal class AuthTokenProviderImpl(
             } catch (cancellation: CancellationException) {
                 throw cancellation
             } catch (cause: Throwable) {
-                tokenLocalDataSource.clear()
+                localAuthDataSource.clear()
                 throw CaroServerException(
                     code = ErrorCode.AUTH_REFRESH_FAILED,
                     message = "Token refresh failed",
@@ -48,7 +48,7 @@ internal class AuthTokenProviderImpl(
                 )
             }
 
-        tokenLocalDataSource.saveTokens(
+        localAuthDataSource.saveTokens(
             accessToken = refreshed.accessToken,
             refreshToken = refreshed.refreshToken,
         )
@@ -56,6 +56,6 @@ internal class AuthTokenProviderImpl(
     }
 
     override suspend fun clearTokens() {
-        tokenLocalDataSource.clear()
+        localAuthDataSource.clear()
     }
 }

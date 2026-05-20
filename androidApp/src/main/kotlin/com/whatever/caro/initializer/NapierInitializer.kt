@@ -1,8 +1,8 @@
-package com.whatever.caro.app.initializer
+package com.whatever.caro.initializer
 
 import android.content.Context
 import androidx.startup.Initializer
-import com.whatever.caro.app.BuildConfig
+import com.whatever.caro.BuildConfig
 import io.github.aakira.napier.DebugAntilog
 import io.github.aakira.napier.Napier
 

@@ -1,6 +1,6 @@
 package com.whatever.caro.core.datastore.datasource
 
-interface TokenLocalDataSource {
+interface LocalAuthDataSource {
     suspend fun fetchAccessToken(): String?
 
     suspend fun fetchRefreshToken(): String?

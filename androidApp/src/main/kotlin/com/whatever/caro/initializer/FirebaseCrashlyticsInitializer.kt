@@ -1,9 +1,9 @@
-package com.whatever.caro.app.initializer
+package com.whatever.caro.initializer
 
 import android.content.Context
 import androidx.startup.Initializer
 import com.google.firebase.crashlytics.FirebaseCrashlytics
-import com.whatever.caro.app.BuildConfig
+import com.whatever.caro.BuildConfig
 import io.github.aakira.napier.Napier
 
 class FirebaseCrashlyticsInitializer : Initializer<Unit> {

@@ -1,7 +1,11 @@
-package com.whatever.caro.core.remote.network.locale
+package com.whatever.caro.core.remote.network.device
 
 import platform.Foundation.NSLocale
 import platform.Foundation.NSTimeZone
+import platform.Foundation.currentLocale
+import platform.Foundation.localTimeZone
+import platform.Foundation.localeIdentifier
+import platform.Foundation.preferredLanguages
 
 actual object DeviceLocaleProvider {
     actual fun acceptLanguage(): String =

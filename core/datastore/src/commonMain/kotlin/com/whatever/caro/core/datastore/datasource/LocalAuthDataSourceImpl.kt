@@ -7,9 +7,9 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 
-internal class TokenLocalDataSourceImpl(
+internal class LocalAuthDataSourceImpl(
     private val dataStore: DataStore<Preferences>,
-) : TokenLocalDataSource {
+) : LocalAuthDataSource {
     override suspend fun fetchAccessToken(): String? =
         dataStore.data
             .map { it[KEY_ACCESS_TOKEN] }
