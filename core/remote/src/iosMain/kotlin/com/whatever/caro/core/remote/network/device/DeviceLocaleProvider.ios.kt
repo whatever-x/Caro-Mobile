@@ -8,9 +8,12 @@ import platform.Foundation.localeIdentifier
 import platform.Foundation.preferredLanguages
 
 actual object DeviceLocaleProvider {
-    actual fun acceptLanguage(): String =
-        (NSLocale.preferredLanguages.firstOrNull() as? String)
-            ?: NSLocale.currentLocale.localeIdentifier
+    actual fun acceptLanguage(): String {
+        val raw =
+            (NSLocale.preferredLanguages.firstOrNull() as? String)
+                ?: NSLocale.currentLocale.localeIdentifier
+        return raw.replace('_', '-')
+    }
 
     actual fun timezone(): String = NSTimeZone.localTimeZone.name
 }
