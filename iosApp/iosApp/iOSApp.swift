@@ -1,10 +1,6 @@
 import SwiftUI
 import UIKit
 import ComposeApp
-import GoogleSignIn
-import FirebaseCore
-import FirebaseAnalytics
-import FirebaseCrashlytics
 
 class CaroAppDelegate: NSObject, UIApplicationDelegate {
     func application(
@@ -29,11 +25,14 @@ struct iOSApp: App {
     @UIApplicationDelegateAdaptor(CaroAppDelegate.self) var appDelegate
 
     init() {
-        FirebaseApp.configure()
+        FirebaseLifecycleKt.configureFirebaseApp()
 
         #if DEBUG
-            Analytics.setAnalyticsCollectionEnabled(false)
-            Crashlytics.crashlytics().setCrashlyticsCollectionEnabled(false)
+            FirebaseLifecycleKt.setAnalyticsCollectionEnabled(enabled: false)
+            CrashlyticsLifecycleKt.setCrashlyticsCollectionEnabled(enabled: false)
+        #else
+            FirebaseLifecycleKt.setAnalyticsCollectionEnabled(enabled: true)
+            CrashlyticsLifecycleKt.setCrashlyticsCollectionEnabled(enabled: true)
         #endif
 
         KoinKt.doInitKoin()
@@ -44,7 +43,7 @@ struct iOSApp: App {
         WindowGroup {
             ContentView()
                 .onOpenURL { url in
-                    GIDSignIn.sharedInstance.handle(url)
+                    _ = GoogleSignInUrlHandlerKt.handleGoogleSignInOpenURL(url: url)
                 }
         }
     }

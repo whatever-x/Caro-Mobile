@@ -24,6 +24,7 @@ kotlin {
                     version = "12.12.1",
                     products = {
                         add("FirebaseAnalytics", exportToKotlin = true)
+                        add("FirebaseCore", exportToKotlin = true)
                     },
                 )
             }
