@@ -1,10 +1,7 @@
 package com.whatever.caro.feature.profile.usecase
 
-import org.koin.core.annotation.Single
-
-@Single
 class ValidateNicknameUseCase {
-    private val nicknameRegex = Regex("^[가-힣a-zA-Z0-9]*$")
+    private val nicknameRegex = Regex("^[가-힣a-zA-Z0-9_-]*$")
 
     fun filterInput(input: String): String =
         input
@@ -22,7 +19,7 @@ class ValidateNicknameUseCase {
 
     companion object {
         const val MIN_LENGTH = 2
-        const val MAX_LENGTH = 10
+        const val MAX_LENGTH = 20
     }
 }
 

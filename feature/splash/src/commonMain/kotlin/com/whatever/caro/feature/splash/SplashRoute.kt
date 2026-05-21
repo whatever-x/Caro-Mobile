@@ -10,6 +10,7 @@ import com.whatever.caro.core.navigator.dispatcher.NavigationDispatcher
 import com.whatever.caro.core.navigator.entries.HomeEntry
 import com.whatever.caro.core.navigator.entries.LoginEntry
 import com.whatever.caro.core.navigator.entries.Payload
+import com.whatever.caro.feature.splash.mvi.SplashIntent
 import com.whatever.caro.feature.splash.mvi.SplashSideEffect
 import dev.icerock.moko.permissions.compose.BindEffect
 import dev.icerock.moko.permissions.compose.rememberPermissionsControllerFactory
@@ -25,7 +26,7 @@ fun SplashRoute(
     BindEffect(permissionsController)
 
     LaunchedEffect(Unit) {
-        viewModel.start(permissionsController)
+        viewModel.intent(SplashIntent.Initialize)
         viewModel.sideEffect.collect { sideEffect ->
             when (sideEffect) {
                 is SplashSideEffect.NavigateLogin -> {

@@ -1,9 +1,7 @@
 package com.whatever.caro.feature.profile.usecase
 
 import com.whatever.caro.core.data.repository.profile.ProfileRepository
-import org.koin.core.annotation.Single
 
-@Single
 class CheckNicknameUseCase(
     private val profileRepository: ProfileRepository,
 ) {

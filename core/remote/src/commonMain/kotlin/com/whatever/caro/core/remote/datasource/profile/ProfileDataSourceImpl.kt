@@ -4,17 +4,16 @@ import com.whatever.caro.core.remote.model.profile.request.CreateProfileRequest
 import com.whatever.caro.core.remote.model.profile.response.CreateProfileResponse
 import com.whatever.caro.core.remote.model.profile.response.RandomNicknameResponse
 import com.whatever.caro.core.remote.model.profile.response.ValidateNicknameResponse
-import org.koin.core.annotation.Single
 
-@Single(binds = [ProfileDataSource::class])
 internal class ProfileDataSourceImpl : ProfileDataSource {
-    private val mockNicknames = listOf(
-        "행복한고양이",
-        "빠른여우",
-        "용감한사자",
-        "귀여운판다",
-        "멋진독수리",
-    )
+    private val mockNicknames =
+        listOf(
+            "행복한고양이",
+            "빠른여우",
+            "용감한사자",
+            "귀여운판다",
+            "멋진독수리",
+        )
 
     override suspend fun getRandomNickname(): RandomNicknameResponse {
 //        return authClient.get("$BASE_URL/nickname/random")
@@ -31,8 +30,13 @@ internal class ProfileDataSourceImpl : ProfileDataSource {
 //        }.body<ValidateNicknameResponse>()
 
         return ValidateNicknameResponse(
-            isValid = nickname.length in 2..10,
-            reason = if (nickname.length < 2) "TOO_SHORT" else null,
+            isValid = nickname.length in 2..20,
+            reason =
+                when {
+                    nickname.length < 2 -> "TOO_SHORT"
+                    nickname.length > 20 -> "TOO_LONG"
+                    else -> null
+                },
         )
     }
 

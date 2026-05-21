@@ -2,6 +2,8 @@ package com.whatever.caro.core.remote.di
 
 import com.whatever.caro.core.remote.datasource.demo.DemoDataSource
 import com.whatever.caro.core.remote.datasource.demo.DemoDataSourceImpl
+import com.whatever.caro.core.remote.datasource.profile.ProfileDataSource
+import com.whatever.caro.core.remote.datasource.profile.ProfileDataSourceImpl
 import com.whatever.caro.core.remote.datasource.sample.SampleDataSource
 import com.whatever.caro.core.remote.datasource.sample.SampleDataSourceImpl
 import com.whatever.caro.core.remote.di.qualifier.NetworkClient
@@ -22,4 +24,6 @@ val remoteModule =
                 httpClient = get(named(NetworkClient.Caro.NON_AUTH)),
             )
         }
+
+        single<ProfileDataSource> { ProfileDataSourceImpl() }
     }

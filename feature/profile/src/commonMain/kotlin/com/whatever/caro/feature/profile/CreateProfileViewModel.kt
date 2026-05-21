@@ -11,9 +11,7 @@ import com.whatever.caro.feature.profile.usecase.NicknameValidationResult
 import com.whatever.caro.feature.profile.usecase.ValidateNicknameUseCase
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
-import org.koin.android.annotation.KoinViewModel
 
-@KoinViewModel
 class CreateProfileViewModel(
     private val validateNicknameUseCase: ValidateNicknameUseCase,
     private val checkNicknameUseCase: CheckNicknameUseCase,
@@ -50,11 +48,12 @@ class CreateProfileViewModel(
         reduce { copy(nickname = filtered, validationResult = NicknameValidationResult.Checking) }
 
         nicknameValidationJob?.cancel()
-        nicknameValidationJob = launch {
-            delay(DEBOUNCE_MS)
-            val result = checkNicknameUseCase(filtered)
-            reduce { copy(validationResult = result) }
-        }
+        nicknameValidationJob =
+            launch {
+                delay(DEBOUNCE_MS)
+                val result = checkNicknameUseCase(filtered)
+                reduce { copy(validationResult = result) }
+            }
     }
 
     private fun fetchRandomNickname() {
