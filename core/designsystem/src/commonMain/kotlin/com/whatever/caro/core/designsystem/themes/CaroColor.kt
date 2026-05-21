@@ -60,20 +60,20 @@ data class CaroColor(
         val error: Color = Red700,
         val info: Color = Blue600,
         val watermark: Color = Gray100,
-        val accent: Color = Red500,
+        val accent: Color = Blue500,
     )
 
     @Immutable
     data class IconColor(
         val primary: Color = Gray900,
         val secondary: Color = Gray700,
-        val tertiary: Color = Gray500,
+        val tertiary: Color = Blue100,
         val disable: Color = Gray400,
         val inverse: Color = White100,
         val brand: Color = Blue500,
         val warning: Color = Yellow700,
         val error: Color = Red700,
-        val accent: Color = Red500,
+        val accent: Color = Blue500,
     )
 
     @Immutable
