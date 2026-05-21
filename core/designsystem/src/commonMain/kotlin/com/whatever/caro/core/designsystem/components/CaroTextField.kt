@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -24,6 +25,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -94,21 +96,33 @@ private fun TextFieldBox(
     trailingIcon: @Composable (() -> Unit)?,
     interactionSource: MutableInteractionSource,
 ) {
-    val textColor = if (enabled) {
-        CaroTheme.color.text.primary
-    } else {
-        CaroTheme.color.text.disable
-    }
-    val surfaceColor = if (enabled) {
-        CaroTheme.color.surface.primary
-    } else {
-        CaroTheme.color.surface.secondary
-    }
+    val isFocused by interactionSource.collectIsFocusedAsState()
+    val textColor =
+        if (enabled) {
+            CaroTheme.color.text.primary
+        } else {
+            CaroTheme.color.text.disable
+        }
+    val surfaceColor =
+        if (enabled) {
+            CaroTheme.color.surface.primary
+        } else {
+            CaroTheme.color.surface.secondary
+        }
+    val borderColor =
+        when {
+            !enabled -> CaroTheme.color.border.secondary
+            isFocused -> CaroTheme.color.border.brand
+            else -> CaroTheme.color.border.secondary
+        }
     val mergedTextStyle = CaroTheme.typography.body1.copy(color = textColor)
-    val selectionColors = TextSelectionColors(
-        handleColor = CaroTheme.color.text.brand,
-        backgroundColor = CaroTheme.color.text.brand.copy(alpha = 0.2f),
-    )
+    val selectionColors =
+        TextSelectionColors(
+            handleColor = CaroTheme.color.text.brand,
+            backgroundColor =
+                CaroTheme.color.text.brand
+                    .copy(alpha = 0.2f),
+        )
 
     CompositionLocalProvider(LocalTextSelectionColors provides selectionColors) {
         Row(
@@ -120,7 +134,7 @@ private fun TextFieldBox(
                     .background(color = surfaceColor, shape = CaroTheme.shape.m)
                     .border(
                         width = 1.dp,
-                        color = CaroTheme.color.border.secondary,
+                        color = borderColor,
                         shape = CaroTheme.shape.m,
                     ).padding(
                         horizontal = CaroTheme.spacing.xl,

@@ -1,42 +1,40 @@
 package com.whatever.caro.feature.profile
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import caromobile.core.designsystem.generated.resources.Res
+import caromobile.core.designsystem.generated.resources.ic_arrow_left_24
+import caromobile.core.designsystem.generated.resources.ic_renew_16
+import caromobile.core.designsystem.generated.resources.ic_x_circle_24
+import com.whatever.caro.core.designsystem.components.CaroTextField
+import com.whatever.caro.core.designsystem.components.CaroTopBar
+import com.whatever.caro.core.designsystem.themes.CaroTheme
 import com.whatever.caro.feature.profile.mvi.CreateProfileIntent
 import com.whatever.caro.feature.profile.mvi.CreateProfileState
+import org.jetbrains.compose.resources.painterResource
 
-private val BackgroundPrimary = Color(0xFFF8FBFD)
-private val TextPrimary = Color(0xFF4A5563)
-private val TextDisabled = Color(0xFFD2DAE2)
-private val TextTertiary = Color(0xFFBCC6D1)
-private val SurfacePrimary = Color.White
-private val DividerPrimary = Color(0xFFE3EAF0)
-private val SurfaceInverse = Color(0xFF4A5563)
-private val TextInverse = Color.White
+private val PageHorizontalPadding = 28.dp
+private val CtaButtonHeight = 56.dp
+private val HeaderMinHeight = 17.dp
+private const val DISABLED_ALPHA = 0.4f
 
 @Composable
 internal fun CreateProfileScreen(
@@ -47,199 +45,198 @@ internal fun CreateProfileScreen(
         modifier =
             Modifier
                 .fillMaxSize()
-                .background(BackgroundPrimary),
+                .background(CaroTheme.color.background.primary),
     ) {
-        TopBar(
-            onBackClick = { onIntent(CreateProfileIntent.ClickBack) },
+        CaroTopBar(
+            leadingContent = {
+                Icon(
+                    modifier =
+                        Modifier
+                            .size(24.dp)
+                            .clickable { onIntent(CreateProfileIntent.ClickBack) },
+                    painter = painterResource(Res.drawable.ic_arrow_left_24),
+                    contentDescription = "뒤로 가기",
+                    tint = CaroTheme.color.icon.secondary,
+                )
+            },
+            centerContent = {
+                Text(
+                    text = "프로필 생성",
+                    style = CaroTheme.typography.heading2,
+                    color = CaroTheme.color.text.primary,
+                )
+            },
         )
 
-        Column(
+        NicknameField(
+            state = state,
+            onIntent = onIntent,
             modifier =
                 Modifier
-                    .weight(1f)
                     .fillMaxWidth()
-                    .padding(horizontal = 20.dp)
-                    .padding(top = 32.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-        ) {
-            NicknameLabel(
-                onRefreshClick = { onIntent(CreateProfileIntent.ClickRefresh) },
-            )
+                    .padding(
+                        horizontal = CaroTheme.spacing.xl,
+                        vertical = CaroTheme.spacing.m,
+                    ),
+        )
 
-            NicknameTextField(
-                nickname = state.nickname,
-                placeholder = state.placeholder,
-                onNicknameChange = { onIntent(CreateProfileIntent.UpdateNickname(it)) },
-            )
+        Spacer(modifier = Modifier.weight(1f))
 
-            NicknameHelperText(
-                characterCount = state.characterCount,
-            )
-        }
-
-        ConfirmButton(
+        CtaButton(
             enabled = state.isConfirmEnabled,
             onClick = { onIntent(CreateProfileIntent.ClickConfirm) },
-        )
-    }
-}
-
-@Composable
-private fun TopBar(onBackClick: () -> Unit) {
-    Row(
-        modifier =
-            Modifier
-                .fillMaxWidth()
-                .height(56.dp)
-                .background(BackgroundPrimary)
-                .padding(horizontal = 20.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(4.dp),
-    ) {
-        Text(
-            text = "<",
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold,
-            color = TextPrimary,
             modifier =
                 Modifier
-                    .size(24.dp)
-                    .clickable(onClick = onBackClick),
-        )
-        Text(
-            text = "프로필 생성",
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold,
-            color = TextPrimary,
+                    .fillMaxWidth()
+                    .padding(
+                        horizontal = PageHorizontalPadding,
+                        vertical = CaroTheme.spacing.l,
+                    ),
         )
     }
 }
 
 @Composable
-private fun NicknameLabel(onRefreshClick: () -> Unit) {
-    Row(
-        modifier =
-            Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 8.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Text(
-            text = "닉네임",
-            fontSize = 14.sp,
-            color = TextPrimary,
-        )
-        Text(
-            text = "\u21BB",
-            fontSize = 14.sp,
-            color = TextPrimary,
-            modifier =
-                Modifier
-                    .size(16.dp)
-                    .clickable(onClick = onRefreshClick),
-        )
-    }
-}
-
-@Composable
-private fun NicknameTextField(
-    nickname: String,
-    placeholder: String,
-    onNicknameChange: (String) -> Unit,
+private fun NicknameField(
+    state: CreateProfileState,
+    onIntent: (CreateProfileIntent) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
-    BasicTextField(
-        value = nickname,
-        onValueChange = onNicknameChange,
-        textStyle =
-            TextStyle(
-                fontSize = 16.sp,
-                lineHeight = 24.sp,
-                color = TextPrimary,
-            ),
-        singleLine = true,
-        cursorBrush = SolidColor(TextPrimary),
-        decorationBox = { innerTextField ->
-            Box(
-                modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .height(50.dp)
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(SurfacePrimary)
-                        .border(
-                            width = 1.dp,
-                            color = DividerPrimary,
-                            shape = RoundedCornerShape(12.dp),
-                        ).padding(horizontal = 17.dp),
-                contentAlignment = Alignment.CenterStart,
-            ) {
-                if (nickname.isEmpty()) {
-                    Text(
-                        text = placeholder,
-                        fontSize = 16.sp,
-                        lineHeight = 24.sp,
-                        color = TextDisabled,
+    CaroTextField(
+        modifier = modifier,
+        value = state.nickname,
+        onValueChange = { onIntent(CreateProfileIntent.UpdateNickname(it)) },
+        placeholder = state.placeholder,
+        header = {
+            NicknameHeader(
+                onRefreshClick = { onIntent(CreateProfileIntent.ClickRefresh) },
+            )
+        },
+        footer = {
+            NicknameFooter(characterCount = state.characterCount)
+        },
+        trailingIcon =
+            if (state.nickname.isNotEmpty()) {
+                {
+                    Icon(
+                        modifier =
+                            Modifier
+                                .size(24.dp)
+                                .clickable {
+                                    onIntent(CreateProfileIntent.UpdateNickname(""))
+                                },
+                        painter = painterResource(Res.drawable.ic_x_circle_24),
+                        contentDescription = "지우기",
+                        tint = CaroTheme.color.icon.tertiary,
                     )
                 }
-                innerTextField()
-            }
-        },
+            } else {
+                null
+            },
     )
 }
 
 @Composable
-private fun NicknameHelperText(characterCount: String) {
-    Row(
+private fun NicknameHeader(onRefreshClick: () -> Unit) {
+    Box(
         modifier =
             Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 8.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
+                .heightIn(min = HeaderMinHeight),
+        contentAlignment = Alignment.CenterStart,
+    ) {
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(CaroTheme.spacing.xxs),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                text = "닉네임",
+                style = CaroTheme.typography.heading3,
+                color = CaroTheme.color.text.primary,
+            )
+            Text(
+                text = "*",
+                style = CaroTheme.typography.label1.bold,
+                color = CaroTheme.color.text.accent,
+            )
+        }
+
+        Row(
+            modifier =
+                Modifier
+                    .align(Alignment.CenterEnd)
+                    .clip(CaroTheme.shape.xxl)
+                    .clickable(onClick = onRefreshClick),
+            horizontalArrangement = Arrangement.spacedBy(CaroTheme.spacing.xs),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Icon(
+                modifier = Modifier.size(16.dp),
+                painter = painterResource(Res.drawable.ic_renew_16),
+                contentDescription = null,
+                tint = CaroTheme.color.icon.brand,
+            )
+            Text(
+                text = "랜덤 생성",
+                style = CaroTheme.typography.caption1,
+                color = CaroTheme.color.text.brand,
+            )
+        }
+    }
+}
+
+@Composable
+private fun NicknameFooter(characterCount: String) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
-            text = "2~10자 한글, 영문, 숫자 사용 가능",
-            fontSize = 12.sp,
-            fontWeight = FontWeight.Medium,
-            color = TextTertiary,
+            text = "2~20자, 한글/영문/숫자 및 -, _만 사용 가능해요",
+            style = CaroTheme.typography.caption1,
+            color = CaroTheme.color.text.secondary,
         )
+        Spacer(modifier = Modifier.weight(1f))
         Text(
             text = characterCount,
-            fontSize = 12.sp,
-            fontWeight = FontWeight.Medium,
-            color = TextTertiary,
+            style = CaroTheme.typography.caption1,
+            color = CaroTheme.color.text.tertiary,
+            textAlign = TextAlign.End,
         )
     }
 }
 
 @Composable
-private fun ConfirmButton(
+private fun CtaButton(
     enabled: Boolean,
     onClick: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
+    val backgroundColor =
+        if (enabled) {
+            CaroTheme.color.surface.brand
+        } else {
+            CaroTheme.color.surface.brand
+                .copy(alpha = DISABLED_ALPHA)
+        }
+
     Box(
         modifier =
-            Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 20.dp)
-                .padding(bottom = 20.dp),
+            modifier
+                .heightIn(min = CtaButtonHeight)
+                .clip(CaroTheme.shape.xxl)
+                .background(backgroundColor)
+                .clickable(enabled = enabled, onClick = onClick)
+                .padding(
+                    horizontal = CaroTheme.spacing.xl,
+                    vertical = CaroTheme.spacing.l,
+                ),
+        contentAlignment = Alignment.Center,
     ) {
-        Box(
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .height(54.dp)
-                    .clip(CircleShape)
-                    .background(if (enabled) SurfaceInverse else SurfaceInverse.copy(alpha = 0.4f))
-                    .clickable(enabled = enabled, onClick = onClick),
-            contentAlignment = Alignment.Center,
-        ) {
-            Text(
-                text = "확인",
-                fontSize = 16.sp,
-                fontWeight = FontWeight.SemiBold,
-                color = TextInverse,
-            )
-        }
+        Text(
+            text = "생성하기",
+            style = CaroTheme.typography.label1.regular,
+            color = CaroTheme.color.text.inverse,
+        )
     }
 }
