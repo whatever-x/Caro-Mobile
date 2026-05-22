@@ -12,7 +12,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
 internal class AuthInterceptorConfig {
-    lateinit var tokenProvider: () -> AuthTokenProvider
+    lateinit var tokenProvider: AuthTokenProvider
 }
 
 internal val AuthInterceptorPlugin =
@@ -20,12 +20,10 @@ internal val AuthInterceptorPlugin =
         name = "CaroAuthInterceptor",
         createConfiguration = ::AuthInterceptorConfig,
     ) {
-        val tokenProviderFactory = pluginConfig.tokenProvider
+        val tokenProvider = pluginConfig.tokenProvider
         val refreshMutex = Mutex()
 
         on(Send) { request ->
-            val tokenProvider = tokenProviderFactory()
-
             val accessTokenSnapshot = tokenProvider.getAccessToken()
             if (!accessTokenSnapshot.isNullOrEmpty()) {
                 request.headers {

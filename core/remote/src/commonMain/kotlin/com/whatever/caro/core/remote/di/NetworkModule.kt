@@ -35,7 +35,7 @@ val networkModule =
                 engine = get(),
                 jsonParser = get(),
                 deviceIdProvider = get(),
-                authTokenProvider = { get<AuthTokenProvider>() },
+                authTokenProvider = get<AuthTokenProvider>(),
             )
         }
 

@@ -32,7 +32,7 @@ object HttpClientFactory {
         engine: HttpClientEngine,
         jsonParser: Json,
         deviceIdProvider: DeviceIdProvider,
-        authTokenProvider: (() -> AuthTokenProvider)? = null,
+        authTokenProvider: AuthTokenProvider? = null,
         configure: HttpClientConfig<*>.() -> Unit = { },
     ): HttpClient =
         HttpClient(engine) {

@@ -2,16 +2,15 @@ package com.whatever.caro.core.data.provider
 
 import com.whatever.caro.core.datastore.datasource.LocalAuthDataSource
 import com.whatever.caro.core.model.exception.CaroClientException
-import com.whatever.caro.core.model.exception.CaroServerException
 import com.whatever.caro.core.model.exception.ErrorCode
 import com.whatever.caro.core.remote.auth.AuthTokenProvider
-import com.whatever.caro.core.remote.datasource.RemoteAuthDataSource
+import com.whatever.caro.core.remote.datasource.RemoteNonAuthDataSource
 import com.whatever.caro.core.remote.dto.auth.request.TokenRefreshRequest
 import kotlinx.coroutines.CancellationException
 
 internal class AuthTokenProviderImpl(
     private val localAuthDataSource: LocalAuthDataSource,
-    private val remoteAuthDataSource: RemoteAuthDataSource,
+    private val remoteNonAuthDatasource: RemoteNonAuthDataSource,
 ) : AuthTokenProvider {
     override suspend fun getAccessToken(): String? = localAuthDataSource.fetchAccessToken()
 
@@ -26,7 +25,7 @@ internal class AuthTokenProviderImpl(
                 debugMessage = "RefreshToken이 존재하지 않습니다.",
             )
         val currentAccess = localAuthDataSource.fetchAccessToken().orEmpty()
-        val refreshed = remoteAuthDataSource.refreshToken(
+        val refreshed = remoteNonAuthDatasource.refreshToken(
             request =
                 TokenRefreshRequest(
                     accessToken = currentAccess,

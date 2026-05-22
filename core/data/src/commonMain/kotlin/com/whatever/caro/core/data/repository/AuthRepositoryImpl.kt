@@ -5,11 +5,13 @@ import com.whatever.caro.core.datastore.datasource.LocalAuthDataSource
 import com.whatever.caro.core.model.auth.AuthSession
 import com.whatever.caro.core.model.auth.SocialLoginType
 import com.whatever.caro.core.remote.datasource.RemoteAuthDataSource
+import com.whatever.caro.core.remote.datasource.RemoteNonAuthDataSource
 import com.whatever.caro.core.remote.dto.auth.request.CompleteRegistrationRequest
 import com.whatever.caro.core.remote.dto.auth.request.SocialLoginRequest
 
 internal class AuthRepositoryImpl(
-    private val remoteAuthDataSource: RemoteAuthDataSource,
+    private val remoteAuthDataSource : RemoteAuthDataSource,
+    private val remoteNonAuthDataSource: RemoteNonAuthDataSource,
     private val localAuthDataSource: LocalAuthDataSource,
 ) : AuthRepository {
     override suspend fun loginWithSocial(
@@ -21,7 +23,7 @@ internal class AuthRepositoryImpl(
                 provider = provider,
                 idToken = idToken,
             )
-        val response = remoteAuthDataSource.socialLogin(request = request)
+        val response = remoteNonAuthDataSource.socialLogin(request = request)
         localAuthDataSource.saveTokens(
             accessToken = response.accessToken,
             refreshToken = response.refreshToken,
