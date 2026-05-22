@@ -44,6 +44,10 @@ internal class AuthRepositoryImpl(
                 isTermsAgreed = termsAgreed,
             )
         val response = remoteAuthDataSource.completeRegistration(request = request)
+        localAuthDataSource.saveTokens(
+            accessToken = response.accessToken,
+            refreshToken = response.refreshToken,
+        )
         return response.toAuthSession()
     }
 }
