@@ -93,7 +93,7 @@ internal val CaroBaseResponseConverter: ClientPlugin<CaroBaseResponseConverterCo
                 throw CaroServerException(
                     code = error.code,
                     message = error.message,
-                    debugMessage = "CaroBaseResponseConverterPlugin에서 오류가 발생하였습니다. (baseResponse:${baseResponse})",
+                    debugMessage = "CaroBaseResponseConverterPlugin에서 오류가 발생하였습니다. (baseResponse:$baseResponse)",
                 )
             }
 

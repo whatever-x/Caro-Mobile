@@ -79,7 +79,7 @@ internal fun HttpCallValidatorConfig.configureCaroExceptionMapping(jsonParser: J
             throw CaroServerException(
                 code = errorResponse.code,
                 message = errorResponse.message,
-                debugMessage = "ConfigureCaroExceptionMapping에서 오류가 발생하였습니다. (cause=${cause})",
+                debugMessage = "ConfigureCaroExceptionMapping에서 오류가 발생하였습니다. (cause=$cause)",
             )
         }
 

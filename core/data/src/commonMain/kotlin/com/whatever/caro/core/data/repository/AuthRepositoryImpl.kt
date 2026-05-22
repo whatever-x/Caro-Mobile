@@ -10,7 +10,7 @@ import com.whatever.caro.core.remote.dto.auth.request.CompleteRegistrationReques
 import com.whatever.caro.core.remote.dto.auth.request.SocialLoginRequest
 
 internal class AuthRepositoryImpl(
-    private val remoteAuthDataSource : RemoteAuthDataSource,
+    private val remoteAuthDataSource: RemoteAuthDataSource,
     private val remoteNonAuthDataSource: RemoteNonAuthDataSource,
     private val localAuthDataSource: LocalAuthDataSource,
 ) : AuthRepository {

@@ -39,10 +39,11 @@ private class GoogleAuthenticator : SocialAuthenticator<GoogleUser> {
                 continuation.resume(SocialLoginResult.Failed)
                 return@suspendCancellableCoroutine
             }
-            val configuration = GIDConfiguration(
-                clientID = GoogleAuthConfig.GID_CLIENT_ID,
-                serverClientID = GoogleAuthConfig.GID_WEB_CLIENT_ID
-            )
+            val configuration =
+                GIDConfiguration(
+                    clientID = GoogleAuthConfig.GID_CLIENT_ID,
+                    serverClientID = GoogleAuthConfig.GID_WEB_CLIENT_ID,
+                )
             GIDSignIn.sharedInstance.configuration = configuration
             GIDSignIn.sharedInstance.signInWithPresentingViewController(rootViewController) { result, error ->
                 if (error != null) {
