@@ -79,8 +79,7 @@ internal fun HttpCallValidatorConfig.configureCaroExceptionMapping(jsonParser: J
             throw CaroServerException(
                 code = errorResponse.code,
                 message = errorResponse.message,
-                debugMessage = errorResponse.debugMessage ?: "서버로부터 받은 debug 메세지가 비어있습니다.",
-                description = errorResponse.description,
+                debugMessage = "ConfigureCaroExceptionMapping에서 오류가 발생하였습니다. (cause=${cause})",
             )
         }
 
