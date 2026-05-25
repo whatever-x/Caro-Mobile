@@ -1,0 +1,1195 @@
+{
+  "components": {
+    "schemas": {
+      "ApiResponseCreateDeckResponse": {
+        "properties": {
+          "data": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/CreateDeckResponse"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "error": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ErrorDetail"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "success": {
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "ApiResponseDeleteDeckResponse": {
+        "properties": {
+          "data": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/DeleteDeckResponse"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "error": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ErrorDetail"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "success": {
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "ApiResponseNicknameCheckResponse": {
+        "properties": {
+          "data": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/NicknameCheckResponse"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "error": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ErrorDetail"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "success": {
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "ApiResponseNicknameResponse": {
+        "properties": {
+          "data": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/NicknameResponse"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "error": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ErrorDetail"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "success": {
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "ApiResponseSocialLoginResponse": {
+        "properties": {
+          "data": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/SocialLoginResponse"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "error": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ErrorDetail"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "success": {
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "ApiResponseTokenResponse": {
+        "properties": {
+          "data": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/TokenResponse"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "error": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ErrorDetail"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "success": {
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "ApiResponseUnit": {
+        "properties": {
+          "error": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ErrorDetail"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "success": {
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "ApiResponseUpdateDeckResponse": {
+        "properties": {
+          "data": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/UpdateDeckResponse"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "error": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ErrorDetail"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "success": {
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "CompleteRegistrationRequest": {
+        "properties": {
+          "isTermsAgreed": {
+            "type": "boolean"
+          },
+          "nickname": {
+            "maxLength": 50,
+            "minLength": 0,
+            "type": "string"
+          }
+        },
+        "required": [
+          "nickname"
+        ],
+        "type": "object"
+      },
+      "CreateDeckRequest": {
+        "properties": {
+          "description": {
+            "description": "덱 설명",
+            "minLength": 1,
+            "type": "string"
+          },
+          "name": {
+            "description": "덱 이름",
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "description",
+          "name"
+        ],
+        "type": "object"
+      },
+      "CreateDeckResponse": {
+        "description": "덱 생성 응답",
+        "properties": {
+          "deckDescription": {
+            "description": "덱 설명",
+            "example": "직장인을 위한 핵심 어휘",
+            "type": "string"
+          },
+          "deckName": {
+            "description": "덱 이름",
+            "example": "TOEIC 필수 단어",
+            "type": "string"
+          },
+          "id": {
+            "description": "덱 ID",
+            "example": 1,
+            "format": "int64",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "DeleteDeckResponse": {
+        "properties": {
+          "id": {
+            "format": "int64",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "ErrorDetail": {
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "fieldErrors": {
+            "items": {
+              "$ref": "#/components/schemas/FieldError"
+            },
+            "type": [
+              "array",
+              "null"
+            ]
+          },
+          "message": {
+            "type": "string"
+          },
+          "traceId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "type": "object"
+      },
+      "FieldError": {
+        "properties": {
+          "field": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "NicknameCheckResponse": {
+        "description": "닉네임 사용 가능 여부 응답",
+        "properties": {
+          "available": {
+            "description": "사용 가능 여부 (true=사용 가능, false=중복)",
+            "example": true,
+            "type": "boolean"
+          },
+          "nickname": {
+            "description": "조회 대상 닉네임",
+            "example": "다정한 고슴도치",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "NicknameResponse": {
+        "description": "랜덤 닉네임 응답",
+        "properties": {
+          "nickname": {
+            "description": "추천 닉네임",
+            "example": "다정한 고슴도치",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "RefreshTokenRequest": {
+        "properties": {
+          "accessToken": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "refreshToken": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "accessToken",
+          "refreshToken"
+        ],
+        "type": "object"
+      },
+      "SocialLoginRequest": {
+        "properties": {
+          "idToken": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "provider": {
+            "enum": [
+              "GOOGLE",
+              "APPLE"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "idToken"
+        ],
+        "type": "object"
+      },
+      "SocialLoginResponse": {
+        "description": "소셜 로그인 응답",
+        "properties": {
+          "accessToken": {
+            "description": "JWT Access Token",
+            "example": "<jwt-access-token>",
+            "type": "string"
+          },
+          "isRegistrationComplete": {
+            "description": "신규 가입자는 false (회원가입 완료 필요), 기존 회원은 true",
+            "example": false,
+            "type": "boolean"
+          },
+          "refreshToken": {
+            "description": "JWT Refresh Token",
+            "example": "<jwt-refresh-token>",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "TokenResponse": {
+        "description": "토큰 발급/재발급 응답",
+        "properties": {
+          "accessToken": {
+            "description": "JWT Access Token",
+            "example": "<jwt-access-token>",
+            "type": "string"
+          },
+          "refreshToken": {
+            "description": "JWT Refresh Token",
+            "example": "<jwt-refresh-token>",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "UpdateDeckRequest": {
+        "properties": {
+          "description": {
+            "description": "덱 설명",
+            "minLength": 1,
+            "type": "string"
+          },
+          "name": {
+            "description": "덱 이름",
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "description",
+          "name"
+        ],
+        "type": "object"
+      },
+      "UpdateDeckResponse": {
+        "properties": {
+          "deckDescription": {
+            "type": "string"
+          },
+          "deckName": {
+            "type": "string"
+          },
+          "id": {
+            "format": "int64",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "bearerFormat": "JWT",
+        "description": "JWT Access Token",
+        "scheme": "bearer",
+        "type": "http"
+      }
+    }
+  },
+  "info": {
+    "description": "Flashcard backend REST API",
+    "title": "Caro Backend API",
+    "version": "v1"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/v1/auth/complete-registration": {
+      "post": {
+        "description": "닉네임/약관 동의 입력 후 access/refresh 토큰을 재발급한다.",
+        "operationId": "completeRegistration",
+        "parameters": [
+          {
+            "description": "디바이스 식별자",
+            "example": "unique-device-identifier",
+            "in": "header",
+            "name": "Device-Id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "응답 메시지 로케일 (BCP 47). 예: ko-KR, en-US, ja. 미지정 시 영어 메시지로 응답.",
+            "example": "ko-KR",
+            "in": "header",
+            "name": "Accept-Language",
+            "required": true,
+            "schema": {
+              "default": "ko-KR",
+              "type": "string"
+            }
+          },
+          {
+            "description": "클라이언트의 IANA Time Zone Database ID. 예: Asia/Seoul, America/New_York",
+            "example": "Asia/Seoul",
+            "in": "header",
+            "name": "Client-Timezone",
+            "required": true,
+            "schema": {
+              "default": "Asia/Seoul",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CompleteRegistrationRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseTokenResponse"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "회원가입 완료",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/v1/auth/logout": {
+      "post": {
+        "description": "현재 access token 을 블랙리스트 처리하고 디바이스 refresh token 을 폐기한다.",
+        "operationId": "logout",
+        "parameters": [
+          {
+            "description": "디바이스 식별자",
+            "example": "unique-device-identifier",
+            "in": "header",
+            "name": "Device-Id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "응답 메시지 로케일 (BCP 47). 예: ko-KR, en-US, ja. 미지정 시 영어 메시지로 응답.",
+            "example": "ko-KR",
+            "in": "header",
+            "name": "Accept-Language",
+            "required": true,
+            "schema": {
+              "default": "ko-KR",
+              "type": "string"
+            }
+          },
+          {
+            "description": "클라이언트의 IANA Time Zone Database ID. 예: Asia/Seoul, America/New_York",
+            "example": "Asia/Seoul",
+            "in": "header",
+            "name": "Client-Timezone",
+            "required": true,
+            "schema": {
+              "default": "Asia/Seoul",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseUnit"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "로그아웃",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/v1/auth/refresh": {
+      "post": {
+        "description": "Refresh Token 으로 access/refresh 토큰을 재발급한다. 단일 사용 정책.",
+        "operationId": "refreshToken",
+        "parameters": [
+          {
+            "description": "디바이스 식별자",
+            "example": "unique-device-identifier",
+            "in": "header",
+            "name": "Device-Id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "응답 메시지 로케일 (BCP 47). 예: ko-KR, en-US, ja. 미지정 시 영어 메시지로 응답.",
+            "example": "ko-KR",
+            "in": "header",
+            "name": "Accept-Language",
+            "required": true,
+            "schema": {
+              "default": "ko-KR",
+              "type": "string"
+            }
+          },
+          {
+            "description": "클라이언트의 IANA Time Zone Database ID. 예: Asia/Seoul, America/New_York",
+            "example": "Asia/Seoul",
+            "in": "header",
+            "name": "Client-Timezone",
+            "required": true,
+            "schema": {
+              "default": "Asia/Seoul",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefreshTokenRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseTokenResponse"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [],
+        "summary": "토큰 재발급",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/v1/auth/refresh/test": {
+      "post": {
+        "operationId": "refreshToken_1",
+        "parameters": [
+          {
+            "description": "디바이스 식별자",
+            "example": "unique-device-identifier",
+            "in": "header",
+            "name": "Device-Id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "accessTokenTtl",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "refreshTokenTtl",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "응답 메시지 로케일 (BCP 47). 예: ko-KR, en-US, ja. 미지정 시 영어 메시지로 응답.",
+            "example": "ko-KR",
+            "in": "header",
+            "name": "Accept-Language",
+            "required": true,
+            "schema": {
+              "default": "ko-KR",
+              "type": "string"
+            }
+          },
+          {
+            "description": "클라이언트의 IANA Time Zone Database ID. 예: Asia/Seoul, America/New_York",
+            "example": "Asia/Seoul",
+            "in": "header",
+            "name": "Client-Timezone",
+            "required": true,
+            "schema": {
+              "default": "Asia/Seoul",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefreshTokenRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseTokenResponse"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [],
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/v1/auth/social-login": {
+      "post": {
+        "description": "소셜 ID 토큰을 검증해 access/refresh 토큰을 발급한다. 신규 사용자는 isRegistrationComplete=false 로 응답.",
+        "operationId": "socialLogin",
+        "parameters": [
+          {
+            "description": "디바이스 식별자",
+            "example": "unique-device-identifier",
+            "in": "header",
+            "name": "Device-Id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "응답 메시지 로케일 (BCP 47). 예: ko-KR, en-US, ja. 미지정 시 영어 메시지로 응답.",
+            "example": "ko-KR",
+            "in": "header",
+            "name": "Accept-Language",
+            "required": true,
+            "schema": {
+              "default": "ko-KR",
+              "type": "string"
+            }
+          },
+          {
+            "description": "클라이언트의 IANA Time Zone Database ID. 예: Asia/Seoul, America/New_York",
+            "example": "Asia/Seoul",
+            "in": "header",
+            "name": "Client-Timezone",
+            "required": true,
+            "schema": {
+              "default": "Asia/Seoul",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SocialLoginRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseSocialLoginResponse"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [],
+        "summary": "소셜 로그인",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/v1/auth/social-login/test": {
+      "post": {
+        "operationId": "socialLoginForTest",
+        "parameters": [
+          {
+            "description": "디바이스 식별자",
+            "example": "unique-device-identifier",
+            "in": "header",
+            "name": "Device-Id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "accessTokenTtl",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "refreshTokenTtl",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "응답 메시지 로케일 (BCP 47). 예: ko-KR, en-US, ja. 미지정 시 영어 메시지로 응답.",
+            "example": "ko-KR",
+            "in": "header",
+            "name": "Accept-Language",
+            "required": true,
+            "schema": {
+              "default": "ko-KR",
+              "type": "string"
+            }
+          },
+          {
+            "description": "클라이언트의 IANA Time Zone Database ID. 예: Asia/Seoul, America/New_York",
+            "example": "Asia/Seoul",
+            "in": "header",
+            "name": "Client-Timezone",
+            "required": true,
+            "schema": {
+              "default": "Asia/Seoul",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SocialLoginRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseSocialLoginResponse"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [],
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/v1/decks": {
+      "post": {
+        "description": "새 덱을 생성하고 기본 프리셋을 연결한다.",
+        "operationId": "createDeck",
+        "parameters": [
+          {
+            "description": "응답 메시지 로케일 (BCP 47). 예: ko-KR, en-US, ja. 미지정 시 영어 메시지로 응답.",
+            "example": "ko-KR",
+            "in": "header",
+            "name": "Accept-Language",
+            "required": true,
+            "schema": {
+              "default": "ko-KR",
+              "type": "string"
+            }
+          },
+          {
+            "description": "클라이언트의 IANA Time Zone Database ID. 예: Asia/Seoul, America/New_York",
+            "example": "Asia/Seoul",
+            "in": "header",
+            "name": "Client-Timezone",
+            "required": true,
+            "schema": {
+              "default": "Asia/Seoul",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateDeckRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseCreateDeckResponse"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "덱 생성",
+        "tags": [
+          "Deck"
+        ]
+      }
+    },
+    "/v1/decks/{deckId}": {
+      "delete": {
+        "operationId": "deleteDeck",
+        "parameters": [
+          {
+            "description": "덱 ID",
+            "in": "path",
+            "name": "deckId",
+            "required": true,
+            "schema": {
+              "exclusiveMinimum": 0,
+              "format": "int64",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "응답 메시지 로케일 (BCP 47). 예: ko-KR, en-US, ja. 미지정 시 영어 메시지로 응답.",
+            "example": "ko-KR",
+            "in": "header",
+            "name": "Accept-Language",
+            "required": true,
+            "schema": {
+              "default": "ko-KR",
+              "type": "string"
+            }
+          },
+          {
+            "description": "클라이언트의 IANA Time Zone Database ID. 예: Asia/Seoul, America/New_York",
+            "example": "Asia/Seoul",
+            "in": "header",
+            "name": "Client-Timezone",
+            "required": true,
+            "schema": {
+              "default": "Asia/Seoul",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDeleteDeckResponse"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "Deck"
+        ]
+      },
+      "patch": {
+        "operationId": "updateDeck",
+        "parameters": [
+          {
+            "description": "덱 ID",
+            "in": "path",
+            "name": "deckId",
+            "required": true,
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "응답 메시지 로케일 (BCP 47). 예: ko-KR, en-US, ja. 미지정 시 영어 메시지로 응답.",
+            "example": "ko-KR",
+            "in": "header",
+            "name": "Accept-Language",
+            "required": true,
+            "schema": {
+              "default": "ko-KR",
+              "type": "string"
+            }
+          },
+          {
+            "description": "클라이언트의 IANA Time Zone Database ID. 예: Asia/Seoul, America/New_York",
+            "example": "Asia/Seoul",
+            "in": "header",
+            "name": "Client-Timezone",
+            "required": true,
+            "schema": {
+              "default": "Asia/Seoul",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateDeckRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseUpdateDeckResponse"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "Deck"
+        ]
+      }
+    },
+    "/v1/nicknames/random": {
+      "get": {
+        "description": "Accept-Language 헤더 로케일에 맞춘 랜덤 닉네임을 반환한다.",
+        "operationId": "getRandomNickname",
+        "parameters": [
+          {
+            "description": "응답 메시지 로케일 (BCP 47). 예: ko-KR, en-US, ja. 미지정 시 영어 메시지로 응답.",
+            "example": "ko-KR",
+            "in": "header",
+            "name": "Accept-Language",
+            "required": true,
+            "schema": {
+              "default": "ko-KR",
+              "type": "string"
+            }
+          },
+          {
+            "description": "클라이언트의 IANA Time Zone Database ID. 예: Asia/Seoul, America/New_York",
+            "example": "Asia/Seoul",
+            "in": "header",
+            "name": "Client-Timezone",
+            "required": true,
+            "schema": {
+              "default": "Asia/Seoul",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseNicknameResponse"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "랜덤 닉네임 1개 발급",
+        "tags": [
+          "Nickname"
+        ]
+      }
+    },
+    "/v1/users/nicknames/{nickname}/availability": {
+      "get": {
+        "description": "닉네임 중복 여부를 반환한다. 길이 제한 50자.",
+        "operationId": "checkNicknameAvailability",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "nickname",
+            "required": true,
+            "schema": {
+              "maxLength": 50,
+              "minLength": 0,
+              "type": "string"
+            }
+          },
+          {
+            "description": "응답 메시지 로케일 (BCP 47). 예: ko-KR, en-US, ja. 미지정 시 영어 메시지로 응답.",
+            "example": "ko-KR",
+            "in": "header",
+            "name": "Accept-Language",
+            "required": true,
+            "schema": {
+              "default": "ko-KR",
+              "type": "string"
+            }
+          },
+          {
+            "description": "클라이언트의 IANA Time Zone Database ID. 예: Asia/Seoul, America/New_York",
+            "example": "Asia/Seoul",
+            "in": "header",
+            "name": "Client-Timezone",
+            "required": true,
+            "schema": {
+              "default": "Asia/Seoul",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseNicknameCheckResponse"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "닉네임 사용 가능 여부 조회",
+        "tags": [
+          "User"
+        ]
+      }
+    }
+  },
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "servers": [
+    {
+      "description": "Generated server url",
+      "url": "https://caro-staging.givendragon.com"
+    }
+  ],
+  "tags": [
+    {
+      "description": "사용자 정보 조회",
+      "name": "User"
+    },
+    {
+      "description": "닉네임 추천",
+      "name": "Nickname"
+    },
+    {
+      "description": "인증 / 세션 관리",
+      "name": "Auth"
+    },
+    {
+      "description": "단어/표현 덱 관리",
+      "name": "Deck"
+    }
+  ]
+}
