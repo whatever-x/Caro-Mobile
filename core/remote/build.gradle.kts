@@ -9,6 +9,7 @@ plugins {
     id("caro.kotlin.serialization")
     id("caro.kmp.test")
     alias(libs.plugins.build.konfig)
+    alias(libs.plugins.ksp)
 }
 
 kotlin {
@@ -27,12 +28,11 @@ kotlin {
         }
         commonMain.dependencies {
             implementation(projects.core.model)
-
             implementation(libs.ktor.client.core)
             implementation(libs.ktor.serialization.kotlinx.json)
             implementation(libs.kotlinx.coroutines.core)
-
             implementation(libs.bundles.ktor.client.plugin)
+            implementation(libs.ktorfit.lib)
         }
         commonTest.dependencies {
             implementation(libs.ktor.client.mock)
@@ -42,6 +42,27 @@ kotlin {
         }
     }
 }
+
+dependencies {
+    add("kspCommonMainMetadata", libs.ktorfit.ksp)
+    add("kspAndroid", libs.ktorfit.ksp)
+    add("kspIosX64", libs.ktorfit.ksp)
+    add("kspIosArm64", libs.ktorfit.ksp)
+    add("kspIosSimulatorArm64", libs.ktorfit.ksp)
+}
+
+kotlin.sourceSets.named("commonMain").configure {
+    kotlin.srcDir("build/generated/ksp/metadata/commonMain/kotlin")
+}
+
+tasks
+    .matching {
+        (it.name.startsWith("compile") || it.name.startsWith("ksp")) &&
+            it.name != "kspCommonMainKotlinMetadata" &&
+            it.name != "compileCommonMainKotlinMetadata"
+    }.configureEach {
+        dependsOn("kspCommonMainKotlinMetadata")
+    }
 
 buildkonfig {
     packageName = "com.whatever.caro.core.remote.generated"

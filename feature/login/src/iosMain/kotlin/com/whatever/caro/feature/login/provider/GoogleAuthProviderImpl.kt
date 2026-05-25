@@ -2,9 +2,11 @@
 
 package com.whatever.caro.feature.login.provider
 
+import GoogleSignIn.GIDConfiguration
 import GoogleSignIn.GIDSignIn
 import GoogleSignIn.kGIDSignInErrorCodeCanceled
 import androidx.compose.runtime.Composable
+import com.whatever.caro.feature.login.config.GoogleAuthConfig
 import com.whatever.caro.feature.login.model.GoogleUser
 import com.whatever.caro.feature.login.model.SocialAuthenticator
 import com.whatever.caro.feature.login.model.SocialLoginResult
@@ -37,6 +39,12 @@ private class GoogleAuthenticator : SocialAuthenticator<GoogleUser> {
                 continuation.resume(SocialLoginResult.Failed)
                 return@suspendCancellableCoroutine
             }
+            val configuration =
+                GIDConfiguration(
+                    clientID = GoogleAuthConfig.GID_CLIENT_ID,
+                    serverClientID = GoogleAuthConfig.GID_WEB_CLIENT_ID,
+                )
+            GIDSignIn.sharedInstance.configuration = configuration
             GIDSignIn.sharedInstance.signInWithPresentingViewController(rootViewController) { result, error ->
                 if (error != null) {
                     if (error.code == kGIDSignInErrorCodeCanceled) {

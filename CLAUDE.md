@@ -71,9 +71,9 @@ feature/<name>/
 |-- route/
 |   |-- <Name>Route.kt          # Composable entry point (collects state, handles side effects)
 |-- <Name>Screen.kt             # Pure UI composable (receives state + intent callback)
-|-- <Name>ViewModel.kt          # @KoinViewModel, extends BaseViewModel
+|-- <Name>ViewModel.kt          # Extends BaseViewModel; registered in the feature's DI module
 |-- di/
-|   |-- <Name>Module.kt         # @Module @ComponentScan (auto-discovers annotated classes)
+|   |-- <Name>Module.kt         # Koin `module { }` declaring viewModel/single bindings
 |-- mvi/
     |-- <Name>Intent.kt         # Sealed interface of user actions
     |-- <Name>State.kt          # Data class representing UI state
@@ -95,17 +95,36 @@ Navigation keys are `@Serializable` data objects/classes extending `NavKey` in `
 3. Add a `navigation<Key> { }` entry in `composeApp/di/NavigationModule.kt`
 4. Create the feature module with Route/Screen/ViewModel/MVI classes
 
-**Passing parameters:** Use a `@Serializable data class` with a `Payload` (see `HomeEntry` pattern). Inject the NavKey into the ViewModel via `@InjectedParam`.
+**Passing parameters:** Use a `@Serializable data class` with a `Payload` (see `HomeEntry` pattern). The ViewModel declares the NavKey as a constructor parameter; in `NavigationModule.kt` the route lambda forwards it via `koinViewModel<HomeViewModel> { parametersOf(navKey) }`, and Koin's compiler plugin auto-routes that parameter through `parametersOf` when resolving `viewModel<HomeViewModel>()`.
 
 ### Dependency Injection (Koin)
 
-Koin uses annotation-based setup processed by KSP:
-- **`@Module` + `@ComponentScan`** — Feature/core modules auto-discover annotated classes in their package
-- **`@KoinViewModel`** — Registers ViewModels for Koin injection
-- **`@Single(binds = [Interface::class])`** — Repository binding pattern
-- **`@InjectedParam`** — Constructor parameter injection (used for NavKey in ViewModels)
+DI uses the **Koin Kotlin compiler plugin** (`io.insert-koin.compiler.plugin`) — no KSP, no annotations. The plugin adds shortcut DSL functions under `org.koin.plugin.module.dsl` that auto-resolve constructor arguments via `get()` (registered beans) and `parametersOf(...)` (call-site parameters):
 
-All modules are composed in `AppModule` (`composeApp/di/`) using `@Configuration` with `includes = [...]`. The `navigationModule` is registered separately in `initKoin {}`.
+```kotlin
+import org.koin.dsl.bind
+import org.koin.dsl.module
+import org.koin.plugin.module.dsl.single
+import org.koin.plugin.module.dsl.viewModel
+
+val dataModule =
+    module {
+        single<AuthRepositoryImpl>() bind AuthRepository::class  // expose impl as interface
+        single<FcmTokenRepositoryImpl>() bind FcmTokenRepository::class
+    }
+
+val homeModule =
+    module {
+        viewModel<HomeViewModel>()  // constructor args auto-resolved (incl. NavKey from parametersOf)
+    }
+```
+
+Fall back to the plain DSL form (`single { ... }`, `viewModel { ... }`) only when the shortcut can't express the binding — i.e. when you need:
+- a `named()` qualifier on the bean or its `get(named(...))` dependencies (see `NetworkModule`, `ApiModule`, `RemoteModule`)
+- a configured builder (`Json { ... }`, `DataStoreFactory.create(producePath = { ... })`)
+- logic that isn't just a constructor call
+
+All modules are composed in `initKoin()` (`composeApp/src/commonMain/kotlin/com/whatever/caro/composeApp/di/Koin.kt`); `navEntryModule` is listed there alongside the core and feature modules.
 
 ### Convention Plugins (build-logic)
 
@@ -116,7 +135,7 @@ All modules are composed in `AppModule` (`composeApp/di/`) using `@Configuration
 | `caro.kmp.ios` | iOS targets (x64, arm64, simulatorArm64) |
 | `caro.cmp` | Compose Multiplatform deps (material3, resources, foundation) + compiler |
 | `caro.feature` | Feature module: auto-adds core deps (designsystem, data, ui, viewmodel, navigator) + koin-compose-viewmodel |
-| `caro.koin` | Koin DI with KSP annotation processing (all platform targets) |
+| `caro.koin` | Applies the Koin Kotlin compiler plugin (`io.insert-koin.compiler.plugin`) + adds `koin-core` to commonMain. Enables shortcut DSL (`single<X>()`, `viewModel<X>()`). |
 | `caro.kmp.test` | Test deps (Kotest, Mokkery, Turbine, coroutines-test, koin-test) |
 | `caro.kover` | Kover coverage: applied to `:core:data` and `:feature:*`, enforces 50% line minimum |
 | `caro.kotlin.serialization` | kotlinx.serialization plugin + JSON |

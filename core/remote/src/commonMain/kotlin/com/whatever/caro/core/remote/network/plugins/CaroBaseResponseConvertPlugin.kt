@@ -3,7 +3,7 @@ package com.whatever.caro.core.remote.network.plugins
 import com.whatever.caro.core.model.exception.CaroInvalidResponseException
 import com.whatever.caro.core.model.exception.CaroServerException
 import com.whatever.caro.core.model.exception.ErrorCode.INVALID_RESPONSE
-import com.whatever.caro.core.remote.model.CaroBaseResponse
+import com.whatever.caro.core.remote.dto.base.ApiResponseDto
 import io.ktor.client.plugins.api.ClientPlugin
 import io.ktor.client.plugins.api.createClientPlugin
 import io.ktor.http.ContentType
@@ -54,7 +54,7 @@ internal val CaroBaseResponseConverter: ClientPlugin<CaroBaseResponseConverterCo
                     )
                 }
 
-            val envelopeSerializer = CaroBaseResponse.serializer(requestedSerializer)
+            val envelopeSerializer = ApiResponseDto.serializer(requestedSerializer)
             val baseResponse =
                 runCatching {
                     json.decodeFromString(envelopeSerializer, payloadText)
@@ -93,8 +93,7 @@ internal val CaroBaseResponseConverter: ClientPlugin<CaroBaseResponseConverterCo
                 throw CaroServerException(
                     code = error.code,
                     message = error.message,
-                    debugMessage = error.debugMessage ?: "서버로부터 받은 debug 메세지가 비어있습니다.",
-                    description = error.description,
+                    debugMessage = "CaroBaseResponseConverterPlugin에서 오류가 발생하였습니다. (baseResponse:$baseResponse)",
                 )
             }
 
