@@ -24,5 +24,5 @@ val remoteModule =
             )
         }
 
-        single<ProfileDataSource> { ProfileDataSourceImpl() }
+        single<ProfileDataSource> { ProfileDataSourceImpl(profileApi = get()) }
     }
