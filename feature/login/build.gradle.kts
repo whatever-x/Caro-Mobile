@@ -63,10 +63,36 @@ buildkonfig {
     packageName = "com.whatever.caro.feature.login.generated"
 
     defaultConfigs {
-        buildConfigField(
-            FieldSpec.Type.STRING,
-            "GOOGLE_WEB_CLIENT_ID",
-            getLocalProperty("GOOGLE_WEB_CLIENT_ID") ?: error("GOOGLE_WEB_CLIENT_ID를 찾을 수 없습니다"),
-        )
+        buildConfigField(FieldSpec.Type.STRING, "GOOGLE_WEB_CLIENT_ID", "")
+    }
+
+    targetConfigs("dev") {
+        create("android") {
+            buildConfigField(
+                FieldSpec.Type.STRING,
+                "GOOGLE_WEB_CLIENT_ID",
+                getLocalProperty("GOOGLE_WEB_CLIENT_ID_DEV") ?: error("GOOGLE_WEB_CLIENT_ID_DEV를 찾을 수 없습니다."),
+            )
+        }
+    }
+
+    targetConfigs("qa") {
+        create("android") {
+            buildConfigField(
+                FieldSpec.Type.STRING,
+                "GOOGLE_WEB_CLIENT_ID",
+                getLocalProperty("GOOGLE_WEB_CLIENT_ID_DEV") ?: error("GOOGLE_WEB_CLIENT_ID_DEV를 찾을 수 없습니다."),
+            )
+        }
+    }
+
+    targetConfigs("prod") {
+        create("android") {
+            buildConfigField(
+                FieldSpec.Type.STRING,
+                "GOOGLE_WEB_CLIENT_ID",
+                getLocalProperty("GOOGLE_WEB_CLIENT_ID_PROD") ?: error("GOOGLE_WEB_CLIENT_ID_PROD를 찾을 수 없습니다."),
+            )
+        }
     }
 }

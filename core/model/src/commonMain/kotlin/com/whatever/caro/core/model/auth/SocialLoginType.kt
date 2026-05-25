@@ -1,8 +1,9 @@
 package com.whatever.caro.core.model.auth
 
-enum class SocialLoginType(
-    val value: String,
-) {
-    GOOGLE("google"),
-    APPLE("apple"),
+import kotlinx.serialization.Serializable
+
+@Serializable
+enum class SocialLoginType {
+    GOOGLE,
+    APPLE,
 }

@@ -25,7 +25,6 @@ fun SplashRoute(
     BindEffect(permissionsController)
 
     LaunchedEffect(Unit) {
-        viewModel.start(permissionsController)
         viewModel.sideEffect.collect { sideEffect ->
             when (sideEffect) {
                 is SplashSideEffect.NavigateLogin -> {

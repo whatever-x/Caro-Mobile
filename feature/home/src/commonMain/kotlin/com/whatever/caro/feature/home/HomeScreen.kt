@@ -1,10 +1,14 @@
 package com.whatever.caro.feature.home
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import com.whatever.caro.feature.home.mvi.HomeIntent
 import com.whatever.caro.feature.home.mvi.HomeState
 
@@ -14,14 +18,18 @@ internal fun HomeScreen(
     onIntent: (HomeIntent) -> Unit,
 ) {
     Column(
-        modifier = Modifier.fillMaxSize(),
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .padding(20.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
-        Text(
-            text = state.screenName,
-        )
+        Button(onClick = { onIntent(HomeIntent.ClickLogout) }) {
+            Text("logOut")
+        }
 
-        Text(
-            text = state.name,
-        )
+        Button(onClick = { onIntent(HomeIntent.ClickSignUp) }) {
+            Text("SignUp")
+        }
     }
 }

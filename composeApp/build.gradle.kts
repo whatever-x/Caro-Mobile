@@ -16,6 +16,7 @@ kotlin {
         }
         commonMain.dependencies {
             implementation(projects.core.data)
+            implementation(projects.core.datastore)
             implementation(projects.core.designsystem)
             implementation(projects.core.ui)
             implementation(projects.core.viewmodel)

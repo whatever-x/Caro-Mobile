@@ -36,10 +36,7 @@ private class AppleAuthenticator(
                 return@suspendCancellableCoroutine
             }
 
-            val provider =
-                OAuthProvider.newBuilder("apple.com").apply {
-                    scopes = listOf("email", "name")
-                }
+            val provider = OAuthProvider.newBuilder("apple.com")
 
             val pendingResultTask = auth.pendingAuthResult
             if (pendingResultTask != null) {

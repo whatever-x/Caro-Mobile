@@ -4,7 +4,7 @@ plugins {
     alias(libs.plugins.firebase.crashlytics)
 }
 
-android.namespace = "com.whatever.caro.app"
+android.namespace = "com.whatever.caro"
 
 dependencies {
     implementation(projects.composeApp)
