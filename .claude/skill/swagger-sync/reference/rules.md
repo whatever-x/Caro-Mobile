@@ -71,7 +71,7 @@
 
 - DTO만으로는 사용자가 엔드포인트를 호출할 수 없다. **태그별로 Ktorfit 인터페이스**를
 만들고 Koin `apiModule`에 binding까지 추가한다.
-- - 헤더 파라미터 중 `Device-Id`, `Accept-Language`, `Client-Timezone`은 인프라에서 자동 주입되므로 DTO/요청 파라미터로 추가하지 않는다.
+- 헤더 파라미터 중 `Device-Id`, `Accept-Language`, `Client-Timezone`은 인프라에서 자동 주입되므로 DTO/요청 파라미터로 추가하지 않는다.
 
 ## 위치 / 네이밍
 

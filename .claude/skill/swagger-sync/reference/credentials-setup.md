@@ -4,7 +4,7 @@ Swagger 스펙은 HTTP Basic(브라우저 시스템 팝업) 방식으로 보호�
 fetch 스크립트는 아래 순서로 자격증명을 찾는다.
 
 1. 환경변수가 있으면 그것을 사용한다.
-2. 없으면 프로젝트 루트의 `.swagger-credentials` 파일을 읽는다.
+2. 없으면 .claude/skill/swagger-sync/의 `.swagger-credentials` 파일을 읽는다.
 3. 둘 다 없으면 에러로 중단한다.
 
 ## 필요한 값
