@@ -80,6 +80,7 @@ data class CaroColor(
     data class BackgroundColor(
         val primary: Color = Gray100,
         val secondary: Color = Blue500,
+        val brand: Color = Blue500,
     )
 
     @Immutable

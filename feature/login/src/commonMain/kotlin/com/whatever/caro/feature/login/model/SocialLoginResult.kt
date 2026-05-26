@@ -8,4 +8,6 @@ sealed interface SocialLoginResult<out T> {
     data object UserCancelled : SocialLoginResult<Nothing>
 
     data object Failed : SocialLoginResult<Nothing>
+
+    data object NotFoundAccount : SocialLoginResult<Nothing>
 }

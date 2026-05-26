@@ -24,23 +24,6 @@ internal fun com.whatever.caro.feature.login.LoginScreen(state: com.whatever.car
     - onLaunch: STABLE (function type)
 
 @Composable
-private fun com.whatever.caro.feature.login.component.FlipButton(isFlipped: kotlin.Boolean, onClick: kotlin.Function0<kotlin.Unit>): kotlin.Unit
-  skippable: true
-  restartable: true
-  params:
-    - isFlipped: STABLE (primitive type)
-    - onClick: STABLE (function type)
-
-@Composable
-public fun com.whatever.caro.feature.login.component.FlipCard(modifier: androidx.compose.ui.Modifier, isFlipped: kotlin.Boolean, onClick: kotlin.Function0<kotlin.Unit>): kotlin.Unit
-  skippable: true
-  restartable: true
-  params:
-    - modifier: STABLE (marked @Stable or @Immutable)
-    - isFlipped: STABLE (primitive type)
-    - onClick: STABLE (function type)
-
-@Composable
 internal fun com.whatever.caro.feature.login.component.SocialLoginButton(modifier: androidx.compose.ui.Modifier, iconRes: org.jetbrains.compose.resources.DrawableResource, contentRes: org.jetbrains.compose.resources.StringResource, textColor: androidx.compose.ui.graphics.Color, onClick: kotlin.Function0<kotlin.Unit>): kotlin.Unit
   skippable: true
   restartable: true
