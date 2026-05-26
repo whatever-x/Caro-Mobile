@@ -46,7 +46,6 @@ class LoginViewModel(
                     idToken = intent.result.authResult.idToken,
                 )
             }
-            SocialLoginResult.NotFoundAccount -> TODO()
         }
     }
 
@@ -66,7 +65,6 @@ class LoginViewModel(
                     idToken = intent.result.authResult.idToken,
                 )
             }
-            SocialLoginResult.NotFoundAccount -> TODO()
         }
     }
 

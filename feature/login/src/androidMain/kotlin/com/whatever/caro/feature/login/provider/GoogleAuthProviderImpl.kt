@@ -92,7 +92,7 @@ private class GoogleAuthenticator(
             } catch (_: GetCredentialException) {
                 SocialLoginResult.Failed
             }
-        } catch (e: GetCredentialException) {
+        } catch (_: GetCredentialException) {
             SocialLoginResult.Failed
         }
     }
