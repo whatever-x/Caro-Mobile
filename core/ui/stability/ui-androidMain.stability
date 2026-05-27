@@ -5,10 +5,25 @@
 //   ./gradlew :ui:stabilityDump
 
 @Composable
-public fun com.whatever.caro.core.ui.CaroTestUi(text: kotlin.String, onClick: kotlin.Function0<kotlin.Unit>): kotlin.Unit
+public fun com.whatever.caro.core.ui.image.CaroAsyncImage(imageUrl: kotlin.String?, contentDescription: kotlin.String?, modifier: androidx.compose.ui.Modifier, placeholder: org.jetbrains.compose.resources.DrawableResource, error: org.jetbrains.compose.resources.DrawableResource, fallback: org.jetbrains.compose.resources.DrawableResource, contentScale: androidx.compose.ui.layout.ContentScale, alignment: androidx.compose.ui.Alignment, alpha: kotlin.Float, colorFilter: androidx.compose.ui.graphics.ColorFilter?): kotlin.Unit
   skippable: true
   restartable: true
   params:
-    - text: STABLE (String is immutable)
-    - onClick: STABLE (function type)
+    - imageUrl: STABLE (class with no mutable properties)
+    - contentDescription: STABLE (class with no mutable properties)
+    - modifier: STABLE (marked @Stable or @Immutable)
+    - placeholder: STABLE (marked @Stable or @Immutable)
+    - error: STABLE (marked @Stable or @Immutable)
+    - fallback: STABLE (marked @Stable or @Immutable)
+    - contentScale: STABLE (marked @Stable or @Immutable)
+    - alignment: STABLE (marked @Stable or @Immutable)
+    - alpha: STABLE (primitive type)
+    - colorFilter: STABLE (marked @Stable or @Immutable)
+
+@Composable
+public fun com.whatever.caro.core.ui.image.ConfigureCaroImageLoader(config: com.whatever.caro.core.ui.image.CaroImageCacheConfig): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - config: STABLE (marked @Stable or @Immutable)
 
