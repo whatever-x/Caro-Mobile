@@ -4,8 +4,6 @@ interface ProfileRepository {
     suspend fun getRandomNickname(): String
 
     suspend fun validateNickname(nickname: String): NicknameValidation
-
-    suspend fun createProfile(nickname: String): Long
 }
 
 data class NicknameValidation(
