@@ -82,8 +82,18 @@ class CreateProfileViewModel(
         if (currentState.isConfirmEnabled.not()) return
         reduce { copy(isLoading = true) }
         launch {
-            createProfileUseCase(currentState.nickname)
-            postSideEffect(CreateProfileSideEffect.NavigateBack)
+            suspendRunCatching {
+                // TODO: 약관 동의 화면 추가 시 termsAgreed 전달 값 변경
+                createProfileUseCase(
+                    nickname = currentState.nickname,
+                    termsAgreed = true,
+                )
+            }.onSuccess {
+                postSideEffect(CreateProfileSideEffect.NavigateBack)
+            }.onFailure { throwable ->
+                Napier.e(throwable = throwable) { "completeRegistration failed" }
+                reduce { copy(isLoading = false) }
+            }
         }
     }
 

@@ -12,7 +12,7 @@ val profileModule =
     module {
         single { ValidateNicknameUseCase() }
         single { CheckNicknameUseCase(profileRepository = get()) }
-        single { CreateProfileUseCase(profileRepository = get()) }
+        single { CreateProfileUseCase(authRepository = get()) }
         single { GetRandomNicknameUseCase(profileRepository = get()) }
 
         viewModel<CreateProfileViewModel> {
