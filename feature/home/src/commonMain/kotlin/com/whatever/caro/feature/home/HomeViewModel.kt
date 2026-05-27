@@ -22,6 +22,7 @@ class HomeViewModel(
         when (intent) {
             HomeIntent.ClickLogout -> testClickLogout()
             HomeIntent.ClickSignUp -> testClickSignUp()
+            HomeIntent.ClickProfile -> postSideEffect(HomeSideEffect.NavigateToProfile)
         }
     }
 

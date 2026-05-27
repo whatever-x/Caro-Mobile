@@ -9,6 +9,7 @@ import com.whatever.caro.feature.profile.usecase.CreateProfileUseCase
 import com.whatever.caro.feature.profile.usecase.GetRandomNicknameUseCase
 import com.whatever.caro.feature.profile.usecase.NicknameValidationResult
 import com.whatever.caro.feature.profile.usecase.ValidateNicknameUseCase
+import io.github.aakira.napier.Napier
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 
@@ -51,7 +52,10 @@ class CreateProfileViewModel(
         nicknameValidationJob =
             launch {
                 delay(DEBOUNCE_MS)
-                val result = checkNicknameUseCase(filtered)
+                val result =
+                    runCatching { checkNicknameUseCase(filtered) }
+                        .onFailure { Napier.e(throwable = it) { "checkNicknameAvailability failed" } }
+                        .getOrDefault(NicknameValidationResult.Valid)
                 reduce { copy(validationResult = result) }
             }
     }
