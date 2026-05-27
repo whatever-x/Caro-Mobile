@@ -1,10 +1,10 @@
 package com.whatever.caro.core.model.exception
 
-data class CaroInvalidResponseException(
+data class CaroUnknownException(
     override val debugMessage: String,
     override val throwable: Throwable? = null,
 ) : CaroException(
-        message = "Invalid Response Error",
+        message = "Unknown Error",
         debugMessage = debugMessage,
         throwable = throwable,
     )

@@ -16,13 +16,18 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 
 abstract class BaseViewModel<S : UiState, I : UiIntent, SE : UiSideEffect>(
     initialState: S,
-) : ViewModel() {
+) : ViewModel(),
+    KoinComponent {
     protected abstract suspend fun handleIntent(intent: I)
+
+    private val exceptionFilter: ExceptionFilter by inject()
 
     private val _state = MutableStateFlow(initialState)
     val state = _state.asStateFlow()
@@ -39,7 +44,11 @@ abstract class BaseViewModel<S : UiState, I : UiIntent, SE : UiSideEffect>(
 
     protected val coroutineExceptionHandler =
         CoroutineExceptionHandler { _, throwable ->
-            handleClientException(throwable)
+            if (exceptionFilter.shouldSuppress(throwable)) {
+                Napier.w(throwable = throwable) { "Suppressed by ExceptionFilter: ${throwable::class.simpleName}" }
+            } else {
+                handleClientException(throwable)
+            }
         }
 
     fun intent(intent: I) {

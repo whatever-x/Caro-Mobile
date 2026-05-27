@@ -25,6 +25,8 @@ fun initKoin(configuration: KoinAppDeclaration? = null) {
             // Navigation
             navEntryModule,
             navigatorModule,
+            // app
+            appPolicyModule,
             // data
             dataModule,
             dataStoreModule,

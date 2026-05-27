@@ -6,8 +6,6 @@ import io.ktor.client.plugins.api.createClientPlugin
 import io.ktor.client.request.headers
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
-import io.ktor.util.AttributeKey
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
@@ -42,14 +40,7 @@ internal val AuthInterceptorPlugin =
                     if (!current.isNullOrEmpty() && current != accessTokenSnapshot) {
                         current
                     } else {
-                        try {
-                            tokenProvider.refresh()
-                        } catch (cancellation: CancellationException) {
-                            throw cancellation
-                        } catch (cause: Throwable) {
-                            tokenProvider.clearTokens()
-                            throw cause
-                        }
+                        tokenProvider.refresh()
                     }
                 }
 
