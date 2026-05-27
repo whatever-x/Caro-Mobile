@@ -25,7 +25,7 @@ fun HomeRoute(
     LaunchedEffect(Unit) {
         viewModel.sideEffect.collect { sideEffect ->
             when (sideEffect) {
-                HomeSideEffect.NavigateToProfile -> {
+                is HomeSideEffect.NavigateToProfile -> {
                     navDispatcher.emit(command = To(key = CreateProfileEntry))
                 }
             }
