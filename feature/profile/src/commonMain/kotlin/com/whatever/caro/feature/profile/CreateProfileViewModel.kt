@@ -1,5 +1,6 @@
 package com.whatever.caro.feature.profile
 
+import com.whatever.caro.core.data.util.suspendRunCatching
 import com.whatever.caro.core.viewmodel.BaseViewModel
 import com.whatever.caro.feature.profile.mvi.CreateProfileIntent
 import com.whatever.caro.feature.profile.mvi.CreateProfileSideEffect
@@ -10,7 +11,6 @@ import com.whatever.caro.feature.profile.usecase.GetRandomNicknameUseCase
 import com.whatever.caro.feature.profile.usecase.NicknameValidationResult
 import com.whatever.caro.feature.profile.usecase.ValidateNicknameUseCase
 import io.github.aakira.napier.Napier
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 
@@ -54,19 +54,11 @@ class CreateProfileViewModel(
             launch {
                 delay(DEBOUNCE_MS)
                 val result =
-                    runCatching { checkNicknameUseCase(filtered) }
+                    suspendRunCatching { checkNicknameUseCase(filtered) }
                         .getOrElse { throwable ->
-                            when (throwable) {
-                                is CancellationException -> {
-                                    throw throwable
-                                }
-
-                                // TODO: 서버 에러 처리 UI 확정 시 폴백 제거
-                                else -> {
-                                    Napier.e(throwable = throwable) { "checkNicknameAvailability failed" }
-                                    NicknameValidationResult.Valid
-                                }
-                            }
+                            Napier.e(throwable = throwable) { "checkNicknameAvailability failed" }
+                            // TODO: 서버 에러 처리 UI 확정 시 폴백 제거
+                            NicknameValidationResult.Valid
                         }
                 reduce { copy(validationResult = result) }
             }
