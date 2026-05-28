@@ -3,6 +3,7 @@ package com.whatever.caro.composeApp.di
 import com.whatever.caro.core.analytics.di.analyticsModule
 import com.whatever.caro.core.crashlytics.di.crashlyticsModule
 import com.whatever.caro.core.data.di.dataModule
+import com.whatever.caro.core.data.di.repositoryModule
 import com.whatever.caro.core.datastore.di.dataStoreModule
 import com.whatever.caro.core.messaging.di.messagingModule
 import com.whatever.caro.core.navigator.di.navigatorModule
@@ -28,6 +29,7 @@ fun initKoin(configuration: KoinAppDeclaration? = null) {
             // app
             appPolicyModule,
             // data
+            repositoryModule,
             dataModule,
             dataStoreModule,
             networkModule,

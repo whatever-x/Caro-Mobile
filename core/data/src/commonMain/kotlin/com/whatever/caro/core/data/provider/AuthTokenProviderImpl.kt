@@ -2,7 +2,7 @@ package com.whatever.caro.core.data.provider
 
 import com.whatever.caro.core.datastore.datasource.LocalAuthDataSource
 import com.whatever.caro.core.model.auth.AuthSessionEvent
-import com.whatever.caro.core.model.auth.AuthSessionEventPublisher
+import com.whatever.caro.core.model.auth.AuthSessionEventBus
 import com.whatever.caro.core.model.exception.CaroAuthException
 import com.whatever.caro.core.remote.auth.AuthTokenProvider
 import com.whatever.caro.core.remote.datasource.RemoteNonAuthDataSource
@@ -12,7 +12,7 @@ import kotlinx.coroutines.CancellationException
 internal class AuthTokenProviderImpl(
     private val localAuthDataSource: LocalAuthDataSource,
     private val remoteNonAuthDatasource: RemoteNonAuthDataSource,
-    private val authSessionEventPublisher: AuthSessionEventPublisher,
+    private val authSessionEventBus: AuthSessionEventBus
 ) : AuthTokenProvider {
     override suspend fun getAccessToken(): String? = localAuthDataSource.fetchAccessToken()
 
@@ -65,6 +65,6 @@ internal class AuthTokenProviderImpl(
 
     private suspend fun notifySessionExpired() {
         localAuthDataSource.clear()
-        authSessionEventPublisher.publish(AuthSessionEvent.Expired)
+        authSessionEventBus.publish(AuthSessionEvent.Expired)
     }
 }
