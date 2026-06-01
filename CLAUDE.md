@@ -186,3 +186,16 @@ PR checks (`.github/workflows/caro-ci.yml`):
 
 Use expect/actual declarations. Platform files follow naming convention: `Foo.android.kt` / `Foo.ios.kt`.
 Example: `HttpClientEngineProvider` has common interface + platform-specific implementations (OkHttp for Android, Darwin for iOS).
+
+## Skill(All Agents)
+
+이 저장소에는 에이전트 중립적인 절차서가 `.claude/skills/` 아래에 있습니다.
+Claude 외의 에이전트(Codex 등)는 자동 발견을 못 하므로, 아래 트리거가 보이면
+해당 `SKILL.md`를 읽고 그 절차를 그대로 따르세요. 절차서·규칙·스크립트는
+모두 에이전트 중립적입니다(YAML frontmatter만 Claude 전용이니 무시).
+
+- **swagger-sync** → [`.claude/skills/swagger-sync/SKILL.md`](./.claude/skills/swagger-sync/SKILL.md)
+    - 트리거: "DTO 동기화", "API 스펙 반영", "Swagger 업데이트", "DTO PR 만들어줘"
+    - 내용: Swagger/OpenAPI 스펙 → Kotlin DTO + 태그별 Ktorfit API 인터페이스 생성,
+      사내 규칙 적용 후 변경 시 브랜치 + 커밋까지.
+    - 실행 스크립트: `scripts/*.sh`(mac/Linux), `scripts/*.ps1`(Windows)

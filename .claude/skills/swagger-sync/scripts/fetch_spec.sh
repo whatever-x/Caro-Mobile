@@ -7,7 +7,9 @@
 set -euo pipefail
 
 ARG_SWAGGER_URL="${1:-}"
-CRED_FILE=".claude/skill/swagger-sync/.swagger-credentials"
+# 스크립트 자기 위치 기준으로 자격증명 파일을 찾는다 (작업 디렉토리/에이전트 무관).
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+CRED_FILE="$SCRIPT_DIR/../.swagger-credentials"
 
 # --- 1. .swagger-credentials 파일이 있으면 로드 (환경변수가 없는 키만 채움) ---
 if [[ -f "$CRED_FILE" ]]; then
