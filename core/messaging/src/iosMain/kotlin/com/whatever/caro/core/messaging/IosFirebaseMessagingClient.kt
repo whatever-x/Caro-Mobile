@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import platform.Foundation.NSData
 import platform.UIKit.UIApplication
+import platform.UIKit.registerForRemoteNotifications
 import platform.UserNotifications.UNNotification
 import platform.UserNotifications.UNNotificationPresentationOptionBanner
 import platform.UserNotifications.UNNotificationPresentationOptionList
@@ -23,34 +24,40 @@ import platform.UserNotifications.UNUserNotificationCenterDelegateProtocol
 import platform.darwin.NSObject
 
 @OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
-internal class IosFirebaseMessagingClient :
-    NSObject(),
-    MessagingClient,
-    FIRMessagingDelegateProtocol,
-    UNUserNotificationCenterDelegateProtocol {
+internal class IosFirebaseMessagingClient : MessagingClient {
     private val mutableTokenFlow = MutableStateFlow("")
     private val mutableMessages = Channel<CloudMessage>(capacity = Channel.CONFLATED)
 
     override val tokenFlow: StateFlow<String> = mutableTokenFlow.asStateFlow()
     override val messages: ReceiveChannel<CloudMessage> = mutableMessages
 
+    private val delegate = MessagingDelegate(mutableTokenFlow, mutableMessages)
+
     fun attach(application: UIApplication) {
-        FIRMessaging.messaging().delegate = this
-        UNUserNotificationCenter.currentNotificationCenter().delegate = this
+        FIRMessaging.messaging().delegate = delegate
+        UNUserNotificationCenter.currentNotificationCenter().delegate = delegate
         application.registerForRemoteNotifications()
     }
 
     fun applyApnsToken(deviceToken: NSData) {
         FIRMessaging.messaging().setAPNSToken(deviceToken)
     }
+}
 
+@OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
+private class MessagingDelegate(
+    private val tokenFlow: MutableStateFlow<String>,
+    private val messages: Channel<CloudMessage>,
+) : NSObject(),
+    FIRMessagingDelegateProtocol,
+    UNUserNotificationCenterDelegateProtocol {
     override fun messaging(
         messaging: FIRMessaging,
         didReceiveRegistrationToken: String?,
     ) {
         val token = didReceiveRegistrationToken ?: return
         Napier.d { "FCM token refreshed: $token" }
-        mutableTokenFlow.tryEmit(token)
+        tokenFlow.tryEmit(token)
     }
 
     // 포그라운드 상태에서 푸쉬 도착
