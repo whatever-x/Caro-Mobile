@@ -22,7 +22,7 @@ kotlin {
             dependency {
                 remotePackageVersion(
                     url = URI("https://github.com/firebase/firebase-ios-sdk"),
-                    version = "12.12.1",
+                    version = "12.14.0",
                     products = {
                         add("FirebaseMessaging", exportToKotlin = true)
                     },
