@@ -13,7 +13,7 @@ class KmpIosPlugin : Plugin<Project> {
                 ).forEach { iosTarget ->
                     iosTarget.binaries.framework {
                         baseName = "ComposeApp"
-                        isStatic = true
+                        isStatic = false
                         export(project(":core:messaging"))
                         export(project(":core:analytics"))
                         export(project(":core:crashlytics"))
