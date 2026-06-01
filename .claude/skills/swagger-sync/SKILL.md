@@ -90,7 +90,7 @@ Claude가 아래 절차를 수행한다.
 
 - src/commonMain/kotlin/com/whatever/caro/core/model은 절대 수정/삭제하지 않는다.
 - 컴파일 검증을 통과하지 못한 코드로는 브랜치 생성과 커밋을 하지 않는다.
-- 브랜치는 feat/swagger-dto-update로 생성한다.
+- 브랜치는 feat/swagger-update로 생성한다.
 - 자격증명(ID/PW)을 SKILL.md, 스크립트, reference 등 어떤 파일에도 저장하지 않는다.
   자격증명은 환경변수 또는 `.gitignore`에 등록된 `.swagger-credentials` 파일로만 다룬다.
 - 자격증명을 PR 본문, 커밋 메시지, 로그, 채팅 출력에 노출하지 않는다.
