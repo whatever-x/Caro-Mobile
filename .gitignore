@@ -37,7 +37,7 @@ core/database/schemas
 *.xcconfig
 
 # Swagger Skil
-.swagger-credentials
+.claude/skills/swagger-sync/.swagger-credentials
 openapi.json
 openapitools.json
 cookies.txt
