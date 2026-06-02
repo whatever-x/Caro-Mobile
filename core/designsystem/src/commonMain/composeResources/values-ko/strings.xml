@@ -9,4 +9,14 @@
     <string name="login_button_apple">Apple로 로그인</string>
     <string name="login_card_button">탭하여 뒤집기</string>
     <string name="login_card_text_title">사과</string>
+
+    <!-- home -->
+    <string name="home_banner_title">%1$s님, 안녕하세요!</string>
+    <string name="home_learning_days">%1$d일 연속 학습중</string>
+    <string name="home_deck_badge_not_started">학습 전</string>
+    <string name="home_deck_badge_learning">학습 중</string>
+    <string name="home_deck_badge_complete">완료</string>
+    <string name="home_deck_button_not_started">완료</string>
+    <string name="home_deck_button_learning">이어서 학습</string>
+    <string name="home_floating_button">덱 만들기</string>
 </resources>

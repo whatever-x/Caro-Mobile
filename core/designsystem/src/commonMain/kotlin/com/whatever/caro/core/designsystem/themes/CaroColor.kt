@@ -80,6 +80,7 @@ data class CaroColor(
     data class BackgroundColor(
         val primary: Color = Gray100,
         val secondary: Color = Blue500,
+        val brand: Color = Blue500,
     )
 
     @Immutable
@@ -161,10 +162,10 @@ data class CaroColor(
     data class ButtonColor(
         val surface: ButtonSurfaceDefaultColor = ButtonSurfaceDefaultColor(),
         val pressed: ButtonSurfacePressedColor = ButtonSurfacePressedColor(),
-        val floating: Color = Gray800,
     ) {
         @Immutable
         data class ButtonSurfaceDefaultColor(
+            val floating: Color = Gray800,
             val easy: Color = Blue600,
             val fair: Color = Yellow600,
             val hard: Color = Red600,
