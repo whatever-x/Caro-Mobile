@@ -1,6 +1,5 @@
 package com.whatever.caro.core.designsystem.components
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -38,9 +37,7 @@ fun CaroTopBar(
         modifier =
             modifier
                 .fillMaxWidth()
-                .height(height = TopBarHeight)
-                .background(color = CaroTheme.color.background.primary)
-                .padding(horizontal = CaroTheme.spacing.xl),
+                .height(height = TopBarHeight),
     ) {
         leadingContent?.let { content ->
             Box(

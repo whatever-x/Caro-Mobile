@@ -18,11 +18,6 @@ fun HomeRoute(
     navDispatcher: NavigationDispatcher,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
-
-    LaunchedEffect(Unit) {
-        viewModel.init()
-    }
-
     LaunchedEffect(Unit) {
         viewModel.sideEffect.collect { sideEffect ->
             when (sideEffect) {
