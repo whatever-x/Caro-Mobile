@@ -31,4 +31,14 @@
     <string name="deck_tip_label">TIP</string>
     <string name="deck_tip_max_cards">한 덱에 최대 200장의 카드를 담을 수 있어요.</string>
     <string name="deck_button_create">만들기</string>
+
+    <!-- home -->
+    <string name="home_banner_title">%1$s님, 안녕하세요!</string>
+    <string name="home_learning_days">%1$d일 연속 학습중</string>
+    <string name="home_deck_badge_not_started">학습 전</string>
+    <string name="home_deck_badge_learning">학습 중</string>
+    <string name="home_deck_badge_complete">완료</string>
+    <string name="home_deck_button_not_started">완료</string>
+    <string name="home_deck_button_learning">이어서 학습</string>
+    <string name="home_floating_button">덱 만들기</string>
 </resources>
