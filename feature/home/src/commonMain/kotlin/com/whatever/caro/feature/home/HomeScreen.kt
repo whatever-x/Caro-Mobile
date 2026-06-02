@@ -195,14 +195,6 @@ internal fun HomeScreen(
                 color = CaroTheme.color.text.inverse,
             )
         }
-
-        Button(onClick = { onIntent(HomeIntent.ClickProfile) }) {
-            Text("Profile")
-        }
-
-        Button(onClick = { onIntent(HomeIntent.ClickCreateDeck) }) {
-            Text("덱 만들기")
-        }
     }
 }
 
