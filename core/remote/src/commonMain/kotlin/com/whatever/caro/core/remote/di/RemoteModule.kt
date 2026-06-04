@@ -5,10 +5,12 @@ import com.whatever.caro.core.remote.datasource.RemoteAuthDataSourceImpl
 import com.whatever.caro.core.remote.datasource.RemoteNonAuthDataSource
 import com.whatever.caro.core.remote.datasource.RemoteNonAuthDataSourceImpl
 import com.whatever.caro.core.remote.datasource.profile.ProfileDataSource
-import com.whatever.caro.core.remote.datasource.profile.ProfileDataSourceImpl
+import com.whatever.caro.core.remote.datasource.profile.RemoteProfileDataSourceImpl
 import com.whatever.caro.core.remote.di.qualifier.NetworkClient
 import org.koin.core.qualifier.named
+import org.koin.dsl.bind
 import org.koin.dsl.module
+import org.koin.plugin.module.dsl.single
 
 val remoteModule =
     module {
@@ -24,5 +26,5 @@ val remoteModule =
             )
         }
 
-        single<ProfileDataSource> { ProfileDataSourceImpl(profileApi = get()) }
+        single<RemoteProfileDataSourceImpl>() bind ProfileDataSource::class
     }

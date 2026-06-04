@@ -25,12 +25,22 @@ import caromobile.core.designsystem.generated.resources.Res
 import caromobile.core.designsystem.generated.resources.ic_arrow_left_24
 import caromobile.core.designsystem.generated.resources.ic_renew_16
 import caromobile.core.designsystem.generated.resources.ic_x_circle_24
+import caromobile.core.designsystem.generated.resources.profile_button_create
+import caromobile.core.designsystem.generated.resources.profile_button_random
+import caromobile.core.designsystem.generated.resources.profile_content_description_back
+import caromobile.core.designsystem.generated.resources.profile_content_description_clear
+import caromobile.core.designsystem.generated.resources.profile_field_label_nickname
+import caromobile.core.designsystem.generated.resources.profile_field_placeholder_random_nickname
+import caromobile.core.designsystem.generated.resources.profile_field_required
+import caromobile.core.designsystem.generated.resources.profile_field_rule_nickname
+import caromobile.core.designsystem.generated.resources.profile_title_create
 import com.whatever.caro.core.designsystem.components.CaroTextField
 import com.whatever.caro.core.designsystem.components.CaroTopBar
 import com.whatever.caro.core.designsystem.themes.CaroTheme
 import com.whatever.caro.feature.profile.mvi.CreateProfileIntent
 import com.whatever.caro.feature.profile.mvi.CreateProfileState
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 
 private val PageHorizontalPadding = 28.dp
 private val CtaButtonHeight = 56.dp
@@ -56,13 +66,13 @@ internal fun CreateProfileScreen(
                             .size(24.dp)
                             .clickable { onIntent(CreateProfileIntent.ClickBack) },
                     painter = painterResource(Res.drawable.ic_arrow_left_24),
-                    contentDescription = "뒤로 가기",
+                    contentDescription = stringResource(Res.string.profile_content_description_back),
                     tint = CaroTheme.color.icon.secondary,
                 )
             },
             centerContent = {
                 Text(
-                    text = "프로필 생성",
+                    text = stringResource(Res.string.profile_title_create),
                     style = CaroTheme.typography.heading2,
                     color = CaroTheme.color.text.primary,
                 )
@@ -108,7 +118,7 @@ private fun NicknameField(
         modifier = modifier,
         value = state.nickname,
         onValueChange = { onIntent(CreateProfileIntent.UpdateNickname(it)) },
-        placeholder = state.placeholder,
+        placeholder = stringResource(Res.string.profile_field_placeholder_random_nickname),
         header = {
             NicknameHeader(
                 onRefreshClick = { onIntent(CreateProfileIntent.ClickRefresh) },
@@ -128,7 +138,7 @@ private fun NicknameField(
                                     onIntent(CreateProfileIntent.UpdateNickname(""))
                                 },
                         painter = painterResource(Res.drawable.ic_x_circle_24),
-                        contentDescription = "지우기",
+                        contentDescription = stringResource(Res.string.profile_content_description_clear),
                         tint = CaroTheme.color.icon.tertiary,
                     )
                 }
@@ -152,12 +162,12 @@ private fun NicknameHeader(onRefreshClick: () -> Unit) {
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
-                text = "닉네임",
+                text = stringResource(Res.string.profile_field_label_nickname),
                 style = CaroTheme.typography.heading3,
                 color = CaroTheme.color.text.primary,
             )
             Text(
-                text = "*",
+                text = stringResource(Res.string.profile_field_required),
                 style = CaroTheme.typography.label1.bold,
                 color = CaroTheme.color.text.accent,
             )
@@ -179,7 +189,7 @@ private fun NicknameHeader(onRefreshClick: () -> Unit) {
                 tint = CaroTheme.color.icon.brand,
             )
             Text(
-                text = "랜덤 생성",
+                text = stringResource(Res.string.profile_button_random),
                 style = CaroTheme.typography.caption1,
                 color = CaroTheme.color.text.brand,
             )
@@ -194,7 +204,7 @@ private fun NicknameFooter(characterCount: String) {
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
-            text = "2~20자, 한글/영문/숫자 및 -, _만 사용 가능해요",
+            text = stringResource(Res.string.profile_field_rule_nickname),
             style = CaroTheme.typography.caption1,
             color = CaroTheme.color.text.secondary,
         )
@@ -236,7 +246,7 @@ private fun CtaButton(
         contentAlignment = Alignment.Center,
     ) {
         Text(
-            text = "생성하기",
+            text = stringResource(Res.string.profile_button_create),
             style = CaroTheme.typography.label1.regular,
             color = CaroTheme.color.text.inverse,
         )

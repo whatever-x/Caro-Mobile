@@ -9,4 +9,14 @@
     <string name="login_button_apple">Apple로 로그인</string>
     <string name="login_card_button">탭하여 뒤집기</string>
     <string name="login_card_text_title">사과</string>
+    <!-- profile -->
+    <string name="profile_title_create">프로필 생성</string>
+    <string name="profile_content_description_back">뒤로 가기</string>
+    <string name="profile_content_description_clear">지우기</string>
+    <string name="profile_field_placeholder_random_nickname">자동 생성된 닉네임</string>
+    <string name="profile_field_label_nickname">닉네임</string>
+    <string name="profile_field_required">*</string>
+    <string name="profile_button_random">랜덤 생성</string>
+    <string name="profile_field_rule_nickname">2~20자, 한글/영문/숫자 및 -, _만 사용 가능해요</string>
+    <string name="profile_button_create">생성하기</string>
 </resources>

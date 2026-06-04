@@ -1,24 +1,20 @@
 package com.whatever.caro.feature.profile
 
+import com.whatever.caro.core.data.repository.AuthRepository
+import com.whatever.caro.core.data.repository.profile.ProfileRepository
 import com.whatever.caro.core.data.util.suspendRunCatching
 import com.whatever.caro.core.viewmodel.BaseViewModel
 import com.whatever.caro.feature.profile.mvi.CreateProfileIntent
 import com.whatever.caro.feature.profile.mvi.CreateProfileSideEffect
 import com.whatever.caro.feature.profile.mvi.CreateProfileState
-import com.whatever.caro.feature.profile.usecase.CheckNicknameUseCase
-import com.whatever.caro.feature.profile.usecase.CreateProfileUseCase
-import com.whatever.caro.feature.profile.usecase.GetRandomNicknameUseCase
-import com.whatever.caro.feature.profile.usecase.NicknameValidationResult
-import com.whatever.caro.feature.profile.usecase.ValidateNicknameUseCase
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 
 class CreateProfileViewModel(
-    private val validateNicknameUseCase: ValidateNicknameUseCase,
-    private val checkNicknameUseCase: CheckNicknameUseCase,
-    private val createProfileUseCase: CreateProfileUseCase,
-    private val getRandomNicknameUseCase: GetRandomNicknameUseCase,
+    private val authRepository: AuthRepository,
+    private val profileRepository: ProfileRepository,
+    private val nicknameValidator: NicknameValidator,
 ) : BaseViewModel<CreateProfileState, CreateProfileIntent, CreateProfileSideEffect>(
         initialState = CreateProfileState(),
     ) {
@@ -38,8 +34,8 @@ class CreateProfileViewModel(
     }
 
     private fun handleUpdateNickname(nickname: String) {
-        val filtered = validateNicknameUseCase.filterInput(nickname)
-        val validation = validateNicknameUseCase.validate(filtered)
+        val filtered = nicknameValidator.filterInput(nickname)
+        val validation = nicknameValidator.validate(filtered)
 
         if (validation.isValid.not()) {
             nicknameValidationJob?.cancel()
@@ -54,27 +50,37 @@ class CreateProfileViewModel(
             launch {
                 delay(DEBOUNCE_MS)
                 val result =
-                    suspendRunCatching { checkNicknameUseCase(filtered) }
-                        .getOrElse { throwable ->
-                            Napier.e(throwable = throwable) { "checkNicknameAvailability failed" }
-                            // TODO: 서버 에러 처리 UI 확정 시 폴백 제거
+                    suspendRunCatching {
+                        if (profileRepository.isNicknameAvailable(filtered)) {
                             NicknameValidationResult.Valid
+                        } else {
+                            NicknameValidationResult.Duplicate
                         }
+                    }.getOrElse { throwable ->
+                        Napier.e(throwable = throwable) { "checkNicknameAvailability failed" }
+                        // TODO: 서버 에러 처리 UI 확정 시 폴백 제거
+                        NicknameValidationResult.Valid
+                    }
                 reduce { copy(validationResult = result) }
             }
     }
 
     private fun fetchRandomNickname() {
+        nicknameValidationJob?.cancel()
         reduce { copy(isRandomNicknameLoading = true) }
         launch {
-            val nickname = getRandomNicknameUseCase()
-            reduce {
-                copy(
-                    nickname = nickname,
-                    validationResult = NicknameValidationResult.Valid,
-                    isRandomNicknameLoading = false,
-                )
-            }
+            suspendRunCatching { profileRepository.getRandomNickname() }
+                .onSuccess { nickname ->
+                    reduce {
+                        copy(
+                            nickname = nickname,
+                            validationResult = NicknameValidationResult.Valid,
+                        )
+                    }
+                }.onFailure { throwable ->
+                    Napier.e(throwable = throwable) { "getRandomNickname failed" }
+                }
+            reduce { copy(isRandomNicknameLoading = false) }
         }
     }
 
@@ -84,7 +90,7 @@ class CreateProfileViewModel(
         launch {
             suspendRunCatching {
                 // TODO: 약관 동의 화면 추가 시 termsAgreed 전달 값 변경
-                createProfileUseCase(
+                authRepository.completeRegistration(
                     nickname = currentState.nickname,
                     termsAgreed = true,
                 )

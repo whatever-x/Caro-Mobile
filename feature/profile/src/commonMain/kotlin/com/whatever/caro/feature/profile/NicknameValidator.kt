@@ -1,6 +1,6 @@
-package com.whatever.caro.feature.profile.usecase
+package com.whatever.caro.feature.profile
 
-class ValidateNicknameUseCase {
+class NicknameValidator {
     private val nicknameRegex = Regex("^[가-힣a-zA-Z0-9_-]*$")
 
     fun filterInput(input: String): String =

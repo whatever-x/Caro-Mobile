@@ -10,11 +10,8 @@ internal class ProfileRepositoryImpl(
         return response.nickname
     }
 
-    override suspend fun validateNickname(nickname: String): NicknameValidation {
+    override suspend fun isNicknameAvailable(nickname: String): Boolean {
         val response = profileDataSource.checkNicknameAvailability(nickname)
-        return NicknameValidation(
-            isValid = response.available,
-            reason = if (response.available) null else "DUPLICATE",
-        )
+        return response.available
     }
 }
