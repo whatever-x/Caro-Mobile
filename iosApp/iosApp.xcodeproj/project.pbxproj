@@ -26,12 +26,6 @@
 		BA5C2CCE2FBDE3350086D722 /* Exceptions for "iosApp" folder in "iosApp" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				Config/DevDebug.xcconfig,
-				Config/DevRelease.xcconfig,
-				Config/ProdDebug.xcconfig,
-				Config/ProdRelease.xcconfig,
-				Config/QaDebug.xcconfig,
-				Config/QaRelease.xcconfig,
 				Info.plist,
 			);
 			target = 4648218809E5AE90BF60B44C /* iosApp */;
@@ -239,7 +233,7 @@
 		0D38C17F125911FB3285E39C /* DevDebug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReferenceAnchor = 2354A1345C967ECDF360E8CE /* iosApp */;
-			baseConfigurationReferenceRelativePath = Config/Dev.xcconfig;
+			baseConfigurationReferenceRelativePath = Config/DevDebug.xcconfig;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -276,7 +270,7 @@
 		1A08946E153E1203139756A3 /* DevDebug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReferenceAnchor = 2354A1345C967ECDF360E8CE /* iosApp */;
-			baseConfigurationReferenceRelativePath = Config/Dev.xcconfig;
+			baseConfigurationReferenceRelativePath = Config/DevDebug.xcconfig;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -342,7 +336,7 @@
 		1F78A817429C5ABB10B25626 /* ProdRelease */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReferenceAnchor = 2354A1345C967ECDF360E8CE /* iosApp */;
-			baseConfigurationReferenceRelativePath = Config/Prod.xcconfig;
+			baseConfigurationReferenceRelativePath = Config/ProdRelease.xcconfig;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -379,7 +373,7 @@
 		A1A1A1A1A1A1A1A1A1A1A401 /* QaDebug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReferenceAnchor = 2354A1345C967ECDF360E8CE /* iosApp */;
-			baseConfigurationReferenceRelativePath = Config/Qa.xcconfig;
+			baseConfigurationReferenceRelativePath = Config/QaDebug.xcconfig;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -445,7 +439,7 @@
 		A1A1A1A1A1A1A1A1A1A1A402 /* QaDebug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReferenceAnchor = 2354A1345C967ECDF360E8CE /* iosApp */;
-			baseConfigurationReferenceRelativePath = Config/Qa.xcconfig;
+			baseConfigurationReferenceRelativePath = Config/QaDebug.xcconfig;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -482,7 +476,7 @@
 		B2B2B2B2B2B2B2B2B2B2B501 /* ProdDebug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReferenceAnchor = 2354A1345C967ECDF360E8CE /* iosApp */;
-			baseConfigurationReferenceRelativePath = Config/Prod.xcconfig;
+			baseConfigurationReferenceRelativePath = Config/ProdDebug.xcconfig;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -548,7 +542,7 @@
 		B2B2B2B2B2B2B2B2B2B2B502 /* ProdDebug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReferenceAnchor = 2354A1345C967ECDF360E8CE /* iosApp */;
-			baseConfigurationReferenceRelativePath = Config/Prod.xcconfig;
+			baseConfigurationReferenceRelativePath = Config/ProdDebug.xcconfig;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -585,7 +579,7 @@
 		B3C66612CEE7C172985EAB6E /* ProdRelease */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReferenceAnchor = 2354A1345C967ECDF360E8CE /* iosApp */;
-			baseConfigurationReferenceRelativePath = Config/Prod.xcconfig;
+			baseConfigurationReferenceRelativePath = Config/ProdRelease.xcconfig;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -644,7 +638,7 @@
 		D3D3D3D3D3D3D3D3D3D3D301 /* DevRelease */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReferenceAnchor = 2354A1345C967ECDF360E8CE /* iosApp */;
-			baseConfigurationReferenceRelativePath = Config/Dev.xcconfig;
+			baseConfigurationReferenceRelativePath = Config/DevRelease.xcconfig;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -703,7 +697,7 @@
 		D3D3D3D3D3D3D3D3D3D3D302 /* DevRelease */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReferenceAnchor = 2354A1345C967ECDF360E8CE /* iosApp */;
-			baseConfigurationReferenceRelativePath = Config/Dev.xcconfig;
+			baseConfigurationReferenceRelativePath = Config/DevRelease.xcconfig;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -740,7 +734,7 @@
 		E93BE8652F1E02DD007CC1AC /* QaRelease */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReferenceAnchor = 2354A1345C967ECDF360E8CE /* iosApp */;
-			baseConfigurationReferenceRelativePath = Config/Qa.xcconfig;
+			baseConfigurationReferenceRelativePath = Config/QaRelease.xcconfig;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -799,7 +793,7 @@
 		E93BE8662F1E02DD007CC1AC /* QaRelease */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReferenceAnchor = 2354A1345C967ECDF360E8CE /* iosApp */;
-			baseConfigurationReferenceRelativePath = Config/Qa.xcconfig;
+			baseConfigurationReferenceRelativePath = Config/QaRelease.xcconfig;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
