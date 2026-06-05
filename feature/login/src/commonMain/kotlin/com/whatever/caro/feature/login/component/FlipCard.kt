@@ -27,7 +27,7 @@ import caromobile.core.designsystem.generated.resources.login_card_button
 import caromobile.core.designsystem.generated.resources.login_card_text_description
 import caromobile.core.designsystem.generated.resources.login_card_text_title
 import com.whatever.caro.core.designsystem.themes.CaroTheme
-import com.whatever.caro.core.ui.noRippleClickable
+import com.whatever.caro.core.ui.modifier.noRippleClickable
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
