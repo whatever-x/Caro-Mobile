@@ -1,18 +1,13 @@
 import SwiftUI
 import UIKit
 import ComposeApp
-import GoogleSignIn
-import FirebaseCore
-import FirebaseAnalytics
-import FirebaseCrashlytics
-import FirebaseMessaging
 
 class CaroAppDelegate: NSObject, UIApplicationDelegate {
     func application(
         _ application: UIApplication,
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
     ) -> Bool {
-        CaroFcmBridge.shared.attach(application: application)
+        IosMessagingAttacherKt.attachMessaging(application: application)
         return true
     }
 
@@ -20,7 +15,7 @@ class CaroAppDelegate: NSObject, UIApplicationDelegate {
         _ application: UIApplication,
         didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data
     ) {
-        Messaging.messaging().apnsToken = deviceToken
+        IosMessagingAttacherKt.applyApnsToken(deviceToken: deviceToken)
     }
 }
 
@@ -30,11 +25,14 @@ struct iOSApp: App {
     @UIApplicationDelegateAdaptor(CaroAppDelegate.self) var appDelegate
 
     init() {
-        FirebaseApp.configure()
+        FirebaseLifecycleKt.configureFirebaseApp()
 
         #if DEBUG
-            Analytics.setAnalyticsCollectionEnabled(false)
-            Crashlytics.crashlytics().setCrashlyticsCollectionEnabled(false)
+            FirebaseLifecycleKt.setAnalyticsCollectionEnabled(enabled: false)
+            CrashlyticsLifecycleKt.setCrashlyticsCollectionEnabled(enabled: false)
+        #else
+            FirebaseLifecycleKt.setAnalyticsCollectionEnabled(enabled: true)
+            CrashlyticsLifecycleKt.setCrashlyticsCollectionEnabled(enabled: true)
         #endif
 
         KoinKt.doInitKoin()
@@ -45,7 +43,7 @@ struct iOSApp: App {
         WindowGroup {
             ContentView()
                 .onOpenURL { url in
-                    GIDSignIn.sharedInstance.handle(url)
+                    _ = GoogleSignInUrlHandlerKt.handleGoogleSignInOpenURL(url: url)
                 }
         }
     }
