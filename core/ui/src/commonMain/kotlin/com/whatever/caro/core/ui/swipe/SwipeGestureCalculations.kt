@@ -99,23 +99,26 @@ internal fun SwipeGestureConfig.targetOffset(
 ): Offset =
     with(density) {
         when (direction) {
-            SwipeDirection.LEFT ->
+            SwipeDirection.LEFT -> {
                 Offset(
                     x = currentOffset.x + leftExitDistance.toPx(),
                     y = currentOffset.y,
                 )
+            }
 
-            SwipeDirection.RIGHT ->
+            SwipeDirection.RIGHT -> {
                 Offset(
                     x = currentOffset.x + rightExitDistance.toPx(),
                     y = currentOffset.y,
                 )
+            }
 
-            SwipeDirection.UP ->
+            SwipeDirection.UP -> {
                 Offset(
                     x = currentOffset.x,
                     y = currentOffset.y + upExitDistance.toPx(),
                 )
+            }
         }
     }
 
