@@ -38,7 +38,7 @@ internal fun SocialLoginButton(
     Box(
         modifier =
             modifier
-                .heightIn(min = 48.dp)
+                .heightIn(min = 52.dp)
                 .padding(vertical = CaroTheme.spacing.xs)
                 .noRippleClickable(onClick = onClick),
         contentAlignment = Alignment.Center,

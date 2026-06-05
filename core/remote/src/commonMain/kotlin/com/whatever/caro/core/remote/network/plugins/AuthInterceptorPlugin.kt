@@ -6,7 +6,6 @@ import io.ktor.client.plugins.api.createClientPlugin
 import io.ktor.client.request.headers
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
-import io.ktor.util.AttributeKey
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
