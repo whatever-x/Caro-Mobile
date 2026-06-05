@@ -85,6 +85,14 @@ Key ViewModel helpers:
 - `postSideEffect(effect)` — Emit one-shot side effect
 - `launch { }` — Coroutine scope with built-in exception handling
 
+Feature ViewModels may call repositories directly for simple one-to-one API actions. Do not introduce a feature UseCase just to wrap a single repository call; add a UseCase only when it owns reusable business rules, orchestration across multiple repositories, or meaningful transformation beyond basic UI mapping. Keep local UI validation helpers close to the feature and name them by behavior (e.g., `NicknameValidator`) rather than as API UseCases.
+
+Repository contracts should expose domain-shaped primitives or models, not pass-through response wrappers created only for one screen. For example, a nickname availability check should return `Boolean` unless the backend actually returns structured reason data the app needs.
+
+### UI Strings
+
+User-visible Compose text and accessibility labels must use Compose resources (`stringResource(Res.string...)`). Avoid hardcoded UI strings in screens, routes, and components except temporary debug-only UI.
+
 ### Navigation (Navigation3)
 
 Navigation keys are `@Serializable` data objects/classes extending `NavKey` in `:core:navigator`. Navigation commands flow through `NavigationDispatcher` using sealed `NavCommand` (Back, To, Replace, ResetTo).
@@ -199,3 +207,6 @@ Claude 외의 에이전트(Codex 등)는 자동 발견을 못 하므로, 아래 
     - 내용: Swagger/OpenAPI 스펙 → Kotlin DTO + 태그별 Ktorfit API 인터페이스 생성,
       사내 규칙 적용 후 변경 시 브랜치 + 커밋까지.
     - 실행 스크립트: `scripts/*.sh`(mac/Linux), `scripts/*.ps1`(Windows)
+
+## Creating Rule
+Remote data source implementation classes should carry a `Remote` prefix when the interface name is generic enough to be confused with repository/data-layer types (e.g., `RemoteProfileDataSourceImpl : ProfileDataSource`).

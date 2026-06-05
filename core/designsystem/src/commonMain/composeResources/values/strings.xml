@@ -11,4 +11,15 @@
 	<string name="login_card_button">Tap to flip</string>
 	<string name="login_card_text_description">[ˈæpəl]</string>
 	<string name="login_card_text_title">Apple</string>
+	<!-- profile -->
+	<string name="profile_title_create">Create Profile</string>
+	<string name="profile_content_description_back">Go back</string>
+	<string name="profile_content_description_clear">Clear</string>
+	<string name="profile_field_placeholder_random_nickname">Auto-generated nickname</string>
+	<string name="profile_field_label_nickname">Nickname</string>
+	<string name="profile_field_required">*</string>
+	<string name="profile_button_random">Random</string>
+	<string name="profile_field_rule_nickname">2-20 characters. Korean, English, numbers, -, and _
+		only</string>
+	<string name="profile_button_create">Create</string>
 </resources>

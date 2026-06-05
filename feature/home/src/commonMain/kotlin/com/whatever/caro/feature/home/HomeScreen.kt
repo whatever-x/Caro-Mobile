@@ -31,5 +31,9 @@ internal fun HomeScreen(
         Button(onClick = { onIntent(HomeIntent.ClickSignUp) }) {
             Text("SignUp")
         }
+
+        Button(onClick = { onIntent(HomeIntent.ClickProfile) }) {
+            Text("Profile")
+        }
     }
 }

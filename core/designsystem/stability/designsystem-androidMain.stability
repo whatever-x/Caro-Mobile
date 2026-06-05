@@ -66,6 +66,25 @@ public fun com.whatever.caro.core.designsystem.components.CaroTextArea(value: ko
     - interactionSource: STABLE (marked @Stable or @Immutable)
 
 @Composable
+public fun com.whatever.caro.core.designsystem.components.CaroTextField(value: kotlin.String, onValueChange: kotlin.Function1<kotlin.String, kotlin.Unit>, modifier: androidx.compose.ui.Modifier, header: @[Composable] androidx.compose.runtime.internal.ComposableFunction0<kotlin.Unit>?, footer: @[Composable] androidx.compose.runtime.internal.ComposableFunction0<kotlin.Unit>?, placeholder: kotlin.String?, enabled: kotlin.Boolean, readOnly: kotlin.Boolean, singleLine: kotlin.Boolean, keyboardOptions: androidx.compose.foundation.text.KeyboardOptions, keyboardActions: androidx.compose.foundation.text.KeyboardActions, trailingIcon: @[Composable] androidx.compose.runtime.internal.ComposableFunction0<kotlin.Unit>?, interactionSource: androidx.compose.foundation.interaction.MutableInteractionSource): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - value: STABLE (String is immutable)
+    - onValueChange: STABLE (function type)
+    - modifier: STABLE (marked @Stable or @Immutable)
+    - header: STABLE (composable function type)
+    - footer: STABLE (composable function type)
+    - placeholder: STABLE (class with no mutable properties)
+    - enabled: STABLE (primitive type)
+    - readOnly: STABLE (primitive type)
+    - singleLine: STABLE (primitive type)
+    - keyboardOptions: STABLE (marked @Stable or @Immutable)
+    - keyboardActions: STABLE (marked @Stable or @Immutable)
+    - trailingIcon: STABLE (composable function type)
+    - interactionSource: STABLE (marked @Stable or @Immutable)
+
+@Composable
 public fun com.whatever.caro.core.designsystem.components.CaroTopBar(modifier: androidx.compose.ui.Modifier, leadingContent: @[Composable] @[ExtensionFunctionType] androidx.compose.runtime.internal.ComposableFunction1<androidx.compose.foundation.layout.BoxScope, kotlin.Unit>?, centerContent: @[Composable] @[ExtensionFunctionType] androidx.compose.runtime.internal.ComposableFunction1<androidx.compose.foundation.layout.BoxScope, kotlin.Unit>?, trailingContent: @[Composable] @[ExtensionFunctionType] androidx.compose.runtime.internal.ComposableFunction1<androidx.compose.foundation.layout.BoxScope, kotlin.Unit>?): kotlin.Unit
   skippable: true
   restartable: true
@@ -92,6 +111,13 @@ private fun com.whatever.caro.core.designsystem.components.PreviewCenterComponen
   skippable: true
   restartable: true
   params:
+
+@Composable
+private fun com.whatever.caro.core.designsystem.components.PreviewContainer(content: @[Composable] androidx.compose.runtime.internal.ComposableFunction0<kotlin.Unit>): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - content: STABLE (composable function type)
 
 @Composable
 private fun com.whatever.caro.core.designsystem.components.PreviewContainer(content: @[Composable] androidx.compose.runtime.internal.ComposableFunction0<kotlin.Unit>): kotlin.Unit
@@ -136,6 +162,22 @@ private fun com.whatever.caro.core.designsystem.components.TextAreaBox(value: ko
     - readOnly: STABLE (primitive type)
     - keyboardOptions: STABLE (marked @Stable or @Immutable)
     - keyboardActions: STABLE (marked @Stable or @Immutable)
+    - interactionSource: STABLE (marked @Stable or @Immutable)
+
+@Composable
+private fun com.whatever.caro.core.designsystem.components.TextFieldBox(value: kotlin.String, onValueChange: kotlin.Function1<kotlin.String, kotlin.Unit>, placeholder: kotlin.String?, enabled: kotlin.Boolean, readOnly: kotlin.Boolean, singleLine: kotlin.Boolean, keyboardOptions: androidx.compose.foundation.text.KeyboardOptions, keyboardActions: androidx.compose.foundation.text.KeyboardActions, trailingIcon: @[Composable] androidx.compose.runtime.internal.ComposableFunction0<kotlin.Unit>?, interactionSource: androidx.compose.foundation.interaction.MutableInteractionSource): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - value: STABLE (String is immutable)
+    - onValueChange: STABLE (function type)
+    - placeholder: STABLE (class with no mutable properties)
+    - enabled: STABLE (primitive type)
+    - readOnly: STABLE (primitive type)
+    - singleLine: STABLE (primitive type)
+    - keyboardOptions: STABLE (marked @Stable or @Immutable)
+    - keyboardActions: STABLE (marked @Stable or @Immutable)
+    - trailingIcon: STABLE (composable function type)
     - interactionSource: STABLE (marked @Stable or @Immutable)
 
 @Composable
