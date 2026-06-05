@@ -72,6 +72,7 @@ tasks.register("koverAllXmlReport") {
     dependsOn(
         ":feature:login:koverXmlReport",
         ":feature:home:koverXmlReport",
+        ":feature:profile:koverXmlReport",
         ":core:data:koverXmlReport"
     )
 }
@@ -87,6 +88,7 @@ tasks.register("koverAllVerify") {
     dependsOn(
         ":feature:login:koverVerify",
         ":feature:home:koverVerify",
+        ":feature:profile:koverVerify",
         ":core:data:koverVerify"
     )
 }

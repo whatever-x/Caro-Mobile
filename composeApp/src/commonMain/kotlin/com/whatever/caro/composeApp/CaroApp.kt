@@ -19,6 +19,7 @@ import com.whatever.caro.core.designsystem.components.LocalSnackbarHostState
 import com.whatever.caro.core.designsystem.themes.CaroTheme
 import com.whatever.caro.core.navigator.contract.NavCommand
 import com.whatever.caro.core.navigator.dispatcher.NavigationDispatcher
+import com.whatever.caro.core.navigator.entries.CreateProfileEntry
 import com.whatever.caro.core.navigator.entries.HomeEntry
 import com.whatever.caro.core.navigator.entries.LoginEntry
 import com.whatever.caro.core.navigator.entries.SplashEntry
@@ -40,6 +41,7 @@ fun CaroApp(navDispatcher: NavigationDispatcher = koinInject()) {
                         polymorphic(NavKey::class) {
                             subclass(SplashEntry::class, SplashEntry.serializer())
                             subclass(LoginEntry::class, LoginEntry.serializer())
+                            subclass(CreateProfileEntry::class, CreateProfileEntry.serializer())
                             subclass(HomeEntry::class, HomeEntry.serializer())
                         }
                     }

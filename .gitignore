@@ -35,3 +35,10 @@ core/database/schemas
 !*.xcodeproj/xcshareddata/
 **/xcshareddata/WorkspaceSettings.xcsettings
 *.xcconfig
+
+# Swagger Skil
+.claude/skills/swagger-sync/.swagger-credentials
+openapi.json
+openapitools.json
+cookies.txt
+build/generated/
