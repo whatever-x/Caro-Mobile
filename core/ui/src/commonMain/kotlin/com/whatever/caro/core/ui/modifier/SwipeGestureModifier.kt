@@ -25,7 +25,6 @@ import com.whatever.caro.core.ui.swipe.DEFAULT_CARD_WIDTH
 import com.whatever.caro.core.ui.swipe.SwipeDirection
 import com.whatever.caro.core.ui.swipe.SwipeGestureConfig
 import com.whatever.caro.core.ui.swipe.SwipeGestureState
-import com.whatever.caro.core.ui.swipe.lerp
 import com.whatever.caro.core.ui.swipe.projectTo
 import com.whatever.caro.core.ui.swipe.resolveAlpha
 import com.whatever.caro.core.ui.swipe.resolveDirection
@@ -197,21 +196,22 @@ fun Modifier.directionLockedSwipeGesture(
         var animationJob by remember { mutableStateOf<Job?>(null) }
         var lastHapticDirection by remember { mutableStateOf<SwipeDirection?>(null) }
 
+        val safeLockedSensitivity = motionConfig.lockedDragSensitivity.coerceAtLeast(0.1f)
         val activationThresholdPx = with(density) { motionConfig.lockedDirectionActivationDistance.toPx() }
         val swipeThresholdPx = with(density) { motionConfig.lockedSwipeThreshold.toPx() }
-        val effectiveDragOffset = dragOffset.scaleBy(factor = motionConfig.lockedDragSensitivity)
+        val effectiveDragOffset = dragOffset.scaleBy(factor = safeLockedSensitivity)
         val direction =
             effectiveDragOffset.resolveLockedDirection(
                 enabledDirections = motionConfig.enabledDirections,
                 activationThreshold = activationThresholdPx,
                 upToHorizontalSwitchRatio = motionConfig.lockedUpToHorizontalSwitchRatio,
             )
-        val projectedOffset =
+        val projectedDragOffset =
             effectiveDragOffset.projectTo(
                 direction = direction,
             )
         val progress =
-            projectedOffset.resolveProgress(
+            projectedDragOffset.resolveProgress(
                 direction = direction,
                 swipeThreshold = swipeThresholdPx,
             )
@@ -252,18 +252,18 @@ fun Modifier.directionLockedSwipeGesture(
 
         LaunchedEffect(
             direction,
-            projectedOffset,
+            projectedDragOffset,
         ) {
             if (!state.isAnimationRunning) {
-                state.snapTo(projectedOffset)
+                state.snapTo(projectedDragOffset)
             }
         }
 
         LaunchedEffect(enabled) {
             if (!enabled) {
                 animationJob?.cancel()
-                dragOffset = Offset.Zero
                 state.reset(animationSpec = motionConfig.resetAnimationSpec)
+                dragOffset = Offset.Zero
             }
         }
 
@@ -277,18 +277,22 @@ fun Modifier.directionLockedSwipeGesture(
                 detectDragGestures(
                     onDragStart = {
                         animationJob?.cancel()
-                        dragOffset = Offset.Zero
+                        dragOffset =
+                            Offset(
+                                x = state.offset.x / safeLockedSensitivity,
+                                y = state.offset.y / safeLockedSensitivity,
+                            )
                     },
                     onDragCancel = {
-                        dragOffset = Offset.Zero
                         animationJob =
                             coroutineScope.launch {
                                 state.reset(animationSpec = motionConfig.resetAnimationSpec)
+                                dragOffset = Offset.Zero
                             }
                     },
                     onDragEnd = {
                         val releasedEffectiveOffset =
-                            dragOffset.scaleBy(factor = motionConfig.lockedDragSensitivity)
+                            dragOffset.scaleBy(factor = safeLockedSensitivity)
                         val releasedDirection =
                             releasedEffectiveOffset.resolveLockedDirection(
                                 enabledDirections = motionConfig.enabledDirections,
@@ -317,11 +321,10 @@ fun Modifier.directionLockedSwipeGesture(
                                             ),
                                         animationSpec = motionConfig.exitAnimationSpec,
                                     )
-                                    dragOffset = Offset.Zero
                                     updatedOnSwiped(releasedDirection)
                                 } else {
-                                    dragOffset = Offset.Zero
                                     state.reset(animationSpec = motionConfig.resetAnimationSpec)
+                                    dragOffset = Offset.Zero
                                 }
                             }
                     },
@@ -331,7 +334,7 @@ fun Modifier.directionLockedSwipeGesture(
                         }
                         val nextDragOffset = dragOffset + dragAmount
                         val nextEffectiveOffset =
-                            nextDragOffset.scaleBy(factor = motionConfig.lockedDragSensitivity)
+                            nextDragOffset.scaleBy(factor = safeLockedSensitivity)
                         val nextDirection =
                             nextEffectiveOffset.resolveLockedDirection(
                                 enabledDirections = motionConfig.enabledDirections,

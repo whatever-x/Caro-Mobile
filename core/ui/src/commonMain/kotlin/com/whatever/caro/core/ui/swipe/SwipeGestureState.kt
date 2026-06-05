@@ -15,18 +15,14 @@ import androidx.compose.ui.geometry.Offset
  *
  * [rememberSwipeGestureState]를 통해 생성하며, 제스처 modifier 내부에서 드래그와 애니메이션 상태를 갱신합니다.
  *
- * @param initialOffset 상태가 처음 생성될 때 사용할 초기 위치입니다.
- *
  * @author gunhyung
  */
 @Stable
-class SwipeGestureState internal constructor(
-    initialOffset: Offset,
-) {
+class SwipeGestureState internal constructor() {
     /**
      * 현재 composable이 이동한 좌표입니다.
      */
-    var offset: Offset by mutableStateOf(initialOffset)
+    var offset: Offset by mutableStateOf(Offset.Zero)
         private set
 
     /**
@@ -123,12 +119,10 @@ class SwipeGestureState internal constructor(
 /**
  * recomposition 사이에서 유지되는 [SwipeGestureState]를 생성합니다.
  *
- * @param initialOffset 상태가 처음 생성될 때 사용할 초기 위치입니다.
- *
  * @author gunhyung
  */
 @Composable
-fun rememberSwipeGestureState(initialOffset: Offset = Offset.Zero): SwipeGestureState =
+fun rememberSwipeGestureState(): SwipeGestureState =
     remember {
-        SwipeGestureState(initialOffset = initialOffset)
+        SwipeGestureState()
     }
