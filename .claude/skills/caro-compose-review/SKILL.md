@@ -12,6 +12,7 @@ description: >
 
 > Caro 컨벤션 단일 출처: [`../_conventions/SKILL.md`](../_conventions/SKILL.md)
 > 근거 스킬: 벤더링한 `compose-*`, `kotlin-*` 스킬들(같은 `.claude/skills/` 디렉토리). 항목마다 해당 스킬을 인용한다.
+> 실제 적용 예시: [`examples/pr-65-create-profile.md`](examples/pr-65-create-profile.md) (PR #65에 직접 돌린 결과).
 
 ## 목적과 경계
 
