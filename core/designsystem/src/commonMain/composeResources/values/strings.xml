@@ -27,9 +27,9 @@
 	<string name="deck_content_description_back">Go back</string>
 	<string name="deck_content_description_clear">Clear</string>
 	<string name="deck_field_label_name">Deck name</string>
-	<string name="deck_field_placeholder_name">Enter a deck name</string>
+	<string name="deck_field_placeholder_name">2000 English words</string>
 	<string name="deck_field_label_description">Description</string>
-	<string name="deck_field_placeholder_description">Enter a deck description</string>
+	<string name="deck_field_placeholder_description">Words used often in daily life</string>
 	<string name="deck_field_required">*</string>
 	<string name="deck_tip_label">TIP</string>
 	<string name="deck_tip_max_cards">You can add up to 200 cards per deck.</string>

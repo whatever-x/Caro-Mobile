@@ -24,9 +24,9 @@
     <string name="deck_content_description_back">뒤로 가기</string>
     <string name="deck_content_description_clear">지우기</string>
     <string name="deck_field_label_name">덱 이름</string>
-    <string name="deck_field_placeholder_name">덱 이름을 입력해주세요</string>
+    <string name="deck_field_placeholder_name">영어 단어 2000개</string>
     <string name="deck_field_label_description">설명</string>
-    <string name="deck_field_placeholder_description">덱 설명을 입력해주세요</string>
+    <string name="deck_field_placeholder_description">일상에서 많이 쓰는 단어</string>
     <string name="deck_field_required">*</string>
     <string name="deck_tip_label">TIP</string>
     <string name="deck_tip_max_cards">한 덱에 최대 200장의 카드를 담을 수 있어요.</string>
