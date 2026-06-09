@@ -7,21 +7,31 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.exclude
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.ime
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import caromobile.core.designsystem.generated.resources.Res
@@ -57,6 +67,13 @@ internal fun CreateDeckScreen(
     state: CreateDeckState,
     onIntent: (CreateDeckIntent) -> Unit,
 ) {
+    val nameFocusRequester = remember { FocusRequester() }
+    val descriptionFocusRequester = remember { FocusRequester() }
+
+    LaunchedEffect(Unit) {
+        nameFocusRequester.requestFocus()
+    }
+
     Column(
         modifier =
             Modifier
@@ -96,8 +113,17 @@ internal fun CreateDeckScreen(
                     ),
             verticalArrangement = Arrangement.spacedBy(CaroTheme.spacing.l),
         ) {
-            DeckNameField(state = state, onIntent = onIntent)
-            DeckDescriptionField(state = state, onIntent = onIntent)
+            DeckNameField(
+                state = state,
+                onIntent = onIntent,
+                focusRequester = nameFocusRequester,
+                onNext = { descriptionFocusRequester.requestFocus() },
+            )
+            DeckDescriptionField(
+                state = state,
+                onIntent = onIntent,
+                focusRequester = descriptionFocusRequester,
+            )
             DeckTipSection()
         }
 
@@ -107,7 +133,7 @@ internal fun CreateDeckScreen(
             modifier =
                 Modifier
                     .fillMaxWidth()
-                    .imePadding()
+                    .windowInsetsPadding(WindowInsets.ime.exclude(WindowInsets.navigationBars))
                     .padding(
                         horizontal = PageHorizontalPadding,
                         vertical = CaroTheme.spacing.l,
@@ -120,6 +146,8 @@ internal fun CreateDeckScreen(
 private fun DeckNameField(
     state: CreateDeckState,
     onIntent: (CreateDeckIntent) -> Unit,
+    focusRequester: FocusRequester,
+    onNext: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     CaroTextField(
@@ -129,6 +157,9 @@ private fun DeckNameField(
         placeholder = stringResource(Res.string.deck_field_placeholder_name),
         header = { RequiredFieldHeader(label = stringResource(Res.string.deck_field_label_name)) },
         footer = { FieldCounter(count = state.nameCount) },
+        focusRequester = focusRequester,
+        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+        keyboardActions = KeyboardActions(onNext = { onNext() }),
         trailingIcon =
             if (state.name.isNotEmpty()) {
                 {
@@ -152,6 +183,7 @@ private fun DeckNameField(
 private fun DeckDescriptionField(
     state: CreateDeckState,
     onIntent: (CreateDeckIntent) -> Unit,
+    focusRequester: FocusRequester,
     modifier: Modifier = Modifier,
 ) {
     CaroTextArea(
@@ -161,6 +193,7 @@ private fun DeckDescriptionField(
         placeholder = stringResource(Res.string.deck_field_placeholder_description),
         header = { RequiredFieldHeader(label = stringResource(Res.string.deck_field_label_description)) },
         footer = { FieldCounter(count = state.descriptionCount) },
+        focusRequester = focusRequester,
     )
 }
 

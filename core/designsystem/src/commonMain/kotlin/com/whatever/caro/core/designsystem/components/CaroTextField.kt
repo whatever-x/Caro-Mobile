@@ -30,6 +30,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -55,6 +57,7 @@ fun CaroTextField(
     keyboardActions: KeyboardActions = KeyboardActions.Default,
     trailingIcon: @Composable (() -> Unit)? = null,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+    focusRequester: FocusRequester? = null,
 ) {
     Column(
         modifier = modifier.fillMaxWidth(),
@@ -76,6 +79,7 @@ fun CaroTextField(
                 keyboardActions = keyboardActions,
                 trailingIcon = trailingIcon,
                 interactionSource = interactionSource,
+                focusRequester = focusRequester,
             )
 
             footer?.invoke()
@@ -95,6 +99,7 @@ private fun TextFieldBox(
     keyboardActions: KeyboardActions,
     trailingIcon: @Composable (() -> Unit)?,
     interactionSource: MutableInteractionSource,
+    focusRequester: FocusRequester?,
 ) {
     val isFocused by interactionSource.collectIsFocusedAsState()
     val textColor =
@@ -150,7 +155,12 @@ private fun TextFieldBox(
                 BasicTextField(
                     value = value,
                     onValueChange = onValueChange,
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .then(
+                                focusRequester?.let { Modifier.focusRequester(it) } ?: Modifier,
+                            ),
                     enabled = enabled,
                     readOnly = readOnly,
                     textStyle = mergedTextStyle,
