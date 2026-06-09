@@ -89,7 +89,7 @@ internal fun CreateDeckScreen(
                             .clickable { onIntent(CreateDeckIntent.ClickBack) },
                     painter = painterResource(Res.drawable.ic_chevron_left_24),
                     contentDescription = stringResource(Res.string.deck_content_description_back),
-                    tint = CaroTheme.color.icon.secondary,
+                    tint = CaroTheme.color.icon.brand,
                 )
             },
             centerContent = {
