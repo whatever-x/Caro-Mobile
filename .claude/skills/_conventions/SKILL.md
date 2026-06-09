@@ -15,7 +15,7 @@ description: >
 
 ## 모듈 구조 & 의존 규칙
 
-```
+```text
 :androidApp → :composeApp
 :composeApp → :core:* + :feature:*
 :feature:*  → caro.feature 가 자동 주입: designsystem, data, ui, viewmodel, navigator
@@ -31,7 +31,7 @@ description: >
 ViewModel은 `BaseViewModel<S, I, SE>`를 상속한다
 (`core/viewmodel/.../BaseViewModel.kt`). 파일 레이아웃:
 
-```
+```text
 feature/<name>/
 ├── route/<Name>Route.kt   # 상태 수집 + side effect 처리 (Composable 진입점)
 ├── <Name>Screen.kt        # 순수 UI (state + onIntent 콜백만 받음)

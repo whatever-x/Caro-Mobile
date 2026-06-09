@@ -34,7 +34,7 @@ description: >
 > Caro 참고: `compose-stability-diagnostics`, `compose-state-deferred-reads`는 핵심 세트에서 제외했다(필요 시
 > 동일 절차로 추가). 현재는 원문을 참조하라:
 > `https://github.com/chrisbanes/skills/tree/main/skills/compose-stability-diagnostics`,
-> `.../compose-state-deferred-reads`.
+> `https://github.com/chrisbanes/skills/tree/main/skills/compose-state-deferred-reads`.
 
 ## 리뷰 순서
 

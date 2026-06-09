@@ -98,7 +98,7 @@ description: >
 
 ## 출력 형식
 
-```
+```text
 ## caro-compose-review 결과
 
 ### 🔴 Must-fix
