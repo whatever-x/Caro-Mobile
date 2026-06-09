@@ -46,7 +46,7 @@ import caromobile.core.designsystem.generated.resources.deck_field_required
 import caromobile.core.designsystem.generated.resources.deck_tip_label
 import caromobile.core.designsystem.generated.resources.deck_tip_max_cards
 import caromobile.core.designsystem.generated.resources.deck_title_create
-import caromobile.core.designsystem.generated.resources.ic_arrow_left_24
+import caromobile.core.designsystem.generated.resources.ic_chevron_left_24
 import caromobile.core.designsystem.generated.resources.ic_x_circle_24
 import com.whatever.caro.core.designsystem.components.CaroTextArea
 import com.whatever.caro.core.designsystem.components.CaroTextField
@@ -87,7 +87,7 @@ internal fun CreateDeckScreen(
                         Modifier
                             .size(24.dp)
                             .clickable { onIntent(CreateDeckIntent.ClickBack) },
-                    painter = painterResource(Res.drawable.ic_arrow_left_24),
+                    painter = painterResource(Res.drawable.ic_chevron_left_24),
                     contentDescription = stringResource(Res.string.deck_content_description_back),
                     tint = CaroTheme.color.icon.secondary,
                 )
