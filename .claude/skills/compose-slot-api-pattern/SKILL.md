@@ -97,7 +97,7 @@ leadingContent: (@Composable () -> Unit)? = null
 object SettingsRowDefaults {
     @Composable
     fun Chevron() = Icon(
-        painter = painterResource(Res.drawable.ic_chevron_right_24),
+        painter = painterResource(Res.drawable.ic_chevron_right_24), // 예시 — 실제 존재하는 드로어블로 교체
         contentDescription = null,
         tint = CaroTheme.color.icon.tertiary,
     )
