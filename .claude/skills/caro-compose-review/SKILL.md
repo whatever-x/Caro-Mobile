@@ -74,6 +74,14 @@ description: >
 - [ ] 파라미터가 `@Serializable Payload`로 전달되고, 파라미터 화면이 `koinViewModel { parametersOf(navKey) }`인가.
 - [ ] feature 모듈끼리 직접 의존하지 않는가(navigator 경유).
 
+> 4단계 등록 확인용 grep (`<Entry>`를 NavKey 이름으로 치환, 예 `CreateProfileEntry`):
+> ```bash
+> grep -rn '<Entry>' core/navigator/                         # ① NavKey 정의(@Serializable)
+> grep -rn 'subclass(<Entry>' composeApp/                     # ② CaroApp.kt polymorphic 등록
+> grep -rn 'navigation<<Entry>>' composeApp/.../NavigationModule.kt  # ③ navigation<Key> { }
+> ```
+> 셋 중 하나라도 결과가 없으면 등록 누락(🔴). 빌드 산출물 오탐을 줄이려면 `--include='*.kt'`를 붙인다.
+
 ### I. Koin DI (`_conventions`)
 - [ ] 단순 바인딩이 단축 DSL(`viewModel<X>()`, `single<X>() bind Y::class`)인가.
 - [ ] `named()`/빌더/비-생성자 로직일 때만 평범한 DSL을 쓰는가.
