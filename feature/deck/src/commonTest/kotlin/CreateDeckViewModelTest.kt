@@ -1,6 +1,6 @@
 import app.cash.turbine.test
 import com.whatever.caro.feature.deck.CreateDeckViewModel
-import com.whatever.caro.feature.deck.DeckInputDefaults
+import com.whatever.caro.feature.deck.DeckInputLimits
 import com.whatever.caro.feature.deck.mvi.CreateDeckIntent
 import com.whatever.caro.feature.deck.mvi.CreateDeckSideEffect
 import io.kotest.core.spec.style.FunSpec
@@ -33,7 +33,7 @@ class CreateDeckViewModelTest : FunSpec() {
                 viewModel.intent(CreateDeckIntent.UpdateName("가".repeat(60)))
                 advanceUntilIdle()
 
-                viewModel.state.value.name.length shouldBe DeckInputDefaults.NAME_MAX
+                viewModel.state.value.name.length shouldBe DeckInputLimits.NAME_MAX
             }
         }
 
@@ -44,7 +44,7 @@ class CreateDeckViewModelTest : FunSpec() {
                 viewModel.intent(CreateDeckIntent.UpdateDescription("a".repeat(600)))
                 advanceUntilIdle()
 
-                viewModel.state.value.description.length shouldBe DeckInputDefaults.DESC_MAX
+                viewModel.state.value.description.length shouldBe DeckInputLimits.DESC_MAX
             }
         }
 

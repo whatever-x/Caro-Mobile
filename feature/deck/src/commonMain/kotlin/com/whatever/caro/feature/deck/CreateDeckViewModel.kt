@@ -19,11 +19,11 @@ class CreateDeckViewModel :
     }
 
     private fun handleUpdateName(name: String) {
-        reduce { copy(name = name.take(DeckInputDefaults.NAME_MAX)) }
+        reduce { copy(name = name.take(DeckInputLimits.NAME_MAX)) }
     }
 
     private fun handleUpdateDescription(description: String) {
-        reduce { copy(description = description.take(DeckInputDefaults.DESC_MAX)) }
+        reduce { copy(description = description.take(DeckInputLimits.DESC_MAX)) }
     }
 
     private fun handleConfirm() {
