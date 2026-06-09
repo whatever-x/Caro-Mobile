@@ -1,9 +1,11 @@
 package com.whatever.caro.composeApp.di
 
+import com.whatever.caro.core.navigator.entries.CreateDeckEntry
 import com.whatever.caro.core.navigator.entries.CreateProfileEntry
 import com.whatever.caro.core.navigator.entries.HomeEntry
 import com.whatever.caro.core.navigator.entries.LoginEntry
 import com.whatever.caro.core.navigator.entries.SplashEntry
+import com.whatever.caro.feature.deck.CreateDeckRoute
 import com.whatever.caro.feature.home.HomeViewModel
 import com.whatever.caro.feature.home.route.HomeRoute
 import com.whatever.caro.feature.login.LoginRoute
@@ -35,6 +37,13 @@ val navEntryModule: Module =
 
         navigation<CreateProfileEntry> {
             CreateProfileRoute(
+                viewModel = koinViewModel(),
+                navDispatcher = get(),
+            )
+        }
+
+        navigation<CreateDeckEntry> {
+            CreateDeckRoute(
                 viewModel = koinViewModel(),
                 navDispatcher = get(),
             )
