@@ -38,7 +38,6 @@ class CreateProfileViewModelTest : FunSpec() {
             dispatcher.cancel()
         }
 
-        // init 의 fetchRandomNickname 이 항상 닉네임을 채우도록 기본 스텁을 준 VM 팩토리.
         fun createViewModel(
             randomNickname: String = "기본닉네임",
             isAvailable: Boolean = true,
@@ -78,7 +77,6 @@ class CreateProfileViewModelTest : FunSpec() {
                 advanceUntilIdle()
 
                 viewModel.state.value.validationResult shouldBe NicknameValidationResult.TooShort
-                // 형식 검증 실패 시 가용성 API 를 호출하지 않아야 한다.
                 verifySuspend(exactly(0)) { profileRepository.isNicknameAvailable("a") }
             }
         }
