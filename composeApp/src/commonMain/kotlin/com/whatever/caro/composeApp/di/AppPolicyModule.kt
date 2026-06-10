@@ -1,5 +1,6 @@
 package com.whatever.caro.composeApp.di
 
+import com.whatever.caro.composeApp.policy.CaroExceptionFilter
 import com.whatever.caro.core.viewmodel.ExceptionFilter
 import org.koin.dsl.bind
 import org.koin.dsl.module

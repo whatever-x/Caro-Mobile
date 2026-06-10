@@ -1,4 +1,4 @@
-package com.whatever.caro.composeApp.di
+package com.whatever.caro.composeApp.policy
 
 import com.whatever.caro.core.model.exception.SilentlyHandledException
 import com.whatever.caro.core.viewmodel.ExceptionFilter
