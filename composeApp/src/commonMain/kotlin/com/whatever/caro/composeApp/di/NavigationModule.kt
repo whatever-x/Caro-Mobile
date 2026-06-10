@@ -7,7 +7,7 @@ import com.whatever.caro.core.navigator.entries.SplashEntry
 import com.whatever.caro.feature.home.HomeViewModel
 import com.whatever.caro.feature.home.route.HomeRoute
 import com.whatever.caro.feature.login.LoginRoute
-import com.whatever.caro.feature.profile.CreateProfileRoute
+import com.whatever.caro.feature.profile.route.CreateProfileRoute
 import com.whatever.caro.feature.splash.route.SplashRoute
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.annotation.KoinExperimentalAPI
