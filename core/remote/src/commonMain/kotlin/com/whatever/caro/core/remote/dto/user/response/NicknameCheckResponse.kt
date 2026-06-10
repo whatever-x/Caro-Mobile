@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class NicknameCheckResponse(
     /** 조회 대상 닉네임 */
-    val nickname: String? = null,
+    val nickname: String?,
     /** 사용 가능 여부 */
     val available: Boolean,
 )

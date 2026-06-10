@@ -9,10 +9,10 @@ data class CreateCardItem(
     /** 카드 필드 */
     val fields: Map<String, String>,
     /** 카드 타입 */
-    val cardType: CardType? = CardType.BASIC,
+    val cardType: CardTypeDto?,
 ) {
     @Serializable
-    enum class CardType {
+    enum class CardTypeDto {
         @SerialName("BASIC")
         BASIC,
     }

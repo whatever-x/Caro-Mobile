@@ -6,5 +6,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class CreateCardsRequest(
     /** 생성할 카드 묶음 목록 */
-    val items: List<CreateCardItem>,
+    val items: List<CreateCardItemDto>,
 )

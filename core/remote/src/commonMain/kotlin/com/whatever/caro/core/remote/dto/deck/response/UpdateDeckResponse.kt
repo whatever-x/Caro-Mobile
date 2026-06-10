@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 // AUTO-GENERATED FROM SWAGGER — 직접 수정하지 마세요
 @Serializable
 data class UpdateDeckResponse(
-    val id: Long? = null,
-    val deckName: String? = null,
-    val deckDescription: String? = null,
+    val id: Long?,
+    val deckName: String?,
+    val deckDescription: String?,
 )

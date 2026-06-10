@@ -6,9 +6,9 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class CreateDeckResponse(
     /** 덱 ID */
-    val id: Long? = null,
+    val id: Long?,
     /** 덱 이름 */
-    val deckName: String? = null,
+    val deckName: String?,
     /** 덱 설명 */
-    val deckDescription: String? = null,
+    val deckDescription: String?,
 )
