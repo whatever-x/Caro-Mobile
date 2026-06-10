@@ -1,6 +1,7 @@
 import com.whatever.caro.core.data.repository.AuthRepository
 import com.whatever.caro.core.navigator.entries.HomeEntry
 import com.whatever.caro.core.navigator.entries.Payload
+import com.whatever.caro.core.viewmodel.ExceptionFilter
 import com.whatever.caro.feature.home.HomeViewModel
 import com.whatever.caro.feature.home.di.homeModule
 import com.whatever.caro.feature.home.mvi.HomeState
@@ -32,6 +33,7 @@ class HomeViewModelTest :
                     homeModule,
                     module {
                         single<AuthRepository> { mock<AuthRepository>() }
+                        single<ExceptionFilter> { ExceptionFilter.None }
                     },
                 ),
             ),
