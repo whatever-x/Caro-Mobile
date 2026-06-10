@@ -1,14 +1,16 @@
 package com.whatever.caro.core.remote.datasource.profile
 
-import com.whatever.caro.core.remote.api.ProfileApi
-import com.whatever.caro.core.remote.model.profile.response.NicknameAvailabilityResponse
-import com.whatever.caro.core.remote.model.profile.response.RandomNicknameResponse
+import com.whatever.caro.core.remote.api.NicknameApi
+import com.whatever.caro.core.remote.api.UserApi
+import com.whatever.caro.core.remote.dto.nickname.response.NicknameResponse
+import com.whatever.caro.core.remote.dto.user.response.NicknameCheckResponse
 
 internal class RemoteProfileDataSourceImpl(
-    private val profileApi: ProfileApi,
+    private val nicknameApi: NicknameApi,
+    private val userApi: UserApi,
 ) : ProfileDataSource {
-    override suspend fun getRandomNickname(): RandomNicknameResponse = profileApi.getRandomNickname()
+    override suspend fun getRandomNickname(): NicknameResponse = nicknameApi.requestRandomNickname()
 
-    override suspend fun checkNicknameAvailability(nickname: String): NicknameAvailabilityResponse =
-        profileApi.checkNicknameAvailability(nickname = nickname)
+    override suspend fun checkNicknameAvailability(nickname: String): NicknameCheckResponse =
+        userApi.requestCheckNicknameAvailability(nickname = nickname)
 }

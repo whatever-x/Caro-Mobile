@@ -14,8 +14,13 @@ CRED_FILE="$SCRIPT_DIR/../.swagger-credentials"
 # --- 1. .swagger-credentials 파일이 있으면 로드 (환경변수가 없는 키만 채움) ---
 if [[ -f "$CRED_FILE" ]]; then
   while IFS='=' read -r key value; do
+    key="${key#$'\357\273\277'}"
+    key="${key%$'\r'}"
+    value="${value%$'\r'}"
     [[ -z "$key" || "$key" == \#* ]] && continue
     key="$(echo "$key" | xargs)"          # 공백 제거
+    [[ -z "$key" || "$key" == \#* ]] && continue
+    [[ "$key" =~ ^[A-Za-z_][A-Za-z0-9_]*$ ]] || continue
     if [[ -z "${!key:-}" ]]; then         # 환경변수가 이미 있으면 덮어쓰지 않음
       export "$key=$value"
     fi
