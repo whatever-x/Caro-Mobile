@@ -21,7 +21,7 @@ import kotlin.coroutines.EmptyCoroutineContext
 
 abstract class BaseViewModel<S : UiState, I : UiIntent, SE : UiSideEffect>(
     initialState: S,
-    private val exceptionFilter: ExceptionFilter = ExceptionFilter.None,
+    private val exceptionFilter: ExceptionFilter,
 ) : ViewModel() {
     protected abstract suspend fun handleIntent(intent: I)
 
