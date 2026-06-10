@@ -40,6 +40,7 @@ abstract class BaseViewModel<S : UiState, I : UiIntent, SE : UiSideEffect>(
 
     protected val coroutineExceptionHandler =
         CoroutineExceptionHandler { _, throwable ->
+            Napier.e { "handleClientException = ${throwable.message}" }
             if (exceptionFilter.shouldSuppress(throwable)) {
                 Napier.w(throwable = throwable) { "Suppressed by ExceptionFilter: ${throwable::class.simpleName}" }
             } else {
@@ -72,6 +73,5 @@ abstract class BaseViewModel<S : UiState, I : UiIntent, SE : UiSideEffect>(
         }
 
     open fun handleClientException(throwable: Throwable) {
-        Napier.e { "handleClientException = ${throwable.message}" }
     }
 }
