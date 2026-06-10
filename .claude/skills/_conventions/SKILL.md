@@ -1,13 +1,13 @@
 ---
 name: _conventions
 description: >
-  Caro-Mobile(KMP + Compose Multiplatform, com.whatever.caro)의 아키텍처 컨벤션 단일 출처.
+  Caro-Mobile(KMP + Compose Multiplatform, com.whatever.caro)의 아키텍처 컨벤션 요약(스킬 참조용, 원문은 CLAUDE.md).
   MVI(BaseViewModel)·Koin 컴파일러 플러그인·Navigation3·Compose resources·expect/actual·Kotest
   규칙을 요약한다. 다른 Compose/Kotlin/KMP 스킬이 "우리 컨벤션은?"을 물을 때 이 문서를 근거로 삼는다.
   "Caro 컨벤션", "우리 컨벤션", "모듈 구조", "MVI 구조", "화면 추가 절차" 같은 맥락에서 사용한다.
 ---
 
-# Caro 컨벤션 (단일 출처)
+# Caro 컨벤션 (요약 · 스킬 참조용)
 
 이 문서는 벤더링한 Compose/Kotlin/KMP 스킬들이 반복 인용하는 **우리 프로젝트 규칙**을 한곳에 모은 것이다.
 권위 있는 원문은 루트 `CLAUDE.md`이며, 이 문서는 스킬 적용 시 빠르게 참조하기 위한 요약이다.
