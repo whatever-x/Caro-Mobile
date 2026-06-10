@@ -16,18 +16,14 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 
 abstract class BaseViewModel<S : UiState, I : UiIntent, SE : UiSideEffect>(
     initialState: S,
-) : ViewModel(),
-    KoinComponent {
+    private val exceptionFilter: ExceptionFilter = ExceptionFilter.None,
+) : ViewModel() {
     protected abstract suspend fun handleIntent(intent: I)
-
-    private val exceptionFilter: ExceptionFilter by inject()
 
     private val _state = MutableStateFlow(initialState)
     val state = _state.asStateFlow()
