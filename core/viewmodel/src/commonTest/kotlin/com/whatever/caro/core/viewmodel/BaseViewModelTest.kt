@@ -7,7 +7,6 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
@@ -52,16 +51,24 @@ class BaseViewModelTest : FunSpec() {
 
         afterTest {
             Dispatchers.resetMain()
-            testDispatcher.cancel()
         }
 
         test("필터가 suppress=true 를 반환하면 handleClientException 이 호출되지 않는다") {
             runTest {
-                val viewModel = TestViewModel(exceptionFilter = ExceptionFilter { true })
+                var filtered: Throwable? = null
+                val viewModel =
+                    TestViewModel(
+                        exceptionFilter =
+                            ExceptionFilter { throwable ->
+                                filtered = throwable
+                                true
+                            },
+                    )
 
                 viewModel.intent(TestIntent.Throw)
                 advanceUntilIdle()
 
+                filtered?.message shouldBe "boom"
                 viewModel.handledThrowable shouldBe null
             }
         }
@@ -73,7 +80,7 @@ class BaseViewModelTest : FunSpec() {
                 viewModel.intent(TestIntent.Throw)
                 advanceUntilIdle()
 
-                viewModel.handledThrowable!!.message shouldBe "boom"
+                viewModel.handledThrowable?.message shouldBe "boom"
             }
         }
     }
