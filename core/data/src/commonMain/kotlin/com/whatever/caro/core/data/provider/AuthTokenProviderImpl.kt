@@ -12,7 +12,7 @@ import kotlinx.coroutines.CancellationException
 internal class AuthTokenProviderImpl(
     private val localAuthDataSource: LocalAuthDataSource,
     private val remoteNonAuthDatasource: RemoteNonAuthDataSource,
-    private val authSessionEventBus: AuthSessionEventBus
+    private val authSessionEventBus: AuthSessionEventBus,
 ) : AuthTokenProvider {
     override suspend fun getAccessToken(): String? = localAuthDataSource.fetchAccessToken()
 
