@@ -22,4 +22,16 @@
 	<string name="profile_field_rule_nickname">2-20 characters. Korean, English, numbers, -, and _
 		only</string>
 	<string name="profile_button_create">Create</string>
+	<!-- deck -->
+	<string name="deck_title_create">Create Deck</string>
+	<string name="deck_content_description_back">Go back</string>
+	<string name="deck_content_description_clear">Clear</string>
+	<string name="deck_field_label_name">Deck name</string>
+	<string name="deck_field_placeholder_name">2000 English words</string>
+	<string name="deck_field_label_description">Description</string>
+	<string name="deck_field_placeholder_description">Words used often in daily life</string>
+	<string name="deck_field_required">*</string>
+	<string name="deck_tip_label">TIP</string>
+	<string name="deck_tip_max_cards">You can add up to 200 cards per deck.</string>
+	<string name="deck_button_create">Create</string>
 </resources>

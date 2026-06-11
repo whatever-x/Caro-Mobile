@@ -232,3 +232,7 @@ Claude 외의 에이전트(Codex 등)는 자동 발견을 못 하므로, 아래 
 
 ## Creating Rule
 Remote data source implementation classes should carry a `Remote` prefix when the interface name is generic enough to be confused with repository/data-layer types (e.g., `RemoteProfileDataSourceImpl : ProfileDataSource`).
+
+상수 위치는 사용 범위로 결정한다. 한 화면(Screen)에서만 쓰는 UI 값은 그 Screen 파일의 `private const val`/`private val` 로 둔다. ViewModel·State·Test 등 feature 내부 여러 곳에서 공유하는 입력 제한·정책 값은 feature 패키지의 `internal object XxxLimits`(예: `DeckInputLimits`)로 분리한다. 서버 정책이나 도메인 규칙에 가까운 값은 domain/model 또는 repository 계층에서 관리한다.
+
+Screen 전용의 작은 `private` Composable 은 같은 Screen 파일에 둔다. 파일이 커지거나 다른 화면에서 재사용할 여지가 있는 UI 조각만 feature 내부 `components/` 패키지로 분리한다. 현재 feature(profile, deck 등)는 한 파일 유지가 기준선이며, `components/` 도입 시 기존 화면도 함께 정리해 구조를 일관되게 맞춘다.

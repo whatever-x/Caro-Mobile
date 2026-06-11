@@ -43,3 +43,6 @@ openapitools.json
 cookies.txt
 build/generated/
 
+# Design/spec docs (generated locally, not tracked)
+docs/
+

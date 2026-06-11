@@ -31,6 +31,7 @@ kotlin {
             api(projects.feature.login)
             implementation(projects.feature.splash)
             implementation(projects.feature.profile)
+            implementation(projects.feature.deck)
 
             implementation(libs.koin.compose.viewmodel)
             implementation(libs.koin.compose.navigation3)
