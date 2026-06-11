@@ -36,13 +36,13 @@
 
 ## 3. 아키텍처 (MVI, `feature/profile` 패턴 준수)
 
-```
+```text
 feature/deck/
 └ src/commonMain/kotlin/com/whatever/caro/feature/deck/
    ├ CreateDeckRoute.kt        # state 수집 + side effect 처리 (NavigateBack)
    ├ CreateDeckScreen.kt       # stateless UI (state + onIntent)
    ├ CreateDeckViewModel.kt    # BaseViewModel<State, Intent, SideEffect>
-   ├ DeckInputDefaults.kt      # 길이/카드 상수 (NAME_MAX=50, DESC_MAX=500, MAX_CARDS=200)
+   ├ DeckInputLimits.kt        # 길이/카드 상수 (NAME_MAX=50, DESC_MAX=500, MAX_CARDS=200)
    ├ di/DeckModule.kt          # viewModel<CreateDeckViewModel>()
    └ mvi/
       ├ CreateDeckIntent.kt
@@ -62,8 +62,8 @@ feature/deck/
   - `description: String = ""`
   - `isLoading: Boolean = false`
   - 파생 getter:
-    - `nameCount: String = "${name.length}/${DeckInputDefaults.NAME_MAX}"`
-    - `descriptionCount: String = "${description.length}/${DeckInputDefaults.DESC_MAX}"`
+    - `nameCount: String = "${name.length}/${DeckInputLimits.NAME_MAX}"`
+    - `descriptionCount: String = "${description.length}/${DeckInputLimits.DESC_MAX}"`
     - `isConfirmEnabled: Boolean = name.isNotBlank() && description.isNotBlank() && !isLoading`
 - **SideEffect** (`sealed interface CreateDeckSideEffect : UiSideEffect`)
   - `NavigateBack`
@@ -78,11 +78,11 @@ feature/deck/
 
 ### 3.3 화면 구조
 
-```
+```text
 CreateDeckRoute(viewModel, navDispatcher)
 └ CreateDeckScreen(state, onIntent)
    Column(fillMaxSize, background.primary)
-   ├ CaroTopBar(leading=ic_arrow_left_24 → ClickBack, center=title "덱 만들기")
+   ├ CaroTopBar(leading=ic_chevron_left_24 → ClickBack, center=title "덱 만들기")
    ├ Column(weight=1f, verticalScroll(rememberScrollState()), 좌우 패딩 xl)
    │  ├ DeckNameField        → CaroTextField (header 라벨+*, footer 카운터, clear trailingIcon)
    │  ├ DeckDescriptionField → CaroTextArea  (header 라벨+*, footer 카운터)
