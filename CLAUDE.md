@@ -208,5 +208,31 @@ Claude 외의 에이전트(Codex 등)는 자동 발견을 못 하므로, 아래 
       사내 규칙 적용 후 변경 시 브랜치 + 커밋까지.
     - 실행 스크립트: `scripts/*.sh`(mac/Linux), `scripts/*.ps1`(Windows)
 
+- **_conventions** → [`.claude/skills/_conventions/SKILL.md`](./.claude/skills/_conventions/SKILL.md)
+    - 트리거: "우리 컨벤션", "모듈 구조", "MVI 구조", "화면 추가 절차"
+    - 내용: Caro 아키텍처 규칙 요약(모듈 의존·MVI·BaseViewModel·Koin·Navigation3·Compose
+      resources·expect-actual·Kotest). 아래 컴포즈/코틀린 스킬이 "우리 컨벤션은?"의 근거로 삼는다.
+
+- **caro-compose-review** → [`.claude/skills/caro-compose-review/SKILL.md`](./.claude/skills/caro-compose-review/SKILL.md)
+    - 트리거: "컴포즈 리뷰", "Compose 리뷰", "UI 리뷰", "MVI 리뷰", "상태/사이드이펙트 점검"
+    - 내용: PR/diff를 `_conventions` 기반 체크리스트(A~K)로 점검. 일반 버그 리뷰와 보완 관계.
+
+- **Compose/Kotlin/KMP 스킬** (코딩·리뷰 중 해당 주제가 나오면 그 디렉토리의 `SKILL.md`를 읽고 따른다)
+    - `kotlin-multiplatform-expect-actual` — "expect/actual", "플랫폼 분기", "commonMain 경계"
+    - `kotlin-coroutines-structured-concurrency` — "코루틴 스코프", "취소", "runBlocking"
+    - `kotlin-flow-state-event-modeling` — "StateFlow vs Channel", "이벤트 모델링", "sideEffect"
+    - `compose-state-authoring` — "remember", "mutableStateOf", "상태 작성"
+    - `compose-state-hoisting` — "상태 끌어올리기", "state hoisting", "remember 어디"
+    - `compose-state-holder-ui-split` — "Route/Screen 분리", "상태홀더", "순수 UI"
+    - `compose-side-effects` — "LaunchedEffect", "DisposableEffect", "부수효과"
+    - `compose-recomposition-performance` — "리컴포지션", "성능", "안정성"
+    - `compose-slot-api-pattern` — "슬롯 API", "재사용 컴포넌트", "디자인시스템 컴포넌트"
+    - `compose-ui-testing-patterns` — "UI 테스트", "ViewModel 테스트", "Turbine"
+    - 개요·출처: [`.claude/skills/README.md`](./.claude/skills/README.md)
+
 ## Creating Rule
 Remote data source implementation classes should carry a `Remote` prefix when the interface name is generic enough to be confused with repository/data-layer types (e.g., `RemoteProfileDataSourceImpl : ProfileDataSource`).
+
+상수 위치는 사용 범위로 결정한다. 한 화면(Screen)에서만 쓰는 UI 값은 그 Screen 파일의 `private const val`/`private val` 로 둔다. ViewModel·State·Test 등 feature 내부 여러 곳에서 공유하는 입력 제한·정책 값은 feature 패키지의 `internal object XxxLimits`(예: `DeckInputLimits`)로 분리한다. 서버 정책이나 도메인 규칙에 가까운 값은 domain/model 또는 repository 계층에서 관리한다.
+
+Screen 전용의 작은 `private` Composable 은 같은 Screen 파일에 둔다. 파일이 커지거나 다른 화면에서 재사용할 여지가 있는 UI 조각만 feature 내부 `components/` 패키지로 분리한다. 현재 feature(profile, deck 등)는 한 파일 유지가 기준선이며, `components/` 도입 시 기존 화면도 함께 정리해 구조를 일관되게 맞춘다.

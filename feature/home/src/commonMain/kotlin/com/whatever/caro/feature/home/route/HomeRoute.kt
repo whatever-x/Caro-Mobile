@@ -6,6 +6,7 @@ import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.whatever.caro.core.navigator.contract.NavCommand.To
 import com.whatever.caro.core.navigator.dispatcher.NavigationDispatcher
+import com.whatever.caro.core.navigator.entries.CreateDeckEntry
 import com.whatever.caro.core.navigator.entries.CreateProfileEntry
 import com.whatever.caro.feature.home.HomeScreen
 import com.whatever.caro.feature.home.HomeViewModel
@@ -27,6 +28,10 @@ fun HomeRoute(
             when (sideEffect) {
                 is HomeSideEffect.NavigateToProfile -> {
                     navDispatcher.emit(command = To(key = CreateProfileEntry))
+                }
+
+                is HomeSideEffect.NavigateToCreateDeck -> {
+                    navDispatcher.emit(command = To(key = CreateDeckEntry))
                 }
             }
         }

@@ -21,6 +21,10 @@
 - **요청 DTO**: Swagger Schema 이름 그대로 사용한다 (예: `CreateDeckRequest`).
   - 기존 코드가 스펙과 어긋난 이름을 쓰고 있으면(예: `TokenRefreshRequest` → 스펙 `RefreshTokenRequest`), 스펙 이름으로 정정한다.
 - **응답 DTO (`ApiResponseXxx` 안의 내부 서버 DTO)**: Swagger Schema 이름 그대로 유지한다 (예: `CreateDeckResponse`, `SocialLoginResponse`). `Dto` 접미사를 붙이지 않는다.
+- **추가 확인 사항 (하위 DTO에는 `Dto` 접미사)**: 요청/응답 DTO 안에서만 쓰이는 하위 DTO에는 이름 끝에 `Dto`를 붙인다. "하위 DTO"는 다음 두 경우를 모두 포함한다.
+  - **DTO 안에 중첩 선언된 클래스/enum**: 예) `CreateDeckResponse` 내부에 `Foobar` 클래스가 있으면 `Foobar` → `FoobarDto`. (`CreateCardItem` 내부 enum `CardType` → `CardTypeDto`)
+  - **DTO의 필드/리스트 요소로 참조되는 별도 스키마**: 그 스키마 자체가 엔드포인트의 직접 요청 본문/응답 타입이 아니라면 `Dto`를 붙인다. 예) `CreateCardsRequest.items: List<CreateCardItem>`에서 `CreateCardItem`은 직접 페이로드가 아니므로 `CreateCardItem` → `CreateCardItemDto` (파일명·클래스·참조 모두 변경).
+  - **예외**: 해당 스키마가 어떤 엔드포인트의 **직접 요청 본문이거나 직접(unwrap된) 응답 타입이기도 하면** 스펙 이름을 그대로 유지한다(`Dto` 미부착). 예) `CardResponse`는 `CreateCardsResponse`에 중첩되지만 `GET /v1/cards/{id}`의 직접 응답이므로 `CardResponse` 유지.
 - **공유/에러 DTO (응답 래퍼와 무관한 독립 객체)**: 이름 끝에 `Dto`를 붙인다 (예: `ErrorDetailDto`, `FieldErrorDto`).
 - **enum**은 기존 `:core:model`에 정의되어 있으면 그것을 재사용한다 (예: `SocialLoginRequest.provider: SocialLoginType`). `:core:model`은 절대 수정/생성하지 않는다.
 
@@ -41,10 +45,11 @@
 
 ## nullable 처리
 
-- **신규 DTO**: 스펙의 `required` 목록에 포함된 필드는 non-null, 그 외는 nullable(`?`)이며 기본값 `= null`을 부여한다.
+- **신규 DTO**: 스펙의 `required` 목록에 포함된 필드는 non-null, 그 외는 nullable(`?`)이다.
 - **기존 DTO 갱신**: 기존 코드의 nullability를 유지한다.
   - 호출부가 non-null로 사용 중인 필드를 스펙만 보고 nullable로 바꾸면 cascading 수정(`orEmpty()` 등)이 불가피하므로, 의도된 non-null은 그대로 둔다.
   - 단, 스펙에서 **필드 자체가 사라졌거나 타입이 변경된 경우**(breaking change)는 그에 맞춰 반영하고 호출부를 함께 수정한다.
+  - 신규 DTO 생성때와 마찬가지로 non-null, nullable을 구분하고 default 기본값은 설정하지 않는다.
 
 ## 네이밍
 

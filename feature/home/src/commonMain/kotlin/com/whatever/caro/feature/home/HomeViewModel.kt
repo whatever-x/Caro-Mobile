@@ -23,6 +23,7 @@ class HomeViewModel(
             HomeIntent.ClickLogout -> testClickLogout()
             HomeIntent.ClickSignUp -> testClickSignUp()
             HomeIntent.ClickProfile -> postSideEffect(HomeSideEffect.NavigateToProfile)
+            HomeIntent.ClickCreateDeck -> postSideEffect(HomeSideEffect.NavigateToCreateDeck)
         }
     }
 

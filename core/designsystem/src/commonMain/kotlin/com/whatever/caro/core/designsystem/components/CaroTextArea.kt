@@ -30,6 +30,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -54,6 +56,7 @@ fun CaroTextArea(
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+    focusRequester: FocusRequester? = null,
 ) {
     Column(
         modifier = modifier.fillMaxWidth(),
@@ -73,6 +76,7 @@ fun CaroTextArea(
                 keyboardOptions = keyboardOptions,
                 keyboardActions = keyboardActions,
                 interactionSource = interactionSource,
+                focusRequester = focusRequester,
             )
 
             footer?.invoke()
@@ -90,6 +94,7 @@ private fun TextAreaBox(
     keyboardOptions: KeyboardOptions,
     keyboardActions: KeyboardActions,
     interactionSource: MutableInteractionSource,
+    focusRequester: FocusRequester?,
 ) {
     val isFocused by interactionSource.collectIsFocusedAsState()
 
@@ -147,7 +152,10 @@ private fun TextAreaBox(
                     modifier =
                         Modifier
                             .fillMaxSize()
-                            .verticalScroll(rememberScrollState()),
+                            .verticalScroll(rememberScrollState())
+                            .then(
+                                focusRequester?.let { Modifier.focusRequester(it) } ?: Modifier,
+                            ),
                     enabled = enabled,
                     readOnly = readOnly,
                     textStyle = mergedTextStyle,
