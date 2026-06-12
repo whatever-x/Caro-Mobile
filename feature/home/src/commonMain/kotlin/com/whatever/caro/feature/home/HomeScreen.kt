@@ -19,13 +19,16 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import caromobile.core.designsystem.generated.resources.Res
 import caromobile.core.designsystem.generated.resources.home_banner_title
+import caromobile.core.designsystem.generated.resources.home_deck_field_empty
 import caromobile.core.designsystem.generated.resources.home_floating_button
 import caromobile.core.designsystem.generated.resources.home_learning_days
 import caromobile.core.designsystem.generated.resources.ic_add_24
@@ -41,15 +44,32 @@ import com.whatever.caro.core.ui.noRippleClickable
 import com.whatever.caro.feature.home.component.Deck
 import com.whatever.caro.feature.home.mvi.HomeIntent
 import com.whatever.caro.feature.home.mvi.HomeState
+import io.github.alexzhirkevich.compottie.Compottie
+import io.github.alexzhirkevich.compottie.ExperimentalCompottieApi
+import io.github.alexzhirkevich.compottie.Lottie
+import io.github.alexzhirkevich.compottie.LottieClipSpec
+import io.github.alexzhirkevich.compottie.LottieCompositionSpec
+import io.github.alexzhirkevich.compottie.Resource
+import io.github.alexzhirkevich.compottie.rememberLottieComposition
+import io.github.alexzhirkevich.compottie.rememberLottiePainter
+import kotlinx.collections.immutable.persistentListOf
+import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
+private const val ARROW_BOUNCE_LOOP_END_PROGRESS = 35f / 60f
+
+@OptIn(ExperimentalResourceApi::class, ExperimentalCompottieApi::class)
 @Composable
 internal fun HomeScreen(
     state: HomeState,
     onIntent: (HomeIntent) -> Unit,
 ) {
     val scrollState = rememberScrollState()
+    val lottieComposition by rememberLottieComposition(
+        LottieCompositionSpec.Resource(Res.getUri("files/arrow_down_bounce.json")),
+    )
+
     Box(
         modifier =
             Modifier
@@ -140,60 +160,91 @@ internal fun HomeScreen(
                     )
                 }
             }
-            LazyColumn(
-                modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = CaroTheme.spacing.xl2),
-                verticalArrangement = Arrangement.spacedBy(space = CaroTheme.spacing.m),
-            ) {
-                items(
-                    items = state.decks,
-                    key = { deck -> deck.id },
+            if (!state.isDeckEmpty) {
+                LazyColumn(
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = CaroTheme.spacing.xl2),
+                    verticalArrangement = Arrangement.spacedBy(space = CaroTheme.spacing.m),
                 ) {
-                    Deck(
-                        title = it.title,
-                        description = it.description,
-                        cardTotalCount = it.cardTotalCount,
-                        todayLearningPercentage = it.todayProgress,
-                        state = it.state,
-                        onLearnClick = {
-                            onIntent(HomeIntent.ClickDeckButton(deckId = it.id))
-                        },
-                    )
+                    items(
+                        items = state.decks,
+                        key = { deck -> deck.id },
+                    ) {
+                        Deck(
+                            title = it.title,
+                            description = it.description,
+                            cardTotalCount = it.cardTotalCount,
+                            todayLearningPercentage = it.todayProgress,
+                            state = it.state,
+                            onLearnClick = {
+                                onIntent(HomeIntent.ClickDeckButton(deckId = it.id))
+                            },
+                        )
+                    }
                 }
             }
         }
-        Row(
+        if (state.isDeckEmpty) {
+            Text(
+                modifier =
+                    Modifier
+                        .align(alignment = Alignment.Center)
+                        .padding(horizontal = CaroTheme.spacing.xl2),
+                text = stringResource(resource = Res.string.home_deck_field_empty),
+                style = CaroTheme.typography.heading3,
+                color = CaroTheme.color.text.primary,
+                textAlign = TextAlign.Center,
+            )
+        }
+        Column(
             modifier =
                 Modifier
                     .align(alignment = Alignment.BottomCenter)
-                    .padding(bottom = 24.dp)
-                    .background(
-                        shape = CaroTheme.shape.xxl,
-                        color = CaroTheme.color.button.surface.floating,
-                    ).padding(horizontal = CaroTheme.spacing.l, vertical = CaroTheme.spacing.m)
-                    .noRippleClickable {
-                        onIntent(HomeIntent.ClickCreateDeckButton)
-                    },
-            horizontalArrangement =
-                Arrangement.spacedBy(
-                    space = CaroTheme.spacing.s,
-                    alignment = Alignment.CenterHorizontally,
-                ),
-            verticalAlignment = Alignment.CenterVertically,
+                    .padding(bottom = 24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Icon(
-                painter = painterResource(resource = Res.drawable.ic_add_24),
-                tint = CaroTheme.color.icon.inverse,
-                contentDescription = null,
-            )
+            if (state.isDeckEmpty) {
+                Lottie(
+                    painter =
+                        rememberLottiePainter(
+                            composition = lottieComposition,
+                            iterations = Compottie.IterateForever,
+                            clipSpec = LottieClipSpec.Progress(0f, ARROW_BOUNCE_LOOP_END_PROGRESS),
+                        ),
+                    contentDescription = null,
+                )
+            }
+            Row(
+                modifier =
+                    Modifier
+                        .background(
+                            shape = CaroTheme.shape.xxl,
+                            color = CaroTheme.color.button.surface.floating,
+                        ).padding(horizontal = CaroTheme.spacing.l, vertical = CaroTheme.spacing.m)
+                        .noRippleClickable {
+                            onIntent(HomeIntent.ClickCreateDeckButton)
+                        },
+                horizontalArrangement =
+                    Arrangement.spacedBy(
+                        space = CaroTheme.spacing.s,
+                        alignment = Alignment.CenterHorizontally,
+                    ),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Icon(
+                    painter = painterResource(resource = Res.drawable.ic_add_24),
+                    tint = CaroTheme.color.icon.inverse,
+                    contentDescription = null,
+                )
 
-            Text(
-                text = stringResource(resource = Res.string.home_floating_button),
-                style = CaroTheme.typography.body2.semiBold,
-                color = CaroTheme.color.text.inverse,
-            )
+                Text(
+                    text = stringResource(resource = Res.string.home_floating_button),
+                    style = CaroTheme.typography.body2.semiBold,
+                    color = CaroTheme.color.text.inverse,
+                )
+            }
         }
     }
 }
@@ -242,11 +293,27 @@ private fun HomeScreenPreview() {
                     additionalDescription = "화이또~",
                     learningDays = 10,
                     decks =
-                        listOf(
+                        persistentListOf(
                             notStarted,
                             learning,
                             complete,
                         ),
+                ),
+            onIntent = {},
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun HomeScreenEmptyDeckPreview() {
+    CaroTheme {
+        HomeScreen(
+            state =
+                HomeState(
+                    nickname = "승우",
+                    additionalDescription = "화이또~",
+                    learningDays = 10,
                 ),
             onIntent = {},
         )
