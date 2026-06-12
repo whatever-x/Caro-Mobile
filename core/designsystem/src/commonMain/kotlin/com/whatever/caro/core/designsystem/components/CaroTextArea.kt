@@ -201,7 +201,7 @@ private fun CaroTextAreaWithTitlePreview() {
             header = {
                 Text(
                     text = "자기소개",
-                    style = CaroTheme.typography.label1.bold,
+                    style = CaroTheme.typography.label1,
                     color = CaroTheme.color.text.primary,
                 )
             },
@@ -224,12 +224,12 @@ private fun CaroTextAreaRequiredPreview() {
                 ) {
                     Text(
                         text = "자기소개",
-                        style = CaroTheme.typography.label1.bold,
+                        style = CaroTheme.typography.label1,
                         color = CaroTheme.color.text.primary,
                     )
                     Text(
                         text = "*",
-                        style = CaroTheme.typography.label1.bold,
+                        style = CaroTheme.typography.label1,
                         color = CaroTheme.color.text.accent,
                     )
                 }
@@ -249,7 +249,7 @@ private fun CaroTextAreaWithCaptionPreview() {
             header = {
                 Text(
                     text = "자기소개",
-                    style = CaroTheme.typography.label1.bold,
+                    style = CaroTheme.typography.label1,
                     color = CaroTheme.color.text.primary,
                 )
             },
@@ -277,7 +277,7 @@ private fun CaroTextAreaWithCounterPreview() {
             header = {
                 Text(
                     text = "자기소개",
-                    style = CaroTheme.typography.label1.bold,
+                    style = CaroTheme.typography.label1,
                     color = CaroTheme.color.text.primary,
                 )
             },
@@ -317,12 +317,12 @@ private fun CaroTextAreaFilledPreview() {
                 ) {
                     Text(
                         text = "자기소개",
-                        style = CaroTheme.typography.label1.bold,
+                        style = CaroTheme.typography.label1,
                         color = CaroTheme.color.text.primary,
                     )
                     Text(
                         text = "*",
-                        style = CaroTheme.typography.label1.bold,
+                        style = CaroTheme.typography.label1,
                         color = CaroTheme.color.text.accent,
                     )
                 }
@@ -369,7 +369,7 @@ private fun CaroTextAreaOverflowPreview() {
             header = {
                 Text(
                     text = "자기소개",
-                    style = CaroTheme.typography.label1.bold,
+                    style = CaroTheme.typography.label1,
                     color = CaroTheme.color.text.primary,
                 )
             },
@@ -402,7 +402,7 @@ private fun CaroTextAreaCustomFooterPreview() {
             header = {
                 Text(
                     text = "자기소개",
-                    style = CaroTheme.typography.label1.bold,
+                    style = CaroTheme.typography.label1,
                     color = CaroTheme.color.text.primary,
                 )
             },
@@ -428,7 +428,7 @@ private fun CaroTextAreaDisabledPreview() {
             header = {
                 Text(
                     text = "자기소개",
-                    style = CaroTheme.typography.label1.bold,
+                    style = CaroTheme.typography.label1,
                     color = CaroTheme.color.text.disable,
                 )
             },

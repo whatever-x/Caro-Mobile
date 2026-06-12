@@ -80,7 +80,7 @@ fun CaroSnackbar(
         contentAlignment = Alignment.Center,
     ) {
         Text(
-            style = CaroTheme.typography.body2.regular,
+            style = CaroTheme.typography.body3,
             text = snackbarData.visuals.message,
             textAlign = TextAlign.Center,
             color = CaroTheme.color.text.inverse,

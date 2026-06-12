@@ -168,7 +168,7 @@ private fun NicknameHeader(onRefreshClick: () -> Unit) {
             )
             Text(
                 text = stringResource(Res.string.profile_field_required),
-                style = CaroTheme.typography.label1.bold,
+                style = CaroTheme.typography.label1,
                 color = CaroTheme.color.text.accent,
             )
         }
@@ -247,7 +247,7 @@ private fun CtaButton(
     ) {
         Text(
             text = stringResource(Res.string.profile_button_create),
-            style = CaroTheme.typography.label1.regular,
+            style = CaroTheme.typography.label1,
             color = CaroTheme.color.text.inverse,
         )
     }

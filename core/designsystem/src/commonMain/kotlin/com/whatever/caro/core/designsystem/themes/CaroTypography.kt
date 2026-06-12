@@ -17,6 +17,7 @@ data class CaroTypography(
     val body1: TextStyle,
     val body2: Body2Style,
     val body3: TextStyle,
+    val label1: TextStyle,
     val label2: TextStyle,
     val caption1: TextStyle,
     val robotoLabel1: TextStyle,
@@ -99,6 +100,12 @@ data class CaroTypography(
                     fontWeight = FontWeight.W400,
                     fontSize = 14.sp,
                     lineHeight = 22.sp,
+                ),
+            label1 =
+                TextStyle(
+                    fontFamily = pretendard,
+                    fontWeight = FontWeight.W700,
+                    fontSize = 16.sp,
                 ),
             label2 =
                 TextStyle(
