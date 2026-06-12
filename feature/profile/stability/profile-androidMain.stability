@@ -51,4 +51,3 @@ private fun com.whatever.caro.feature.profile.NicknameHeader(onRefreshClick: kot
   restartable: true
   params:
     - onRefreshClick: STABLE (function type)
-
