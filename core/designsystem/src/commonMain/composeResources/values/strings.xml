@@ -34,7 +34,6 @@
 	<string name="deck_tip_label">TIP</string>
 	<string name="deck_tip_max_cards">You can add up to 200 cards per deck.</string>
 	<string name="deck_button_create">Create</string>
-
 	<!-- home -->
 	<string name="home_banner_title">Hello, %1$s!</string>
 	<string name="home_learning_days">Learning Streak: %1$d Days</string>
@@ -44,4 +43,5 @@
 	<string name="home_deck_button_not_started">Start Learning</string>
 	<string name="home_deck_button_learning">Continue Learning</string>
 	<string name="home_floating_button">Create Deck</string>
+    <string name="home_deck_field_empty">Create a deck to begin learning.</string>
 </resources>

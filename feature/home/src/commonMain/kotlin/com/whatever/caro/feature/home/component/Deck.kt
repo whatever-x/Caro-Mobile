@@ -20,6 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -81,6 +82,8 @@ internal fun Deck(
             text = description,
             style = CaroTheme.typography.body3,
             color = CaroTheme.color.text.secondary,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
         )
         Spacer(modifier = Modifier.size(size = progressSpace))
         LinearProgressIndicator(
@@ -168,21 +171,21 @@ private fun DeckStateBadge(
     // FIXME: 디자인 토큰 재적용 필요
     val backgroundColor =
         when (state) {
-            DeckState.NOT_STARTED -> CaroTheme.color.text.brand
-            DeckState.LEARNING -> CaroTheme.color.text.brand
-            DeckState.COMPLETE -> CaroTheme.color.text.brand
+            DeckState.NOT_STARTED -> Color(0xFFFFEFCD)
+            DeckState.LEARNING -> Color(0xFFC9D3FD)
+            DeckState.COMPLETE -> Color(0xFFF8F8F9)
         }
     val borderColor =
         when (state) {
-            DeckState.NOT_STARTED -> CaroTheme.color.text.brand
-            DeckState.LEARNING -> CaroTheme.color.text.brand
-            DeckState.COMPLETE -> CaroTheme.color.text.brand
+            DeckState.NOT_STARTED -> Color(0xFFFFEFCD)
+            DeckState.LEARNING -> Color(0xFFC9D3FD)
+            DeckState.COMPLETE -> Color(0xFFD8DADD)
         }
     val textColor =
         when (state) {
-            DeckState.NOT_STARTED -> CaroTheme.color.text.brand
-            DeckState.LEARNING -> CaroTheme.color.text.brand
-            DeckState.COMPLETE -> CaroTheme.color.text.brand
+            DeckState.NOT_STARTED -> Color(0xFF8D6500)
+            DeckState.LEARNING ->  CaroTheme.color.text.brand
+            DeckState.COMPLETE -> CaroTheme.color.text.secondary
         }
     val stringRes =
         when (state) {
