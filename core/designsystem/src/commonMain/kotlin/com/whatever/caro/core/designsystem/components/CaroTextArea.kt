@@ -112,7 +112,7 @@ private fun TextAreaBox(
         }
     val borderColor =
         when {
-            !enabled -> CaroTheme.color.border.disable
+            !enabled -> CaroTheme.color.border.disabled
             isFocused -> CaroTheme.color.border.brand
             else -> CaroTheme.color.border.secondary
         }
