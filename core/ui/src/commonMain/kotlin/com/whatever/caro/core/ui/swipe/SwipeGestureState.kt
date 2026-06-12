@@ -2,6 +2,7 @@ package com.whatever.caro.core.ui.swipe
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationSpec
+import androidx.compose.animation.core.AnimationVector1D
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
@@ -18,7 +19,9 @@ import androidx.compose.ui.geometry.Offset
  * @author gunhyung
  */
 @Stable
-class SwipeGestureState internal constructor() {
+class SwipeGestureState internal constructor(
+    private val animationProgress: Animatable<Float, AnimationVector1D>,
+) {
     /**
      * 현재 composable이 이동한 좌표입니다.
      */
@@ -90,18 +93,18 @@ class SwipeGestureState internal constructor() {
         isAnimationRunning = true
         try {
             val startOffset = offset
-            Animatable(initialValue = 0f)
-                .animateTo(
-                    targetValue = 1f,
-                    animationSpec = animationSpec,
-                ) {
-                    offset =
-                        lerp(
-                            start = startOffset,
-                            stop = targetOffset,
-                            fraction = value,
-                        )
-                }
+            animationProgress.snapTo(targetValue = 0f)
+            animationProgress.animateTo(
+                targetValue = 1f,
+                animationSpec = animationSpec,
+            ) {
+                offset =
+                    lerp(
+                        start = startOffset,
+                        stop = targetOffset,
+                        fraction = value,
+                    )
+            }
         } finally {
             isAnimationRunning = false
         }
@@ -122,7 +125,12 @@ class SwipeGestureState internal constructor() {
  * @author gunhyung
  */
 @Composable
-fun rememberSwipeGestureState(): SwipeGestureState =
-    remember {
-        SwipeGestureState()
+fun rememberSwipeGestureState(): SwipeGestureState {
+    val animationProgress = remember { Animatable(initialValue = 0f) }
+
+    return remember(animationProgress) {
+        SwipeGestureState(
+            animationProgress = animationProgress,
+        )
     }
+}
