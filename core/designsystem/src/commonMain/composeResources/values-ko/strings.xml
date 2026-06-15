@@ -37,7 +37,7 @@
     <string name="home_deck_badge_not_started">학습 전</string>
     <string name="home_deck_badge_learning">학습 중</string>
     <string name="home_deck_badge_complete">완료</string>
-    <string name="home_deck_button_not_started">완료</string>
+    <string name="home_deck_button_not_started">학습 시작</string>
     <string name="home_deck_button_learning">이어서 학습</string>
     <string name="home_floating_button">덱 만들기</string>
     <string name="home_deck_field_empty">덱을 먼저 만들고\n학습을 시작해 보세요.</string>
