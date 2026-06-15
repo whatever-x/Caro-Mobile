@@ -83,7 +83,7 @@ internal fun Deck(
             style = CaroTheme.typography.body3,
             color = CaroTheme.color.text.secondary,
             maxLines = 1,
-            overflow = TextOverflow.Ellipsis
+            overflow = TextOverflow.Ellipsis,
         )
         Spacer(modifier = Modifier.size(size = progressSpace))
         LinearProgressIndicator(
@@ -184,7 +184,7 @@ private fun DeckStateBadge(
     val textColor =
         when (state) {
             DeckState.NOT_STARTED -> Color(0xFF8D6500)
-            DeckState.LEARNING ->  CaroTheme.color.text.brand
+            DeckState.LEARNING -> CaroTheme.color.text.brand
             DeckState.COMPLETE -> CaroTheme.color.text.secondary
         }
     val stringRes =

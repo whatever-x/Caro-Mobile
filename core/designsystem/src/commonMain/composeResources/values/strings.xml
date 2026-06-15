@@ -43,5 +43,5 @@
 	<string name="home_deck_button_not_started">Start Learning</string>
 	<string name="home_deck_button_learning">Continue Learning</string>
 	<string name="home_floating_button">Create Deck</string>
-    <string name="home_deck_field_empty">Create a deck to begin learning.</string>
+	<string name="home_deck_field_empty">Create a deck to begin learning.</string>
 </resources>
