@@ -93,7 +93,7 @@ internal fun Deck(
                     .height(height = 8.dp)
                     .clip(shape = CaroTheme.shape.xs),
             drawStopIndicator = {},
-            progress = { todayLearningPercentage.toFloat() / 100f },
+            progress = { todayLearningPercentage.coerceIn(0, 100).toFloat() / 100f },
             color = CaroTheme.color.surface.brand,
             trackColor = CaroTheme.color.surface.tertiary,
         )
