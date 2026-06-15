@@ -19,9 +19,7 @@ kotlin {
             implementation(projects.core.model)
             implementation(projects.core.util)
             implementation(libs.compottie)
-            implementation(libs.compottie.dot)
             implementation(libs.compottie.lite)
-            implementation(libs.compottie.network)
             implementation(libs.compottie.resources)
         }
     }

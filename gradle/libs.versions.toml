@@ -151,8 +151,6 @@ coil-network-ktor3 = { module = "io.coil-kt.coil3:coil-network-ktor3", version.r
 coil-mp = { module = "io.coil-kt.coil3:coil", version.ref = "coil3" }
 compottie = { module = "io.github.alexzhirkevich:compottie", version.ref = "compottie" }
 compottie-lite = { module = "io.github.alexzhirkevich:compottie-lite", version.ref = "compottie" }
-compottie-dot = { module = "io.github.alexzhirkevich:compottie-dot", version.ref = "compottie" }
-compottie-network = { module = "io.github.alexzhirkevich:compottie-network", version.ref = "compottie" }
 compottie-resources = { module = "io.github.alexzhirkevich:compottie-resources", version.ref = "compottie" }
 
 
