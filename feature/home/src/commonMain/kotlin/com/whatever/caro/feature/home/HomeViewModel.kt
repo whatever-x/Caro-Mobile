@@ -4,6 +4,7 @@ import com.whatever.caro.core.viewmodel.BaseViewModel
 import com.whatever.caro.feature.home.mvi.HomeIntent
 import com.whatever.caro.feature.home.mvi.HomeSideEffect
 import com.whatever.caro.feature.home.mvi.HomeState
+import io.github.aakira.napier.Napier
 
 class HomeViewModel :
     BaseViewModel<HomeState, HomeIntent, HomeSideEffect>(
@@ -14,9 +15,9 @@ class HomeViewModel :
 
     override suspend fun handleIntent(intent: HomeIntent) {
         when (intent) {
-            HomeIntent.ClickCreateDeckButton -> TODO()
-            is HomeIntent.ClickDeckButton -> TODO()
-            HomeIntent.ClickSettingButton -> TODO()
+            HomeIntent.ClickCreateDeckButton -> Napier.d { "intent: $intent" }
+            is HomeIntent.ClickDeckButton -> Napier.d { "intent: $intent" }
+            HomeIntent.ClickSettingButton -> Napier.d { "intent: $intent" }
             HomeIntent.ClickProfile -> postSideEffect(HomeSideEffect.NavigateToProfile)
             HomeIntent.ClickCreateDeck -> postSideEffect(HomeSideEffect.NavigateToCreateDeck)
         }

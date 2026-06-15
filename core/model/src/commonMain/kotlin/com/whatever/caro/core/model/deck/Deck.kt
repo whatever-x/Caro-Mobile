@@ -14,6 +14,6 @@ data class Deck(
             if (todayLearningCount == 0) {
                 0
             } else {
-                (todayCompleteCount / todayLearningCount) * 100
+                ((todayCompleteCount * 100) / todayLearningCount).coerceIn(0, 100)
             }
 }

@@ -65,7 +65,6 @@ internal fun HomeScreen(
     state: HomeState,
     onIntent: (HomeIntent) -> Unit,
 ) {
-    val scrollState = rememberScrollState()
     val lottieComposition by rememberLottieComposition(
         LottieCompositionSpec.Resource(Res.getUri("files/arrow_down_bounce.json")),
     )
@@ -99,91 +98,87 @@ internal fun HomeScreen(
                     )
                 },
             )
-            Column(
+
+            LazyColumn(
                 modifier =
                     Modifier
                         .fillMaxWidth()
-                        .verticalScroll(state = scrollState),
+                        .padding(bottom = 72.dp),
             ) {
-                Row(
-                    modifier =
-                        Modifier
-                            .fillMaxWidth()
-                            .background(color = CaroTheme.color.background.brand)
-                            .padding(horizontal = CaroTheme.spacing.xl2)
-                            .padding(bottom = 21.dp),
-                ) {
-                    Column(
-                        modifier = Modifier.weight(1f),
+                item {
+                    Row(
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .background(color = CaroTheme.color.background.brand)
+                                .padding(horizontal = CaroTheme.spacing.xl2)
+                                .padding(bottom = 24.dp),
                     ) {
-                        Text(
-                            text = stringResource(Res.string.home_banner_title, state.nickname),
-                            style = CaroTheme.typography.display,
-                            color = CaroTheme.color.text.inverse,
-                        )
-                        Spacer(modifier = Modifier.size(size = CaroTheme.spacing.s))
-                        Text(
-                            text = state.additionalDescription,
-                            style = CaroTheme.typography.body3,
-                        )
-                        Spacer(modifier = Modifier.size(size = CaroTheme.spacing.l))
-                        Row(
-                            modifier =
-                                Modifier
-                                    .clip(
-                                        shape = RoundedCornerShape(size = 50.dp),
-                                    ).background(color = CaroTheme.color.overlay.light)
-                                    .padding(
-                                        horizontal = CaroTheme.spacing.m,
-                                        vertical = CaroTheme.spacing.s,
-                                    ),
-                            horizontalArrangement = Arrangement.spacedBy(space = CaroTheme.spacing.xs),
+                        Column(
+                            modifier = Modifier.weight(1f),
                         ) {
-                            Image(
-                                modifier = Modifier.size(size = 18.dp),
-                                painter = painterResource(resource = Res.drawable.img_fire),
-                                contentDescription = null,
-                            )
                             Text(
-                                text =
-                                    stringResource(
-                                        Res.string.home_learning_days,
-                                        state.learningDays,
-                                    ),
-                                style = CaroTheme.typography.body2.semiBold,
-                                color = CaroTheme.color.text.warning,
+                                text = stringResource(Res.string.home_banner_title, state.nickname),
+                                style = CaroTheme.typography.display,
+                                color = CaroTheme.color.text.inverse,
                             )
+                            Spacer(modifier = Modifier.size(size = CaroTheme.spacing.s))
+                            Text(
+                                text = state.additionalDescription,
+                                style = CaroTheme.typography.body3,
+                            )
+                            Spacer(modifier = Modifier.size(size = CaroTheme.spacing.l))
+                            Row(
+                                modifier =
+                                    Modifier
+                                        .clip(
+                                            shape = RoundedCornerShape(size = 50.dp),
+                                        ).background(color = CaroTheme.color.overlay.light)
+                                        .padding(
+                                            horizontal = CaroTheme.spacing.m,
+                                            vertical = CaroTheme.spacing.s,
+                                        ),
+                                horizontalArrangement = Arrangement.spacedBy(space = CaroTheme.spacing.xs),
+                            ) {
+                                Image(
+                                    modifier = Modifier.size(size = 18.dp),
+                                    painter = painterResource(resource = Res.drawable.img_fire),
+                                    contentDescription = null,
+                                )
+                                Text(
+                                    text =
+                                        stringResource(
+                                            Res.string.home_learning_days,
+                                            state.learningDays,
+                                        ),
+                                    style = CaroTheme.typography.body2.semiBold,
+                                    color = CaroTheme.color.text.warning,
+                                )
+                            }
                         }
-                    }
-                    Image(
-                        painter = painterResource(resource = Res.drawable.img_home_banner),
-                        contentDescription = null,
-                    )
-                }
-            }
-            if (!state.isDeckEmpty) {
-                LazyColumn(
-                    modifier =
-                        Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = CaroTheme.spacing.xl2),
-                    verticalArrangement = Arrangement.spacedBy(space = CaroTheme.spacing.m),
-                ) {
-                    items(
-                        items = state.decks,
-                        key = { deck -> deck.id },
-                    ) {
-                        Deck(
-                            title = it.title,
-                            description = it.description,
-                            cardTotalCount = it.cardTotalCount,
-                            todayLearningPercentage = it.todayProgress,
-                            state = it.state,
-                            onLearnClick = {
-                                onIntent(HomeIntent.ClickDeckButton(deckId = it.id))
-                            },
+                        Image(
+                            painter = painterResource(resource = Res.drawable.img_home_banner),
+                            contentDescription = null,
                         )
                     }
+                }
+
+                items(
+                    items = state.decks,
+                    key = { deck -> deck.id },
+                ) {
+                    Deck(
+                        modifier = Modifier.padding(horizontal = CaroTheme.spacing.xl2),
+                        title = it.title,
+                        description = it.description,
+                        cardTotalCount = it.cardTotalCount,
+                        todayLearningPercentage = it.todayProgress,
+                        state = it.state,
+                        onLearnClick = {
+                            onIntent(HomeIntent.ClickDeckButton(deckId = it.id))
+                        },
+                    )
+                    Spacer(modifier = Modifier.size(size = CaroTheme.spacing.m))
                 }
             }
         }

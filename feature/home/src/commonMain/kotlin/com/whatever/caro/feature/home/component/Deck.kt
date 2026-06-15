@@ -74,7 +74,6 @@ internal fun Deck(
                 color = CaroTheme.color.text.primary,
                 overflow = TextOverflow.Ellipsis,
             )
-
             DeckStateBadge(state = state)
         }
         Spacer(modifier = Modifier.size(size = CaroTheme.spacing.s))
@@ -171,8 +170,8 @@ private fun DeckStateBadge(
     // FIXME: 디자인 토큰 재적용 필요
     val backgroundColor =
         when (state) {
-            DeckState.NOT_STARTED -> Color(0xFFFFEFCD)
-            DeckState.LEARNING -> Color(0xFFC9D3FD)
+            DeckState.NOT_STARTED -> Color(0xFFFFF9EE)
+            DeckState.LEARNING -> Color(0xFFEDF0FE)
             DeckState.COMPLETE -> Color(0xFFF8F8F9)
         }
     val borderColor =
@@ -194,12 +193,14 @@ private fun DeckStateBadge(
             DeckState.COMPLETE -> Res.string.home_deck_badge_complete
         }
 
+    val badgeShape = RoundedCornerShape(size = 20.dp)
+
     Text(
         modifier =
             modifier
-                .background(shape = RoundedCornerShape(size = 20.dp), color = backgroundColor)
-                .padding(vertical = CaroTheme.spacing.xs, horizontal = CaroTheme.spacing.s)
-                .border(width = 1.dp, color = borderColor),
+                .background(color = backgroundColor, shape = badgeShape)
+                .border(width = 1.dp, color = borderColor, shape = badgeShape)
+                .padding(vertical = CaroTheme.spacing.xs, horizontal = CaroTheme.spacing.s),
         text = stringResource(stringRes),
         style = CaroTheme.typography.caption1,
         color = textColor,

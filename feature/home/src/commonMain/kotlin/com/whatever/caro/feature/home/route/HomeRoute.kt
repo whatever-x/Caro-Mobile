@@ -29,7 +29,9 @@ fun HomeRoute(
                     navDispatcher.emit(command = To(key = CreateDeckEntry))
                 }
 
-                HomeSideEffect.NavigateToSetting -> TODO()
+                HomeSideEffect.NavigateToSetting -> {
+                    TODO()
+                }
             }
         }
     }
