@@ -6,7 +6,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 
 internal class AuthSessionEventBusImpl : AuthSessionEventBus {
-    private val channel = Channel<AuthSessionEvent>(capacity = Channel.BUFFERED)
+    private val channel = Channel<AuthSessionEvent>(capacity = Channel.CONFLATED)
 
     override val events = channel.receiveAsFlow()
 
