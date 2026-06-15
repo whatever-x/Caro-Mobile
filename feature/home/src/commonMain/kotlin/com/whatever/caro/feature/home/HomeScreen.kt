@@ -93,6 +93,7 @@ internal fun HomeScreen(
                 },
                 trailingContent = {
                     Image(
+                        modifier = Modifier.noRippleClickable { onIntent(HomeIntent.ClickSettingButton) },
                         painter = painterResource(resource = Res.drawable.ic_setting_24),
                         contentDescription = null,
                     )
