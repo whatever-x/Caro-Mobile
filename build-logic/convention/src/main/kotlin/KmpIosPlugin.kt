@@ -7,7 +7,6 @@ class KmpIosPlugin : Plugin<Project> {
         with(target) {
             kotlin {
                 listOf(
-                    iosX64(),
                     iosArm64(),
                     iosSimulatorArm64()
                 ).forEach { iosTarget ->

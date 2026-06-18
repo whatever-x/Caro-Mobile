@@ -50,6 +50,7 @@ ktorfit = "2.7.1"
 
 # Image Loader
 coil3 = "3.4.0"
+compottie="2.2.2"
 
 # Permission
 moko = "0.20.1"
@@ -148,6 +149,10 @@ coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil3"
 coil-compose-core = { module = "io.coil-kt.coil3:coil-compose-core", version.ref = "coil3" }
 coil-network-ktor3 = { module = "io.coil-kt.coil3:coil-network-ktor3", version.ref = "coil3" }
 coil-mp = { module = "io.coil-kt.coil3:coil", version.ref = "coil3" }
+compottie = { module = "io.github.alexzhirkevich:compottie", version.ref = "compottie" }
+compottie-lite = { module = "io.github.alexzhirkevich:compottie-lite", version.ref = "compottie" }
+compottie-resources = { module = "io.github.alexzhirkevich:compottie-resources", version.ref = "compottie" }
+
 
 # Logging
 napier = { module = "io.github.aakira:napier", version.ref = "napier" }
