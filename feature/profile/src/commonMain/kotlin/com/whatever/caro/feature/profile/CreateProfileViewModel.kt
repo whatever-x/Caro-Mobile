@@ -18,9 +18,9 @@ class CreateProfileViewModel(
     private val nicknameValidator: NicknameValidator,
     exceptionFilter: ExceptionFilter,
 ) : BaseViewModel<CreateProfileState, CreateProfileIntent, CreateProfileSideEffect>(
-    initialState = CreateProfileState(),
-    exceptionFilter = exceptionFilter
-) {
+        initialState = CreateProfileState(),
+        exceptionFilter = exceptionFilter,
+    ) {
     private var nicknameValidationJob: Job? = null
 
     init {

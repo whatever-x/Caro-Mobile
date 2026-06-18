@@ -9,9 +9,9 @@ import com.whatever.caro.feature.deck.mvi.CreateDeckState
 class CreateDeckViewModel(
     exceptionFilter: ExceptionFilter,
 ) : BaseViewModel<CreateDeckState, CreateDeckIntent, CreateDeckSideEffect>(
-    initialState = CreateDeckState(),
-    exceptionFilter = exceptionFilter,
-) {
+        initialState = CreateDeckState(),
+        exceptionFilter = exceptionFilter,
+    ) {
     override suspend fun handleIntent(intent: CreateDeckIntent) {
         when (intent) {
             is CreateDeckIntent.UpdateName -> handleUpdateName(intent.name)
