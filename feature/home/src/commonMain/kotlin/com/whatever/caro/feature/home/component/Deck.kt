@@ -33,7 +33,7 @@ import caromobile.core.designsystem.generated.resources.home_deck_button_not_sta
 import caromobile.core.designsystem.generated.resources.ic_dot
 import com.whatever.caro.core.designsystem.themes.CaroTheme
 import com.whatever.caro.core.model.deck.DeckState
-import com.whatever.caro.core.ui.noRippleClickable
+import com.whatever.caro.core.ui.modifier.noRippleClickable
 import com.whatever.caro.core.util.NumberFormatter.formatWithComma
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
