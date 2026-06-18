@@ -5,6 +5,14 @@
 //   ./gradlew :splash:stabilityDump
 
 @Composable
+public fun com.whatever.caro.feature.splash.SplashRoute(viewModel: com.whatever.caro.feature.splash.SplashViewModel, navDispatcher: com.whatever.caro.core.navigator.dispatcher.NavigationDispatcher): kotlin.Unit
+  skippable: false
+  restartable: true
+  params:
+    - viewModel: RUNTIME (requires runtime check)
+    - navDispatcher: RUNTIME (requires runtime check)
+
+@Composable
 internal fun com.whatever.caro.feature.splash.SplashScreen(state: com.whatever.caro.feature.splash.mvi.SplashState): kotlin.Unit
   skippable: true
   restartable: true

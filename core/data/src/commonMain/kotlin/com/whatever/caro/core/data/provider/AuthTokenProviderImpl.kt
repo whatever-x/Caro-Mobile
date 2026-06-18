@@ -6,7 +6,7 @@ import com.whatever.caro.core.model.auth.AuthSessionEventBus
 import com.whatever.caro.core.model.exception.CaroAuthException
 import com.whatever.caro.core.remote.auth.AuthTokenProvider
 import com.whatever.caro.core.remote.datasource.RemoteNonAuthDataSource
-import com.whatever.caro.core.remote.dto.auth.request.TokenRefreshRequest
+import com.whatever.caro.core.remote.dto.auth.request.RefreshTokenRequest
 import kotlinx.coroutines.CancellationException
 
 internal class AuthTokenProviderImpl(
@@ -32,7 +32,7 @@ internal class AuthTokenProviderImpl(
             val refreshed =
                 remoteNonAuthDatasource.refreshToken(
                     request =
-                        TokenRefreshRequest(
+                        RefreshTokenRequest(
                             accessToken = currentAccess,
                             refreshToken = currentRefresh,
                         ),

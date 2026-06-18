@@ -7,15 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		BAAA4FE12F686AE40069538E /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = BAAA4FE02F686AE40069538E /* GoogleSignIn */; };
-		BAAA4FE32F686AE40069538E /* GoogleSignInSwift in Frameworks */ = {isa = PBXBuildFile; productRef = BAAA4FE22F686AE40069538E /* GoogleSignInSwift */; };
-		BAB867B52FBDF41800F501F9 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = BAB867B42FBDF41800F501F9 /* FirebaseAnalytics */; };
-		BAB867B72FBDF41800F501F9 /* FirebaseAnalyticsCore in Frameworks */ = {isa = PBXBuildFile; productRef = BAB867B62FBDF41800F501F9 /* FirebaseAnalyticsCore */; };
-		BAB867B92FBDF41800F501F9 /* FirebaseAnalyticsIdentitySupport in Frameworks */ = {isa = PBXBuildFile; productRef = BAB867B82FBDF41800F501F9 /* FirebaseAnalyticsIdentitySupport */; };
-		BAB867BB2FBDF41800F501F9 /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = BAB867BA2FBDF41800F501F9 /* FirebaseCore */; };
-		BAB867BD2FBDF41800F501F9 /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = BAB867BC2FBDF41800F501F9 /* FirebaseCrashlytics */; };
-		BAB867BF2FBDF41800F501F9 /* FirebaseInAppMessaging-Beta in Frameworks */ = {isa = PBXBuildFile; productRef = BAB867BE2FBDF41800F501F9 /* FirebaseInAppMessaging-Beta */; };
-		BAB867C12FBDF41800F501F9 /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = BAB867C02FBDF41800F501F9 /* FirebaseMessaging */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -23,6 +14,18 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		BA3AD9662FCD888B008FD2C5 /* Exceptions for "Config" folder in "iosApp" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				DevDebug.xcconfig,
+				DevRelease.xcconfig,
+				ProdDebug.xcconfig,
+				ProdRelease.xcconfig,
+				QaDebug.xcconfig,
+				QaRelease.xcconfig,
+			);
+			target = 4648218809E5AE90BF60B44C /* iosApp */;
+		};
 		BA5C2CCE2FBDE3350086D722 /* Exceptions for "iosApp" folder in "iosApp" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -32,6 +35,9 @@
 				Config/ProdRelease.xcconfig,
 				Config/QaDebug.xcconfig,
 				Config/QaRelease.xcconfig,
+				"FirebaseConfig/GoogleService-Info-Dev.plist",
+				"FirebaseConfig/GoogleService-Info-Prod.plist",
+				"FirebaseConfig/GoogleService-Info-Qa.plist",
 				Info.plist,
 			);
 			target = 4648218809E5AE90BF60B44C /* iosApp */;
@@ -47,6 +53,14 @@
 			path = iosApp;
 			sourceTree = "<group>";
 		};
+		BA3AD9592FCD888A008FD2C5 /* Config */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				BA3AD9662FCD888B008FD2C5 /* Exceptions for "Config" folder in "iosApp" target */,
+			);
+			path = Config;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -54,15 +68,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BAB867C12FBDF41800F501F9 /* FirebaseMessaging in Frameworks */,
-				BAAA4FE12F686AE40069538E /* GoogleSignIn in Frameworks */,
-				BAB867B92FBDF41800F501F9 /* FirebaseAnalyticsIdentitySupport in Frameworks */,
-				BAAA4FE32F686AE40069538E /* GoogleSignInSwift in Frameworks */,
-				BAB867BF2FBDF41800F501F9 /* FirebaseInAppMessaging-Beta in Frameworks */,
-				BAB867BD2FBDF41800F501F9 /* FirebaseCrashlytics in Frameworks */,
-				BAB867B52FBDF41800F501F9 /* FirebaseAnalytics in Frameworks */,
-				BAB867BB2FBDF41800F501F9 /* FirebaseCore in Frameworks */,
-				BAB867B72FBDF41800F501F9 /* FirebaseAnalyticsCore in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -72,6 +77,7 @@
 		78BDD31C79EA60842533B039 = {
 			isa = PBXGroup;
 			children = (
+				BA3AD9592FCD888A008FD2C5 /* Config */,
 				2354A1345C967ECDF360E8CE /* iosApp */,
 				FA83853C7BB573C5EFE88810 /* Products */,
 			);
@@ -105,18 +111,10 @@
 			);
 			fileSystemSynchronizedGroups = (
 				2354A1345C967ECDF360E8CE /* iosApp */,
+				BA3AD9592FCD888A008FD2C5 /* Config */,
 			);
 			name = iosApp;
 			packageProductDependencies = (
-				BAAA4FE02F686AE40069538E /* GoogleSignIn */,
-				BAAA4FE22F686AE40069538E /* GoogleSignInSwift */,
-				BAB867B42FBDF41800F501F9 /* FirebaseAnalytics */,
-				BAB867B62FBDF41800F501F9 /* FirebaseAnalyticsCore */,
-				BAB867B82FBDF41800F501F9 /* FirebaseAnalyticsIdentitySupport */,
-				BAB867BA2FBDF41800F501F9 /* FirebaseCore */,
-				BAB867BC2FBDF41800F501F9 /* FirebaseCrashlytics */,
-				BAB867BE2FBDF41800F501F9 /* FirebaseInAppMessaging-Beta */,
-				BAB867C02FBDF41800F501F9 /* FirebaseMessaging */,
 			);
 			productName = iosApp;
 			productReference = 3E06E91E468A67CBE7F646FC /* iosApp.app */;
@@ -147,8 +145,6 @@
 			mainGroup = 78BDD31C79EA60842533B039;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				BAAA4FDF2F686AE40069538E /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */,
-				BAB867B32FBDF41800F501F9 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = FA83853C7BB573C5EFE88810 /* Products */;
@@ -238,8 +234,8 @@
 /* Begin XCBuildConfiguration section */
 		0D38C17F125911FB3285E39C /* DevDebug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReferenceAnchor = 2354A1345C967ECDF360E8CE /* iosApp */;
-			baseConfigurationReferenceRelativePath = Config/DevDebug.xcconfig;
+			baseConfigurationReferenceAnchor = BA3AD9592FCD888A008FD2C5 /* Config */;
+			baseConfigurationReferenceRelativePath = DevDebug.xcconfig;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -247,6 +243,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_ASSET_PATHS = "\"iosApp/Preview Content\"";
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = AR6HWFH5V3;
@@ -263,6 +260,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MARKETING_VERSION = 0.0.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.whatever.caro.dev;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -275,8 +273,8 @@
 		};
 		1A08946E153E1203139756A3 /* DevDebug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReferenceAnchor = 2354A1345C967ECDF360E8CE /* iosApp */;
-			baseConfigurationReferenceRelativePath = Config/DevDebug.xcconfig;
+			baseConfigurationReferenceAnchor = BA3AD9592FCD888A008FD2C5 /* Config */;
+			baseConfigurationReferenceRelativePath = DevDebug.xcconfig;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -341,8 +339,8 @@
 		};
 		1F78A817429C5ABB10B25626 /* ProdRelease */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReferenceAnchor = 2354A1345C967ECDF360E8CE /* iosApp */;
-			baseConfigurationReferenceRelativePath = Config/ProdRelease.xcconfig;
+			baseConfigurationReferenceAnchor = BA3AD9592FCD888A008FD2C5 /* Config */;
+			baseConfigurationReferenceRelativePath = ProdRelease.xcconfig;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -350,6 +348,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_ASSET_PATHS = "\"iosApp/Preview Content\"";
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = AR6HWFH5V3;
@@ -366,6 +365,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MARKETING_VERSION = 0.0.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.whatever.caro;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -378,8 +378,8 @@
 		};
 		A1A1A1A1A1A1A1A1A1A1A401 /* QaDebug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReferenceAnchor = 2354A1345C967ECDF360E8CE /* iosApp */;
-			baseConfigurationReferenceRelativePath = Config/QaDebug.xcconfig;
+			baseConfigurationReferenceAnchor = BA3AD9592FCD888A008FD2C5 /* Config */;
+			baseConfigurationReferenceRelativePath = QaDebug.xcconfig;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -444,8 +444,8 @@
 		};
 		A1A1A1A1A1A1A1A1A1A1A402 /* QaDebug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReferenceAnchor = 2354A1345C967ECDF360E8CE /* iosApp */;
-			baseConfigurationReferenceRelativePath = Config/QaDebug.xcconfig;
+			baseConfigurationReferenceAnchor = BA3AD9592FCD888A008FD2C5 /* Config */;
+			baseConfigurationReferenceRelativePath = QaDebug.xcconfig;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -453,6 +453,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_ASSET_PATHS = "\"iosApp/Preview Content\"";
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = AR6HWFH5V3;
@@ -469,6 +470,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MARKETING_VERSION = 0.0.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.whatever.caro.qa;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -481,8 +483,8 @@
 		};
 		B2B2B2B2B2B2B2B2B2B2B501 /* ProdDebug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReferenceAnchor = 2354A1345C967ECDF360E8CE /* iosApp */;
-			baseConfigurationReferenceRelativePath = Config/ProdDebug.xcconfig;
+			baseConfigurationReferenceAnchor = BA3AD9592FCD888A008FD2C5 /* Config */;
+			baseConfigurationReferenceRelativePath = ProdDebug.xcconfig;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -547,8 +549,8 @@
 		};
 		B2B2B2B2B2B2B2B2B2B2B502 /* ProdDebug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReferenceAnchor = 2354A1345C967ECDF360E8CE /* iosApp */;
-			baseConfigurationReferenceRelativePath = Config/ProdDebug.xcconfig;
+			baseConfigurationReferenceAnchor = BA3AD9592FCD888A008FD2C5 /* Config */;
+			baseConfigurationReferenceRelativePath = ProdDebug.xcconfig;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -556,6 +558,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_ASSET_PATHS = "\"iosApp/Preview Content\"";
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = AR6HWFH5V3;
@@ -572,6 +575,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MARKETING_VERSION = 0.0.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.whatever.caro;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -584,8 +588,8 @@
 		};
 		B3C66612CEE7C172985EAB6E /* ProdRelease */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReferenceAnchor = 2354A1345C967ECDF360E8CE /* iosApp */;
-			baseConfigurationReferenceRelativePath = Config/ProdRelease.xcconfig;
+			baseConfigurationReferenceAnchor = BA3AD9592FCD888A008FD2C5 /* Config */;
+			baseConfigurationReferenceRelativePath = ProdRelease.xcconfig;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -643,8 +647,8 @@
 		};
 		D3D3D3D3D3D3D3D3D3D3D301 /* DevRelease */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReferenceAnchor = 2354A1345C967ECDF360E8CE /* iosApp */;
-			baseConfigurationReferenceRelativePath = Config/DevRelease.xcconfig;
+			baseConfigurationReferenceAnchor = BA3AD9592FCD888A008FD2C5 /* Config */;
+			baseConfigurationReferenceRelativePath = DevRelease.xcconfig;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -702,8 +706,8 @@
 		};
 		D3D3D3D3D3D3D3D3D3D3D302 /* DevRelease */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReferenceAnchor = 2354A1345C967ECDF360E8CE /* iosApp */;
-			baseConfigurationReferenceRelativePath = Config/DevRelease.xcconfig;
+			baseConfigurationReferenceAnchor = BA3AD9592FCD888A008FD2C5 /* Config */;
+			baseConfigurationReferenceRelativePath = DevRelease.xcconfig;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -711,6 +715,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_ASSET_PATHS = "\"iosApp/Preview Content\"";
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = AR6HWFH5V3;
@@ -727,6 +732,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MARKETING_VERSION = 0.0.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.whatever.caro.dev;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -739,8 +745,8 @@
 		};
 		E93BE8652F1E02DD007CC1AC /* QaRelease */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReferenceAnchor = 2354A1345C967ECDF360E8CE /* iosApp */;
-			baseConfigurationReferenceRelativePath = Config/QaRelease.xcconfig;
+			baseConfigurationReferenceAnchor = BA3AD9592FCD888A008FD2C5 /* Config */;
+			baseConfigurationReferenceRelativePath = QaRelease.xcconfig;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -798,8 +804,8 @@
 		};
 		E93BE8662F1E02DD007CC1AC /* QaRelease */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReferenceAnchor = 2354A1345C967ECDF360E8CE /* iosApp */;
-			baseConfigurationReferenceRelativePath = Config/QaRelease.xcconfig;
+			baseConfigurationReferenceAnchor = BA3AD9592FCD888A008FD2C5 /* Config */;
+			baseConfigurationReferenceRelativePath = QaRelease.xcconfig;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -807,6 +813,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_ASSET_PATHS = "\"iosApp/Preview Content\"";
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = AR6HWFH5V3;
@@ -823,6 +830,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MARKETING_VERSION = 0.0.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.whatever.caro.qa;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -864,72 +872,7 @@
 		};
 /* End XCConfigurationList section */
 
-/* Begin XCRemoteSwiftPackageReference section */
-		BAAA4FDF2F686AE40069538E /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/google/GoogleSignIn-iOS";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 9.1.0;
-			};
-		};
-		BAB867B32FBDF41800F501F9 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 12.13.0;
-			};
-		};
-/* End XCRemoteSwiftPackageReference section */
 
-/* Begin XCSwiftPackageProductDependency section */
-		BAAA4FE02F686AE40069538E /* GoogleSignIn */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = BAAA4FDF2F686AE40069538E /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
-			productName = GoogleSignIn;
-		};
-		BAAA4FE22F686AE40069538E /* GoogleSignInSwift */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = BAAA4FDF2F686AE40069538E /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
-			productName = GoogleSignInSwift;
-		};
-		BAB867B42FBDF41800F501F9 /* FirebaseAnalytics */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = BAB867B32FBDF41800F501F9 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
-			productName = FirebaseAnalytics;
-		};
-		BAB867B62FBDF41800F501F9 /* FirebaseAnalyticsCore */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = BAB867B32FBDF41800F501F9 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
-			productName = FirebaseAnalyticsCore;
-		};
-		BAB867B82FBDF41800F501F9 /* FirebaseAnalyticsIdentitySupport */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = BAB867B32FBDF41800F501F9 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
-			productName = FirebaseAnalyticsIdentitySupport;
-		};
-		BAB867BA2FBDF41800F501F9 /* FirebaseCore */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = BAB867B32FBDF41800F501F9 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
-			productName = FirebaseCore;
-		};
-		BAB867BC2FBDF41800F501F9 /* FirebaseCrashlytics */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = BAB867B32FBDF41800F501F9 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
-			productName = FirebaseCrashlytics;
-		};
-		BAB867BE2FBDF41800F501F9 /* FirebaseInAppMessaging-Beta */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = BAB867B32FBDF41800F501F9 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
-			productName = "FirebaseInAppMessaging-Beta";
-		};
-		BAB867C02FBDF41800F501F9 /* FirebaseMessaging */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = BAB867B32FBDF41800F501F9 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
-			productName = FirebaseMessaging;
-		};
-/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 3A843BE3CB8F6534283C4600 /* Project object */;
 }

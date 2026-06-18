@@ -6,4 +6,8 @@ sealed interface HomeIntent : UiIntent {
     data object ClickLogout : HomeIntent
 
     data object ClickSignUp : HomeIntent
+
+    data object ClickProfile : HomeIntent
+
+    data object ClickCreateDeck : HomeIntent
 }

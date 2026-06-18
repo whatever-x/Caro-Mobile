@@ -23,13 +23,15 @@ kotlin {
             implementation(projects.core.navigator)
             implementation(projects.core.model)
             implementation(projects.core.remote)
-            implementation(projects.core.analytics)
-            implementation(projects.core.crashlytics)
+            api(projects.core.analytics)
+            api(projects.core.crashlytics)
             api(projects.core.messaging)
 
             implementation(projects.feature.home)
-            implementation(projects.feature.login)
+            api(projects.feature.login)
             implementation(projects.feature.splash)
+            implementation(projects.feature.profile)
+            implementation(projects.feature.deck)
 
             implementation(libs.koin.compose.viewmodel)
             implementation(libs.koin.compose.navigation3)

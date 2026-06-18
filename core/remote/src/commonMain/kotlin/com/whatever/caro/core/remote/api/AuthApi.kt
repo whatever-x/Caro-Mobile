@@ -1,8 +1,8 @@
 package com.whatever.caro.core.remote.api
 
 import com.whatever.caro.core.remote.dto.auth.request.CompleteRegistrationRequest
+import com.whatever.caro.core.remote.dto.auth.request.RefreshTokenRequest
 import com.whatever.caro.core.remote.dto.auth.request.SocialLoginRequest
-import com.whatever.caro.core.remote.dto.auth.request.TokenRefreshRequest
 import com.whatever.caro.core.remote.dto.auth.response.SocialLoginResponse
 import com.whatever.caro.core.remote.dto.auth.response.TokenResponse
 import de.jensklingenberg.ktorfit.http.Body
@@ -15,8 +15,8 @@ internal interface AuthApi {
     ): SocialLoginResponse
 
     @POST("v1/auth/refresh")
-    suspend fun requestTokenRefresh(
-        @Body request: TokenRefreshRequest,
+    suspend fun requestRefreshToken(
+        @Body request: RefreshTokenRequest,
     ): TokenResponse
 
     @POST("v1/auth/complete-registration")
