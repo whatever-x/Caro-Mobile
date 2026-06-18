@@ -1,12 +1,16 @@
 package com.whatever.caro.feature.deck
 
+import com.whatever.caro.core.data.repository.deck.DeckRepository
+import com.whatever.caro.core.data.util.suspendRunCatching
 import com.whatever.caro.core.viewmodel.BaseViewModel
 import com.whatever.caro.feature.deck.mvi.CreateDeckIntent
 import com.whatever.caro.feature.deck.mvi.CreateDeckSideEffect
 import com.whatever.caro.feature.deck.mvi.CreateDeckState
+import io.github.aakira.napier.Napier
 
-class CreateDeckViewModel :
-    BaseViewModel<CreateDeckState, CreateDeckIntent, CreateDeckSideEffect>(
+class CreateDeckViewModel(
+    private val deckRepository: DeckRepository,
+) : BaseViewModel<CreateDeckState, CreateDeckIntent, CreateDeckSideEffect>(
         initialState = CreateDeckState(),
     ) {
     override suspend fun handleIntent(intent: CreateDeckIntent) {
@@ -28,7 +32,20 @@ class CreateDeckViewModel :
 
     private fun handleConfirm() {
         if (currentState.isConfirmEnabled.not()) return
-        // TODO: 덱 생성 API 연동 (서버 스펙 확정 후 DeckRepository 호출)
-        postSideEffect(CreateDeckSideEffect.NavigateBack)
+        reduce { copy(isLoading = true) }
+        launch {
+            suspendRunCatching {
+                deckRepository.createDeck(
+                    name = currentState.name,
+                    description = currentState.description,
+                )
+            }.onSuccess {
+                postSideEffect(CreateDeckSideEffect.NavigateBack)
+            }.onFailure { throwable ->
+                Napier.e(throwable = throwable) { "createDeck failed" }
+                reduce { copy(isLoading = false) }
+                postSideEffect(CreateDeckSideEffect.ShowError)
+            }
+        }
     }
 }
