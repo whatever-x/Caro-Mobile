@@ -17,6 +17,8 @@ import com.whatever.caro.core.designsystem.components.CaroSnackBarHost
 import com.whatever.caro.core.designsystem.components.CaroSnackbar
 import com.whatever.caro.core.designsystem.components.LocalSnackbarHostState
 import com.whatever.caro.core.designsystem.themes.CaroTheme
+import com.whatever.caro.core.model.auth.AuthSessionEvent
+import com.whatever.caro.core.model.auth.AuthSessionEventBus
 import com.whatever.caro.core.navigator.contract.NavCommand
 import com.whatever.caro.core.navigator.dispatcher.NavigationDispatcher
 import com.whatever.caro.core.navigator.entries.CreateDeckEntry
@@ -31,7 +33,10 @@ import kotlinx.serialization.modules.polymorphic
 import org.koin.compose.koinInject
 
 @Composable
-fun CaroApp(navDispatcher: NavigationDispatcher = koinInject()) {
+fun CaroApp(
+    navDispatcher: NavigationDispatcher = koinInject(),
+    authSessionEventBus: AuthSessionEventBus = koinInject(),
+) {
     ConfigureCaroImageLoader()
 
     val savedStateConfiguration =
@@ -72,6 +77,18 @@ fun CaroApp(navDispatcher: NavigationDispatcher = koinInject()) {
                 is NavCommand.ResetTo -> {
                     backStack.clear()
                     backStack.add(command.key)
+                }
+            }
+        }
+    }
+
+    LaunchedEffect(authSessionEventBus, navDispatcher) {
+        authSessionEventBus.events.collect { event ->
+            when (event) {
+                AuthSessionEvent.Expired -> {
+                    // TODO: 팝업 처리 이후 emit
+                    Napier.w { "Auth session expired → navigate to LoginEntry" }
+                    navDispatcher.emit(NavCommand.ResetTo(LoginEntry))
                 }
             }
         }

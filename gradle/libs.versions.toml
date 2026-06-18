@@ -42,7 +42,7 @@ jetbrains-androidx-navigation3-event = "1.0.0"
 
 # DI
 koin = "4.2.1"
-koin-compiler = "1.0.0-RC1"
+koin-compiler = "1.0.0"
 
 # Network
 ktor = "3.4.2"

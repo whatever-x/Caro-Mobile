@@ -14,7 +14,7 @@ import org.koin.dsl.bind
 import org.koin.dsl.module
 import org.koin.plugin.module.dsl.single
 
-val dataModule =
+val repositoryModule =
     module {
         single<FcmTokenRepositoryImpl>() bind FcmTokenRepository::class
         single<AuthRepositoryImpl>() bind AuthRepository::class

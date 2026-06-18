@@ -1,4 +1,5 @@
 import app.cash.turbine.test
+import com.whatever.caro.core.viewmodel.ExceptionFilter
 import com.whatever.caro.feature.splash.SplashViewModel
 import com.whatever.caro.feature.splash.mvi.SplashIntent
 import com.whatever.caro.feature.splash.mvi.SplashSideEffect
@@ -30,7 +31,7 @@ class SplashViewModelTest : FunSpec() {
 
         test("Initialize intent 처리 시 NavigateLogin sideEffect를 발행한다") {
             runTest {
-                val viewModel = SplashViewModel()
+                val viewModel = SplashViewModel(exceptionFilter = ExceptionFilter.None)
 
                 viewModel.sideEffect.test {
                     viewModel.intent(SplashIntent.Initialize)
@@ -43,7 +44,7 @@ class SplashViewModelTest : FunSpec() {
 
         test("Initialize 완료 시 isInitializing 이 false 로 갱신된다") {
             runTest {
-                val viewModel = SplashViewModel()
+                val viewModel = SplashViewModel(exceptionFilter = ExceptionFilter.None)
 
                 viewModel.intent(SplashIntent.Initialize)
                 advanceUntilIdle()

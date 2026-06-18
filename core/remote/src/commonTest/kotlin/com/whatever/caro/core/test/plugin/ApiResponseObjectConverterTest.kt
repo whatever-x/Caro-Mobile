@@ -2,7 +2,6 @@ package com.whatever.caro.core.test.plugin
 
 import com.whatever.caro.core.model.exception.CaroInvalidResponseException
 import com.whatever.caro.core.model.exception.CaroServerException
-import com.whatever.caro.core.model.exception.ErrorCode
 import com.whatever.caro.core.remote.dto.auth.response.SocialLoginResponse
 import com.whatever.caro.core.remote.network.plugins.CaroBaseResponseConverter
 import io.kotest.assertions.throwables.shouldNotThrowAny
@@ -33,7 +32,8 @@ class ApiResponseObjectConverterTest : FunSpec() {
                           "success": true,
                           "data": {
                             "accessToken": "access-token",
-                            "refreshToken": "refresh-token"
+                            "refreshToken": "refresh-token",
+                            "isRegistrationComplete": true
                           },
                           "error": null
                         }
@@ -42,7 +42,12 @@ class ApiResponseObjectConverterTest : FunSpec() {
 
             val body = shouldNotThrowAny { client.get("https://caro.test/auth/login").body<SocialLoginResponse>() }
 
-            body shouldBe SocialLoginResponse(accessToken = "access-token", refreshToken = "refresh-token")
+            body shouldBe
+                SocialLoginResponse(
+                    accessToken = "access-token",
+                    refreshToken = "refresh-token",
+                    isRegistrationComplete = true,
+                )
         }
 
         test("success=true 이고 data=null 일 때 Unit 요청은 성공 처리한다") {
@@ -74,8 +79,8 @@ class ApiResponseObjectConverterTest : FunSpec() {
                           "error": {
                             "code": "AUTH-401",
                             "message": "사용자 토큰 인증에 실패했습니다.",
-                            "debugMessage": "사용자 토큰 인증 실패",
-                            "description": "login again"
+                            "traceId": null,
+                            "fieldErrors": null
                           }
                         }
                         """.trimIndent(),
@@ -88,11 +93,9 @@ class ApiResponseObjectConverterTest : FunSpec() {
 
             exception.code shouldBe "AUTH-401"
             exception.message shouldBe "사용자 토큰 인증에 실패했습니다."
-            exception.debugMessage shouldBe "사용자 토큰 인증 실패"
-            exception.description shouldBe "login again"
         }
 
-        test("success=false 인데 error 가 없으면 INVALID_RESPONSE인 CaroInvalidResponseException 예외를 던진다") {
+        test("success=false 인데 error 가 없으면 CaroInvalidResponseException 예외를 던진다") {
             val client =
                 createClient(
                     responseBody =
@@ -110,11 +113,10 @@ class ApiResponseObjectConverterTest : FunSpec() {
                     client.get("https://caro.test/auth/login").body<SocialLoginResponse>()
                 }
 
-            exception.code shouldBe ErrorCode.INVALID_RESPONSE
             exception.message shouldBe "Invalid Response Error"
         }
 
-        test("success=true 인데 data=null 이면 INVALID_RESPONSE인 CaroInvalidResponseException 예외를 던진다") {
+        test("success=true 인데 data=null 이면 CaroInvalidResponseException 예외를 던진다") {
             val client =
                 createClient(
                     responseBody =
@@ -132,11 +134,10 @@ class ApiResponseObjectConverterTest : FunSpec() {
                     client.get("https://caro.test/auth/login").body<SocialLoginResponse>()
                 }
 
-            exception.code shouldBe ErrorCode.INVALID_RESPONSE
             exception.message shouldBe "Invalid Response Error"
         }
 
-        test("응답 decode에 실패하면 INVALID_RESPONSE인 CaroInvalidResponseException 예외를 던진다") {
+        test("응답 decode에 실패하면 CaroInvalidResponseException 예외를 던진다") {
             val client =
                 createClient(
                     responseBody =
@@ -154,7 +155,6 @@ class ApiResponseObjectConverterTest : FunSpec() {
                     client.get("https://caro.test/auth/login").body<SocialLoginResponse>()
                 }
 
-            exception.code shouldBe ErrorCode.INVALID_RESPONSE
             exception.message shouldBe "Invalid Response Error"
         }
 

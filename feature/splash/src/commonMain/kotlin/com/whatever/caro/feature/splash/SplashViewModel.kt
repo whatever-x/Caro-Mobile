@@ -1,6 +1,7 @@
 package com.whatever.caro.feature.splash
 
 import com.whatever.caro.core.viewmodel.BaseViewModel
+import com.whatever.caro.core.viewmodel.ExceptionFilter
 import com.whatever.caro.feature.splash.mvi.SplashIntent
 import com.whatever.caro.feature.splash.mvi.SplashSideEffect
 import com.whatever.caro.feature.splash.mvi.SplashState
@@ -13,9 +14,11 @@ import dev.icerock.moko.permissions.RequestCanceledException
 import dev.icerock.moko.permissions.notifications.REMOTE_NOTIFICATION
 import kotlinx.coroutines.delay
 
-class SplashViewModel :
-    BaseViewModel<SplashState, SplashIntent, SplashSideEffect>(
+class SplashViewModel(
+    exceptionFilter: ExceptionFilter,
+) : BaseViewModel<SplashState, SplashIntent, SplashSideEffect>(
         initialState = SplashState(),
+        exceptionFilter = exceptionFilter,
     ) {
     override suspend fun handleIntent(intent: SplashIntent) {
         when (intent) {
