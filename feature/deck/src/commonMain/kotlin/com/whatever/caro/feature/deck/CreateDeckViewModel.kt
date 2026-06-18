@@ -13,9 +13,9 @@ class CreateDeckViewModel(
     private val deckRepository: DeckRepository,
     exceptionFilter: ExceptionFilter,
 ) : BaseViewModel<CreateDeckState, CreateDeckIntent, CreateDeckSideEffect>(
-    initialState = CreateDeckState(),
-    exceptionFilter = exceptionFilter
-) {
+        initialState = CreateDeckState(),
+        exceptionFilter = exceptionFilter,
+    ) {
     override suspend fun handleIntent(intent: CreateDeckIntent) {
         when (intent) {
             is CreateDeckIntent.UpdateName -> handleUpdateName(intent.name)
