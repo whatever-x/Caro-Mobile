@@ -91,7 +91,7 @@ internal fun LoginScreen(
 
             Text(
                 text = stringResource(resource = Res.string.login_text_bottom_terms_of_service),
-                style = CaroTheme.typography.label1.regular,
+                style = CaroTheme.typography.label1,
                 color = CaroTheme.color.text.tertiary,
                 textAlign = TextAlign.Center,
             )
