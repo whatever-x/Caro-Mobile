@@ -3,6 +3,7 @@ package com.whatever.caro.feature.deck
 import com.whatever.caro.core.data.repository.deck.DeckRepository
 import com.whatever.caro.core.data.util.suspendRunCatching
 import com.whatever.caro.core.viewmodel.BaseViewModel
+import com.whatever.caro.core.viewmodel.ExceptionFilter
 import com.whatever.caro.feature.deck.mvi.CreateDeckIntent
 import com.whatever.caro.feature.deck.mvi.CreateDeckSideEffect
 import com.whatever.caro.feature.deck.mvi.CreateDeckState
@@ -10,8 +11,10 @@ import io.github.aakira.napier.Napier
 
 class CreateDeckViewModel(
     private val deckRepository: DeckRepository,
+    exceptionFilter: ExceptionFilter,
 ) : BaseViewModel<CreateDeckState, CreateDeckIntent, CreateDeckSideEffect>(
         initialState = CreateDeckState(),
+        exceptionFilter = exceptionFilter,
     ) {
     override suspend fun handleIntent(intent: CreateDeckIntent) {
         when (intent) {

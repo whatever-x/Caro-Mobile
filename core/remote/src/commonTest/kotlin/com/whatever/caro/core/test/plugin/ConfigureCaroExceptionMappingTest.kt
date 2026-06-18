@@ -2,13 +2,13 @@ package com.whatever.caro.core.test.plugin
 
 import com.whatever.caro.core.model.exception.CaroInvalidResponseException
 import com.whatever.caro.core.model.exception.CaroServerException
-import com.whatever.caro.core.model.exception.ErrorCode
 import com.whatever.caro.core.model.exception.NetworkException
 import com.whatever.caro.core.remote.network.plugins.configureCaroExceptionMapping
 import io.kotest.assertions.throwables.shouldNotThrowAny
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.types.shouldBeInstanceOf
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.engine.mock.MockEngine
@@ -38,8 +38,8 @@ class ConfigureCaroExceptionMappingTest : FunSpec() {
                           "error": {
                             "code": "SERVER-500",
                             "message": "server exploded",
-                            "debugMessage": "stacktrace",
-                            "description": "retry later"
+                            "traceId": null,
+                            "fieldErrors": null
                           }
                         }
                         """.trimIndent(),
@@ -52,11 +52,9 @@ class ConfigureCaroExceptionMappingTest : FunSpec() {
 
             exception.code shouldBe "SERVER-500"
             exception.message shouldBe "server exploded"
-            exception.debugMessage shouldBe "stacktrace"
-            exception.description shouldBe "retry later"
         }
 
-        test("에러 응답 body 파싱에 실패하면 status code와 기본 메시지로 CaroInvalidResponseException을 만든다") {
+        test("에러 응답 body 파싱에 실패하면 CaroInvalidResponseException을 만든다") {
             val errorStatus = HttpStatusCode.BadGateway
             val client =
                 createClient(
@@ -70,11 +68,10 @@ class ConfigureCaroExceptionMappingTest : FunSpec() {
                     client.get("https://caro.test/sample").body<Unit>()
                 }
 
-            exception.code shouldBe ErrorCode.INVALID_RESPONSE
             exception.message shouldBe "Invalid Response Error"
         }
 
-        test("응답이 없는 네트워크 오류는 NetworkException으로 변환한다") {
+        test("응답이 없는 네트워크 오류는 NetworkException.Connection으로 변환한다") {
             val client =
                 HttpClient(
                     MockEngine {
@@ -98,7 +95,7 @@ class ConfigureCaroExceptionMappingTest : FunSpec() {
                     client.get("https://caro.test/sample").body<Unit>()
                 }
 
-            exception.code shouldBe ErrorCode.NETWORK_001
+            exception.shouldBeInstanceOf<NetworkException.Connection>()
             exception.message shouldBe "Network Error"
         }
 

@@ -2,7 +2,6 @@ package com.whatever.caro.core.remote.network.plugins
 
 import com.whatever.caro.core.model.exception.CaroInvalidResponseException
 import com.whatever.caro.core.model.exception.CaroServerException
-import com.whatever.caro.core.model.exception.ErrorCode.INVALID_RESPONSE
 import com.whatever.caro.core.remote.dto.base.ApiResponseDto
 import io.ktor.client.plugins.api.ClientPlugin
 import io.ktor.client.plugins.api.createClientPlugin
@@ -39,8 +38,6 @@ internal val CaroBaseResponseConverter: ClientPlugin<CaroBaseResponseConverterCo
                     json.serializersModule.serializer(kotlinType)
                 }.getOrElse { throwable ->
                     throw CaroInvalidResponseException(
-                        code = INVALID_RESPONSE,
-                        message = "Invalid Response Error",
                         debugMessage =
                             buildDebugMessage(
                                 reason = "요청 타입에 대한 serializer를 찾지 못했습니다.",
@@ -60,8 +57,6 @@ internal val CaroBaseResponseConverter: ClientPlugin<CaroBaseResponseConverterCo
                     json.decodeFromString(envelopeSerializer, payloadText)
                 }.getOrElse { throwable ->
                     throw CaroInvalidResponseException(
-                        code = INVALID_RESPONSE,
-                        message = "Invalid Response Error",
                         debugMessage =
                             buildDebugMessage(
                                 reason = "Response Body Decode 과정에서 실패 했습니다.",
@@ -78,8 +73,6 @@ internal val CaroBaseResponseConverter: ClientPlugin<CaroBaseResponseConverterCo
             if (!baseResponse.success) {
                 val error =
                     baseResponse.error ?: throw CaroInvalidResponseException(
-                        code = INVALID_RESPONSE,
-                        message = "Invalid Response Error",
                         debugMessage =
                             buildDebugMessage(
                                 reason = "success=false 이지만 error 페이로드가 null 입니다.",
@@ -108,8 +101,6 @@ internal val CaroBaseResponseConverter: ClientPlugin<CaroBaseResponseConverterCo
             }
 
             throw CaroInvalidResponseException(
-                code = INVALID_RESPONSE,
-                message = "Invalid Response Error",
                 debugMessage =
                     buildDebugMessage(
                         reason = "success=true 이지만 non-Unit 응답의 data가 null입니다",

@@ -4,6 +4,7 @@ import com.whatever.caro.core.data.repository.AuthRepository
 import com.whatever.caro.core.data.repository.profile.ProfileRepository
 import com.whatever.caro.core.data.util.suspendRunCatching
 import com.whatever.caro.core.viewmodel.BaseViewModel
+import com.whatever.caro.core.viewmodel.ExceptionFilter
 import com.whatever.caro.feature.profile.mvi.CreateProfileIntent
 import com.whatever.caro.feature.profile.mvi.CreateProfileSideEffect
 import com.whatever.caro.feature.profile.mvi.CreateProfileState
@@ -15,8 +16,10 @@ class CreateProfileViewModel(
     private val authRepository: AuthRepository,
     private val profileRepository: ProfileRepository,
     private val nicknameValidator: NicknameValidator,
+    exceptionFilter: ExceptionFilter,
 ) : BaseViewModel<CreateProfileState, CreateProfileIntent, CreateProfileSideEffect>(
         initialState = CreateProfileState(),
+        exceptionFilter = exceptionFilter,
     ) {
     private var nicknameValidationJob: Job? = null
 
