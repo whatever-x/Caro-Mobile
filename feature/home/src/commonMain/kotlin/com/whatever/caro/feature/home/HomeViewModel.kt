@@ -10,9 +10,9 @@ import io.github.aakira.napier.Napier
 class HomeViewModel(
     exceptionFilter: ExceptionFilter,
 ) : BaseViewModel<HomeState, HomeIntent, HomeSideEffect>(
-    initialState = HomeState(),
-    exceptionFilter = exceptionFilter
-) {
+        initialState = HomeState(),
+        exceptionFilter = exceptionFilter,
+    ) {
     override fun handleClientException(throwable: Throwable) {
     }
 
