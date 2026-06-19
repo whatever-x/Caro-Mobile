@@ -3,12 +3,16 @@ package com.whatever.caro.core.remote.di
 import com.whatever.caro.core.remote.api.AuthApi
 import com.whatever.caro.core.remote.api.CardControllerApi
 import com.whatever.caro.core.remote.api.DeckApi
+import com.whatever.caro.core.remote.api.DeckCardInformationApi
 import com.whatever.caro.core.remote.api.NicknameApi
+import com.whatever.caro.core.remote.api.StudySessionApi
 import com.whatever.caro.core.remote.api.UserApi
 import com.whatever.caro.core.remote.api.createAuthApi
 import com.whatever.caro.core.remote.api.createCardControllerApi
 import com.whatever.caro.core.remote.api.createDeckApi
+import com.whatever.caro.core.remote.api.createDeckCardInformationApi
 import com.whatever.caro.core.remote.api.createNicknameApi
+import com.whatever.caro.core.remote.api.createStudySessionApi
 import com.whatever.caro.core.remote.api.createUserApi
 import com.whatever.caro.core.remote.di.qualifier.NetworkClient
 import de.jensklingenberg.ktorfit.Ktorfit
@@ -33,8 +37,16 @@ val apiModule =
             get<Ktorfit>(named(NetworkClient.Caro.AUTH)).createCardControllerApi()
         }
 
+        single<DeckCardInformationApi> {
+            get<Ktorfit>(named(NetworkClient.Caro.AUTH)).createDeckCardInformationApi()
+        }
+
         single<NicknameApi> {
             get<Ktorfit>(named(NetworkClient.Caro.AUTH)).createNicknameApi()
+        }
+
+        single<StudySessionApi> {
+            get<Ktorfit>(named(NetworkClient.Caro.AUTH)).createStudySessionApi()
         }
 
         single<UserApi> {
