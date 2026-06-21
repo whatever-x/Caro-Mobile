@@ -39,5 +39,9 @@ internal fun HomeScreen(
         Button(onClick = { onIntent(HomeIntent.ClickCreateDeck) }) {
             Text("덱 만들기")
         }
+
+        Button(onClick = { onIntent(HomeIntent.ClickCreateCard) }) {
+            Text("카드 생성")
+        }
     }
 }

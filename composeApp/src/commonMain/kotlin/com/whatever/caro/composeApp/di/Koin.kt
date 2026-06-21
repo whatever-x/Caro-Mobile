@@ -10,6 +10,7 @@ import com.whatever.caro.core.remote.di.apiModule
 import com.whatever.caro.core.remote.di.deviceModule
 import com.whatever.caro.core.remote.di.networkModule
 import com.whatever.caro.core.remote.di.remoteModule
+import com.whatever.caro.feature.card.di.cardModule
 import com.whatever.caro.feature.deck.di.deckModule
 import com.whatever.caro.feature.home.di.homeModule
 import com.whatever.caro.feature.login.di.loginModule
@@ -44,6 +45,7 @@ fun initKoin(configuration: KoinAppDeclaration? = null) {
             splashModule,
             profileModule,
             deckModule,
+            cardModule,
         )
     }
 }

@@ -24,6 +24,7 @@ class HomeViewModel(
             HomeIntent.ClickSignUp -> testClickSignUp()
             HomeIntent.ClickProfile -> postSideEffect(HomeSideEffect.NavigateToProfile)
             HomeIntent.ClickCreateDeck -> postSideEffect(HomeSideEffect.NavigateToCreateDeck)
+            HomeIntent.ClickCreateCard -> postSideEffect(HomeSideEffect.NavigateToCreateCard)
         }
     }
 

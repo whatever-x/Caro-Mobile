@@ -6,4 +6,6 @@ sealed interface HomeSideEffect : UiSideEffect {
     data object NavigateToProfile : HomeSideEffect
 
     data object NavigateToCreateDeck : HomeSideEffect
+
+    data object NavigateToCreateCard : HomeSideEffect
 }
