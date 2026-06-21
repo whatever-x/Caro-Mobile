@@ -1,0 +1,41 @@
+package com.whatever.caro.feature.card.mvi
+
+import com.whatever.caro.core.model.card.CardContent
+import com.whatever.caro.core.viewmodel.contract.UiState
+import com.whatever.caro.feature.card.CardInputLimits
+
+data class CreateCardState(
+    val front: String = "",
+    val back: String = "",
+    val addedCards: List<StagedCard> = emptyList(),
+    val nextCardId: Long = 0L,
+    val isSaving: Boolean = false,
+) : UiState {
+    val frontCount: String
+        get() = "${front.length}/${CardInputLimits.FIELD_MAX}"
+
+    val backCount: String
+        get() = "${back.length}/${CardInputLimits.FIELD_MAX}"
+
+    val addedCount: Int
+        get() = addedCards.size
+
+    val isAddEnabled: Boolean
+        get() =
+            front.isNotBlank() &&
+                back.isNotBlank() &&
+                addedCards.size < CardInputLimits.MAX_CARDS &&
+                isSaving.not()
+
+    val isSaveEnabled: Boolean
+        get() = addedCards.isNotEmpty() && isSaving.not()
+}
+
+/**
+ * 추가된 카드 미리보기 항목.
+ * LazyRow 안정 key 와 인덱스 무관 삭제(중복 탭 방어)를 위해 고유 [id] 를 가진다.
+ */
+data class StagedCard(
+    val id: Long,
+    val content: CardContent,
+)
