@@ -45,4 +45,16 @@
 	<string name="home_deck_button_learning">Continue Learning</string>
 	<string name="home_floating_button">Create Deck</string>
 	<string name="home_deck_field_empty">Create a deck to begin learning.</string>
+	<!-- setting -->
+	<string name="setting_title">Settings</string>
+	<string name="setting_userinfo_nickname_change">Change Nickname</string>
+	<string name="setting_menu_terms_of_service">Terms of Service</string>
+	<string name="setting_menu_privacy_policy">Privacy Policy</string>
+	<string name="setting_menu_report_bug">Report a Bug</string>
+	<string name="setting_menu_logout">Log Out</string>
+	<string name="setting_menu_delete_account">Delete Account</string>
+	<string name="setting_description_app_version">Current App Version: %1$s</string>
+	<string name="setting_privcay_policy_url">https://www.naver.com</string>
+	<string name="setting_terms_of_service_url">https://www.naver.com</string>
+	<string name="setting_report_bug_url">https://www.naver.com</string>
 </resources>

@@ -17,9 +17,11 @@ data class CaroTypography(
     val body1: TextStyle,
     val body2: Body2Style,
     val body3: TextStyle,
+    val body4: TextStyle,
     val label1: TextStyle,
     val label2: TextStyle,
     val caption1: TextStyle,
+    val caption2: TextStyle,
     val robotoLabel1: TextStyle,
 ) {
     interface SemiBoldStyle {
@@ -101,6 +103,13 @@ data class CaroTypography(
                     fontSize = 14.sp,
                     lineHeight = 22.sp,
                 ),
+            body4 =
+                TextStyle(
+                    fontFamily = pretendard,
+                    fontWeight = FontWeight.W400,
+                    fontSize = 14.sp,
+                    lineHeight = 20.sp,
+                ),
             label1 =
                 TextStyle(
                     fontFamily = pretendard,
@@ -118,6 +127,12 @@ data class CaroTypography(
                     fontFamily = pretendard,
                     fontWeight = FontWeight.W500,
                     fontSize = 12.sp,
+                ),
+            caption2 =
+                TextStyle(
+                    fontFamily = pretendard,
+                    fontWeight = FontWeight.W500,
+                    fontSize = 10.sp,
                 ),
             robotoLabel1 =
                 TextStyle(

@@ -42,4 +42,13 @@
     <string name="home_deck_button_learning">이어서 학습</string>
     <string name="home_floating_button">덱 만들기</string>
     <string name="home_deck_field_empty">덱을 먼저 만들고\n학습을 시작해 보세요.</string>
+    <!-- setting -->
+    <string name="setting_title">설정</string>
+    <string name="setting_userinfo_nickname_change">닉네임 변경</string>
+    <string name="setting_menu_terms_of_service">이용약관</string>
+    <string name="setting_menu_privacy_policy">개인정보 처리방침</string>
+    <string name="setting_menu_report_bug">버그신고</string>
+    <string name="setting_menu_logout">로그아웃</string>
+    <string name="setting_menu_delete_account">계정탈퇴</string>
+    <string name="setting_description_app_version">현재 앱 버전 : %1$s</string>
 </resources>
