@@ -1,11 +1,11 @@
-package com.whatever.caro.feature.profile
+package com.whatever.caro.feature.setting
 
 import com.whatever.caro.core.viewmodel.BaseViewModel
 import com.whatever.caro.core.viewmodel.ExceptionFilter
-import com.whatever.caro.feature.profile.model.WebViewType
-import com.whatever.caro.feature.profile.mvi.SettingIntent
-import com.whatever.caro.feature.profile.mvi.SettingSideEffect
-import com.whatever.caro.feature.profile.mvi.SettingState
+import com.whatever.caro.feature.setting.model.WebViewType
+import com.whatever.caro.feature.setting.mvi.SettingIntent
+import com.whatever.caro.feature.setting.mvi.SettingSideEffect
+import com.whatever.caro.feature.setting.mvi.SettingState
 
 class SettingViewModel(
     exceptionFilter: ExceptionFilter,

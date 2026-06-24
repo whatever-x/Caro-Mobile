@@ -1,4 +1,4 @@
-package com.whatever.caro.feature.profile.mvi
+package com.whatever.caro.feature.setting.mvi
 
 import com.whatever.caro.core.model.auth.SocialLoginType
 import com.whatever.caro.core.viewmodel.contract.UiState

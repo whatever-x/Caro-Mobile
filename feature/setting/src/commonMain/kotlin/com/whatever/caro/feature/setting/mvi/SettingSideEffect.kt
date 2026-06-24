@@ -1,7 +1,7 @@
-package com.whatever.caro.feature.profile.mvi
+package com.whatever.caro.feature.setting.mvi
 
 import com.whatever.caro.core.viewmodel.contract.UiSideEffect
-import com.whatever.caro.feature.profile.model.WebViewType
+import com.whatever.caro.feature.setting.model.WebViewType
 
 sealed interface SettingSideEffect : UiSideEffect {
     data class NavigateToEditNickName(

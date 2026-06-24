@@ -1,9 +1,8 @@
-package com.whatever.caro.feature.profile
+package com.whatever.caro.feature.setting
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,8 +11,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -29,9 +26,7 @@ import caromobile.core.designsystem.generated.resources.ic_arrow_left_24
 import caromobile.core.designsystem.generated.resources.ic_file_text_24
 import caromobile.core.designsystem.generated.resources.ic_lock_24
 import caromobile.core.designsystem.generated.resources.ic_log_out_24
-import caromobile.core.designsystem.generated.resources.ic_logo_apple
 import caromobile.core.designsystem.generated.resources.ic_logo_apple_small
-import caromobile.core.designsystem.generated.resources.ic_logo_google
 import caromobile.core.designsystem.generated.resources.ic_logo_google_small
 import caromobile.core.designsystem.generated.resources.ic_tool_24
 import caromobile.core.designsystem.generated.resources.ic_x_circle_24
@@ -47,10 +42,10 @@ import com.whatever.caro.core.designsystem.components.CaroTopBar
 import com.whatever.caro.core.designsystem.themes.CaroTheme
 import com.whatever.caro.core.model.auth.SocialLoginType
 import com.whatever.caro.core.ui.modifier.noRippleClickable
-import com.whatever.caro.feature.profile.component.MenuSection
-import com.whatever.caro.feature.profile.model.SettingMenu
-import com.whatever.caro.feature.profile.mvi.SettingIntent
-import com.whatever.caro.feature.profile.mvi.SettingState
+import com.whatever.caro.feature.setting.component.MenuSection
+import com.whatever.caro.feature.setting.model.SettingMenu
+import com.whatever.caro.feature.setting.mvi.SettingIntent
+import com.whatever.caro.feature.setting.mvi.SettingState
 import kotlinx.collections.immutable.persistentListOf
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource

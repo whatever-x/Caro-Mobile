@@ -1,6 +1,6 @@
-package com.whatever.caro.feature.profile.model
+package com.whatever.caro.feature.setting.model
 
-import com.whatever.caro.feature.profile.mvi.SettingIntent
+import com.whatever.caro.feature.setting.mvi.SettingIntent
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.StringResource
 

@@ -1,4 +1,4 @@
-package com.whatever.caro.feature.profile.model
+package com.whatever.caro.feature.setting.model
 
 enum class WebViewType {
     TERMS_OF_SERVICE,

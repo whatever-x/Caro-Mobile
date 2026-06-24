@@ -1,4 +1,4 @@
-package com.whatever.caro.feature.profile.route
+package com.whatever.caro.feature.setting.route
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -12,16 +12,16 @@ import caromobile.core.designsystem.generated.resources.setting_terms_of_service
 import com.whatever.caro.core.navigator.contract.NavCommand
 import com.whatever.caro.core.navigator.dispatcher.NavigationDispatcher
 import com.whatever.caro.core.navigator.entries.LoginEntry
-import com.whatever.caro.feature.profile.SettingScreen
-import com.whatever.caro.feature.profile.SettingViewModel
-import com.whatever.caro.feature.profile.model.WebViewType
-import com.whatever.caro.feature.profile.mvi.SettingSideEffect
+import com.whatever.caro.feature.setting.SettingScreen
+import com.whatever.caro.feature.setting.SettingViewModel
+import com.whatever.caro.feature.setting.model.WebViewType
+import com.whatever.caro.feature.setting.mvi.SettingSideEffect
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun SettingRoute(
     viewModel: SettingViewModel,
-    navigationDispatcher: NavigationDispatcher,
+    navDispatcher: NavigationDispatcher,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val uriHandler = LocalUriHandler.current
@@ -37,7 +37,7 @@ fun SettingRoute(
                 }
 
                 SettingSideEffect.NavigateToLogin -> {
-                    navigationDispatcher.emit(
+                    navDispatcher.emit(
                         NavCommand.ResetTo(
                             key = LoginEntry,
                         ),
@@ -55,7 +55,7 @@ fun SettingRoute(
                 }
 
                 SettingSideEffect.PopBackStack -> {
-                    navigationDispatcher.emit(
+                    navDispatcher.emit(
                         NavCommand.Back,
                     )
                 }

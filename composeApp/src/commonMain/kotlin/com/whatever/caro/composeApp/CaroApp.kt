@@ -25,6 +25,7 @@ import com.whatever.caro.core.navigator.entries.CreateDeckEntry
 import com.whatever.caro.core.navigator.entries.CreateProfileEntry
 import com.whatever.caro.core.navigator.entries.HomeEntry
 import com.whatever.caro.core.navigator.entries.LoginEntry
+import com.whatever.caro.core.navigator.entries.SettingEntry
 import com.whatever.caro.core.navigator.entries.SplashEntry
 import com.whatever.caro.core.ui.image.ConfigureCaroImageLoader
 import io.github.aakira.napier.Napier
@@ -50,6 +51,7 @@ fun CaroApp(
                             subclass(CreateProfileEntry::class, CreateProfileEntry.serializer())
                             subclass(CreateDeckEntry::class, CreateDeckEntry.serializer())
                             subclass(HomeEntry::class, HomeEntry.serializer())
+                            subclass(SettingEntry::class, SettingEntry.serializer())
                         }
                     }
             }

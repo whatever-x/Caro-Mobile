@@ -1,10 +1,10 @@
-package com.whatever.caro.feature.profile.di
+package com.whatever.caro.feature.setting.di
 
-import com.whatever.caro.feature.profile.SettingViewModel
+import com.whatever.caro.feature.setting.SettingViewModel
 import org.koin.dsl.module
 import org.koin.plugin.module.dsl.viewModel
 
-val settingModules =
+val settingModule =
     module {
         viewModel<SettingViewModel>()
     }

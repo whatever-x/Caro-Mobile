@@ -1,4 +1,4 @@
-package com.whatever.caro.feature.profile.component
+package com.whatever.caro.feature.setting.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -23,8 +23,8 @@ import caromobile.core.designsystem.generated.resources.ic_logo_apple
 import caromobile.core.designsystem.generated.resources.login_button_google
 import com.whatever.caro.core.designsystem.themes.CaroTheme
 import com.whatever.caro.core.ui.modifier.noRippleClickable
-import com.whatever.caro.feature.profile.model.SettingMenu
-import com.whatever.caro.feature.profile.mvi.SettingIntent
+import com.whatever.caro.feature.setting.model.SettingMenu
+import com.whatever.caro.feature.setting.mvi.SettingIntent
 import kotlinx.collections.immutable.ImmutableList
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.StringResource
