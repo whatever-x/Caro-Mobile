@@ -72,7 +72,7 @@ internal fun EditProfileScreen(
             modifier =
                 Modifier
                     .fillMaxWidth()
-                    .padding(vertical = CaroTheme.spacing.m,),
+                    .padding(vertical = CaroTheme.spacing.m),
         )
 
         Spacer(modifier = Modifier.weight(1f))

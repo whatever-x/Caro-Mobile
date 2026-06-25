@@ -22,7 +22,6 @@ class SplashViewModel(
         initialState = SplashState(),
         exceptionFilter = exceptionFilter,
     ) {
-
     override fun handleClientException(throwable: Throwable) {
         super.handleClientException(throwable)
         postSideEffect(SplashSideEffect.NavigateLogin)

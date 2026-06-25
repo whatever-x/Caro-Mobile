@@ -56,9 +56,10 @@ internal fun MenuSection(
 
                 is SettingMenu.Menu -> {
                     MenuItem(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = CaroTheme.spacing.l),
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = CaroTheme.spacing.l),
                         leadingIcon = menu.leadingIcon,
                         content = menu.content,
                         highlight = menu.highlight,

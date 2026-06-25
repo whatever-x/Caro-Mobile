@@ -59,19 +59,24 @@ internal class AuthRepositoryImpl(
         val accessToken = localAuthDataSource.fetchAccessToken()
         val refreshToken = localAuthDataSource.fetchRefreshToken()
 
-        if (accessToken.isNullOrEmpty() || refreshToken.isNullOrEmpty()) throw CaroAuthException.TokenEmpty(
-            debugMessage = "Token is Empty"
-        )
-        val request = RefreshTokenRequest(
-            accessToken = accessToken,
-            refreshToken = refreshToken,
-        )
-        remoteNonAuthDataSource.refreshToken(
-            request = request
-        ).also {
-            localAuthDataSource.saveTokens(
-                accessToken = it.accessToken, refreshToken = it.refreshToken
+        if (accessToken.isNullOrEmpty() || refreshToken.isNullOrEmpty()) {
+            throw CaroAuthException.TokenEmpty(
+                debugMessage = "Token is Empty",
             )
         }
+        val request =
+            RefreshTokenRequest(
+                accessToken = accessToken,
+                refreshToken = refreshToken,
+            )
+        remoteNonAuthDataSource
+            .refreshToken(
+                request = request,
+            ).also {
+                localAuthDataSource.saveTokens(
+                    accessToken = it.accessToken,
+                    refreshToken = it.refreshToken,
+                )
+            }
     }
 }

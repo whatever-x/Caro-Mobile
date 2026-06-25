@@ -13,9 +13,9 @@ import androidx.compose.ui.Modifier
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.savedstate.serialization.SavedStateConfiguration
-import com.whatever.caro.core.designsystem.components.CaroSnackBarHost
-import com.whatever.caro.core.designsystem.components.CaroSnackbar
-import com.whatever.caro.core.designsystem.components.LocalSnackbarHostState
+import com.whatever.caro.core.designsystem.components.snackbar.CaroSnackBarHost
+import com.whatever.caro.core.designsystem.components.snackbar.CaroSnackbar
+import com.whatever.caro.core.designsystem.components.snackbar.LocalSnackbarHostState
 import com.whatever.caro.core.designsystem.themes.CaroTheme
 import com.whatever.caro.core.model.auth.AuthSessionEvent
 import com.whatever.caro.core.model.auth.AuthSessionEventBus
@@ -91,7 +91,7 @@ fun CaroApp(
             when (event) {
                 AuthSessionEvent.Expired -> {
                     Napier.w { "Auth session expired → navigate to LoginEntry" }
-                    if(backStack.first() == SplashEntry) {
+                    if (backStack.first() == SplashEntry) {
                         navDispatcher.emit(NavCommand.ResetTo(LoginEntry))
                     } else {
                         // TODO: 팝업 처리 이후 emit
@@ -102,7 +102,6 @@ fun CaroApp(
     }
     CaroTheme {
         val snackBarHostState = remember { SnackbarHostState() }
-
         CompositionLocalProvider(
             LocalSnackbarHostState provides snackBarHostState,
         ) {

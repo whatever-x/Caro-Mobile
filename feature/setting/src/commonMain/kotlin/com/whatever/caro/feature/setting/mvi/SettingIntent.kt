@@ -7,6 +7,8 @@ sealed interface SettingIntent : UiIntent {
 
     data object ClickTermsOfService : SettingIntent
 
+    data object ClickBack : SettingIntent
+
     data object ClickPrivacyPolicy : SettingIntent
 
     data object ClickReportBug : SettingIntent

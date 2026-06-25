@@ -1,6 +1,5 @@
 package com.whatever.caro.feature.profile.edit
 
-import com.whatever.caro.core.data.repository.auth.AuthRepository
 import com.whatever.caro.core.data.repository.profile.ProfileRepository
 import com.whatever.caro.core.data.util.suspendRunCatching
 import com.whatever.caro.core.viewmodel.BaseViewModel
@@ -15,20 +14,15 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 
 class EditProfileViewModel(
-    private val authRepository: AuthRepository,
     private val profileRepository: ProfileRepository,
     private val nicknameValidator: NicknameValidator,
-    nickname : String,
+    nickname: String,
     exceptionFilter: ExceptionFilter,
 ) : BaseViewModel<EditProfileState, EditProfileIntent, EditProfileSideEffect>(
-    initialState = EditProfileState(nickname = nickname),
-    exceptionFilter = exceptionFilter,
-) {
+        initialState = EditProfileState(nickname = nickname),
+        exceptionFilter = exceptionFilter,
+    ) {
     private var nicknameValidationJob: Job? = null
-
-    init {
-        fetchRandomNickname()
-    }
 
     override suspend fun handleIntent(intent: EditProfileIntent) {
         when (intent) {
@@ -95,15 +89,11 @@ class EditProfileViewModel(
         reduce { copy(isLoading = true) }
         launch {
             suspendRunCatching {
-                // TODO: 약관 동의 화면 추가 시 termsAgreed 전달 값 변경
-                authRepository.completeRegistration(
-                    nickname = currentState.nickname,
-                    termsAgreed = true,
-                )
+                profileRepository.updateNickname(nickname = currentState.nickname)
             }.onSuccess {
                 postSideEffect(EditProfileSideEffect.NavigateBack)
             }.onFailure { throwable ->
-                Napier.e(throwable = throwable) { "completeRegistration failed" }
+                Napier.e(throwable = throwable) { "handleConfirm failed" }
                 reduce { copy(isLoading = false) }
             }
         }

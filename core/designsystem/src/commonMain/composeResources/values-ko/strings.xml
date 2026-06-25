@@ -53,4 +53,6 @@
     <string name="setting_menu_logout">로그아웃</string>
     <string name="setting_menu_delete_account">계정탈퇴</string>
     <string name="setting_description_app_version">현재 앱 버전 : %1$s</string>
+    <string name="setting_toast_logout">로그아웃을 하였습니다.</string>
+    <string name="setting_toast_delete_account">회원탈퇴를 하였습니다.</string>
 </resources>

@@ -27,11 +27,12 @@ internal fun ProfileCtaButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val (backgroundColor, textColor) = if (enabled) {
-        CaroTheme.color.surface.brand to CaroTheme.color.text.inverse
-    } else {
-        CaroTheme.color.badge.surface.info to Color(0xFFA4B5FB)
-    }
+    val (backgroundColor, textColor) =
+        if (enabled) {
+            CaroTheme.color.surface.brand to CaroTheme.color.text.inverse
+        } else {
+            CaroTheme.color.badge.surface.info to Color(0xFFA4B5FB)
+        }
 
     Box(
         modifier =
@@ -49,7 +50,7 @@ internal fun ProfileCtaButton(
         Text(
             text = text,
             style = CaroTheme.typography.label1,
-            color = textColor
+            color = textColor,
         )
     }
 }

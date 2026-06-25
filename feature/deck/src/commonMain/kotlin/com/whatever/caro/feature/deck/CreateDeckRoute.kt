@@ -6,8 +6,8 @@ import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import caromobile.core.designsystem.generated.resources.Res
 import caromobile.core.designsystem.generated.resources.deck_toast_create_error
-import com.whatever.caro.core.designsystem.components.LocalSnackbarHostState
-import com.whatever.caro.core.designsystem.components.showSnackbarMessage
+import com.whatever.caro.core.designsystem.components.snackbar.LocalSnackbarHostState
+import com.whatever.caro.core.designsystem.components.snackbar.showSnackbarMessage
 import com.whatever.caro.core.navigator.contract.NavCommand
 import com.whatever.caro.core.navigator.dispatcher.NavigationDispatcher
 import com.whatever.caro.feature.deck.mvi.CreateDeckSideEffect

@@ -107,7 +107,7 @@ internal fun SettingScreen(
                     .fillMaxWidth()
                     .padding(horizontal = CaroTheme.spacing.xl2),
             leadingContent = {
-                Row {
+                Row(modifier = Modifier.noRippleClickable { onIntent(SettingIntent.ClickBack) }) {
                     Icon(
                         imageVector = vectorResource(Res.drawable.ic_arrow_left_24),
                         tint = CaroTheme.color.icon.primary,
@@ -213,8 +213,10 @@ private fun UserInfo(
         Box(
             modifier =
                 Modifier
-                    .background(color = CaroTheme.color.surface.secondary, shape = CaroTheme.shape.xxl)
-                    .padding(horizontal = 14.dp, vertical = 9.dp)
+                    .background(
+                        color = CaroTheme.color.surface.secondary,
+                        shape = CaroTheme.shape.xxl,
+                    ).padding(horizontal = 14.dp, vertical = 9.dp)
                     .noRippleClickable(onNicknameChangeClick),
             contentAlignment = Alignment.Center,
         ) {

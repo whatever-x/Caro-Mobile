@@ -5,5 +5,5 @@ interface ProfileRepository {
 
     suspend fun isNicknameAvailable(nickname: String): Boolean
 
-    suspend fun changeNickname(nickname: String)
+    suspend fun updateNickname(nickname: String)
 }
