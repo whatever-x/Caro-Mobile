@@ -1,7 +1,5 @@
 import app.cash.turbine.test
-import com.whatever.caro.core.data.repository.auth.AuthRepository
 import com.whatever.caro.core.data.repository.profile.ProfileRepository
-import com.whatever.caro.core.model.auth.AuthSession
 import com.whatever.caro.core.viewmodel.ExceptionFilter
 import com.whatever.caro.feature.profile.NicknameValidationResult
 import com.whatever.caro.feature.profile.NicknameValidator
@@ -40,39 +38,40 @@ class EditProfileViewModelTest : FunSpec() {
         }
 
         fun createViewModel(
-            randomNickname: String = "기본닉네임",
+            nickname: String = "기존닉네임",
+            randomNickname: String = "랜덤닉네임",
             isAvailable: Boolean = true,
-        ): Triple<EditProfileViewModel, AuthRepository, ProfileRepository> {
-            val authRepository = mock<AuthRepository>()
+        ): Pair<EditProfileViewModel, ProfileRepository> {
             val profileRepository =
                 mock<ProfileRepository> {
                     everySuspend { getRandomNickname() } returns randomNickname
                     everySuspend { isNicknameAvailable(any()) } returns isAvailable
+                    everySuspend { updateNickname(any()) } returns Unit
                 }
             val viewModel =
                 EditProfileViewModel(
-                    authRepository = authRepository,
                     profileRepository = profileRepository,
                     nicknameValidator = NicknameValidator(),
+                    nickname = nickname,
                     exceptionFilter = ExceptionFilter.None,
                 )
-            return Triple(viewModel, authRepository, profileRepository)
+            return viewModel to profileRepository
         }
 
-        test("init() 은 랜덤 닉네임을 받아 state 를 Valid 로 채운다") {
+        test("초기 nickname 으로 state 가 채워지고 기본 검증 결과는 Valid 다") {
             runTest {
-                val (viewModel, _, _) = createViewModel(randomNickname = "랜덤닉네임")
+                val (viewModel, _) = createViewModel(nickname = "기존닉네임")
 
                 advanceUntilIdle()
 
-                viewModel.state.value.nickname shouldBe "랜덤닉네임"
+                viewModel.state.value.nickname shouldBe "기존닉네임"
                 viewModel.state.value.validationResult shouldBe NicknameValidationResult.Valid
             }
         }
 
         test("최소 길이 미만 닉네임은 서버 확인 없이 TooShort 로 표시된다") {
             runTest {
-                val (viewModel, _, profileRepository) = createViewModel()
+                val (viewModel, profileRepository) = createViewModel()
                 advanceUntilIdle()
 
                 viewModel.intent(EditProfileIntent.UpdateNickname("a"))
@@ -85,7 +84,7 @@ class EditProfileViewModelTest : FunSpec() {
 
         test("형식이 유효하고 중복이 아니면 Valid 가 된다") {
             runTest {
-                val (viewModel, _, _) = createViewModel(isAvailable = true)
+                val (viewModel, _) = createViewModel(isAvailable = true)
                 advanceUntilIdle()
 
                 viewModel.intent(EditProfileIntent.UpdateNickname("거북이"))
@@ -97,7 +96,7 @@ class EditProfileViewModelTest : FunSpec() {
 
         test("형식이 유효하지만 이미 사용 중이면 Duplicate 가 된다") {
             runTest {
-                val (viewModel, _, _) = createViewModel(isAvailable = false)
+                val (viewModel, _) = createViewModel(isAvailable = false)
                 advanceUntilIdle()
 
                 viewModel.intent(EditProfileIntent.UpdateNickname("거북이"))
@@ -107,13 +106,23 @@ class EditProfileViewModelTest : FunSpec() {
             }
         }
 
-        test("확인 가능 상태에서 ClickConfirm 은 완료 후 NavigateBack 을 emit 한다") {
+        test("ClickRefresh 는 랜덤 닉네임을 받아 Valid 로 채우고 로딩을 해제한다") {
             runTest {
-                val (viewModel, authRepository, _) =
-                    createViewModel(randomNickname = "랜덤닉네임")
-                everySuspend {
-                    authRepository.completeRegistration(any(), any())
-                } returns AuthSession(accessToken = "access", refreshToken = "refresh")
+                val (viewModel, _) = createViewModel(randomNickname = "거북이123")
+                advanceUntilIdle()
+
+                viewModel.intent(EditProfileIntent.ClickRefresh)
+                advanceUntilIdle()
+
+                viewModel.state.value.nickname shouldBe "거북이123"
+                viewModel.state.value.validationResult shouldBe NicknameValidationResult.Valid
+                viewModel.state.value.isRandomNicknameLoading shouldBe false
+            }
+        }
+
+        test("유효한 상태에서 ClickConfirm 은 updateNickname 후 NavigateBack 을 emit 한다") {
+            runTest {
+                val (viewModel, profileRepository) = createViewModel(nickname = "거북이")
                 advanceUntilIdle()
 
                 viewModel.sideEffect.test {
@@ -122,18 +131,31 @@ class EditProfileViewModelTest : FunSpec() {
 
                     awaitItem() shouldBe EditProfileSideEffect.NavigateBack
                 }
-                verifySuspend(exactly(1)) {
-                    authRepository.completeRegistration(
-                        nickname = "랜덤닉네임",
-                        termsAgreed = true,
-                    )
+                verifySuspend(exactly(1)) { profileRepository.updateNickname(nickname = "거북이") }
+            }
+        }
+
+        test("검증 결과가 유효하지 않으면 ClickConfirm 은 무시된다") {
+            runTest {
+                val (viewModel, profileRepository) = createViewModel()
+                advanceUntilIdle()
+
+                viewModel.intent(EditProfileIntent.UpdateNickname("a"))
+                advanceUntilIdle()
+
+                viewModel.sideEffect.test {
+                    viewModel.intent(EditProfileIntent.ClickConfirm)
+                    advanceUntilIdle()
+
+                    expectNoEvents()
                 }
+                verifySuspend(exactly(0)) { profileRepository.updateNickname(any()) }
             }
         }
 
         test("ClickBack 은 NavigateBack 을 emit 한다") {
             runTest {
-                val (viewModel, _, _) = createViewModel()
+                val (viewModel, _) = createViewModel()
                 advanceUntilIdle()
 
                 viewModel.sideEffect.test {
