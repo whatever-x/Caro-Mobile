@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -143,12 +144,14 @@ private fun PreviewTitle() {
 
 @Composable
 private fun PreviewBody() {
+    Spacer(modifier = Modifier.size(size = 20.dp))
     Text(
         text = "가운데 메인 내용이 들어가는 슬롯입니다.",
         style = CaroTheme.typography.body3,
         color = CaroTheme.color.text.secondary,
         textAlign = TextAlign.Center,
     )
+    Spacer(modifier = Modifier.size(size = 12.dp))
 }
 
 @Composable
