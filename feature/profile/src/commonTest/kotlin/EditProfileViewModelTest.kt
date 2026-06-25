@@ -5,9 +5,9 @@ import com.whatever.caro.core.model.auth.AuthSession
 import com.whatever.caro.core.viewmodel.ExceptionFilter
 import com.whatever.caro.feature.profile.NicknameValidationResult
 import com.whatever.caro.feature.profile.NicknameValidator
-import com.whatever.caro.feature.profile.create.CreateProfileViewModel
-import com.whatever.caro.feature.profile.create.mvi.CreateProfileIntent
-import com.whatever.caro.feature.profile.create.mvi.CreateProfileSideEffect
+import com.whatever.caro.feature.profile.edit.EditProfileViewModel
+import com.whatever.caro.feature.profile.edit.mvi.EditProfileIntent
+import com.whatever.caro.feature.profile.edit.mvi.EditProfileSideEffect
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
@@ -26,7 +26,7 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class CreateProfileViewModelTest : FunSpec() {
+class EditProfileViewModelTest : FunSpec() {
     init {
         val dispatcher = StandardTestDispatcher()
 
@@ -42,7 +42,7 @@ class CreateProfileViewModelTest : FunSpec() {
         fun createViewModel(
             randomNickname: String = "기본닉네임",
             isAvailable: Boolean = true,
-        ): Triple<CreateProfileViewModel, AuthRepository, ProfileRepository> {
+        ): Triple<EditProfileViewModel, AuthRepository, ProfileRepository> {
             val authRepository = mock<AuthRepository>()
             val profileRepository =
                 mock<ProfileRepository> {
@@ -50,7 +50,7 @@ class CreateProfileViewModelTest : FunSpec() {
                     everySuspend { isNicknameAvailable(any()) } returns isAvailable
                 }
             val viewModel =
-                CreateProfileViewModel(
+                EditProfileViewModel(
                     authRepository = authRepository,
                     profileRepository = profileRepository,
                     nicknameValidator = NicknameValidator(),
@@ -75,7 +75,7 @@ class CreateProfileViewModelTest : FunSpec() {
                 val (viewModel, _, profileRepository) = createViewModel()
                 advanceUntilIdle()
 
-                viewModel.intent(CreateProfileIntent.UpdateNickname("a"))
+                viewModel.intent(EditProfileIntent.UpdateNickname("a"))
                 advanceUntilIdle()
 
                 viewModel.state.value.validationResult shouldBe NicknameValidationResult.TooShort
@@ -88,7 +88,7 @@ class CreateProfileViewModelTest : FunSpec() {
                 val (viewModel, _, _) = createViewModel(isAvailable = true)
                 advanceUntilIdle()
 
-                viewModel.intent(CreateProfileIntent.UpdateNickname("거북이"))
+                viewModel.intent(EditProfileIntent.UpdateNickname("거북이"))
                 advanceUntilIdle()
 
                 viewModel.state.value.validationResult shouldBe NicknameValidationResult.Valid
@@ -100,14 +100,14 @@ class CreateProfileViewModelTest : FunSpec() {
                 val (viewModel, _, _) = createViewModel(isAvailable = false)
                 advanceUntilIdle()
 
-                viewModel.intent(CreateProfileIntent.UpdateNickname("거북이"))
+                viewModel.intent(EditProfileIntent.UpdateNickname("거북이"))
                 advanceUntilIdle()
 
                 viewModel.state.value.validationResult shouldBe NicknameValidationResult.Duplicate
             }
         }
 
-        test("확인 가능 상태에서 ClickConfirm 은 가입 완료 후 NavigateBack 을 emit 한다") {
+        test("확인 가능 상태에서 ClickConfirm 은 완료 후 NavigateBack 을 emit 한다") {
             runTest {
                 val (viewModel, authRepository, _) =
                     createViewModel(randomNickname = "랜덤닉네임")
@@ -117,10 +117,10 @@ class CreateProfileViewModelTest : FunSpec() {
                 advanceUntilIdle()
 
                 viewModel.sideEffect.test {
-                    viewModel.intent(CreateProfileIntent.ClickConfirm)
+                    viewModel.intent(EditProfileIntent.ClickConfirm)
                     advanceUntilIdle()
 
-                    awaitItem() shouldBe CreateProfileSideEffect.NavigateBack
+                    awaitItem() shouldBe EditProfileSideEffect.NavigateBack
                 }
                 verifySuspend(exactly(1)) {
                     authRepository.completeRegistration(
@@ -137,10 +137,10 @@ class CreateProfileViewModelTest : FunSpec() {
                 advanceUntilIdle()
 
                 viewModel.sideEffect.test {
-                    viewModel.intent(CreateProfileIntent.ClickBack)
+                    viewModel.intent(EditProfileIntent.ClickBack)
                     advanceUntilIdle()
 
-                    awaitItem() shouldBe CreateProfileSideEffect.NavigateBack
+                    awaitItem() shouldBe EditProfileSideEffect.NavigateBack
                 }
             }
         }

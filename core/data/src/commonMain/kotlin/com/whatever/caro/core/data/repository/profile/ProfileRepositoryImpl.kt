@@ -14,4 +14,8 @@ internal class ProfileRepositoryImpl(
         val response = profileDataSource.checkNicknameAvailability(nickname)
         return response.available
     }
+
+    override suspend fun changeNickname(nickname: String) {
+        val request = Request
+    }
 }

@@ -43,6 +43,7 @@ import com.whatever.caro.core.designsystem.themes.CaroTheme
 import com.whatever.caro.core.model.auth.SocialLoginType
 import com.whatever.caro.core.ui.modifier.noRippleClickable
 import com.whatever.caro.feature.setting.component.MenuSection
+import com.whatever.caro.feature.setting.model.AppConfig
 import com.whatever.caro.feature.setting.model.SettingMenu
 import com.whatever.caro.feature.setting.mvi.SettingIntent
 import com.whatever.caro.feature.setting.mvi.SettingState
@@ -150,7 +151,7 @@ internal fun SettingScreen(
                 text =
                     stringResource(
                         Res.string.setting_description_app_version,
-                        state.appVersion,
+                        AppConfig.appVersion,
                     ),
                 style = CaroTheme.typography.caption2,
                 color = CaroTheme.color.text.tertiary,
@@ -185,14 +186,7 @@ private fun UserInfo(
     ) {
         Image(
             modifier =
-                Modifier
-                    .size(size = ProfileImageSize)
-                    .clip(shape = CaroTheme.shape.xxl)
-                    .border(
-                        shape = CaroTheme.shape.xxl,
-                        color = CaroTheme.color.icon.tertiary,
-                        width = 1.dp,
-                    ).padding(all = CaroTheme.spacing.s),
+                Modifier.size(size = ProfileImageSize),
             painter = painterResource(socialIcon),
             contentDescription = null,
         )
@@ -243,7 +237,6 @@ private fun SettingScreenPreview() {
                     nickname = "승우",
                     emailAddress = "rsw1452@gmail.com",
                     socialLoginType = SocialLoginType.GOOGLE,
-                    appVersion = "1.0.0",
                 ),
             onIntent = {},
         )

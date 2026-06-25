@@ -1,38 +1,41 @@
-package com.whatever.caro.feature.profile
+package com.whatever.caro.feature.profile.edit
 
-import com.whatever.caro.core.data.repository.AuthRepository
+import com.whatever.caro.core.data.repository.auth.AuthRepository
 import com.whatever.caro.core.data.repository.profile.ProfileRepository
 import com.whatever.caro.core.data.util.suspendRunCatching
 import com.whatever.caro.core.viewmodel.BaseViewModel
 import com.whatever.caro.core.viewmodel.ExceptionFilter
-import com.whatever.caro.feature.profile.mvi.CreateProfileIntent
-import com.whatever.caro.feature.profile.mvi.CreateProfileSideEffect
-import com.whatever.caro.feature.profile.mvi.CreateProfileState
+import com.whatever.caro.feature.profile.NicknameValidationResult
+import com.whatever.caro.feature.profile.NicknameValidator
+import com.whatever.caro.feature.profile.edit.mvi.EditProfileIntent
+import com.whatever.caro.feature.profile.edit.mvi.EditProfileSideEffect
+import com.whatever.caro.feature.profile.edit.mvi.EditProfileState
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 
-class CreateProfileViewModel(
+class EditProfileViewModel(
     private val authRepository: AuthRepository,
     private val profileRepository: ProfileRepository,
     private val nicknameValidator: NicknameValidator,
+    nickname : String,
     exceptionFilter: ExceptionFilter,
-) : BaseViewModel<CreateProfileState, CreateProfileIntent, CreateProfileSideEffect>(
-        initialState = CreateProfileState(),
-        exceptionFilter = exceptionFilter,
-    ) {
+) : BaseViewModel<EditProfileState, EditProfileIntent, EditProfileSideEffect>(
+    initialState = EditProfileState(nickname = nickname),
+    exceptionFilter = exceptionFilter,
+) {
     private var nicknameValidationJob: Job? = null
 
     init {
         fetchRandomNickname()
     }
 
-    override suspend fun handleIntent(intent: CreateProfileIntent) {
+    override suspend fun handleIntent(intent: EditProfileIntent) {
         when (intent) {
-            is CreateProfileIntent.UpdateNickname -> handleUpdateNickname(intent.nickname)
-            is CreateProfileIntent.ClickRefresh -> fetchRandomNickname()
-            is CreateProfileIntent.ClickConfirm -> handleConfirm()
-            is CreateProfileIntent.ClickBack -> postSideEffect(CreateProfileSideEffect.NavigateBack)
+            is EditProfileIntent.UpdateNickname -> handleUpdateNickname(intent.nickname)
+            is EditProfileIntent.ClickRefresh -> fetchRandomNickname()
+            is EditProfileIntent.ClickConfirm -> handleConfirm()
+            is EditProfileIntent.ClickBack -> postSideEffect(EditProfileSideEffect.NavigateBack)
         }
     }
 
@@ -98,7 +101,7 @@ class CreateProfileViewModel(
                     termsAgreed = true,
                 )
             }.onSuccess {
-                postSideEffect(CreateProfileSideEffect.NavigateBack)
+                postSideEffect(EditProfileSideEffect.NavigateBack)
             }.onFailure { throwable ->
                 Napier.e(throwable = throwable) { "completeRegistration failed" }
                 reduce { copy(isLoading = false) }

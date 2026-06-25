@@ -23,6 +23,7 @@ import com.whatever.caro.core.navigator.contract.NavCommand
 import com.whatever.caro.core.navigator.dispatcher.NavigationDispatcher
 import com.whatever.caro.core.navigator.entries.CreateDeckEntry
 import com.whatever.caro.core.navigator.entries.CreateProfileEntry
+import com.whatever.caro.core.navigator.entries.EditProfileEntry
 import com.whatever.caro.core.navigator.entries.HomeEntry
 import com.whatever.caro.core.navigator.entries.LoginEntry
 import com.whatever.caro.core.navigator.entries.SettingEntry
@@ -49,6 +50,7 @@ fun CaroApp(
                             subclass(SplashEntry::class, SplashEntry.serializer())
                             subclass(LoginEntry::class, LoginEntry.serializer())
                             subclass(CreateProfileEntry::class, CreateProfileEntry.serializer())
+                            subclass(EditProfileEntry::class, EditProfileEntry.serializer())
                             subclass(CreateDeckEntry::class, CreateDeckEntry.serializer())
                             subclass(HomeEntry::class, HomeEntry.serializer())
                             subclass(SettingEntry::class, SettingEntry.serializer())
@@ -88,9 +90,12 @@ fun CaroApp(
         authSessionEventBus.events.collect { event ->
             when (event) {
                 AuthSessionEvent.Expired -> {
-                    // TODO: 팝업 처리 이후 emit
                     Napier.w { "Auth session expired → navigate to LoginEntry" }
-                    navDispatcher.emit(NavCommand.ResetTo(LoginEntry))
+                    if(backStack.first() == SplashEntry) {
+                        navDispatcher.emit(NavCommand.ResetTo(LoginEntry))
+                    } else {
+                        // TODO: 팝업 처리 이후 emit
+                    }
                 }
             }
         }

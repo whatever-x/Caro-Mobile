@@ -11,6 +11,7 @@ import caromobile.core.designsystem.generated.resources.setting_report_bug_url
 import caromobile.core.designsystem.generated.resources.setting_terms_of_service_url
 import com.whatever.caro.core.navigator.contract.NavCommand
 import com.whatever.caro.core.navigator.dispatcher.NavigationDispatcher
+import com.whatever.caro.core.navigator.entries.EditProfileEntry
 import com.whatever.caro.core.navigator.entries.LoginEntry
 import com.whatever.caro.feature.setting.SettingScreen
 import com.whatever.caro.feature.setting.SettingViewModel
@@ -33,7 +34,11 @@ fun SettingRoute(
         viewModel.sideEffect.collect { sideEffect ->
             when (sideEffect) {
                 is SettingSideEffect.NavigateToEditNickName -> {
-                    TODO()
+                    navDispatcher.emit(
+                        NavCommand.To(
+                            key = EditProfileEntry(nickname = state.nickname),
+                        ),
+                    )
                 }
 
                 SettingSideEffect.NavigateToLogin -> {

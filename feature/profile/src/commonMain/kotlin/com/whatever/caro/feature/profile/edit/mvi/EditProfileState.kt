@@ -1,10 +1,10 @@
-package com.whatever.caro.feature.profile.mvi
+package com.whatever.caro.feature.profile.edit.mvi
 
 import com.whatever.caro.core.viewmodel.contract.UiState
 import com.whatever.caro.feature.profile.NicknameValidationResult
 import com.whatever.caro.feature.profile.NicknameValidator
 
-data class CreateProfileState(
+data class EditProfileState(
     val nickname: String = "",
     val validationResult: NicknameValidationResult = NicknameValidationResult.Empty,
     val isLoading: Boolean = false,

@@ -1,4 +1,4 @@
-package com.whatever.caro.feature.profile.mvi
+package com.whatever.caro.feature.profile.create.mvi
 
 import com.whatever.caro.core.viewmodel.contract.UiSideEffect
 

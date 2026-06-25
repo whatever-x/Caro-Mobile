@@ -12,6 +12,14 @@ sealed class CaroAuthException(
             message = "Token Expired",
             debugMessage = debugMessage,
             throwable = throwable,
-        ),
-        SilentlyHandledException
+        ), SilentlyHandledException
+
+    data class TokenEmpty(
+        override val debugMessage: String,
+        override val throwable: Throwable? = null,
+    ) : CaroAuthException(
+        message = "Token is Empty",
+        debugMessage = debugMessage,
+        throwable = throwable,
+    )
 }

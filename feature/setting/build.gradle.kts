@@ -1,3 +1,5 @@
+import com.codingfeline.buildkonfig.compiler.FieldSpec
+
 plugins {
     id("caro.kmp")
     id("caro.kmp.ios")
@@ -7,6 +9,7 @@ plugins {
     id("caro.koin")
     id("caro.kmp.test")
     id("caro.kover")
+    alias(libs.plugins.build.konfig)
 }
 
 kotlin {
@@ -18,5 +21,18 @@ kotlin {
         commonMain.dependencies {
             implementation(projects.core.model)
         }
+    }
+}
+
+buildkonfig {
+    packageName = "com.whatever.caro.feature.setting.generated"
+
+    defaultConfigs {
+        buildConfigField(
+            FieldSpec.Type.STRING,
+            "VERSION_NAME",
+            libs.versions.version.name
+                .get(),
+        )
     }
 }

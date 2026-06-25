@@ -1,4 +1,4 @@
-import com.whatever.caro.core.data.repository.AuthRepository
+import com.whatever.caro.core.data.repository.auth.AuthRepository
 import com.whatever.caro.core.navigator.entries.HomeEntry
 import com.whatever.caro.core.navigator.entries.Payload
 import com.whatever.caro.core.viewmodel.ExceptionFilter

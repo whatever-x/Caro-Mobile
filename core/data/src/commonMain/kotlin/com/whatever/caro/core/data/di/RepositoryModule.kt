@@ -1,10 +1,10 @@
 package com.whatever.caro.core.data.di
 
 import com.whatever.caro.core.data.provider.AuthTokenProviderImpl
-import com.whatever.caro.core.data.repository.AuthRepository
-import com.whatever.caro.core.data.repository.AuthRepositoryImpl
-import com.whatever.caro.core.data.repository.FcmTokenRepository
-import com.whatever.caro.core.data.repository.FcmTokenRepositoryImpl
+import com.whatever.caro.core.data.repository.auth.AuthRepository
+import com.whatever.caro.core.data.repository.auth.AuthRepositoryImpl
+import com.whatever.caro.core.data.repository.fcm.FcmTokenRepository
+import com.whatever.caro.core.data.repository.fcm.FcmTokenRepositoryImpl
 import com.whatever.caro.core.data.repository.deck.DeckRepository
 import com.whatever.caro.core.data.repository.deck.DeckRepositoryImpl
 import com.whatever.caro.core.data.repository.profile.ProfileRepository

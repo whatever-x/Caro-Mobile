@@ -1,6 +1,6 @@
 package com.whatever.caro.feature.login
 
-import com.whatever.caro.core.data.repository.AuthRepository
+import com.whatever.caro.core.data.repository.auth.AuthRepository
 import com.whatever.caro.core.model.auth.SocialLoginType
 import com.whatever.caro.core.viewmodel.BaseViewModel
 import com.whatever.caro.core.viewmodel.ExceptionFilter

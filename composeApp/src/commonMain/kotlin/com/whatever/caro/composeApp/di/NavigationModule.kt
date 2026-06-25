@@ -2,6 +2,7 @@ package com.whatever.caro.composeApp.di
 
 import com.whatever.caro.core.navigator.entries.CreateDeckEntry
 import com.whatever.caro.core.navigator.entries.CreateProfileEntry
+import com.whatever.caro.core.navigator.entries.EditProfileEntry
 import com.whatever.caro.core.navigator.entries.HomeEntry
 import com.whatever.caro.core.navigator.entries.LoginEntry
 import com.whatever.caro.core.navigator.entries.SettingEntry
@@ -10,7 +11,9 @@ import com.whatever.caro.feature.deck.CreateDeckRoute
 import com.whatever.caro.feature.home.HomeViewModel
 import com.whatever.caro.feature.home.route.HomeRoute
 import com.whatever.caro.feature.login.LoginRoute
-import com.whatever.caro.feature.profile.route.CreateProfileRoute
+import com.whatever.caro.feature.profile.create.CreateProfileRoute
+import com.whatever.caro.feature.profile.edit.EditProfileRoute
+import com.whatever.caro.feature.profile.edit.EditProfileViewModel
 import com.whatever.caro.feature.setting.route.SettingRoute
 import com.whatever.caro.feature.splash.route.SplashRoute
 import org.koin.compose.viewmodel.koinViewModel
@@ -40,6 +43,13 @@ val navEntryModule: Module =
         navigation<CreateProfileEntry> {
             CreateProfileRoute(
                 viewModel = koinViewModel(),
+                navDispatcher = get(),
+            )
+        }
+
+        navigation<EditProfileEntry> { navKey ->
+            EditProfileRoute(
+                viewModel = koinViewModel<EditProfileViewModel> { parametersOf(navKey.nickname) },
                 navDispatcher = get(),
             )
         }

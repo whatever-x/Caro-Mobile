@@ -41,7 +41,8 @@ internal fun MenuSection(
         modifier =
             modifier
                 .fillMaxWidth()
-                .background(color = CaroTheme.color.surface.primary),
+                .background(color = CaroTheme.color.surface.primary)
+                .padding(horizontal = CaroTheme.spacing.xl2),
     ) {
         items.forEach { menu ->
             when (menu) {
@@ -55,10 +56,9 @@ internal fun MenuSection(
 
                 is SettingMenu.Menu -> {
                     MenuItem(
-                        modifier =
-                            Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = CaroTheme.spacing.l, horizontal = CaroTheme.spacing.xl2),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = CaroTheme.spacing.l),
                         leadingIcon = menu.leadingIcon,
                         content = menu.content,
                         highlight = menu.highlight,
