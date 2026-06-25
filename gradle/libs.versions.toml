@@ -7,7 +7,7 @@ version-code = "2" # major(10), minor(01), patch(01), build(00)
 version-name = "0.0.2" # major(1), minor(1), patch(1)
 
 # Multiplatform
-compose-multiplatform = "1.10.0"
+compose-multiplatform = "1.11.0"
 kotlin = "2.3.20"
 ksp = "2.3.4"
 
@@ -29,16 +29,16 @@ kotlinx-date-time = "0.7.1"
 kotlinx-collections-immutable = "0.4.0"
 
 # org.jetbrains.compose
-compose-runtime = "1.10.0"
-compose-ui = "1.10.0"
-compose-foundation = "1.10.0"
-compose-material3 = "1.10.0-alpha05"
-compose-resources = "1.10.0"
+compose-runtime = "1.11.0"
+compose-ui = "1.11.0"
+compose-foundation = "1.11.0"
+compose-material3 = "1.11.0-alpha07"
+compose-resources = "1.11.0"
 
 # org.jetbrains.androidx
-jetbrains-androidx-lifecycle = "2.10.0-alpha06"
-jetbrains-androidx-navigation3-ui = "1.0.0-alpha06"
-jetbrains-androidx-navigation3-event = "1.0.0"
+jetbrains-androidx-lifecycle = "2.11.0-beta01"
+jetbrains-androidx-navigation3-ui = "1.1.1"
+jetbrains-androidx-navigation3-event = "1.1.0"
 
 # DI
 koin = "4.2.1"
@@ -120,7 +120,7 @@ jetbrains-androidx-lifecycle-viewmodel-savestate = { group = "org.jetbrains.andr
 jetbrains-androidx-lifecycle-runtime-compose = { group = "org.jetbrains.androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "jetbrains-androidx-lifecycle" }
 jetbrains-androidx-lifecycle-viewmodel-nav3 = { group = "org.jetbrains.androidx.lifecycle", name = "lifecycle-viewmodel-navigation3", version.ref = "jetbrains-androidx-lifecycle" }
 jetbrains-androidx-navigation3-ui = { group = "org.jetbrains.androidx.navigation3", name = "navigation3-ui", version.ref = "jetbrains-androidx-navigation3-ui" }
-jetbrains-androidx-navigation3-event = { group = "rg.jetbrains.androidx.navigationevent", name = "navigationevent-compose", version.ref = "jetbrains-androidx-navigation3-event" }
+jetbrains-androidx-navigation3-event = { group = "org.jetbrains.androidx.navigationevent", name = "navigationevent-compose", version.ref = "jetbrains-androidx-navigation3-event" }
 
 # DI
 koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }
