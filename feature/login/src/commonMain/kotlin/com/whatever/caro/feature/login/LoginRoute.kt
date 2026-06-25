@@ -9,13 +9,13 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import caromobile.core.designsystem.generated.resources.Res
 import caromobile.core.designsystem.generated.resources.login_toast_cancel
 import caromobile.core.designsystem.generated.resources.login_toast_error
-import com.whatever.caro.core.designsystem.components.snackbar.LocalSnackbarHostState
-import com.whatever.caro.core.designsystem.components.snackbar.showSnackbarMessage
 import com.whatever.caro.core.model.auth.SocialLoginType
 import com.whatever.caro.core.navigator.contract.NavCommand.To
 import com.whatever.caro.core.navigator.dispatcher.NavigationDispatcher
 import com.whatever.caro.core.navigator.entries.HomeEntry
 import com.whatever.caro.core.navigator.entries.Payload
+import com.whatever.caro.core.ui.toast.ToastController
+import com.whatever.caro.core.ui.toast.ToastMessage
 import com.whatever.caro.feature.login.model.AppleUser
 import com.whatever.caro.feature.login.model.GoogleUser
 import com.whatever.caro.feature.login.model.LoginError
@@ -32,11 +32,11 @@ import org.koin.compose.koinInject
 fun LoginRoute(
     viewModel: LoginViewModel,
     navDispatcher: NavigationDispatcher,
+    toastController: ToastController,
     googleAuthenticator: SocialAuthenticator<GoogleUser> = koinInject<GoogleAuthProvider>().get(),
     appleAuthenticator: SocialAuthenticator<AppleUser> = koinInject<AppleAuthProvider>().get(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
-    val snackbarHost = LocalSnackbarHostState.current
     val coroutineScope = rememberCoroutineScope()
     val loginErrorMessage = stringResource(Res.string.login_toast_error)
     val loginCancelledMessage = stringResource(Res.string.login_toast_cancel)
@@ -84,11 +84,7 @@ fun LoginRoute(
                             LoginError.UNKNOWN -> loginErrorMessage
                             LoginError.USER_CANCELLED -> loginCancelledMessage
                         }
-                    showSnackbarMessage(
-                        coroutineScope = this,
-                        snackbarHostState = snackbarHost,
-                        message = message,
-                    )
+                    toastController.show(ToastMessage(message = message))
                 }
             }
         }

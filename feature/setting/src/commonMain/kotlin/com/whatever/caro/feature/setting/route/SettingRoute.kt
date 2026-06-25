@@ -11,12 +11,12 @@ import caromobile.core.designsystem.generated.resources.setting_report_bug_url
 import caromobile.core.designsystem.generated.resources.setting_terms_of_service_url
 import caromobile.core.designsystem.generated.resources.setting_toast_delete_account
 import caromobile.core.designsystem.generated.resources.setting_toast_logout
-import com.whatever.caro.core.designsystem.components.snackbar.LocalSnackbarHostState
-import com.whatever.caro.core.designsystem.components.snackbar.showSnackbarMessage
 import com.whatever.caro.core.navigator.contract.NavCommand
 import com.whatever.caro.core.navigator.dispatcher.NavigationDispatcher
 import com.whatever.caro.core.navigator.entries.EditProfileEntry
 import com.whatever.caro.core.navigator.entries.LoginEntry
+import com.whatever.caro.core.ui.toast.ToastController
+import com.whatever.caro.core.ui.toast.ToastMessage
 import com.whatever.caro.feature.setting.SettingScreen
 import com.whatever.caro.feature.setting.SettingViewModel
 import com.whatever.caro.feature.setting.model.ToastType
@@ -28,10 +28,10 @@ import org.jetbrains.compose.resources.stringResource
 fun SettingRoute(
     viewModel: SettingViewModel,
     navDispatcher: NavigationDispatcher,
+    toastController: ToastController,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val uriHandler = LocalUriHandler.current
-    val snackbarHostState = LocalSnackbarHostState.current
     val privacyPolicyUrl = stringResource(resource = Res.string.setting_privcay_policy_url)
     val termsOfServiceUrl = stringResource(resource = Res.string.setting_terms_of_service_url)
     val reportBugUrl = stringResource(resource = Res.string.setting_report_bug_url)
@@ -79,11 +79,7 @@ fun SettingRoute(
                             ToastType.LOGOUT -> logoutToastMessage
                             ToastType.DELETE_ACCOUNT -> deleteAccountToastMessage
                         }
-                    showSnackbarMessage(
-                        coroutineScope = this,
-                        snackbarHostState = snackbarHostState,
-                        message = message,
-                    )
+                    toastController.show(ToastMessage(message = message))
                 }
             }
         }

@@ -37,6 +37,7 @@ val navEntryModule: Module =
             LoginRoute(
                 viewModel = koinViewModel(),
                 navDispatcher = get(),
+                toastController = get(),
             )
         }
 
@@ -72,6 +73,7 @@ val navEntryModule: Module =
             SettingRoute(
                 viewModel = koinViewModel(),
                 navDispatcher = get(),
+                toastController = get(),
             )
         }
     }

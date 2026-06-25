@@ -16,6 +16,7 @@ import androidx.savedstate.serialization.SavedStateConfiguration
 import com.whatever.caro.core.designsystem.components.snackbar.CaroSnackBarHost
 import com.whatever.caro.core.designsystem.components.snackbar.CaroSnackbar
 import com.whatever.caro.core.designsystem.components.snackbar.LocalSnackbarHostState
+import com.whatever.caro.core.designsystem.components.snackbar.showSnackbarMessage
 import com.whatever.caro.core.designsystem.themes.CaroTheme
 import com.whatever.caro.core.model.auth.AuthSessionEvent
 import com.whatever.caro.core.model.auth.AuthSessionEventBus
@@ -29,6 +30,7 @@ import com.whatever.caro.core.navigator.entries.LoginEntry
 import com.whatever.caro.core.navigator.entries.SettingEntry
 import com.whatever.caro.core.navigator.entries.SplashEntry
 import com.whatever.caro.core.ui.image.ConfigureCaroImageLoader
+import com.whatever.caro.core.ui.toast.ToastController
 import io.github.aakira.napier.Napier
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
@@ -38,6 +40,7 @@ import org.koin.compose.koinInject
 fun CaroApp(
     navDispatcher: NavigationDispatcher = koinInject(),
     authSessionEventBus: AuthSessionEventBus = koinInject(),
+    toastController: ToastController = koinInject(),
 ) {
     ConfigureCaroImageLoader()
 
@@ -102,6 +105,17 @@ fun CaroApp(
     }
     CaroTheme {
         val snackBarHostState = remember { SnackbarHostState() }
+
+        LaunchedEffect(toastController, snackBarHostState) {
+            toastController.messages.collect { toast ->
+                showSnackbarMessage(
+                    coroutineScope = this,
+                    snackbarHostState = snackBarHostState,
+                    message = toast.message,
+                )
+            }
+        }
+
         CompositionLocalProvider(
             LocalSnackbarHostState provides snackBarHostState,
         ) {
