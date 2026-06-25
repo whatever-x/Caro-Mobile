@@ -59,6 +59,7 @@ val navEntryModule: Module =
             CreateDeckRoute(
                 viewModel = koinViewModel(),
                 navDispatcher = get(),
+                toastController = get(),
             )
         }
 

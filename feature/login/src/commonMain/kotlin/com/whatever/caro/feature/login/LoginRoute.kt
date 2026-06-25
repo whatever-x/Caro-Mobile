@@ -9,6 +9,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import caromobile.core.designsystem.generated.resources.Res
 import caromobile.core.designsystem.generated.resources.login_toast_cancel
 import caromobile.core.designsystem.generated.resources.login_toast_error
+import com.whatever.caro.core.designsystem.components.snackbar.CaroSnackbarStyle
 import com.whatever.caro.core.model.auth.SocialLoginType
 import com.whatever.caro.core.navigator.contract.NavCommand.To
 import com.whatever.caro.core.navigator.dispatcher.NavigationDispatcher
@@ -84,7 +85,12 @@ fun LoginRoute(
                             LoginError.UNKNOWN -> loginErrorMessage
                             LoginError.USER_CANCELLED -> loginCancelledMessage
                         }
-                    toastController.show(ToastMessage(message = message))
+                    toastController.show(
+                        ToastMessage(
+                            message = message,
+                            style = CaroSnackbarStyle.Error,
+                        ),
+                    )
                 }
             }
         }

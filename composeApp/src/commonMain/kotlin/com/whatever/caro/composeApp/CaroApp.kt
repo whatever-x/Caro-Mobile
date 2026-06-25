@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -15,7 +14,6 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.savedstate.serialization.SavedStateConfiguration
 import com.whatever.caro.core.designsystem.components.snackbar.CaroSnackBarHost
 import com.whatever.caro.core.designsystem.components.snackbar.CaroSnackbar
-import com.whatever.caro.core.designsystem.components.snackbar.LocalSnackbarHostState
 import com.whatever.caro.core.designsystem.components.snackbar.showSnackbarMessage
 import com.whatever.caro.core.designsystem.themes.CaroTheme
 import com.whatever.caro.core.model.auth.AuthSessionEvent
@@ -112,37 +110,35 @@ fun CaroApp(
                     coroutineScope = this,
                     snackbarHostState = snackBarHostState,
                     message = toast.message,
+                    style = toast.style,
+                    duration = toast.duration,
                 )
             }
         }
 
-        CompositionLocalProvider(
-            LocalSnackbarHostState provides snackBarHostState,
-        ) {
-            Scaffold(
-                modifier = Modifier.fillMaxSize(),
-                snackbarHost = {
-                    CaroSnackBarHost(
-                        modifier = Modifier,
-                        hostState = LocalSnackbarHostState.current,
-                        snackbar = { snackbarData ->
-                            CaroSnackbar(
-                                snackbarData = snackbarData,
-                            )
-                        },
-                    )
-                },
-            ) { innerPadding ->
-                Box(
-                    modifier =
-                        Modifier
-                            .fillMaxSize()
-                            .padding(paddingValues = innerPadding),
-                ) {
-                    CaroNavHost(
-                        backStack = backStack,
-                    )
-                }
+        Scaffold(
+            modifier = Modifier.fillMaxSize(),
+            snackbarHost = {
+                CaroSnackBarHost(
+                    modifier = Modifier,
+                    hostState = snackBarHostState,
+                    snackbar = { snackbarData ->
+                        CaroSnackbar(
+                            snackbarData = snackbarData,
+                        )
+                    },
+                )
+            },
+        ) { innerPadding ->
+            Box(
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues = innerPadding),
+            ) {
+                CaroNavHost(
+                    backStack = backStack,
+                )
             }
         }
     }
