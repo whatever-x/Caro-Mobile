@@ -79,13 +79,9 @@ private fun CaroDialogContent(
     ) {
         title?.let { titleContent ->
             titleContent()
-            Spacer(modifier = Modifier.height(CaroTheme.spacing.m))
         }
-
         content()
-
         buttons?.let { buttonsContent ->
-            Spacer(modifier = Modifier.height(CaroTheme.spacing.xl))
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(CaroTheme.spacing.s),
