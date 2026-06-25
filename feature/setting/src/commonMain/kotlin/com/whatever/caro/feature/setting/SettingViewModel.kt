@@ -18,10 +18,6 @@ class SettingViewModel(
     ) {
     override suspend fun handleIntent(intent: SettingIntent) {
         when (intent) {
-            SettingIntent.ClickDeleteAccount -> {
-                deleteAccount()
-            }
-
             SettingIntent.ClickLogOut -> {
                 logout()
             }
@@ -57,11 +53,28 @@ class SettingViewModel(
             SettingIntent.ClickBack -> {
                 postSideEffect(SettingSideEffect.PopBackStack)
             }
+
+            SettingIntent.ClickDeleteAccountDialogCancel,
+            SettingIntent.ClickDeleteAccount,
+            -> {
+                controlAccountDeleteButton()
+            }
+
+            SettingIntent.ClickDeleteAccountDialogConfirm -> {
+                deleteAccount()
+            }
         }
     }
 
-    private suspend fun deleteAccount() {
+    private fun controlAccountDeleteButton() {
+        reduce { copy(accountDeleteDialogVisible = !accountDeleteDialogVisible) }
+    }
+
+    // TODO: 계정 삭제 필요
+    private fun deleteAccount() {
+        reduce { copy(accountDeleteDialogVisible = false) }
         postSideEffect(SettingSideEffect.ShowToast(type = ToastType.DELETE_ACCOUNT))
+        postSideEffect(SettingSideEffect.NavigateToLogin)
     }
 
     private suspend fun logout() {

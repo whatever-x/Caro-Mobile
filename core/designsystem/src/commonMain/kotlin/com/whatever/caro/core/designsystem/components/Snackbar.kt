@@ -1,4 +1,4 @@
-package com.whatever.caro.core.designsystem.components.snackbar
+package com.whatever.caro.core.designsystem.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box

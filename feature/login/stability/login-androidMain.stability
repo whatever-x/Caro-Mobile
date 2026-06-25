@@ -5,12 +5,13 @@
 //   ./gradlew :login:stabilityDump
 
 @Composable
-public fun com.whatever.caro.feature.login.LoginRoute(viewModel: com.whatever.caro.feature.login.LoginViewModel, navDispatcher: com.whatever.caro.core.navigator.dispatcher.NavigationDispatcher, googleAuthenticator: com.whatever.caro.feature.login.model.SocialAuthenticator<com.whatever.caro.feature.login.model.GoogleUser>, appleAuthenticator: com.whatever.caro.feature.login.model.SocialAuthenticator<com.whatever.caro.feature.login.model.AppleUser>): kotlin.Unit
+public fun com.whatever.caro.feature.login.LoginRoute(viewModel: com.whatever.caro.feature.login.LoginViewModel, navDispatcher: com.whatever.caro.core.navigator.dispatcher.NavigationDispatcher, toastController: com.whatever.caro.core.ui.toast.ToastController, googleAuthenticator: com.whatever.caro.feature.login.model.SocialAuthenticator<com.whatever.caro.feature.login.model.GoogleUser>, appleAuthenticator: com.whatever.caro.feature.login.model.SocialAuthenticator<com.whatever.caro.feature.login.model.AppleUser>): kotlin.Unit
   skippable: false
   restartable: true
   params:
     - viewModel: RUNTIME (requires runtime check)
     - navDispatcher: RUNTIME (requires runtime check)
+    - toastController: RUNTIME (requires runtime check)
     - googleAuthenticator: RUNTIME (requires runtime check)
     - appleAuthenticator: RUNTIME (requires runtime check)
 

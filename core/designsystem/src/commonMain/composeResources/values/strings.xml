@@ -63,4 +63,8 @@
 	<string name="setting_report_bug_url">https://www.naver.com</string>
 	<string name="setting_toast_logout">Successfully logged out.</string>
 	<string name="setting_toast_delete_account">Account deleted successfully.</string>
+	<string name="setting_dialog_title">Are you sure you want to delete your account?</string>
+	<string name="setting_dialog_content">All your saved data will be permanently removed.</string>
+	<string name="setting_dialog_button_delete_account">Delete Account</string>
+	<string name="setting_dialog_button_cancel">Cancel</string>
 </resources>

@@ -1,7 +1,7 @@
 package com.whatever.caro.core.ui.toast
 
 import androidx.compose.material3.SnackbarDuration
-import com.whatever.caro.core.designsystem.components.snackbar.CaroSnackbarStyle
+import com.whatever.caro.core.designsystem.components.CaroSnackbarStyle
 
 /**
  * 이미 해석된 토스트 문자열을 운반하는 계약 타입. 문자열 지역화는 호출부(Route)에서 처리한다.

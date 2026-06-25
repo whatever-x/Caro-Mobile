@@ -16,4 +16,8 @@ sealed interface SettingIntent : UiIntent {
     data object ClickLogOut : SettingIntent
 
     data object ClickDeleteAccount : SettingIntent
+
+    data object ClickDeleteAccountDialogConfirm : SettingIntent
+
+    data object ClickDeleteAccountDialogCancel : SettingIntent
 }

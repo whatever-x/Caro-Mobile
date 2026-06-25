@@ -12,9 +12,9 @@ import androidx.compose.ui.Modifier
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.savedstate.serialization.SavedStateConfiguration
-import com.whatever.caro.core.designsystem.components.snackbar.CaroSnackBarHost
-import com.whatever.caro.core.designsystem.components.snackbar.CaroSnackbar
-import com.whatever.caro.core.designsystem.components.snackbar.showSnackbarMessage
+import com.whatever.caro.core.designsystem.components.CaroSnackBarHost
+import com.whatever.caro.core.designsystem.components.CaroSnackbar
+import com.whatever.caro.core.designsystem.components.showSnackbarMessage
 import com.whatever.caro.core.designsystem.themes.CaroTheme
 import com.whatever.caro.core.model.auth.AuthSessionEvent
 import com.whatever.caro.core.model.auth.AuthSessionEventBus

@@ -32,6 +32,28 @@ private fun com.whatever.caro.core.designsystem.animation.animatedSlideOffsetY(a
     - onAnimationFinish: STABLE (function type)
 
 @Composable
+public fun com.whatever.caro.core.designsystem.components.CaroDialog(onDismissRequest: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier, properties: androidx.compose.ui.window.DialogProperties, title: @[Composable] androidx.compose.runtime.internal.ComposableFunction0<kotlin.Unit>?, buttons: @[Composable] @[ExtensionFunctionType] androidx.compose.runtime.internal.ComposableFunction1<androidx.compose.foundation.layout.RowScope, kotlin.Unit>?, content: @[Composable] androidx.compose.runtime.internal.ComposableFunction0<kotlin.Unit>): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - onDismissRequest: STABLE (function type)
+    - modifier: STABLE (marked @Stable or @Immutable)
+    - properties: STABLE (marked @Stable or @Immutable)
+    - title: STABLE (composable function type)
+    - buttons: STABLE (composable function type)
+    - content: STABLE (composable function type)
+
+@Composable
+private fun com.whatever.caro.core.designsystem.components.CaroDialogContent(modifier: androidx.compose.ui.Modifier, title: @[Composable] androidx.compose.runtime.internal.ComposableFunction0<kotlin.Unit>?, buttons: @[Composable] @[ExtensionFunctionType] androidx.compose.runtime.internal.ComposableFunction1<androidx.compose.foundation.layout.RowScope, kotlin.Unit>?, content: @[Composable] androidx.compose.runtime.internal.ComposableFunction0<kotlin.Unit>): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - modifier: STABLE (marked @Stable or @Immutable)
+    - title: STABLE (composable function type)
+    - buttons: STABLE (composable function type)
+    - content: STABLE (composable function type)
+
+@Composable
 public fun com.whatever.caro.core.designsystem.components.CaroSnackBarHost(modifier: androidx.compose.ui.Modifier, hostState: androidx.compose.material3.SnackbarHostState, snackbar: @[Composable] androidx.compose.runtime.internal.ComposableFunction1<androidx.compose.material3.SnackbarData, kotlin.Unit>): kotlin.Unit
   skippable: true
   restartable: true
@@ -109,6 +131,22 @@ private fun com.whatever.caro.core.designsystem.components.PreviewArrowLeftIcon(
   params:
 
 @Composable
+private fun com.whatever.caro.core.designsystem.components.PreviewBody(): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+
+@Composable
+private fun com.whatever.caro.core.designsystem.components.PreviewButton(text: kotlin.String, backgroundColor: androidx.compose.ui.graphics.Color, textColor: androidx.compose.ui.graphics.Color, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - text: STABLE (String is immutable)
+    - backgroundColor: STABLE (marked @Stable or @Immutable)
+    - textColor: STABLE (marked @Stable or @Immutable)
+    - modifier: STABLE (marked @Stable or @Immutable)
+
+@Composable
 private fun com.whatever.caro.core.designsystem.components.PreviewCenterComponent(): kotlin.Unit
   skippable: true
   restartable: true
@@ -142,6 +180,12 @@ private fun com.whatever.caro.core.designsystem.components.PreviewMoreIcon(): ko
 
 @Composable
 private fun com.whatever.caro.core.designsystem.components.PreviewText(): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+
+@Composable
+private fun com.whatever.caro.core.designsystem.components.PreviewTitle(): kotlin.Unit
   skippable: true
   restartable: true
   params:
