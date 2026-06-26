@@ -11,7 +11,6 @@ import io.kotest.koin.KoinExtension
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
@@ -47,7 +46,6 @@ class HomeViewModelTest :
 
         afterTest {
             Dispatchers.resetMain()
-            dispatcher.cancel()
         }
 
         test("init() 호출 시 navKey payload 로 state 갱신") {

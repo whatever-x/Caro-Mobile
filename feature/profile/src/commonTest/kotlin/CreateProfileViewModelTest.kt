@@ -18,7 +18,6 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
@@ -36,7 +35,6 @@ class CreateProfileViewModelTest : FunSpec() {
 
         afterTest {
             Dispatchers.resetMain()
-            dispatcher.cancel()
         }
 
         fun createViewModel(
