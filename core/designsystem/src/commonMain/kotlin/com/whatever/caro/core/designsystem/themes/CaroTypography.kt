@@ -17,15 +17,19 @@ data class CaroTypography(
     val body1: TextStyle,
     val body2: Body2Style,
     val body3: TextStyle,
-    val body4: TextStyle,
+    val body4: Body4Style,
     val label1: TextStyle,
     val label2: TextStyle,
-    val caption1: TextStyle,
+    val caption1: Caption1Style,
     val caption2: TextStyle,
     val robotoLabel1: TextStyle,
 ) {
     interface SemiBoldStyle {
         val semiBold: TextStyle
+    }
+
+    interface RegularStyle {
+        val regular: TextStyle
     }
 
     interface MediumStyle {
@@ -38,6 +42,16 @@ data class CaroTypography(
         override val medium: TextStyle,
     ) : SemiBoldStyle,
         MediumStyle
+
+    @Immutable
+    data class Body4Style(
+        override val regular: TextStyle
+    ) : RegularStyle
+
+    @Immutable
+    data class Caption1Style(
+        override val regular: TextStyle
+    ) : RegularStyle
 
     companion object {
         fun defaultTypography(
@@ -103,13 +117,14 @@ data class CaroTypography(
                     fontSize = 14.sp,
                     lineHeight = 22.sp,
                 ),
-            body4 =
-                TextStyle(
+            body4 = Body4Style(
+                regular = TextStyle(
                     fontFamily = pretendard,
                     fontWeight = FontWeight.W400,
                     fontSize = 14.sp,
                     lineHeight = 20.sp,
                 ),
+            ),
             label1 =
                 TextStyle(
                     fontFamily = pretendard,
@@ -122,12 +137,13 @@ data class CaroTypography(
                     fontWeight = FontWeight.W500,
                     fontSize = 14.sp,
                 ),
-            caption1 =
-                TextStyle(
+            caption1 = Caption1Style(
+                regular = TextStyle(
                     fontFamily = pretendard,
                     fontWeight = FontWeight.W500,
                     fontSize = 12.sp,
                 ),
+            ),
             caption2 =
                 TextStyle(
                     fontFamily = pretendard,

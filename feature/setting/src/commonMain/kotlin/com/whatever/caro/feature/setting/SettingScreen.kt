@@ -167,14 +167,14 @@ private fun UserInfo(
     modifier: Modifier = Modifier,
     nickname: String,
     emailAddress: String,
-    socialLoginType: SocialLoginType?,
+    socialLoginType: SocialLoginType,
     onNicknameChangeClick: () -> Unit,
 ) {
-    if (socialLoginType == null) return
     val socialIcon =
         when (socialLoginType) {
             SocialLoginType.GOOGLE -> Res.drawable.ic_logo_google_small
             SocialLoginType.APPLE -> Res.drawable.ic_logo_apple_small
+            else -> return
         }
 
     Row(
@@ -203,7 +203,7 @@ private fun UserInfo(
             )
             Text(
                 text = emailAddress,
-                style = CaroTheme.typography.body4,
+                style = CaroTheme.typography.body4.regular,
                 color = CaroTheme.color.text.secondary,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
@@ -222,7 +222,7 @@ private fun UserInfo(
         ) {
             Text(
                 text = stringResource(Res.string.setting_userinfo_nickname_change),
-                style = CaroTheme.typography.caption1,
+                style = CaroTheme.typography.caption1.regular,
                 color = CaroTheme.color.text.brand,
             )
         }

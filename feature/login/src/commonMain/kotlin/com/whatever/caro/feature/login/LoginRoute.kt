@@ -55,6 +55,8 @@ fun LoginRoute(
                             val result = appleAuthenticator.authenticate()
                             viewModel.intent(LoginIntent.ClickAppleLoginButton(result))
                         }
+
+                        SocialLoginType.NONE -> {}
                     }
                 }
             }

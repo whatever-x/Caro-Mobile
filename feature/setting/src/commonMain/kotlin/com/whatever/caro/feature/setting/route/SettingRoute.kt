@@ -166,7 +166,7 @@ private fun DeleteAccountDialog(
                             ).noRippleClickable(onDeleteAccountClick),
                     text = stringResource(Res.string.setting_dialog_button_delete_account),
                     color = Color(0xFFFF7A70),
-                    style = CaroTheme.typography.caption1,
+                    style = CaroTheme.typography.caption1.regular,
                     textAlign = TextAlign.Center,
                 )
                 Text(
@@ -182,7 +182,7 @@ private fun DeleteAccountDialog(
                             ).noRippleClickable(onCancelClick),
                     text = stringResource(Res.string.setting_dialog_button_cancel),
                     color = CaroTheme.color.text.brand,
-                    style = CaroTheme.typography.caption1,
+                    style = CaroTheme.typography.caption1.regular,
                     textAlign = TextAlign.Center,
                 )
             }

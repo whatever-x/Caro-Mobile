@@ -35,6 +35,7 @@ class SplashViewModel(
 
     private suspend fun initialize() {
         delay(MINIMUM_SPLASH_DURATION_MILLIS)
+        // TODO : 서버에서 세션 확인 API 만들어지면 변경
         authRepository.refreshToken()
         reduce { copy(isInitializing = false) }
         postSideEffect(SplashSideEffect.NavigateHome)

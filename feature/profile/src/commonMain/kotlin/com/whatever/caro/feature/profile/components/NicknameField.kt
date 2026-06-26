@@ -116,7 +116,7 @@ private fun NicknameHeader(onRefreshClick: () -> Unit) {
             )
             Text(
                 text = stringResource(Res.string.profile_button_random),
-                style = CaroTheme.typography.caption1,
+                style = CaroTheme.typography.caption1.regular,
                 color = CaroTheme.color.text.brand,
             )
         }
@@ -131,13 +131,13 @@ private fun NicknameFooter(characterCount: String) {
     ) {
         Text(
             text = stringResource(Res.string.profile_field_rule_nickname),
-            style = CaroTheme.typography.caption1,
+            style = CaroTheme.typography.caption1.regular,
             color = CaroTheme.color.text.secondary,
         )
         Spacer(modifier = Modifier.weight(1f))
         Text(
             text = characterCount,
-            style = CaroTheme.typography.caption1,
+            style = CaroTheme.typography.caption1.regular,
             color = CaroTheme.color.text.tertiary,
             textAlign = TextAlign.End,
         )

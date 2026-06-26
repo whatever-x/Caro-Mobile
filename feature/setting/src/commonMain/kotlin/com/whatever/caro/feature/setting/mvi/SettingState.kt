@@ -7,6 +7,6 @@ data class SettingState(
     val isLoading: Boolean = false,
     val nickname: String = "",
     val emailAddress: String = "",
-    val socialLoginType: SocialLoginType? = null,
+    val socialLoginType: SocialLoginType = SocialLoginType.NONE,
     val accountDeleteDialogVisible: Boolean = false,
 ) : UiState

@@ -202,7 +202,7 @@ private fun DeckStateBadge(
                 .border(width = 1.dp, color = borderColor, shape = badgeShape)
                 .padding(vertical = CaroTheme.spacing.xs, horizontal = CaroTheme.spacing.s),
         text = stringResource(stringRes),
-        style = CaroTheme.typography.caption1,
+        style = CaroTheme.typography.caption1.regular,
         color = textColor,
     )
 }
