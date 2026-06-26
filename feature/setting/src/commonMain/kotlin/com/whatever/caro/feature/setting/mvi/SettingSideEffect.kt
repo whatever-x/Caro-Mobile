@@ -1,7 +1,7 @@
 package com.whatever.caro.feature.setting.mvi
 
 import com.whatever.caro.core.viewmodel.contract.UiSideEffect
-import com.whatever.caro.feature.setting.model.ToastType
+import com.whatever.caro.feature.setting.model.SnackbarType
 import com.whatever.caro.feature.setting.model.WebViewType
 
 sealed interface SettingSideEffect : UiSideEffect {
@@ -15,8 +15,8 @@ sealed interface SettingSideEffect : UiSideEffect {
         val type: WebViewType,
     ) : SettingSideEffect
 
-    data class ShowToast(
-        val type: ToastType,
+    data class ShowSnackbar(
+        val type: SnackbarType,
     ) : SettingSideEffect
 
     data object PopBackStack : SettingSideEffect

@@ -45,7 +45,7 @@ fun CaroDialog(
     modifier: Modifier = Modifier,
     properties: DialogProperties = DialogProperties(usePlatformDefaultWidth = false),
     title: (@Composable () -> Unit)? = null,
-    buttons: (@Composable RowScope.() -> Unit)? = null,
+    buttons: (@Composable () -> Unit)? = null,
     content: @Composable () -> Unit,
 ) {
     Dialog(
@@ -65,7 +65,7 @@ fun CaroDialog(
 private fun CaroDialogContent(
     modifier: Modifier = Modifier,
     title: (@Composable () -> Unit)? = null,
-    buttons: (@Composable RowScope.() -> Unit)? = null,
+    buttons: (@Composable () -> Unit)? = null,
     content: @Composable () -> Unit,
 ) {
     Column(
@@ -83,11 +83,7 @@ private fun CaroDialogContent(
         }
         content()
         buttons?.let { buttonsContent ->
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(CaroTheme.spacing.s),
-                content = buttonsContent,
-            )
+            buttonsContent()
         }
     }
 }
@@ -99,18 +95,20 @@ private fun CaroDialogFullPreview() {
         CaroDialogContent(
             title = { PreviewTitle() },
             buttons = {
-                PreviewButton(
-                    text = "취소",
-                    modifier = Modifier.weight(1f),
-                    backgroundColor = CaroTheme.color.surface.secondary,
-                    textColor = CaroTheme.color.text.secondary,
-                )
-                PreviewButton(
-                    text = "확인",
-                    modifier = Modifier.weight(1f),
-                    backgroundColor = CaroTheme.color.surface.brand,
-                    textColor = CaroTheme.color.text.inverse,
-                )
+                Row(modifier = Modifier.fillMaxWidth()) {
+                    PreviewButton(
+                        text = "취소",
+                        modifier = Modifier.weight(1f),
+                        backgroundColor = CaroTheme.color.surface.secondary,
+                        textColor = CaroTheme.color.text.secondary,
+                    )
+                    PreviewButton(
+                        text = "확인",
+                        modifier = Modifier.weight(1f),
+                        backgroundColor = CaroTheme.color.surface.brand,
+                        textColor = CaroTheme.color.text.inverse,
+                    )
+                }
             },
         ) {
             PreviewBody()

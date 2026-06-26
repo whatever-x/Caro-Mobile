@@ -2,9 +2,7 @@ package com.whatever.caro.feature.setting.route
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -27,9 +25,9 @@ import caromobile.core.designsystem.generated.resources.setting_dialog_content
 import caromobile.core.designsystem.generated.resources.setting_dialog_title
 import caromobile.core.designsystem.generated.resources.setting_privcay_policy_url
 import caromobile.core.designsystem.generated.resources.setting_report_bug_url
+import caromobile.core.designsystem.generated.resources.setting_snackbar_delete_account
+import caromobile.core.designsystem.generated.resources.setting_snackbar_logout
 import caromobile.core.designsystem.generated.resources.setting_terms_of_service_url
-import caromobile.core.designsystem.generated.resources.setting_toast_delete_account
-import caromobile.core.designsystem.generated.resources.setting_toast_logout
 import com.whatever.caro.core.designsystem.components.CaroDialog
 import com.whatever.caro.core.designsystem.themes.CaroTheme
 import com.whatever.caro.core.navigator.contract.NavCommand
@@ -37,11 +35,11 @@ import com.whatever.caro.core.navigator.dispatcher.NavigationDispatcher
 import com.whatever.caro.core.navigator.entries.EditProfileEntry
 import com.whatever.caro.core.navigator.entries.LoginEntry
 import com.whatever.caro.core.ui.modifier.noRippleClickable
-import com.whatever.caro.core.ui.toast.ToastController
-import com.whatever.caro.core.ui.toast.ToastMessage
+import com.whatever.caro.core.ui.snackbar.SnackBarMessage
+import com.whatever.caro.core.ui.snackbar.SnackbarController
 import com.whatever.caro.feature.setting.SettingScreen
 import com.whatever.caro.feature.setting.SettingViewModel
-import com.whatever.caro.feature.setting.model.ToastType
+import com.whatever.caro.feature.setting.model.SnackbarType
 import com.whatever.caro.feature.setting.model.WebViewType
 import com.whatever.caro.feature.setting.mvi.SettingIntent
 import com.whatever.caro.feature.setting.mvi.SettingSideEffect
@@ -51,16 +49,16 @@ import org.jetbrains.compose.resources.stringResource
 fun SettingRoute(
     viewModel: SettingViewModel,
     navDispatcher: NavigationDispatcher,
-    toastController: ToastController,
+    snackbarController: SnackbarController,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val uriHandler = LocalUriHandler.current
     val privacyPolicyUrl = stringResource(resource = Res.string.setting_privcay_policy_url)
     val termsOfServiceUrl = stringResource(resource = Res.string.setting_terms_of_service_url)
     val reportBugUrl = stringResource(resource = Res.string.setting_report_bug_url)
-    val logoutToastMessage = stringResource(resource = Res.string.setting_toast_logout)
-    val deleteAccountToastMessage =
-        stringResource(resource = Res.string.setting_toast_delete_account)
+    val logoutSnackbarMessage = stringResource(resource = Res.string.setting_snackbar_logout)
+    val deleteAccountSnackbarMessage =
+        stringResource(resource = Res.string.setting_snackbar_delete_account)
 
     LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
         viewModel.intent(SettingIntent.Initialize)
@@ -101,13 +99,13 @@ fun SettingRoute(
                     )
                 }
 
-                is SettingSideEffect.ShowToast -> {
+                is SettingSideEffect.ShowSnackbar -> {
                     val message =
                         when (sideEffect.type) {
-                            ToastType.LOGOUT -> logoutToastMessage
-                            ToastType.DELETE_ACCOUNT -> deleteAccountToastMessage
+                            SnackbarType.LOGOUT -> logoutSnackbarMessage
+                            SnackbarType.DELETE_ACCOUNT -> deleteAccountSnackbarMessage
                         }
-                    toastController.show(ToastMessage(message = message))
+                    snackbarController.show(SnackBarMessage(message = message))
                 }
             }
         }

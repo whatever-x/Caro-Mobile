@@ -2,7 +2,7 @@ import app.cash.turbine.test
 import com.whatever.caro.core.data.repository.auth.AuthRepository
 import com.whatever.caro.core.viewmodel.ExceptionFilter
 import com.whatever.caro.feature.setting.SettingViewModel
-import com.whatever.caro.feature.setting.model.ToastType
+import com.whatever.caro.feature.setting.model.SnackbarType
 import com.whatever.caro.feature.setting.model.WebViewType
 import com.whatever.caro.feature.setting.mvi.SettingIntent
 import com.whatever.caro.feature.setting.mvi.SettingSideEffect
@@ -47,7 +47,7 @@ class SettingViewModelTest : FunSpec() {
             return viewModel to authRepository
         }
 
-        test("ClickLogOut 은 logout 을 호출하고 ShowToast(LOGOUT) 와 NavigateToLogin 을 순서대로 emit 한다") {
+        test("ClickLogOut 은 logout 을 호출하고 ShowSnackbar(LOGOUT) 와 NavigateToLogin 을 순서대로 emit 한다") {
             runTest {
                 val (viewModel, authRepository) = createViewModel()
 
@@ -55,7 +55,7 @@ class SettingViewModelTest : FunSpec() {
                     viewModel.intent(SettingIntent.ClickLogOut)
                     advanceUntilIdle()
 
-                    awaitItem() shouldBe SettingSideEffect.ShowToast(type = ToastType.LOGOUT)
+                    awaitItem() shouldBe SettingSideEffect.ShowSnackbar(type = SnackbarType.LOGOUT)
                     awaitItem() shouldBe SettingSideEffect.NavigateToLogin
                 }
                 verifySuspend(exactly(1)) { authRepository.logout() }
@@ -157,7 +157,7 @@ class SettingViewModelTest : FunSpec() {
             }
         }
 
-        test("ClickDeleteAccountDialogConfirm 은 다이얼로그를 닫고 ShowToast(DELETE_ACCOUNT) 와 NavigateToLogin 을 emit 한다") {
+        test("ClickDeleteAccountDialogConfirm 은 다이얼로그를 닫고 ShowSnackbar(DELETE_ACCOUNT) 와 NavigateToLogin 을 emit 한다") {
             runTest {
                 val (viewModel, _) = createViewModel()
 
@@ -168,7 +168,7 @@ class SettingViewModelTest : FunSpec() {
                     viewModel.intent(SettingIntent.ClickDeleteAccountDialogConfirm)
                     advanceUntilIdle()
 
-                    awaitItem() shouldBe SettingSideEffect.ShowToast(type = ToastType.DELETE_ACCOUNT)
+                    awaitItem() shouldBe SettingSideEffect.ShowSnackbar(type = SnackbarType.DELETE_ACCOUNT)
                     awaitItem() shouldBe SettingSideEffect.NavigateToLogin
                 }
                 viewModel.state.value.accountDeleteDialogVisible shouldBe false

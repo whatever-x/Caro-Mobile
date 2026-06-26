@@ -37,7 +37,7 @@ val navEntryModule: Module =
             LoginRoute(
                 viewModel = koinViewModel(),
                 navDispatcher = get(),
-                toastController = get(),
+                snackbarController = get(),
             )
         }
 
@@ -59,7 +59,7 @@ val navEntryModule: Module =
             CreateDeckRoute(
                 viewModel = koinViewModel(),
                 navDispatcher = get(),
-                toastController = get(),
+                snackbarController = get(),
             )
         }
 
@@ -74,7 +74,7 @@ val navEntryModule: Module =
             SettingRoute(
                 viewModel = koinViewModel(),
                 navDispatcher = get(),
-                toastController = get(),
+                snackbarController = get(),
             )
         }
     }

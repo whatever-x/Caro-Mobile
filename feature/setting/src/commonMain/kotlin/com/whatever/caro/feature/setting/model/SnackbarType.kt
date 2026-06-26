@@ -1,6 +1,6 @@
 package com.whatever.caro.feature.setting.model
 
-enum class ToastType {
+enum class SnackbarType {
     LOGOUT,
     DELETE_ACCOUNT,
 }

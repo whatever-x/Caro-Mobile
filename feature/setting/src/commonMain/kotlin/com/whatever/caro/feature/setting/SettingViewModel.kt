@@ -3,7 +3,7 @@ package com.whatever.caro.feature.setting
 import com.whatever.caro.core.data.repository.auth.AuthRepository
 import com.whatever.caro.core.viewmodel.BaseViewModel
 import com.whatever.caro.core.viewmodel.ExceptionFilter
-import com.whatever.caro.feature.setting.model.ToastType
+import com.whatever.caro.feature.setting.model.SnackbarType
 import com.whatever.caro.feature.setting.model.WebViewType
 import com.whatever.caro.feature.setting.mvi.SettingIntent
 import com.whatever.caro.feature.setting.mvi.SettingSideEffect
@@ -81,13 +81,13 @@ class SettingViewModel(
     // TODO: 계정 삭제 필요
     private fun deleteAccount() {
         reduce { copy(accountDeleteDialogVisible = false) }
-        postSideEffect(SettingSideEffect.ShowToast(type = ToastType.DELETE_ACCOUNT))
+        postSideEffect(SettingSideEffect.ShowSnackbar(type = SnackbarType.DELETE_ACCOUNT))
         postSideEffect(SettingSideEffect.NavigateToLogin)
     }
 
     private suspend fun logout() {
         authRepository.logout()
-        postSideEffect(SettingSideEffect.ShowToast(type = ToastType.LOGOUT))
+        postSideEffect(SettingSideEffect.ShowSnackbar(type = SnackbarType.LOGOUT))
         postSideEffect(SettingSideEffect.NavigateToLogin)
     }
 }

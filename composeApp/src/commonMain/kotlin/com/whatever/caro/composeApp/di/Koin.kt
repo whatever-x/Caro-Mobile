@@ -31,7 +31,7 @@ fun initKoin(configuration: KoinAppDeclaration? = null) {
             navigatorModule,
             // app
             appPolicyModule,
-            toastModule,
+            snackbar,
             // data
             repositoryModule,
             dataModule,

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <resources>
     <!-- login -->
-    <string name="login_toast_cancel">취소되었습니다.</string>
-    <string name="login_toast_error">오류가 발생했습니다.</string>
+    <string name="login_snackbar_cancel">취소되었습니다.</string>
+    <string name="login_snackbar_error">오류가 발생했습니다.</string>
     <string name="login_text_logo_description">카드 한 장으로 시작하는\n매일의 학습 습관</string>
     <string name="login_text_bottom_terms_of_service">계속하면 이용약관 및 개인정보 처리방침에 동의하게 됩니다.</string>
     <string name="login_button_google">Google 계정으로 로그인</string>
@@ -33,7 +33,7 @@
     <string name="deck_tip_label">TIP</string>
     <string name="deck_tip_max_cards">한 덱에 최대 200장의 카드를 담을 수 있어요.</string>
     <string name="deck_button_create">만들기</string>
-    <string name="deck_toast_create_error">덱 만들기에 실패했어요. 잠시 후 다시 시도해주세요.</string>
+    <string name="deck_snackbar_create_error">덱 만들기에 실패했어요. 잠시 후 다시 시도해주세요.</string>
     <!-- home -->
     <string name="home_banner_title">%1$s님, 안녕하세요!</string>
     <string name="home_learning_days">%1$d일 연속 학습중</string>
@@ -53,8 +53,8 @@
     <string name="setting_menu_logout">로그아웃</string>
     <string name="setting_menu_delete_account">계정탈퇴</string>
     <string name="setting_description_app_version">현재 앱 버전 : %1$s</string>
-    <string name="setting_toast_logout">로그아웃을 하였습니다.</string>
-    <string name="setting_toast_delete_account">회원탈퇴를 하였습니다.</string>
+    <string name="setting_snackbar_logout">로그아웃을 하였습니다.</string>
+    <string name="setting_snackbar_delete_account">회원탈퇴를 하였습니다.</string>
     <string name="setting_dialog_title">정말 계정을 탈퇴하시겠습니까?</string>
     <string name="setting_dialog_content">저장된 모든 기록이 소멸될 수 있습니다.</string>
     <string name="setting_dialog_button_delete_account">탈퇴하기</string>

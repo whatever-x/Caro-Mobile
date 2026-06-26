@@ -1,12 +1,12 @@
 package com.whatever.caro.composeApp.di
 
-import com.whatever.caro.composeApp.toast.ToastControllerImpl
-import com.whatever.caro.core.ui.toast.ToastController
+import com.whatever.caro.composeApp.snackbar.SnackbarControllerImpl
+import com.whatever.caro.core.ui.snackbar.SnackbarController
 import org.koin.dsl.bind
 import org.koin.dsl.module
 import org.koin.plugin.module.dsl.single
 
-val toastModule =
+val snackbar =
     module {
-        single<ToastControllerImpl>() bind ToastController::class
+        single<SnackbarControllerImpl>() bind SnackbarController::class
     }
