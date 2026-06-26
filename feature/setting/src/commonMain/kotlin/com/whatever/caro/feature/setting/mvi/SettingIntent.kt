@@ -3,6 +3,8 @@ package com.whatever.caro.feature.setting.mvi
 import com.whatever.caro.core.viewmodel.contract.UiIntent
 
 sealed interface SettingIntent : UiIntent {
+    data object Initialize : SettingIntent
+
     data object ClickNicknameChange : SettingIntent
 
     data object ClickTermsOfService : SettingIntent

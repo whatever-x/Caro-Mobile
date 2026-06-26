@@ -50,7 +50,7 @@ val navEntryModule: Module =
 
         navigation<EditProfileEntry> { navKey ->
             EditProfileRoute(
-                viewModel = koinViewModel<EditProfileViewModel> { parametersOf(navKey.nickname) },
+                viewModel = koinViewModel<EditProfileViewModel> { parametersOf(navKey) },
                 navDispatcher = get(),
             )
         }

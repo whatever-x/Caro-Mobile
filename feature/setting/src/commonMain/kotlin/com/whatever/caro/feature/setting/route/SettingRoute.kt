@@ -17,6 +17,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.style.TextAlign
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import caromobile.core.designsystem.generated.resources.Res
 import caromobile.core.designsystem.generated.resources.setting_dialog_button_cancel
@@ -60,13 +62,17 @@ fun SettingRoute(
     val deleteAccountToastMessage =
         stringResource(resource = Res.string.setting_toast_delete_account)
 
+    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
+        viewModel.intent(SettingIntent.Initialize)
+    }
+
     LaunchedEffect(Unit) {
         viewModel.sideEffect.collect { sideEffect ->
             when (sideEffect) {
                 is SettingSideEffect.NavigateToEditNickName -> {
                     navDispatcher.emit(
                         NavCommand.To(
-                            key = EditProfileEntry(nickname = state.nickname),
+                            key = EditProfileEntry(nickname = sideEffect.currentNickname),
                         ),
                     )
                 }

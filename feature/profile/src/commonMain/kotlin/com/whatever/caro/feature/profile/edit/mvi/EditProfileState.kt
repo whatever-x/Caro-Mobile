@@ -5,7 +5,7 @@ import com.whatever.caro.feature.profile.NicknameValidationResult
 import com.whatever.caro.feature.profile.NicknameValidator
 
 data class EditProfileState(
-    val nickname: String = "",
+    val nickname: String,
     val validationResult: NicknameValidationResult = NicknameValidationResult.Valid,
     val isLoading: Boolean = false,
     val isRandomNicknameLoading: Boolean = false,

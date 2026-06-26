@@ -18,7 +18,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import caromobile.core.designsystem.generated.resources.Res
-import caromobile.core.designsystem.generated.resources.ic_arrow_right_24
+import caromobile.core.designsystem.generated.resources.ic_arrow_right_16
 import caromobile.core.designsystem.generated.resources.ic_logo_apple
 import caromobile.core.designsystem.generated.resources.login_button_google
 import com.whatever.caro.core.designsystem.themes.CaroTheme
@@ -106,7 +106,7 @@ private fun MenuItem(
             color = contentColor,
         )
         Icon(
-            imageVector = vectorResource(Res.drawable.ic_arrow_right_24),
+            imageVector = vectorResource(Res.drawable.ic_arrow_right_16),
             tint = CaroTheme.color.icon.secondary,
             contentDescription = null,
         )

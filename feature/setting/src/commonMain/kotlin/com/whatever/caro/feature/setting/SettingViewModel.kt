@@ -63,7 +63,15 @@ class SettingViewModel(
             SettingIntent.ClickDeleteAccountDialogConfirm -> {
                 deleteAccount()
             }
+
+            SettingIntent.Initialize -> {
+                initialize()
+            }
         }
+    }
+
+    private suspend fun initialize() {
+        // TODO : 사용자 정보 조회 API 구현 필요
     }
 
     private fun controlAccountDeleteButton() {

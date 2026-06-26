@@ -4,8 +4,7 @@
 	<string name="login_toast_cancel">Cancelled.</string>
 	<string name="login_toast_error">An error occurred.</string>
 	<string name="login_text_logo_description">Build your daily study habit\nwith just one card</string>
-	<string name="login_text_bottom_terms_of_service">By continuing, you agree to the Terms of Service
-		and Privacy Policy.</string>
+	<string name="login_text_bottom_terms_of_service">By continuing, you agree to the Terms of Service and Privacy Policy.</string>
 	<string name="login_button_google">Sign in with Google</string>
 	<string name="login_button_apple">Sign in with Apple</string>
 	<string name="login_card_button">Tap to flip</string>
@@ -20,8 +19,7 @@
 	<string name="profile_field_label_nickname">Nickname</string>
 	<string name="profile_field_required">*</string>
 	<string name="profile_button_random">Random</string>
-	<string name="profile_field_rule_nickname">2-20 characters. Korean, English, numbers, -, and
-		_only</string>
+	<string name="profile_field_rule_nickname">2-20 characters. Korean, English, numbers, -, and _ only</string>
 	<string name="profile_button_create">Create</string>
 	<string name="profile_button_done">Done</string>
 
@@ -58,9 +56,9 @@
 	<string name="setting_menu_logout">Log Out</string>
 	<string name="setting_menu_delete_account">Delete Account</string>
 	<string name="setting_description_app_version">Current App Version: %1$s</string>
-	<string name="setting_privcay_policy_url">https://www.naver.com</string>
-	<string name="setting_terms_of_service_url">https://www.naver.com</string>
-	<string name="setting_report_bug_url">https://www.naver.com</string>
+	<string name="setting_privcay_policy_url">https://given-dragon.notion.site/38b870f222b980b9b0c6f471c4cf7930</string>
+	<string name="setting_terms_of_service_url">https://given-dragon.notion.site/38b870f222b980cfb51fdb9a3ca850c5</string>
+	<string name="setting_report_bug_url">https://forms.gle/tCVKgkuNc6ZHuNkp9</string>
 	<string name="setting_toast_logout">Successfully logged out.</string>
 	<string name="setting_toast_delete_account">Account deleted successfully.</string>
 	<string name="setting_dialog_title">Are you sure you want to delete your account?</string>
