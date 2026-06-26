@@ -1,5 +1,6 @@
 import app.cash.turbine.test
 import com.whatever.caro.core.data.repository.deck.DeckRepository
+import com.whatever.caro.core.viewmodel.ExceptionFilter
 import com.whatever.caro.feature.deck.CreateDeckViewModel
 import com.whatever.caro.feature.deck.DeckInputLimits
 import com.whatever.caro.feature.deck.mvi.CreateDeckIntent
@@ -28,7 +29,7 @@ class CreateDeckViewModelTest : FunSpec() {
         fun viewModelWith(
             deckRepository: DeckRepository =
                 mock { everySuspend { createDeck(any(), any()) } returns Unit },
-        ) = CreateDeckViewModel(deckRepository)
+        ) = CreateDeckViewModel(deckRepository, ExceptionFilter.None)
 
         beforeTest {
             Dispatchers.setMain(testDispatcher)
