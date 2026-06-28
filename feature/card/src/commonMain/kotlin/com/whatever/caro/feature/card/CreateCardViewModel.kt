@@ -58,12 +58,14 @@ class CreateCardViewModel(
 
     private fun handleSave() {
         if (currentState.isSaveEnabled.not()) return
+        val cards = currentState.addedCards.map { it.content }
+        reduce { copy(isSaving = true) }
+
         launch {
-            reduce { copy(isSaving = true) }
             runCatching {
                 cardRepository.createCards(
                     deckId = navKey.deckId,
-                    cards = currentState.addedCards.map { it.content },
+                    cards = cards,
                 )
             }.onSuccess {
                 postSideEffect(CreateCardSideEffect.NavigateBack)

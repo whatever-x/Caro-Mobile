@@ -174,6 +174,35 @@ class CreateCardViewModelTest : FunSpec() {
             }
         }
 
+        test("ClickSave 를 빠르게 두 번 눌러도 저장 요청은 한 번만 보낸다") {
+            runTest(dispatcher) {
+                val cardRepository =
+                    mock<CardRepository> {
+                        everySuspend { createCards(any(), any()) } returns Unit
+                    }
+                val viewModel = createViewModel(cardRepository)
+
+                viewModel.intent(CreateCardIntent.UpdateFront("Run"))
+                viewModel.intent(CreateCardIntent.UpdateBack("달리다"))
+                viewModel.intent(CreateCardIntent.ClickAddCard)
+                advanceUntilIdle()
+
+                viewModel.sideEffect.test {
+                    viewModel.intent(CreateCardIntent.ClickSave)
+                    viewModel.intent(CreateCardIntent.ClickSave)
+                    advanceUntilIdle()
+
+                    awaitItem() shouldBe CreateCardSideEffect.NavigateBack
+                }
+                verifySuspend(exactly(1)) {
+                    cardRepository.createCards(
+                        deckId = testDeckId,
+                        cards = listOf(CardContent(front = "Run", back = "달리다")),
+                    )
+                }
+            }
+        }
+
         test("ClickSave 가 실패하면 ShowSaveError 를 emit 하고 isSaving 을 false 로 되돌린다") {
             runTest(dispatcher) {
                 val cardRepository =
