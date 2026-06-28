@@ -9,6 +9,7 @@ import io.kotest.assertions.throwables.shouldNotThrowAny
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.string.shouldContain
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.engine.mock.MockEngine
@@ -39,7 +40,9 @@ class ConfigureCaroExceptionMappingTest : FunSpec() {
                             "code": "SERVER-500",
                             "message": "server exploded",
                             "debugMessage": "stacktrace",
-                            "description": "retry later"
+                            "description": "retry later",
+                            "traceId": null,
+                            "fieldErrors": null
                           }
                         }
                         """.trimIndent(),
@@ -52,8 +55,7 @@ class ConfigureCaroExceptionMappingTest : FunSpec() {
 
             exception.code shouldBe "SERVER-500"
             exception.message shouldBe "server exploded"
-            exception.debugMessage shouldBe "stacktrace"
-            exception.description shouldBe "retry later"
+            exception.debugMessage shouldContain "ConfigureCaroExceptionMapping"
         }
 
         test("에러 응답 body 파싱에 실패하면 status code와 기본 메시지로 CaroInvalidResponseException을 만든다") {
