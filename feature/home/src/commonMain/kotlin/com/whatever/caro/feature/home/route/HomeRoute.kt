@@ -22,11 +22,6 @@ fun HomeRoute(
     navDispatcher: NavigationDispatcher,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
-
-    LaunchedEffect(Unit) {
-        viewModel.init()
-    }
-
     LaunchedEffect(Unit) {
         viewModel.sideEffect.collect { sideEffect ->
             when (sideEffect) {
@@ -40,6 +35,10 @@ fun HomeRoute(
 
                 is HomeSideEffect.NavigateToCreateCard -> {
                     navDispatcher.emit(command = To(key = CreateCardEntry(deckId = TEST_DECK_ID)))
+                }
+
+                HomeSideEffect.NavigateToSetting -> {
+                    TODO()
                 }
             }
         }

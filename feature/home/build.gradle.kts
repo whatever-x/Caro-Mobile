@@ -17,6 +17,10 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             implementation(projects.core.model)
+            implementation(projects.core.util)
+            implementation(libs.compottie)
+            implementation(libs.compottie.lite)
+            implementation(libs.compottie.resources)
         }
     }
 }

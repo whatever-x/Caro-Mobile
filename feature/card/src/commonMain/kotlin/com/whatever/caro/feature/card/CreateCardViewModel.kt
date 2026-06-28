@@ -4,6 +4,7 @@ import com.whatever.caro.core.data.repository.card.CardRepository
 import com.whatever.caro.core.model.card.CardContent
 import com.whatever.caro.core.navigator.entries.CreateCardEntry
 import com.whatever.caro.core.viewmodel.BaseViewModel
+import com.whatever.caro.core.viewmodel.ExceptionFilter
 import com.whatever.caro.feature.card.mvi.CreateCardIntent
 import com.whatever.caro.feature.card.mvi.CreateCardSideEffect
 import com.whatever.caro.feature.card.mvi.CreateCardState
@@ -13,8 +14,10 @@ import kotlinx.coroutines.CancellationException
 class CreateCardViewModel(
     private val cardRepository: CardRepository,
     private val navKey: CreateCardEntry,
+    exceptionFilter: ExceptionFilter,
 ) : BaseViewModel<CreateCardState, CreateCardIntent, CreateCardSideEffect>(
         initialState = CreateCardState(),
+        exceptionFilter = exceptionFilter,
     ) {
     override suspend fun handleIntent(intent: CreateCardIntent) {
         when (intent) {

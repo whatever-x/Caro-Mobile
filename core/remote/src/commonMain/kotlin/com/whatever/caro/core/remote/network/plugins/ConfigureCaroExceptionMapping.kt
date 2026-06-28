@@ -1,13 +1,9 @@
 package com.whatever.caro.core.remote.network.plugins
 
-import com.whatever.caro.core.model.exception.CaroClientException
 import com.whatever.caro.core.model.exception.CaroException
 import com.whatever.caro.core.model.exception.CaroInvalidResponseException
 import com.whatever.caro.core.model.exception.CaroServerException
-import com.whatever.caro.core.model.exception.ErrorCode.INVALID_RESPONSE
-import com.whatever.caro.core.model.exception.ErrorCode.NETWORK_001
-import com.whatever.caro.core.model.exception.ErrorCode.NETWORK_002
-import com.whatever.caro.core.model.exception.ErrorCode.UNKNOWN
+import com.whatever.caro.core.model.exception.CaroUnknownException
 import com.whatever.caro.core.model.exception.NetworkException
 import com.whatever.caro.core.remote.dto.base.ApiResponseDto
 import io.ktor.client.network.sockets.ConnectTimeoutException
@@ -34,8 +30,6 @@ internal fun HttpCallValidatorConfig.configureCaroExceptionMapping(jsonParser: J
                     response.bodyAsText()
                 }.getOrElse { throwable ->
                     throw CaroInvalidResponseException(
-                        code = INVALID_RESPONSE,
-                        message = "Invalid Response Error",
                         debugMessage =
                             buildResponseDebugMessage(
                                 reason = "Response Body를 읽는 것을 실패 했습니다.",
@@ -51,8 +45,6 @@ internal fun HttpCallValidatorConfig.configureCaroExceptionMapping(jsonParser: J
                     jsonParser.decodeFromString<ApiResponseDto<JsonElement>>(responseText)
                 }.getOrElse { throwable ->
                     throw CaroInvalidResponseException(
-                        code = INVALID_RESPONSE,
-                        message = "Invalid Response Error",
                         debugMessage =
                             buildResponseDebugMessage(
                                 reason = "Response Body Decode 과정에서 실패 했습니다.",
@@ -66,8 +58,6 @@ internal fun HttpCallValidatorConfig.configureCaroExceptionMapping(jsonParser: J
 
             val errorResponse =
                 baseResponse.error ?: throw CaroInvalidResponseException(
-                    code = INVALID_RESPONSE,
-                    message = "Invalid Response Error",
                     debugMessage =
                         buildResponseDebugMessage(
                             reason = "Error Response가 null 입니다.",
@@ -92,9 +82,7 @@ internal fun HttpCallValidatorConfig.configureCaroExceptionMapping(jsonParser: J
             is ConnectTimeoutException,
             is SocketTimeoutException,
             -> {
-                NetworkException(
-                    code = NETWORK_002,
-                    message = "Network Timeout Error",
+                NetworkException.Timeout(
                     debugMessage = "네트워크 타임아웃 발생: ${cause.message.orEmpty()}",
                     throwable = cause,
                 )
@@ -103,18 +91,14 @@ internal fun HttpCallValidatorConfig.configureCaroExceptionMapping(jsonParser: J
             is UnresolvedAddressException,
             is IOException,
             -> {
-                NetworkException(
-                    code = NETWORK_001,
-                    message = "Network Error",
+                NetworkException.Connection(
                     debugMessage = "네트워크 연결 오류 발생: ${cause.message.orEmpty()}",
                     throwable = cause,
                 )
             }
 
             else -> {
-                CaroClientException(
-                    code = UNKNOWN,
-                    message = "Unknown Error",
+                CaroUnknownException(
                     debugMessage = "알 수 없는 예외가 발생했습니다. cause=${cause.message.orEmpty()}",
                     throwable = cause,
                 )

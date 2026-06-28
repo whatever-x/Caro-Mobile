@@ -60,26 +60,25 @@ data class CaroColor(
         val error: Color = Red700,
         val info: Color = Blue600,
         val watermark: Color = Gray100,
-        val accent: Color = Blue500,
+        val accent: Color = Red500,
     )
 
     @Immutable
     data class IconColor(
         val primary: Color = Gray900,
         val secondary: Color = Gray700,
-        val tertiary: Color = Blue100,
+        val tertiary: Color = Gray500,
         val disable: Color = Gray400,
         val inverse: Color = White100,
         val brand: Color = Blue500,
         val warning: Color = Yellow700,
         val error: Color = Red700,
-        val accent: Color = Blue500,
+        val accent: Color = Red500,
     )
 
     @Immutable
     data class BackgroundColor(
         val primary: Color = Gray100,
-        val secondary: Color = Blue500,
         val brand: Color = Blue500,
     )
 
@@ -92,9 +91,8 @@ data class CaroColor(
         val brand: Color = Blue500,
         val warning: Color = Yellow100,
         val error: Color = Red100,
-        val disable: Color = Gray400,
+        val disabled: Color = Gray400,
         val info: Color = Blue100,
-        val watermark: Color = Gray100,
         val accent: Color = Red500,
     )
 
@@ -103,7 +101,7 @@ data class CaroColor(
         val primary: Color = Gray300,
         val secondary: Color = Gray200,
         val tertiary: Color = Gray100,
-        val disable: Color = Gray200,
+        val disabled: Color = Gray200,
         val brand: Color = Blue500,
         val warning: Color = Yellow300,
         val error: Color = Red300,
@@ -162,10 +160,10 @@ data class CaroColor(
     data class ButtonColor(
         val surface: ButtonSurfaceDefaultColor = ButtonSurfaceDefaultColor(),
         val pressed: ButtonSurfacePressedColor = ButtonSurfacePressedColor(),
-        val floating: Color = Gray800,
     ) {
         @Immutable
         data class ButtonSurfaceDefaultColor(
+            val floating: Color = Gray800,
             val easy: Color = Blue600,
             val fair: Color = Yellow600,
             val hard: Color = Red600,

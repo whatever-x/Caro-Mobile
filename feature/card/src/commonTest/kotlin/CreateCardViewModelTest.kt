@@ -2,6 +2,7 @@ import app.cash.turbine.test
 import com.whatever.caro.core.data.repository.card.CardRepository
 import com.whatever.caro.core.model.card.CardContent
 import com.whatever.caro.core.navigator.entries.CreateCardEntry
+import com.whatever.caro.core.viewmodel.ExceptionFilter
 import com.whatever.caro.feature.card.CardInputLimits
 import com.whatever.caro.feature.card.CreateCardViewModel
 import com.whatever.caro.feature.card.mvi.CreateCardIntent
@@ -44,6 +45,7 @@ class CreateCardViewModelTest : FunSpec() {
             CreateCardViewModel(
                 cardRepository = cardRepository,
                 navKey = CreateCardEntry(deckId = testDeckId),
+                exceptionFilter = ExceptionFilter.None,
             )
 
         test("Front/Back 입력은 FIELD_MAX(500)자에서 잘린다") {

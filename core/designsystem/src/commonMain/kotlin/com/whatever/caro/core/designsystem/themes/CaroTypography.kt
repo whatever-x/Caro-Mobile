@@ -16,43 +16,26 @@ data class CaroTypography(
     val heading3: TextStyle,
     val body1: TextStyle,
     val body2: Body2Style,
-    val label1: Label1Style,
+    val body3: TextStyle,
+    val label1: TextStyle,
+    val label2: TextStyle,
     val caption1: TextStyle,
-    val caption2: Caption2Style,
     val robotoLabel1: TextStyle,
 ) {
-    interface BoldStyle {
-        val bold: TextStyle
+    interface SemiBoldStyle {
+        val semiBold: TextStyle
     }
 
-    interface ReadingStyle {
-        val reading: TextStyle
-    }
-
-    interface RegularStyle {
-        val regular: TextStyle
+    interface MediumStyle {
+        val medium: TextStyle
     }
 
     @Immutable
     data class Body2Style(
-        override val regular: TextStyle,
-        override val reading: TextStyle,
-    ) : ReadingStyle,
-        RegularStyle
-
-    @Immutable
-    data class Label1Style(
-        override val bold: TextStyle,
-        override val regular: TextStyle,
-    ) : BoldStyle,
-        RegularStyle
-
-    @Immutable
-    data class Caption2Style(
-        override val bold: TextStyle,
-        override val regular: TextStyle,
-    ) : BoldStyle,
-        RegularStyle
+        override val semiBold: TextStyle,
+        override val medium: TextStyle,
+    ) : SemiBoldStyle,
+        MediumStyle
 
     companion object {
         fun defaultTypography(
@@ -70,83 +53,71 @@ data class CaroTypography(
                 TextStyle(
                     fontFamily = pretendard,
                     fontWeight = FontWeight.W700,
-                    fontSize = 28.sp,
+                    fontSize = 24.sp,
                 ),
             heading1 =
                 TextStyle(
                     fontFamily = pretendard,
                     fontWeight = FontWeight.W700,
-                    fontSize = 22.sp,
+                    fontSize = 20.sp,
                 ),
             heading2 =
                 TextStyle(
                     fontFamily = pretendard,
-                    fontWeight = FontWeight.W700,
+                    fontWeight = FontWeight.W600,
                     fontSize = 18.sp,
                 ),
             heading3 =
                 TextStyle(
                     fontFamily = pretendard,
-                    fontWeight = FontWeight.W700,
+                    fontWeight = FontWeight.W500,
                     fontSize = 16.sp,
                 ),
             body1 =
                 TextStyle(
                     fontFamily = pretendard,
-                    fontWeight = FontWeight.W500,
+                    fontWeight = FontWeight.W600,
                     fontSize = 16.sp,
                 ),
             body2 =
                 Body2Style(
-                    regular =
-                        TextStyle(
-                            fontFamily = pretendard,
-                            fontWeight = FontWeight.W400,
-                            fontSize = 14.sp,
-                        ),
-                    reading =
-                        TextStyle(
-                            fontFamily = pretendard,
-                            fontWeight = FontWeight.W500,
-                            fontSize = 14.sp,
-                            lineHeight = 22.sp,
-                        ),
-                ),
-            label1 =
-                Label1Style(
-                    bold =
+                    semiBold =
                         TextStyle(
                             fontFamily = pretendard,
                             fontWeight = FontWeight.W600,
                             fontSize = 14.sp,
                         ),
-                    regular =
+                    medium =
                         TextStyle(
                             fontFamily = pretendard,
-                            fontWeight = FontWeight.W400,
+                            fontWeight = FontWeight.W500,
                             fontSize = 14.sp,
                         ),
+                ),
+            body3 =
+                TextStyle(
+                    fontFamily = pretendard,
+                    fontWeight = FontWeight.W400,
+                    fontSize = 14.sp,
+                    lineHeight = 22.sp,
+                ),
+            label1 =
+                TextStyle(
+                    fontFamily = pretendard,
+                    fontWeight = FontWeight.W700,
+                    fontSize = 16.sp,
+                ),
+            label2 =
+                TextStyle(
+                    fontFamily = pretendard,
+                    fontWeight = FontWeight.W500,
+                    fontSize = 14.sp,
                 ),
             caption1 =
                 TextStyle(
                     fontFamily = pretendard,
                     fontWeight = FontWeight.W500,
                     fontSize = 12.sp,
-                ),
-            caption2 =
-                Caption2Style(
-                    bold =
-                        TextStyle(
-                            fontFamily = pretendard,
-                            fontWeight = FontWeight.W600,
-                            fontSize = 10.sp,
-                        ),
-                    regular =
-                        TextStyle(
-                            fontFamily = pretendard,
-                            fontWeight = FontWeight.W400,
-                            fontSize = 10.sp,
-                        ),
                 ),
             robotoLabel1 =
                 TextStyle(

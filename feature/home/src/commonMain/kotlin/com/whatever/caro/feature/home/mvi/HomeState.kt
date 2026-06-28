@@ -1,8 +1,17 @@
 package com.whatever.caro.feature.home.mvi
 
+import com.whatever.caro.core.model.deck.Deck
 import com.whatever.caro.core.viewmodel.contract.UiState
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.immutableListOf
+import kotlinx.collections.immutable.persistentListOf
 
 data class HomeState(
-    val screenName: String = "",
-    val name: String = "",
-) : UiState
+    val nickname: String = "",
+    val additionalDescription: String = "",
+    val learningDays: Int = 0,
+    val decks: ImmutableList<Deck> = persistentListOf(),
+) : UiState {
+    val isDeckEmpty: Boolean
+        get() = decks.isEmpty()
+}

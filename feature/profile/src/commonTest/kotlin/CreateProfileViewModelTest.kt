@@ -2,6 +2,7 @@ import app.cash.turbine.test
 import com.whatever.caro.core.data.repository.AuthRepository
 import com.whatever.caro.core.data.repository.profile.ProfileRepository
 import com.whatever.caro.core.model.auth.AuthSession
+import com.whatever.caro.core.viewmodel.ExceptionFilter
 import com.whatever.caro.feature.profile.CreateProfileViewModel
 import com.whatever.caro.feature.profile.NicknameValidationResult
 import com.whatever.caro.feature.profile.NicknameValidator
@@ -53,6 +54,7 @@ class CreateProfileViewModelTest : FunSpec() {
                     authRepository = authRepository,
                     profileRepository = profileRepository,
                     nicknameValidator = NicknameValidator(),
+                    exceptionFilter = ExceptionFilter.None,
                 )
             return Triple(viewModel, authRepository, profileRepository)
         }

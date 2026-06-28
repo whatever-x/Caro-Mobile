@@ -2,6 +2,7 @@ import app.cash.turbine.test
 import com.whatever.caro.core.data.repository.AuthRepository
 import com.whatever.caro.core.model.auth.AuthSession
 import com.whatever.caro.core.model.auth.SocialLoginType
+import com.whatever.caro.core.viewmodel.ExceptionFilter
 import com.whatever.caro.feature.login.LoginViewModel
 import com.whatever.caro.feature.login.model.GoogleUser
 import com.whatever.caro.feature.login.model.LoginError
@@ -28,7 +29,11 @@ class LoginViewModelTest : FunSpec() {
     init {
         val testDispatcher = StandardTestDispatcher()
 
-        fun createViewModel(authRepository: AuthRepository = mock<AuthRepository>()) = LoginViewModel(authRepository)
+        fun createViewModel(authRepository: AuthRepository = mock<AuthRepository>()) =
+            LoginViewModel(
+                authRepository = authRepository,
+                exceptionFilter = ExceptionFilter.None,
+            )
 
         beforeTest {
             Dispatchers.setMain(testDispatcher)

@@ -41,3 +41,10 @@ kotlin {
         }
     }
 }
+
+// koin-compiler 1.0.0의 전역 그래프 검증(KOIN-D001)이 plain DSL 람다/named()/parametersOf로
+// 등록된 정의를 provider로 인식하지 못해 기존 등록 5건을 누락으로 오판하여 비활성화한다.
+// 플러그인이 해당 패턴(@Provides/@Assisted 격)을 지원하면 재활성화한다.
+koinCompiler {
+    compileSafety = false
+}
