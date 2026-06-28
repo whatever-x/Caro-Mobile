@@ -49,6 +49,7 @@ include(":core:datastore")
 include(":core:analytics")
 include(":core:crashlytics")
 include(":core:messaging")
+include(":core:util")
 
 // :Feature
 include(":feature:home")

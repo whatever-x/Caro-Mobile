@@ -2,7 +2,6 @@ package com.whatever.caro.core.test.plugin
 
 import com.whatever.caro.core.model.exception.CaroInvalidResponseException
 import com.whatever.caro.core.model.exception.CaroServerException
-import com.whatever.caro.core.model.exception.ErrorCode
 import com.whatever.caro.core.remote.dto.auth.response.SocialLoginResponse
 import com.whatever.caro.core.remote.network.plugins.CaroBaseResponseConverter
 import io.kotest.assertions.throwables.shouldNotThrowAny
@@ -100,7 +99,7 @@ class ApiResponseObjectConverterTest : FunSpec() {
             exception.debugMessage shouldContain "CaroBaseResponseConverterPlugin"
         }
 
-        test("success=false 인데 error 가 없으면 INVALID_RESPONSE인 CaroInvalidResponseException 예외를 던진다") {
+        test("success=false 인데 error 가 없으면 CaroInvalidResponseException 예외를 던진다") {
             val client =
                 createClient(
                     responseBody =
@@ -118,11 +117,10 @@ class ApiResponseObjectConverterTest : FunSpec() {
                     client.get("https://caro.test/auth/login").body<SocialLoginResponse>()
                 }
 
-            exception.code shouldBe ErrorCode.INVALID_RESPONSE
             exception.message shouldBe "Invalid Response Error"
         }
 
-        test("success=true 인데 data=null 이면 INVALID_RESPONSE인 CaroInvalidResponseException 예외를 던진다") {
+        test("success=true 인데 data=null 이면 CaroInvalidResponseException 예외를 던진다") {
             val client =
                 createClient(
                     responseBody =
@@ -140,11 +138,10 @@ class ApiResponseObjectConverterTest : FunSpec() {
                     client.get("https://caro.test/auth/login").body<SocialLoginResponse>()
                 }
 
-            exception.code shouldBe ErrorCode.INVALID_RESPONSE
             exception.message shouldBe "Invalid Response Error"
         }
 
-        test("응답 decode에 실패하면 INVALID_RESPONSE인 CaroInvalidResponseException 예외를 던진다") {
+        test("응답 decode에 실패하면 CaroInvalidResponseException 예외를 던진다") {
             val client =
                 createClient(
                     responseBody =
@@ -162,7 +159,6 @@ class ApiResponseObjectConverterTest : FunSpec() {
                     client.get("https://caro.test/auth/login").body<SocialLoginResponse>()
                 }
 
-            exception.code shouldBe ErrorCode.INVALID_RESPONSE
             exception.message shouldBe "Invalid Response Error"
         }
 

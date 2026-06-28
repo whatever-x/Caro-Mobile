@@ -21,6 +21,7 @@ import kotlin.coroutines.EmptyCoroutineContext
 
 abstract class BaseViewModel<S : UiState, I : UiIntent, SE : UiSideEffect>(
     initialState: S,
+    private val exceptionFilter: ExceptionFilter,
 ) : ViewModel() {
     protected abstract suspend fun handleIntent(intent: I)
 
@@ -39,7 +40,12 @@ abstract class BaseViewModel<S : UiState, I : UiIntent, SE : UiSideEffect>(
 
     protected val coroutineExceptionHandler =
         CoroutineExceptionHandler { _, throwable ->
-            handleClientException(throwable)
+            Napier.e { "handleClientException = ${throwable.message}" }
+            if (exceptionFilter.shouldSuppress(throwable)) {
+                Napier.w(throwable = throwable) { "Suppressed by ExceptionFilter: ${throwable::class.simpleName}" }
+            } else {
+                handleClientException(throwable)
+            }
         }
 
     fun intent(intent: I) {
@@ -67,6 +73,5 @@ abstract class BaseViewModel<S : UiState, I : UiIntent, SE : UiSideEffect>(
         }
 
     open fun handleClientException(throwable: Throwable) {
-        Napier.e { "handleClientException = ${throwable.message}" }
     }
 }

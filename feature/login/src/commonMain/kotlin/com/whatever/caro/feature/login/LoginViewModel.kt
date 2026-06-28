@@ -3,6 +3,7 @@ package com.whatever.caro.feature.login
 import com.whatever.caro.core.data.repository.AuthRepository
 import com.whatever.caro.core.model.auth.SocialLoginType
 import com.whatever.caro.core.viewmodel.BaseViewModel
+import com.whatever.caro.core.viewmodel.ExceptionFilter
 import com.whatever.caro.feature.login.model.AppleUser
 import com.whatever.caro.feature.login.model.GoogleUser
 import com.whatever.caro.feature.login.model.LoginError
@@ -14,8 +15,10 @@ import io.github.aakira.napier.Napier
 
 class LoginViewModel(
     private val authRepository: AuthRepository,
+    exceptionFilter: ExceptionFilter,
 ) : BaseViewModel<LoginState, LoginIntent, LoginSideEffect>(
         initialState = LoginState(),
+        exceptionFilter = exceptionFilter,
     ) {
     override fun handleClientException(throwable: Throwable) {
         Napier.e(throwable = throwable) { "login failed: ${throwable.message}" }

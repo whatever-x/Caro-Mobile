@@ -34,6 +34,7 @@
 	<string name="deck_tip_label">TIP</string>
 	<string name="deck_tip_max_cards">You can add up to 200 cards per deck.</string>
 	<string name="deck_button_create">Create</string>
+	<string name="deck_toast_create_error">Failed to create the deck. Please try again.</string>
 	<!-- card -->
 	<string name="card_title_create">Create Card</string>
 	<string name="card_content_description_back">Go back</string>
@@ -53,4 +54,14 @@
 	<string name="card_button_add_more">Add another</string>
 	<string name="card_button_save">Save</string>
 	<string name="card_save_error">Failed to save cards. Please try again.</string>
+	<!-- home -->
+	<string name="home_banner_title">Hello, %1$s!</string>
+	<string name="home_learning_days">Learning Streak: %1$d Days</string>
+	<string name="home_deck_badge_not_started">Not Started</string>
+	<string name="home_deck_badge_learning">In Progress</string>
+	<string name="home_deck_badge_complete">Completed</string>
+	<string name="home_deck_button_not_started">Start Learning</string>
+	<string name="home_deck_button_learning">Continue Learning</string>
+	<string name="home_floating_button">Create Deck</string>
+	<string name="home_deck_field_empty">Create a deck to begin learning.</string>
 </resources>

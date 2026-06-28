@@ -175,7 +175,7 @@ private fun RequiredFieldHeader(label: String) {
         )
         Text(
             text = stringResource(Res.string.card_field_required),
-            style = CaroTheme.typography.label1.bold,
+            style = CaroTheme.typography.label1,
             color = CaroTheme.color.text.accent,
         )
     }
@@ -311,7 +311,7 @@ private fun AddedCounterChip(count: Int) {
     ) {
         Text(
             text = stringResource(Res.string.card_counter_added, count),
-            style = CaroTheme.typography.caption2.bold,
+            style = CaroTheme.typography.caption1,
             color = CaroTheme.color.text.inverse,
         )
     }
@@ -452,7 +452,7 @@ private fun AddCardButton(
         )
         Text(
             text = label,
-            style = CaroTheme.typography.label1.regular,
+            style = CaroTheme.typography.label1,
             color = CaroTheme.color.text.inverse,
         )
     }
@@ -480,7 +480,7 @@ private fun SaveButton(
     ) {
         Text(
             text = stringResource(Res.string.card_button_save),
-            style = CaroTheme.typography.label1.regular,
+            style = CaroTheme.typography.label1,
             color = textColor,
         )
     }

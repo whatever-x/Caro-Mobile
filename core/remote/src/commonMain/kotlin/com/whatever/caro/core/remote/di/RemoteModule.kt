@@ -6,6 +6,8 @@ import com.whatever.caro.core.remote.datasource.RemoteNonAuthDataSource
 import com.whatever.caro.core.remote.datasource.RemoteNonAuthDataSourceImpl
 import com.whatever.caro.core.remote.datasource.card.CardDataSource
 import com.whatever.caro.core.remote.datasource.card.RemoteCardDataSourceImpl
+import com.whatever.caro.core.remote.datasource.deck.DeckDataSource
+import com.whatever.caro.core.remote.datasource.deck.RemoteDeckDataSourceImpl
 import com.whatever.caro.core.remote.datasource.profile.ProfileDataSource
 import com.whatever.caro.core.remote.datasource.profile.RemoteProfileDataSourceImpl
 import com.whatever.caro.core.remote.di.qualifier.NetworkClient
@@ -31,4 +33,5 @@ val remoteModule =
         single<RemoteProfileDataSourceImpl>() bind ProfileDataSource::class
 
         single<RemoteCardDataSourceImpl>() bind CardDataSource::class
+        single<RemoteDeckDataSourceImpl>() bind DeckDataSource::class
     }
