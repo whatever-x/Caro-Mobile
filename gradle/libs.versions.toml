@@ -50,7 +50,7 @@ ktorfit = "2.7.1"
 
 # Image Loader
 coil3 = "3.4.0"
-compottie="2.2.2"
+compottie = "2.2.2"
 
 # Permission
 moko = "0.20.1"
@@ -82,9 +82,6 @@ stability-analyzer = "0.7.2"
 
 # Google Login
 google-id = "1.2.0"
-
-# Lottie
-compottie = "2.1.0"
 
 [libraries]
 # androidX
@@ -154,6 +151,8 @@ coil-network-ktor3 = { module = "io.coil-kt.coil3:coil-network-ktor3", version.r
 coil-mp = { module = "io.coil-kt.coil3:coil", version.ref = "coil3" }
 compottie = { module = "io.github.alexzhirkevich:compottie", version.ref = "compottie" }
 compottie-lite = { module = "io.github.alexzhirkevich:compottie-lite", version.ref = "compottie" }
+compottie-dot = { module = "io.github.alexzhirkevich:compottie-dot", version.ref = "compottie" }
+compottie-network = { module = "io.github.alexzhirkevich:compottie-network", version.ref = "compottie" }
 compottie-resources = { module = "io.github.alexzhirkevich:compottie-resources", version.ref = "compottie" }
 
 
@@ -197,13 +196,6 @@ stability-analyzer-gradleplugin = { group = "com.github.skydoves.compose.stabili
 
 # Google Id
 android-google-id = { group = "com.google.android.libraries.identity.googleid", name = "googleid", version.ref = "google-id" }
-
-# Lottie
-compottie = { group = "io.github.alexzhirkevich", name = "compottie", version.ref = "compottie" }
-compottie-lite = { module = "io.github.alexzhirkevich:compottie-lite", version.ref = "compottie" }
-compottie-dot = { module = "io.github.alexzhirkevich:compottie-dot", version.ref = "compottie" }
-compottie-network = { module = "io.github.alexzhirkevich:compottie-network", version.ref = "compottie" }
-compottie-resources = { module = "io.github.alexzhirkevich:compottie-resources", version.ref = "compottie" }
 
 [plugins]
 # Android
