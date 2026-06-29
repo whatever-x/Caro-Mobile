@@ -1,9 +1,14 @@
 import app.cash.turbine.test
+import com.whatever.caro.core.data.repository.auth.AuthRepository
 import com.whatever.caro.core.viewmodel.ExceptionFilter
 import com.whatever.caro.feature.splash.SplashViewModel
 import com.whatever.caro.feature.splash.mvi.SplashIntent
 import com.whatever.caro.feature.splash.mvi.SplashSideEffect
 import com.whatever.caro.feature.splash.mvi.SplashState
+import dev.mokkery.answering.returns
+import dev.mokkery.answering.throws
+import dev.mokkery.everySuspend
+import dev.mokkery.mock
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.Dispatchers
@@ -29,9 +34,17 @@ class SplashViewModelTest : FunSpec() {
             testDispatcher.cancel()
         }
 
-        test("Initialize intent 처리 시 NavigateLogin sideEffect를 발행한다") {
-            runTest {
-                val viewModel = SplashViewModel(exceptionFilter = ExceptionFilter.None)
+        test("Initialize 중 토큰 갱신 실패 시 NavigateLogin sideEffect를 발행한다") {
+            runTest(testDispatcher) {
+                val authRepository =
+                    mock<AuthRepository> {
+                        everySuspend { refreshToken() } throws RuntimeException("refresh failed")
+                    }
+                val viewModel =
+                    SplashViewModel(
+                        authRepository = authRepository,
+                        exceptionFilter = ExceptionFilter.None,
+                    )
 
                 viewModel.sideEffect.test {
                     viewModel.intent(SplashIntent.Initialize)
@@ -43,8 +56,16 @@ class SplashViewModelTest : FunSpec() {
         }
 
         test("Initialize 완료 시 isInitializing 이 false 로 갱신된다") {
-            runTest {
-                val viewModel = SplashViewModel(exceptionFilter = ExceptionFilter.None)
+            runTest(testDispatcher) {
+                val authRepository =
+                    mock<AuthRepository> {
+                        everySuspend { refreshToken() } returns Unit
+                    }
+                val viewModel =
+                    SplashViewModel(
+                        authRepository = authRepository,
+                        exceptionFilter = ExceptionFilter.None,
+                    )
 
                 viewModel.intent(SplashIntent.Initialize)
                 advanceUntilIdle()

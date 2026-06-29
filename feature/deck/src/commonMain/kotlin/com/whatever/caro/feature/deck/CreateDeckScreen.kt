@@ -225,7 +225,7 @@ private fun FieldCounter(count: String) {
         Spacer(modifier = Modifier.weight(1f))
         Text(
             text = count,
-            style = CaroTheme.typography.caption1,
+            style = CaroTheme.typography.caption1.regular,
             color = CaroTheme.color.text.tertiary,
             textAlign = TextAlign.End,
         )
@@ -240,7 +240,7 @@ private fun DeckTipSection(modifier: Modifier = Modifier) {
     ) {
         Text(
             text = stringResource(Res.string.deck_tip_label),
-            style = CaroTheme.typography.caption1,
+            style = CaroTheme.typography.caption1.regular,
             color = CaroTheme.color.text.secondary,
         )
         Row(
@@ -256,7 +256,7 @@ private fun DeckTipSection(modifier: Modifier = Modifier) {
             )
             Text(
                 text = stringResource(Res.string.deck_tip_max_cards),
-                style = CaroTheme.typography.caption1,
+                style = CaroTheme.typography.caption1.regular,
                 color = CaroTheme.color.text.tertiary,
             )
         }

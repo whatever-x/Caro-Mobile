@@ -6,10 +6,10 @@
 
 @Composable
 internal fun com.whatever.caro.feature.home.HomeScreen(state: com.whatever.caro.feature.home.mvi.HomeState, onIntent: kotlin.Function1<com.whatever.caro.feature.home.mvi.HomeIntent, kotlin.Unit>): kotlin.Unit
-  skippable: false
+  skippable: true
   restartable: true
   params:
-    - state: RUNTIME (requires runtime check)
+    - state: STABLE (class with no mutable properties)
     - onIntent: STABLE (function type)
 
 @Composable

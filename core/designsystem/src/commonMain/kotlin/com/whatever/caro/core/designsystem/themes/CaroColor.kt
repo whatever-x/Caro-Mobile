@@ -65,7 +65,7 @@ data class CaroColor(
 
     @Immutable
     data class IconColor(
-        val primary: Color = Gray900,
+        val primary: Color = Blue500,
         val secondary: Color = Gray700,
         val tertiary: Color = Gray500,
         val disable: Color = Gray400,
