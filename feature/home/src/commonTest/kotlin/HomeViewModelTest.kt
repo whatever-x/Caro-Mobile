@@ -30,19 +30,6 @@ class HomeViewModelTest : FunSpec() {
 
         fun createViewModel() = HomeViewModel(exceptionFilter = ExceptionFilter.None)
 
-        test("ClickCreateCard 는 NavigateToCreateCard 를 emit 한다") {
-            runTest(dispatcher) {
-                val viewModel = createViewModel()
-
-                viewModel.sideEffect.test {
-                    viewModel.intent(HomeIntent.ClickCreateCard)
-                    advanceUntilIdle()
-
-                    awaitItem() shouldBe HomeSideEffect.NavigateToCreateCard
-                }
-            }
-        }
-
         test("ClickProfile 은 NavigateToProfile 을 emit 한다") {
             runTest(dispatcher) {
                 val viewModel = createViewModel()

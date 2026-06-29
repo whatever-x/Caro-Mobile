@@ -1,13 +1,15 @@
 package com.whatever.caro.feature.card.mvi
 
 import com.whatever.caro.core.model.card.CardContent
+import com.whatever.caro.core.model.card.CardInputLimits
 import com.whatever.caro.core.viewmodel.contract.UiState
-import com.whatever.caro.feature.card.CardInputLimits
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 
 data class CreateCardState(
     val front: String = "",
     val back: String = "",
-    val addedCards: List<StagedCard> = emptyList(),
+    val addedCards: ImmutableList<StagedCard> = persistentListOf(),
     val nextCardId: Long = 0L,
     val isSaving: Boolean = false,
 ) : UiState {

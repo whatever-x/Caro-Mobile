@@ -23,7 +23,6 @@ class HomeViewModel(
             HomeIntent.ClickSettingButton -> Napier.d { "intent: $intent" }
             HomeIntent.ClickProfile -> postSideEffect(HomeSideEffect.NavigateToProfile)
             HomeIntent.ClickCreateDeck -> postSideEffect(HomeSideEffect.NavigateToCreateDeck)
-            HomeIntent.ClickCreateCard -> postSideEffect(HomeSideEffect.NavigateToCreateCard)
         }
     }
 }

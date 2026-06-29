@@ -61,7 +61,7 @@ val navEntryModule: Module =
 
         navigation<CreateCardEntry> { navKey ->
             CreateCardRoute(
-                viewModel = koinViewModel<CreateCardViewModel> { parametersOf(navKey) },
+                viewModel = koinViewModel<CreateCardViewModel> { parametersOf(navKey.payload.deckId) },
                 navDispatcher = get(),
             )
         }
