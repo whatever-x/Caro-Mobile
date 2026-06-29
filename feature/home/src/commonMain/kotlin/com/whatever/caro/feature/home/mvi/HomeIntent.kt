@@ -14,6 +14,4 @@ sealed interface HomeIntent : UiIntent {
     data object ClickProfile : HomeIntent
 
     data object ClickCreateDeck : HomeIntent
-
-    data object ClickCreateCard : HomeIntent
 }

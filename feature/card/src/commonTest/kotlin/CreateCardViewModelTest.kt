@@ -1,9 +1,8 @@
 import app.cash.turbine.test
 import com.whatever.caro.core.data.repository.card.CardRepository
 import com.whatever.caro.core.model.card.CardContent
-import com.whatever.caro.core.navigator.entries.CreateCardEntry
+import com.whatever.caro.core.model.card.CardInputLimits
 import com.whatever.caro.core.viewmodel.ExceptionFilter
-import com.whatever.caro.feature.card.CardInputLimits
 import com.whatever.caro.feature.card.CreateCardViewModel
 import com.whatever.caro.feature.card.mvi.CreateCardIntent
 import com.whatever.caro.feature.card.mvi.CreateCardSideEffect
@@ -44,7 +43,7 @@ class CreateCardViewModelTest : FunSpec() {
         fun createViewModel(cardRepository: CardRepository = mock<CardRepository>()): CreateCardViewModel =
             CreateCardViewModel(
                 cardRepository = cardRepository,
-                navKey = CreateCardEntry(deckId = testDeckId),
+                deckId = testDeckId,
                 exceptionFilter = ExceptionFilter.None,
             )
 

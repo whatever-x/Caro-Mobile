@@ -27,7 +27,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import caromobile.core.designsystem.generated.resources.Res
-import caromobile.core.designsystem.generated.resources.card_title_create
 import caromobile.core.designsystem.generated.resources.home_banner_title
 import caromobile.core.designsystem.generated.resources.home_deck_field_empty
 import caromobile.core.designsystem.generated.resources.home_floating_button
@@ -242,27 +241,6 @@ internal fun HomeScreen(
                     color = CaroTheme.color.text.inverse,
                 )
             }
-        }
-
-        Row(
-            modifier =
-                Modifier
-                    .align(Alignment.TopEnd)
-                    .padding(CaroTheme.spacing.xl2)
-                    .background(
-                        shape = CaroTheme.shape.xxl,
-                        color = CaroTheme.color.button.surface.floating,
-                    ).padding(horizontal = CaroTheme.spacing.l, vertical = CaroTheme.spacing.m)
-                    .noRippleClickable {
-                        onIntent(HomeIntent.ClickCreateCard)
-                    },
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Text(
-                text = stringResource(resource = Res.string.card_title_create),
-                style = CaroTheme.typography.body2.semiBold,
-                color = CaroTheme.color.text.inverse,
-            )
         }
     }
 }

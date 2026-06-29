@@ -35,8 +35,8 @@
     <!-- card -->
     <string name="card_title_create">카드 생성</string>
     <string name="card_content_description_back">뒤로 가기</string>
-    <string name="card_field_label_front">Front</string>
-    <string name="card_field_label_back">Back</string>
+    <string name="card_field_label_front">앞면</string>
+    <string name="card_field_label_back">뒷면</string>
     <string name="card_field_required">*</string>
     <string name="card_field_placeholder_front">앞 면에 들어갈 텍스트를 입력하세요.</string>
     <string name="card_field_placeholder_back">뒷 면에 들어갈 텍스트를 입력하세요.</string>

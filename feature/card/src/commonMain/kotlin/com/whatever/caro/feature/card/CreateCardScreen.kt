@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.exclude
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,7 +17,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
@@ -64,6 +67,7 @@ import com.whatever.caro.core.model.card.CardContent
 import com.whatever.caro.feature.card.mvi.CreateCardIntent
 import com.whatever.caro.feature.card.mvi.CreateCardState
 import com.whatever.caro.feature.card.mvi.StagedCard
+import kotlinx.collections.immutable.ImmutableList
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
@@ -93,23 +97,27 @@ internal fun CreateCardScreen(
                 .background(CaroTheme.color.background.primary),
     ) {
         CaroTopBar(
+            modifier = Modifier.padding(horizontal = CaroTheme.spacing.xl),
             leadingContent = {
-                Icon(
-                    modifier =
-                        Modifier
-                            .size(TopBarIconSize)
-                            .clickable { onIntent(CreateCardIntent.ClickBack) },
-                    painter = painterResource(Res.drawable.ic_chevron_left_24),
-                    contentDescription = stringResource(Res.string.card_content_description_back),
-                    tint = CaroTheme.color.icon.brand,
-                )
-            },
-            centerContent = {
-                Text(
-                    text = stringResource(Res.string.card_title_create),
-                    style = CaroTheme.typography.heading2,
-                    color = CaroTheme.color.text.primary,
-                )
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(CaroTheme.spacing.s),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Icon(
+                        modifier =
+                            Modifier
+                                .size(TopBarIconSize)
+                                .clickable { onIntent(CreateCardIntent.ClickBack) },
+                        painter = painterResource(Res.drawable.ic_chevron_left_24),
+                        contentDescription = stringResource(Res.string.card_content_description_back),
+                        tint = CaroTheme.color.icon.brand,
+                    )
+                    Text(
+                        text = stringResource(Res.string.card_title_create),
+                        style = CaroTheme.typography.heading2,
+                        color = CaroTheme.color.text.primary,
+                    )
+                }
             },
         )
 
@@ -234,8 +242,8 @@ private fun TipSection() {
     ) {
         Text(
             text = stringResource(Res.string.card_tip_label),
-            style = CaroTheme.typography.caption1,
-            color = CaroTheme.color.text.secondary,
+            style = CaroTheme.typography.body2.semiBold,
+            color = CaroTheme.color.text.primary,
         )
         TipRow(text = stringResource(Res.string.card_tip_max_cards))
         TipRow(text = stringResource(Res.string.card_tip_split_by_topic))
@@ -266,7 +274,7 @@ private fun TipRow(text: String) {
 @Composable
 private fun AddedCardsSection(
     addedCount: Int,
-    addedCards: List<StagedCard>,
+    addedCards: ImmutableList<StagedCard>,
     onRemove: (Long) -> Unit,
 ) {
     Column(
@@ -390,6 +398,7 @@ private fun BottomBar(
         modifier =
             Modifier
                 .fillMaxWidth()
+                .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Bottom))
                 .windowInsetsPadding(WindowInsets.ime.exclude(WindowInsets.navigationBars))
                 .padding(
                     horizontal = PageHorizontalPadding,
