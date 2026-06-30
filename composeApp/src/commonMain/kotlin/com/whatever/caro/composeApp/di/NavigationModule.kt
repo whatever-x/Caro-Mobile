@@ -68,7 +68,12 @@ val navEntryModule: Module =
 
         navigation<DeckDetailEntry> { navKey ->
             DeckDetailRoute(
-                viewModel = koinViewModel<DeckDetailViewModel> { parametersOf(navKey) },
+                viewModel =
+                    koinViewModel<DeckDetailViewModel> {
+                        parametersOf(
+                            navKey.payload.deck,
+                        )
+                    },
                 navDispatcher = get(),
             )
         }

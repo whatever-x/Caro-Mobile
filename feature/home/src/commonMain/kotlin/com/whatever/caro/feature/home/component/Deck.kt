@@ -46,7 +46,7 @@ internal fun Deck(
     cardTotalCount: Int,
     todayLearningPercentage: Int,
     state: DeckState,
-    onLearnClick: () -> Unit,
+    onDeckClick: () -> Unit,
 ) {
     val progressSpace =
         when (state) {
@@ -59,6 +59,7 @@ internal fun Deck(
             modifier
                 .fillMaxWidth()
                 .clip(shape = CaroTheme.shape.xl)
+                .noRippleClickable(onClick = onDeckClick)
                 .background(color = CaroTheme.color.surface.primary)
                 .border(width = 1.dp, color = CaroTheme.color.border.secondary)
                 .padding(vertical = CaroTheme.spacing.xl, horizontal = CaroTheme.spacing.xl2),
@@ -123,7 +124,7 @@ internal fun Deck(
             }
             CtaButton(
                 state = state,
-                onClick = { onLearnClick() },
+                onClick = onDeckClick,
             )
         }
     }
@@ -231,7 +232,7 @@ private fun NotStartedDeckItemPreview() {
             cardTotalCount = 1000,
             todayLearningPercentage = 0,
             state = DeckState.NOT_STARTED,
-            onLearnClick = {},
+            onDeckClick = {},
         )
     }
 }
@@ -246,7 +247,7 @@ private fun LearningDeckItemPreview() {
             cardTotalCount = 1000,
             todayLearningPercentage = 70,
             state = DeckState.LEARNING,
-            onLearnClick = {},
+            onDeckClick = {},
         )
     }
 }
@@ -261,7 +262,7 @@ private fun CompleteDeckItemPreview() {
             cardTotalCount = 1000,
             todayLearningPercentage = 100,
             state = DeckState.COMPLETE,
-            onLearnClick = {},
+            onDeckClick = {},
         )
     }
 }

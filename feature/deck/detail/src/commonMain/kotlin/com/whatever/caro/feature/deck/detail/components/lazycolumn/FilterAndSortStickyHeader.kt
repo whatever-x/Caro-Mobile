@@ -1,7 +1,6 @@
-package com.whatever.caro.feature.deck.detail.components
+package com.whatever.caro.feature.deck.detail.components.lazycolumn
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -10,7 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -22,26 +21,12 @@ import caromobile.core.designsystem.generated.resources.deck_detail_button_botto
 import caromobile.core.designsystem.generated.resources.deck_detail_button_bottom_sheet_last_reviewed
 import caromobile.core.designsystem.generated.resources.deck_detail_button_edit
 import caromobile.core.designsystem.generated.resources.deck_detail_label_total_count
+import caromobile.core.designsystem.generated.resources.ic_arrow_down_16
 import com.whatever.caro.core.designsystem.themes.CaroTheme
+import com.whatever.caro.core.ui.modifier.noRippleClickable
 import com.whatever.caro.feature.deck.detail.mvi.DeckDetailSortOption
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
-
-internal fun LazyListScope.filterAndSortStickyHeader(
-    deckCardTotal: Int,
-    selectedSortOption: DeckDetailSortOption,
-    onSortCardList: () -> Unit,
-    onEditCardList: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    stickyHeader {
-        FilterAndSortSection(
-            deckCardTotal = deckCardTotal,
-            selectedSortOption = selectedSortOption,
-            onSortCardList = onSortCardList,
-            onEditCardList = onEditCardList,
-        )
-    }
-}
 
 @Composable
 internal fun FilterAndSortSection(
@@ -55,24 +40,23 @@ internal fun FilterAndSortSection(
         modifier =
             modifier
                 .fillMaxWidth()
-                .background(color = CaroTheme.color.background.primary)
-                .padding(top = CaroTheme.spacing.xs),
+                .background(color = CaroTheme.color.background.primary),
     ) {
         Spacer(
             modifier =
                 Modifier
                     .fillMaxWidth()
                     .height(1.dp)
-                    .background(color = CaroTheme.color.divider.primary),
+                    .background(color = CaroTheme.color.divider.secondary),
         )
 
         Row(
             modifier =
                 Modifier
                     .fillMaxWidth()
+                    .height(47.dp)
                     .padding(
                         horizontal = CaroTheme.spacing.xl,
-                        vertical = CaroTheme.spacing.m,
                     ),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
@@ -92,7 +76,7 @@ internal fun FilterAndSortSection(
                 )
 
                 Row(
-                    modifier = Modifier.clickable(onClick = onSortCardList),
+                    modifier = Modifier.noRippleClickable(onClick = onSortCardList),
                     horizontalArrangement = Arrangement.spacedBy(CaroTheme.spacing.xs),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
@@ -117,19 +101,21 @@ internal fun FilterAndSortSection(
                         style = CaroTheme.typography.caption1,
                     )
 
-                    SortIcon(
+                    Icon(
+                        painter = painterResource(Res.drawable.ic_arrow_down_16),
+                        contentDescription = null,
                         modifier =
                             Modifier
-                                .width(15.dp)
-                                .height(13.5.dp),
-                        color = CaroTheme.color.icon.secondary,
+                                .width(16.dp)
+                                .height(16.dp),
+                        tint = CaroTheme.color.icon.secondary,
                     )
                 }
             }
 
             Text(
                 text = stringResource(Res.string.deck_detail_button_edit),
-                modifier = Modifier.clickable(onClick = onEditCardList),
+                modifier = Modifier.noRippleClickable(onClick = onEditCardList),
                 color = CaroTheme.color.text.secondary,
                 style = CaroTheme.typography.caption1,
             )

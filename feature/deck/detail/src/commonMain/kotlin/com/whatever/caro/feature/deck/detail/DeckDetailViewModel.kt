@@ -1,6 +1,6 @@
 package com.whatever.caro.feature.deck.detail
 
-import com.whatever.caro.core.navigator.entries.DeckDetailEntry
+import com.whatever.caro.core.model.deck.Deck
 import com.whatever.caro.core.viewmodel.BaseViewModel
 import com.whatever.caro.core.viewmodel.ExceptionFilter
 import com.whatever.caro.feature.deck.detail.mvi.DeckDetailIntent
@@ -8,10 +8,13 @@ import com.whatever.caro.feature.deck.detail.mvi.DeckDetailSideEffect
 import com.whatever.caro.feature.deck.detail.mvi.DeckDetailState
 
 class DeckDetailViewModel(
-    private val navKey: DeckDetailEntry,
+    deck: Deck,
     exceptionFilter: ExceptionFilter,
 ) : BaseViewModel<DeckDetailState, DeckDetailIntent, DeckDetailSideEffect>(
-        initialState = DeckDetailState(),
+        initialState =
+            DeckDetailState(
+                deck = deck,
+            ),
         exceptionFilter = exceptionFilter,
     ) {
     override suspend fun handleIntent(intent: DeckDetailIntent) {

@@ -12,17 +12,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.whatever.caro.core.designsystem.themes.CaroTheme
-import com.whatever.caro.feature.deck.detail.components.AddCardButtonItem
-import com.whatever.caro.feature.deck.detail.components.DeckCardItem
 import com.whatever.caro.feature.deck.detail.components.DeckDetailGuid
-import com.whatever.caro.feature.deck.detail.components.DeckDetailHeader
 import com.whatever.caro.feature.deck.detail.components.DeckDetailTopBar
 import com.whatever.caro.feature.deck.detail.components.DeckEditBottomSheet
 import com.whatever.caro.feature.deck.detail.components.SortBottomSheet
-import com.whatever.caro.feature.deck.detail.components.dailyLearningCard
-import com.whatever.caro.feature.deck.detail.components.filterAndSortStickyHeader
-import com.whatever.caro.feature.deck.detail.model.DeckUiModel
-import com.whatever.caro.feature.deck.detail.model.LearningUiModel
+import com.whatever.caro.feature.deck.detail.components.lazycolumn.AddCardButtonItem
+import com.whatever.caro.feature.deck.detail.components.lazycolumn.DeckCardItem
+import com.whatever.caro.feature.deck.detail.components.lazycolumn.DeckDetailHeader
+import com.whatever.caro.feature.deck.detail.components.lazycolumn.FilterAndSortSection
 import com.whatever.caro.feature.deck.detail.mvi.DeckDetailIntent
 import com.whatever.caro.feature.deck.detail.mvi.DeckDetailState
 
@@ -39,16 +36,12 @@ internal fun DeckDetailScreen(
                 .background(color = CaroTheme.color.background.primary),
     ) {
         DeckDetailTopBar(
+            title = state.deck.title,
             onBack = { onIntent(DeckDetailIntent.ClickBack) },
             onEditDeck = { onIntent(DeckDetailIntent.ClickEditDeck) },
         )
 
         if (state.isEmptyDeckCard) {
-            DeckDetailHeader(
-                title = state.deckUiModel.title,
-                description = state.deckUiModel.description,
-            )
-
             DeckDetailGuid(
                 onAddFirstCard = { onIntent(DeckDetailIntent.ClickAddCard) },
             )
@@ -57,29 +50,27 @@ internal fun DeckDetailScreen(
                 modifier =
                     Modifier
                         .fillMaxSize(),
+                overscrollEffect = null,
             ) {
                 item {
                     DeckDetailHeader(
-                        title = state.deckUiModel.title,
-                        description = state.deckUiModel.description,
+                        description = state.deck.description,
+                        learningCardTotal = state.deck.todayLearningCount,
+                        learningProgress = state.deck.todayProgress,
+                        currentLearningStatus = state.deck.state,
+                        onAllStudy = { onIntent(DeckDetailIntent.ClickAllStudy) },
+                        onDailyStudy = { onIntent(DeckDetailIntent.ClickDailyStudy) },
                     )
                 }
 
-                dailyLearningCard(
-                    learningCardCount = state.learningUiModel.reviewedCardCount,
-                    learningCardTotal = state.learningUiModel.learningCardTotal,
-                    learningProgress = state.learningUiModel.learningProgress,
-                    currentLearningStatus = state.learningUiModel.currentLearningStatus,
-                    onAllStudy = { onIntent(DeckDetailIntent.ClickAllStudy) },
-                    onDailyStudy = { onIntent(DeckDetailIntent.ClickDailyStudy) },
-                )
-
-                filterAndSortStickyHeader(
-                    deckCardTotal = state.deckUiModel.deckCardTotal,
-                    selectedSortOption = state.selectedSortOption,
-                    onSortCardList = { onIntent(DeckDetailIntent.ClickSortCardList) },
-                    onEditCardList = { onIntent(DeckDetailIntent.ClickEditCardList) },
-                )
+                stickyHeader {
+                    FilterAndSortSection(
+                        deckCardTotal = state.deck.cardTotalCount,
+                        selectedSortOption = state.selectedSortOption,
+                        onSortCardList = { onIntent(DeckDetailIntent.ClickSortCardList) },
+                        onEditCardList = { onIntent(DeckDetailIntent.ClickEditCardList) },
+                    )
+                }
 
                 item {
                     AddCardButtonItem(
@@ -88,7 +79,7 @@ internal fun DeckDetailScreen(
                 }
 
                 itemsIndexed(
-                    items = state.deckUiModel.deckCardList,
+                    items = state.deckCardList,
                     key = { index, card -> "${card.id}-$index" },
                 ) { index, card ->
                     DeckCardItem(
@@ -97,12 +88,12 @@ internal fun DeckDetailScreen(
                         modifier =
                             Modifier
                                 .padding(
-                                    start = CaroTheme.spacing.l,
-                                    top = CaroTheme.spacing.s,
-                                    end = CaroTheme.spacing.l,
+                                    start = CaroTheme.spacing.xl,
+                                    top = CaroTheme.spacing.m,
+                                    end = CaroTheme.spacing.xl,
                                     bottom =
-                                        if (index == state.deckUiModel.deckCardList.lastIndex) {
-                                            CaroTheme.spacing.s
+                                        if (index == state.deckCardList.lastIndex) {
+                                            CaroTheme.spacing.m
                                         } else {
                                             0.dp
                                         },
@@ -138,11 +129,7 @@ internal fun DeckDetailScreen(
 private fun DeckDetailScreenPreview() {
     CaroTheme {
         DeckDetailScreen(
-            state =
-                DeckDetailState(
-                    deckUiModel = DeckUiModel.preview(),
-                    learningUiModel = LearningUiModel.preview(),
-                ),
+            state = DeckDetailState(),
             onIntent = { },
         )
     }

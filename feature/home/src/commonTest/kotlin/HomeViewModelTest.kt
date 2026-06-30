@@ -1,4 +1,6 @@
 import app.cash.turbine.test
+import com.whatever.caro.core.model.deck.Deck
+import com.whatever.caro.core.model.deck.DeckState
 import com.whatever.caro.core.viewmodel.ExceptionFilter
 import com.whatever.caro.feature.home.HomeViewModel
 import com.whatever.caro.feature.home.di.homeModule
@@ -72,6 +74,38 @@ class HomeViewModelTest :
                 viewModel.sideEffect.test {
                     viewModel.intent(HomeIntent.ClickCreateDeck)
                     awaitItem() shouldBe HomeSideEffect.NavigateToCreateDeck
+                }
+            }
+        }
+
+        test("덱 클릭 시 덱 상세 이동 side effect에 홈 덱 데이터를 그대로 포함한다") {
+            runTest(dispatcher) {
+                val viewModel: HomeViewModel = get()
+                val deck =
+                    Deck(
+                        id = 1L,
+                        title = "테스트 덱",
+                        description = "테스트 설명",
+                        cardTotalCount = 24,
+                        todayLearningCount = 12,
+                        todayCompleteCount = 6,
+                        state = DeckState.LEARNING,
+                    )
+
+                viewModel.sideEffect.test {
+                    viewModel.intent(HomeIntent.ClickDeckButton(deck = deck))
+
+                    val sideEffect = awaitItem()
+                    sideEffect shouldBe HomeSideEffect.NavigateToDeckDetail(deck = deck)
+
+                    val payloadDeck = (sideEffect as HomeSideEffect.NavigateToDeckDetail).deck
+                    payloadDeck.title shouldBe "테스트 덱"
+                    payloadDeck.description shouldBe "테스트 설명"
+                    payloadDeck.cardTotalCount shouldBe 24
+                    payloadDeck.todayLearningCount shouldBe 12
+                    payloadDeck.todayCompleteCount shouldBe 6
+                    payloadDeck.todayProgress shouldBe 50
+                    payloadDeck.state shouldBe DeckState.LEARNING
                 }
             }
         }

@@ -13,6 +13,7 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
+            api(projects.core.model)
             api(libs.jetbrains.androidx.navigation3.ui)
         }
     }

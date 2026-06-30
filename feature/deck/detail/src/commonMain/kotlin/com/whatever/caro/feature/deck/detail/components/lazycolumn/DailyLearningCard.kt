@@ -1,6 +1,6 @@
 @file:Suppress("FunctionName")
 
-package com.whatever.caro.feature.deck.detail.components
+package com.whatever.caro.feature.deck.detail.components.lazycolumn
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -45,14 +45,14 @@ import caromobile.core.designsystem.generated.resources.deck_detail_label_daily_
 import caromobile.core.designsystem.generated.resources.deck_detail_sub_title_daily_learning
 import caromobile.core.designsystem.generated.resources.deck_detail_title_daily_learning
 import com.whatever.caro.core.designsystem.themes.CaroTheme
-import com.whatever.caro.feature.deck.detail.model.LearningStatus
+import com.whatever.caro.core.model.deck.DeckState
 import org.jetbrains.compose.resources.stringResource
 
 internal fun LazyListScope.dailyLearningCard(
     learningCardCount: Int,
     learningCardTotal: Int,
     learningProgress: Int,
-    currentLearningStatus: LearningStatus,
+    currentLearningStatus: DeckState,
     onDailyStudy: () -> Unit,
     onAllStudy: () -> Unit,
     modifier: Modifier = Modifier,
@@ -81,36 +81,46 @@ private fun DailyLearningCardContent(
     counting: Int,
     total: Int,
     learningProgress: Int,
-    learningStatus: LearningStatus,
+    learningStatus: DeckState,
     onDailyStudy: () -> Unit,
     onAllStudy: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val isLearningUnavailable = total == 0
+
     val motivationalMessage =
-        when (learningStatus) {
-            LearningStatus.UNAVAILABLE -> stringResource(Res.string.deck_detail_caption_daily_learning_unavailable)
-            LearningStatus.COMPLETED -> stringResource(Res.string.deck_detail_caption_daily_learning_completed)
-            LearningStatus.IN_PROGRESS -> stringResource(Res.string.deck_detail_caption_daily_learning_in_progress)
-            LearningStatus.READY -> stringResource(Res.string.deck_detail_caption_daily_learning_ready)
+        if (isLearningUnavailable) {
+            stringResource(Res.string.deck_detail_caption_daily_learning_unavailable)
+        } else {
+            when (learningStatus) {
+                DeckState.NOT_STARTED -> stringResource(Res.string.deck_detail_caption_daily_learning_ready)
+                DeckState.LEARNING -> stringResource(Res.string.deck_detail_caption_daily_learning_in_progress)
+                DeckState.COMPLETE -> stringResource(Res.string.deck_detail_caption_daily_learning_completed)
+            }
         }
 
     val learningStatusLabelText =
-        when (learningStatus) {
-            LearningStatus.UNAVAILABLE -> stringResource(Res.string.deck_detail_label_daily_learning_unavailable)
-            LearningStatus.COMPLETED -> stringResource(Res.string.deck_detail_label_daily_learning_completed)
-            LearningStatus.IN_PROGRESS -> stringResource(Res.string.deck_detail_label_daily_learning_in_progress)
-            LearningStatus.READY -> ""
+        if (isLearningUnavailable) {
+            stringResource(Res.string.deck_detail_label_daily_learning_unavailable)
+        } else {
+            when (learningStatus) {
+                DeckState.NOT_STARTED -> ""
+                DeckState.LEARNING -> stringResource(Res.string.deck_detail_label_daily_learning_in_progress)
+                DeckState.COMPLETE -> stringResource(Res.string.deck_detail_label_daily_learning_completed)
+            }
         }
 
     val learningStatusLabelTextColor =
-        when (learningStatus) {
-            LearningStatus.COMPLETED,
-            LearningStatus.IN_PROGRESS,
-            -> CaroTheme.color.text.brand
+        if (isLearningUnavailable) {
+            CaroTheme.color.text.brand
+        } else {
+            when (learningStatus) {
+                DeckState.LEARNING,
+                DeckState.COMPLETE,
+                -> CaroTheme.color.text.brand
 
-            LearningStatus.UNAVAILABLE -> CaroTheme.color.text.brand
-
-            LearningStatus.READY -> Color.Unspecified
+                DeckState.NOT_STARTED -> Color.Unspecified
+            }
         }
 
     Column(
@@ -306,7 +316,7 @@ private fun DailyLearningCardContentPreview() {
                 learningCardCount = 0,
                 learningCardTotal = 1000,
                 learningProgress = 0,
-                currentLearningStatus = LearningStatus.IN_PROGRESS,
+                currentLearningStatus = DeckState.LEARNING,
                 onDailyStudy = { },
                 onAllStudy = { },
             )
