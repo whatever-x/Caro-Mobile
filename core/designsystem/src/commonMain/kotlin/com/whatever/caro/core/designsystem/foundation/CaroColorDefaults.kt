@@ -52,3 +52,11 @@ internal val Yellow600 = Color(0xFFD39C05)
 internal val Yellow700 = Color(0xFFB07F00)
 internal val Yellow800 = Color(0xFF8D6500)
 internal val Yellow900 = Color(0xFF6A4C00)
+
+internal val BadgeSurfaceError = Color(0xFFFFF2F1)
+internal val BadgeSurfaceInfo = Color(0xFFEDF0FE)
+internal val BadgeSurfaceWarning = Color(0xFFFFF9EE)
+
+internal val BadgeTextError = Color(0xFFFF7A70)
+internal val BadgeTextInfo = Color(0xFF4A6CF7)
+internal val BadgeTextWarning = Color(0xFFFFC857)

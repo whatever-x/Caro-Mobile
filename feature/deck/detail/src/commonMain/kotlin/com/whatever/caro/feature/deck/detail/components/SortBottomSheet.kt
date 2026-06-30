@@ -1,7 +1,6 @@
 package com.whatever.caro.feature.deck.detail.components
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,6 +24,7 @@ import caromobile.core.designsystem.generated.resources.deck_detail_button_botto
 import caromobile.core.designsystem.generated.resources.deck_detail_button_bottom_sheet_last_reviewed
 import caromobile.core.designsystem.generated.resources.ic_check_16
 import com.whatever.caro.core.designsystem.themes.CaroTheme
+import com.whatever.caro.core.ui.modifier.noRippleClickable
 import com.whatever.caro.feature.deck.detail.mvi.DeckDetailSortOption
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
@@ -114,7 +114,7 @@ internal fun SortBottomSheetItem(
         modifier =
             modifier
                 .fillMaxWidth()
-                .clickable(onClick = onClick)
+                .noRippleClickable(onClick = onClick)
                 .padding(vertical = CaroTheme.spacing.m),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,

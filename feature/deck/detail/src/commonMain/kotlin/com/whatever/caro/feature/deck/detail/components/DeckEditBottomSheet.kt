@@ -1,7 +1,6 @@
 package com.whatever.caro.feature.deck.detail.components
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -26,6 +25,7 @@ import caromobile.core.designsystem.generated.resources.deck_detail_button_botto
 import caromobile.core.designsystem.generated.resources.ic_edit_24
 import caromobile.core.designsystem.generated.resources.ic_trash_24
 import com.whatever.caro.core.designsystem.themes.CaroTheme
+import com.whatever.caro.core.ui.modifier.noRippleClickable
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
@@ -111,7 +111,7 @@ private fun DeckEditBottomSheetItem(
         modifier =
             modifier
                 .fillMaxWidth()
-                .clickable(onClick = onClick)
+                .noRippleClickable(onClick = onClick)
                 .padding(vertical = CaroTheme.spacing.s),
         horizontalArrangement = Arrangement.spacedBy(CaroTheme.spacing.m),
         verticalAlignment = Alignment.CenterVertically,

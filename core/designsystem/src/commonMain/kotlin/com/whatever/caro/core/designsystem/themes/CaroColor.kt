@@ -4,6 +4,12 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
 import com.whatever.caro.core.designsystem.foundation.Alpha20
 import com.whatever.caro.core.designsystem.foundation.Alpha60
+import com.whatever.caro.core.designsystem.foundation.BadgeSurfaceError
+import com.whatever.caro.core.designsystem.foundation.BadgeSurfaceInfo
+import com.whatever.caro.core.designsystem.foundation.BadgeSurfaceWarning
+import com.whatever.caro.core.designsystem.foundation.BadgeTextError
+import com.whatever.caro.core.designsystem.foundation.BadgeTextInfo
+import com.whatever.caro.core.designsystem.foundation.BadgeTextWarning
 import com.whatever.caro.core.designsystem.foundation.Blue100
 import com.whatever.caro.core.designsystem.foundation.Blue200
 import com.whatever.caro.core.designsystem.foundation.Blue300
@@ -196,15 +202,15 @@ data class CaroColor(
                     BadgeColor(
                         surface =
                             BadgeColor.BadgeSurfaceColor(
-                                error = surfaceColor.error,
-                                info = surfaceColor.info,
-                                warning = surfaceColor.warning,
+                                error = BadgeSurfaceError,
+                                info = BadgeSurfaceInfo,
+                                warning = BadgeSurfaceWarning,
                             ),
                         text =
                             BadgeColor.BadgeTextColor(
-                                error = textColor.error,
-                                info = textColor.info,
-                                warning = textColor.warning,
+                                error = BadgeTextError,
+                                info = BadgeTextInfo,
+                                warning = BadgeTextWarning,
                             ),
                     ),
                 button = ButtonColor(),
