@@ -105,7 +105,7 @@ internal fun DeckCardItem(
                 Text(
                     text = badgeText,
                     color = badgeTextColor,
-                    style = CaroTheme.typography.caption1,
+                    style = CaroTheme.typography.caption1.regular,
                 )
             }
 
@@ -117,7 +117,7 @@ internal fun DeckCardItem(
                             card.reviewCount,
                         ),
                     color = CaroTheme.color.text.tertiary,
-                    style = CaroTheme.typography.caption1,
+                    style = CaroTheme.typography.caption1.regular,
                 )
             }
         }

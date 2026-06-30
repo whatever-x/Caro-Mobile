@@ -152,7 +152,7 @@ private fun DailyLearningCardContent(
                     Text(
                         text = stringResource(resource = Res.string.deck_detail_title_daily_learning),
                         color = CaroTheme.color.text.primary,
-                        style = CaroTheme.typography.caption1,
+                        style = CaroTheme.typography.caption1.regular,
                     )
 
                     Row(
@@ -174,7 +174,7 @@ private fun DailyLearningCardContent(
                         Text(
                             text = learningStatusLabelText,
                             color = learningStatusLabelTextColor,
-                            style = CaroTheme.typography.caption1,
+                            style = CaroTheme.typography.caption1.regular,
                         )
                     }
                 }
@@ -264,7 +264,7 @@ private fun DailyLearningCardContent(
                     Text(
                         text = stringResource(resource = Res.string.deck_detail_button_daily_learning),
                         color = CaroTheme.color.text.inverse,
-                        style = CaroTheme.typography.caption1,
+                        style = CaroTheme.typography.caption1.regular,
                     )
                 }
             }
@@ -295,7 +295,7 @@ private fun DailyLearningCardContent(
             Text(
                 text = stringResource(resource = Res.string.deck_detail_button_all_learning),
                 color = CaroTheme.color.text.primary,
-                style = CaroTheme.typography.caption1,
+                style = CaroTheme.typography.caption1.regular,
             )
         }
     }

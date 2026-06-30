@@ -98,7 +98,7 @@ internal fun FilterAndSortSection(
                                 },
                             ),
                         color = CaroTheme.color.text.secondary,
-                        style = CaroTheme.typography.caption1,
+                        style = CaroTheme.typography.caption1.regular,
                     )
 
                     Icon(
@@ -117,7 +117,7 @@ internal fun FilterAndSortSection(
                 text = stringResource(Res.string.deck_detail_button_edit),
                 modifier = Modifier.noRippleClickable(onClick = onEditCardList),
                 color = CaroTheme.color.text.secondary,
-                style = CaroTheme.typography.caption1,
+                style = CaroTheme.typography.caption1.regular,
             )
         }
     }

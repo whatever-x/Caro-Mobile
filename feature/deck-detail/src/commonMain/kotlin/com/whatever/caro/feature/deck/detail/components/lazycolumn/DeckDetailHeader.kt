@@ -198,7 +198,7 @@ private fun DeckStateBadge(
         Text(
             text = text,
             color = textColor,
-            style = CaroTheme.typography.caption1,
+            style = CaroTheme.typography.caption1.regular,
         )
     }
 }

@@ -124,7 +124,7 @@ internal fun DeckDetailGuid(
                         stringResource(
                             resource = Res.string.deck_detail_button_empty_guid,
                         ),
-                    style = CaroTheme.typography.caption1,
+                    style = CaroTheme.typography.caption1.regular,
                     color = CaroTheme.color.text.inverse,
                 )
             }

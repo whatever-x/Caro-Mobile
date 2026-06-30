@@ -51,12 +51,9 @@
 	<string name="deck_detail_label_daily_learning_ready">Not started</string>
 	<string name="deck_detail_label_daily_learning_completed">Completed</string>
 	<string name="deck_detail_label_daily_learning_unavailable">Rest</string>
-	<string
-		name="deck_detail_caption_daily_learning_unavailable_title">No review needed today</string>
-	<string
-		name="deck_detail_caption_daily_learning_unavailable_body_1">The algorithm decided there is nothing to review today.</string>
-	<string
-		name="deck_detail_caption_daily_learning_unavailable_body_2">New questions will be ready tomorrow!</string>
+	<string name="deck_detail_caption_daily_learning_unavailable_title">No review needed today</string>
+	<string name="deck_detail_caption_daily_learning_unavailable_body_1">The algorithm decided there is nothing to review today.</string>
+	<string name="deck_detail_caption_daily_learning_unavailable_body_2">New questions will be ready tomorrow!</string>
 	<string name="deck_detail_button_daily_learning">Start daily study</string>
 	<string name="deck_detail_button_all_learning">Cram mode (all cards)</string>
 	<string name="deck_detail_label_total_count">Total %1$d</string>

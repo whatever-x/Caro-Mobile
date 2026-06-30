@@ -49,7 +49,7 @@ internal fun ProfileCtaButton(
     ) {
         Text(
             text = text,
-            style = CaroTheme.typography.label1,
+            style = CaroTheme.typography.label1.bold,
             color = textColor,
         )
     }
