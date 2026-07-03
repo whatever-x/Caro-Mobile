@@ -18,12 +18,35 @@ fun DeckDetailRoute(
     val state by viewModel.state.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
-    }
-
-    LaunchedEffect(Unit) {
         viewModel.sideEffect.collect { sideEffect ->
             when (sideEffect) {
-                DeckDetailSideEffect.NavigateBack -> navDispatcher.emit(NavCommand.Back)
+                DeckDetailSideEffect.NavigateBack -> {
+                    navDispatcher.emit(NavCommand.Back)
+                }
+
+                is DeckDetailSideEffect.NavigateToCreateCard -> {
+                    // TODO: 카드 생성 화면 구현 후 sideEffect.deckId 를 사용해 이동 로직을 연결합니다.
+                }
+
+                is DeckDetailSideEffect.NavigateToAllStudy -> {
+                    // TODO: 전체 학습 화면 구현 후 sideEffect.deckId 를 사용해 이동 로직을 연결합니다.
+                }
+
+                is DeckDetailSideEffect.NavigateToDailyStudy -> {
+                    // TODO: 일일 학습 화면 구현 후 sideEffect.deckId 를 사용해 이동 로직을 연결합니다.
+                }
+
+                is DeckDetailSideEffect.NavigateToEditCardList -> {
+                    // TODO: 카드 목록 편집 화면 구현 후 sideEffect.deckId 를 사용해 이동 로직을 연결합니다.
+                }
+
+                is DeckDetailSideEffect.NavigateToEditDeck -> {
+                    // TODO: 덱 수정 화면 구현 후 sideEffect.deckId 를 사용해 이동 로직을 연결합니다.
+                }
+
+                is DeckDetailSideEffect.NavigateToCardDetail -> {
+                    // TODO: 카드 상세 화면 구현 후 sideEffect.cardId 를 사용해 이동 로직을 연결합니다.
+                }
             }
         }
     }

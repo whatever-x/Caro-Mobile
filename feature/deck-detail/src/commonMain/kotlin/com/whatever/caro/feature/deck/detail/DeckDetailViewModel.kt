@@ -24,15 +24,15 @@ class DeckDetailViewModel(
             }
 
             DeckDetailIntent.ClickAddCard -> {
-                TODO()
+                postSideEffect(DeckDetailSideEffect.NavigateToCreateCard(deckId = currentState.deck.id))
             }
 
             DeckDetailIntent.ClickAllStudy -> {
-                TODO()
+                postSideEffect(DeckDetailSideEffect.NavigateToAllStudy(deckId = currentState.deck.id))
             }
 
             DeckDetailIntent.ClickDailyStudy -> {
-                TODO()
+                postSideEffect(DeckDetailSideEffect.NavigateToDailyStudy(deckId = currentState.deck.id))
             }
 
             DeckDetailIntent.ClickSortCardList -> {
@@ -57,7 +57,7 @@ class DeckDetailViewModel(
             }
 
             DeckDetailIntent.ClickEditCardList -> {
-                TODO()
+                postSideEffect(DeckDetailSideEffect.NavigateToEditCardList(deckId = currentState.deck.id))
             }
 
             DeckDetailIntent.ClickEditDeck -> {
@@ -76,6 +76,7 @@ class DeckDetailViewModel(
                 reduce {
                     copy(isDeckEditBottomSheetVisible = false)
                 }
+                postSideEffect(DeckDetailSideEffect.NavigateToEditDeck(deckId = currentState.deck.id))
             }
 
             DeckDetailIntent.ClickDeckEditBottomSheetDelete -> {
@@ -85,7 +86,7 @@ class DeckDetailViewModel(
             }
 
             is DeckDetailIntent.ClickCard -> {
-                TODO()
+                postSideEffect(DeckDetailSideEffect.NavigateToCardDetail(cardId = intent.cardId))
             }
         }
     }
