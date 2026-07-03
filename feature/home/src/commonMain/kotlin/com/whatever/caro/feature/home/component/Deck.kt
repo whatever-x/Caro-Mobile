@@ -20,7 +20,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -168,24 +167,23 @@ private fun DeckStateBadge(
     modifier: Modifier = Modifier,
     state: DeckState,
 ) {
-    // FIXME: 디자인 토큰 재적용 필요
     val backgroundColor =
         when (state) {
-            DeckState.NOT_STARTED -> Color(0xFFFFF9EE)
-            DeckState.LEARNING -> Color(0xFFEDF0FE)
-            DeckState.COMPLETE -> Color(0xFFF8F8F9)
+            DeckState.NOT_STARTED -> CaroTheme.color.surface.ready
+            DeckState.LEARNING -> CaroTheme.color.surface.progress
+            DeckState.COMPLETE -> CaroTheme.color.surface.complete
         }
     val borderColor =
         when (state) {
-            DeckState.NOT_STARTED -> Color(0xFFFFEFCD)
-            DeckState.LEARNING -> Color(0xFFC9D3FD)
-            DeckState.COMPLETE -> Color(0xFFD8DADD)
+            DeckState.NOT_STARTED -> CaroTheme.color.border.ready
+            DeckState.LEARNING -> CaroTheme.color.border.progress
+            DeckState.COMPLETE -> CaroTheme.color.border.complete
         }
     val textColor =
         when (state) {
-            DeckState.NOT_STARTED -> Color(0xFF8D6500)
-            DeckState.LEARNING -> CaroTheme.color.text.brand
-            DeckState.COMPLETE -> CaroTheme.color.text.secondary
+            DeckState.NOT_STARTED -> CaroTheme.color.text.ready
+            DeckState.LEARNING -> CaroTheme.color.text.progress
+            DeckState.COMPLETE -> CaroTheme.color.text.complete
         }
     val stringRes =
         when (state) {

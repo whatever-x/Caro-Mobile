@@ -4,12 +4,6 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
 import com.whatever.caro.core.designsystem.foundation.Alpha20
 import com.whatever.caro.core.designsystem.foundation.Alpha60
-import com.whatever.caro.core.designsystem.foundation.BadgeSurfaceError
-import com.whatever.caro.core.designsystem.foundation.BadgeSurfaceInfo
-import com.whatever.caro.core.designsystem.foundation.BadgeSurfaceWarning
-import com.whatever.caro.core.designsystem.foundation.BadgeTextError
-import com.whatever.caro.core.designsystem.foundation.BadgeTextInfo
-import com.whatever.caro.core.designsystem.foundation.BadgeTextWarning
 import com.whatever.caro.core.designsystem.foundation.Blue100
 import com.whatever.caro.core.designsystem.foundation.Blue200
 import com.whatever.caro.core.designsystem.foundation.Blue300
@@ -19,6 +13,9 @@ import com.whatever.caro.core.designsystem.foundation.Blue600
 import com.whatever.caro.core.designsystem.foundation.Blue700
 import com.whatever.caro.core.designsystem.foundation.Blue800
 import com.whatever.caro.core.designsystem.foundation.Blue900
+import com.whatever.caro.core.designsystem.foundation.BorderComplete
+import com.whatever.caro.core.designsystem.foundation.BorderProgress
+import com.whatever.caro.core.designsystem.foundation.BorderReady
 import com.whatever.caro.core.designsystem.foundation.Gray100
 import com.whatever.caro.core.designsystem.foundation.Gray200
 import com.whatever.caro.core.designsystem.foundation.Gray300
@@ -33,6 +30,12 @@ import com.whatever.caro.core.designsystem.foundation.Red500
 import com.whatever.caro.core.designsystem.foundation.Red600
 import com.whatever.caro.core.designsystem.foundation.Red700
 import com.whatever.caro.core.designsystem.foundation.Red800
+import com.whatever.caro.core.designsystem.foundation.SurfaceComplete
+import com.whatever.caro.core.designsystem.foundation.SurfaceProgress
+import com.whatever.caro.core.designsystem.foundation.SurfaceReady
+import com.whatever.caro.core.designsystem.foundation.TextComplete
+import com.whatever.caro.core.designsystem.foundation.TextProgress
+import com.whatever.caro.core.designsystem.foundation.TextReady
 import com.whatever.caro.core.designsystem.foundation.White100
 import com.whatever.caro.core.designsystem.foundation.Yellow100
 import com.whatever.caro.core.designsystem.foundation.Yellow300
@@ -51,7 +54,6 @@ data class CaroColor(
     val overlay: OverlayColor,
     val skeleton: SkeletonColor,
     val gradient: GradientColor,
-    val badge: BadgeColor,
     val button: ButtonColor,
 ) {
     @Immutable
@@ -62,9 +64,12 @@ data class CaroColor(
         val disable: Color = Gray400,
         val inverse: Color = White100,
         val brand: Color = Blue500,
-        val warning: Color = Yellow700,
+        val warning: Color = Yellow800,
         val error: Color = Red700,
-        val info: Color = Blue600,
+        val info: Color = Blue800,
+        val ready: Color = TextReady,
+        val progress: Color = TextProgress,
+        val complete: Color = TextComplete,
         val watermark: Color = Gray100,
         val accent: Color = Red500,
     )
@@ -99,6 +104,9 @@ data class CaroColor(
         val error: Color = Red100,
         val disabled: Color = Gray400,
         val info: Color = Blue100,
+        val ready: Color = SurfaceReady,
+        val progress: Color = SurfaceProgress,
+        val complete: Color = SurfaceComplete,
         val accent: Color = Red500,
     )
 
@@ -112,6 +120,9 @@ data class CaroColor(
         val warning: Color = Yellow300,
         val error: Color = Red300,
         val info: Color = Blue300,
+        val ready: Color = BorderReady,
+        val progress: Color = BorderProgress,
+        val complete: Color = BorderComplete,
     )
 
     @Immutable
@@ -143,26 +154,6 @@ data class CaroColor(
     )
 
     @Immutable
-    data class BadgeColor(
-        val surface: BadgeSurfaceColor,
-        val text: BadgeTextColor,
-    ) {
-        @Immutable
-        data class BadgeSurfaceColor(
-            val error: Color,
-            val info: Color,
-            val warning: Color,
-        )
-
-        @Immutable
-        data class BadgeTextColor(
-            val error: Color,
-            val info: Color,
-            val warning: Color,
-        )
-    }
-
-    @Immutable
     data class ButtonColor(
         val surface: ButtonSurfaceDefaultColor = ButtonSurfaceDefaultColor(),
         val pressed: ButtonSurfacePressedColor = ButtonSurfacePressedColor(),
@@ -186,33 +177,17 @@ data class CaroColor(
     companion object {
         fun defaultColor(): CaroColor {
             val textColor = TextColor()
-            val surfaceColor = SurfaceColor()
 
             return CaroColor(
                 text = textColor,
                 icon = IconColor(),
                 background = BackgroundColor(),
-                surface = surfaceColor,
+                surface = SurfaceColor(),
                 border = BorderColor(),
                 divider = DividerColor(),
                 overlay = OverlayColor(),
                 skeleton = SkeletonColor(),
                 gradient = GradientColor(),
-                badge =
-                    BadgeColor(
-                        surface =
-                            BadgeColor.BadgeSurfaceColor(
-                                error = BadgeSurfaceError,
-                                info = BadgeSurfaceInfo,
-                                warning = BadgeSurfaceWarning,
-                            ),
-                        text =
-                            BadgeColor.BadgeTextColor(
-                                error = BadgeTextError,
-                                info = BadgeTextInfo,
-                                warning = BadgeTextWarning,
-                            ),
-                    ),
                 button = ButtonColor(),
             )
         }

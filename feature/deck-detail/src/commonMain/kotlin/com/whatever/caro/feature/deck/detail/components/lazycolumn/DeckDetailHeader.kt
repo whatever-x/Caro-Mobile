@@ -148,14 +148,12 @@ private fun DeckStateBadge(
 
     val textColor =
         if (isLearningUnavailable) {
-            CaroTheme.color.text.error
+            CaroTheme.color.text.warning
         } else {
             when (currentLearningStatus) {
-                DeckState.NOT_STARTED,
-                DeckState.LEARNING,
-                -> CaroTheme.color.text.brand
-
-                DeckState.COMPLETE -> CaroTheme.color.text.secondary
+                DeckState.NOT_STARTED -> CaroTheme.color.text.ready
+                DeckState.LEARNING -> CaroTheme.color.text.progress
+                DeckState.COMPLETE -> CaroTheme.color.text.complete
             }
         }
 
@@ -164,19 +162,18 @@ private fun DeckStateBadge(
             CaroTheme.color.surface.warning
         } else {
             when (currentLearningStatus) {
-                DeckState.NOT_STARTED,
-                DeckState.LEARNING,
-                -> CaroTheme.color.surface.info
-
-                DeckState.COMPLETE -> CaroTheme.color.surface.primary
+                DeckState.NOT_STARTED -> CaroTheme.color.surface.ready
+                DeckState.LEARNING -> CaroTheme.color.surface.progress
+                DeckState.COMPLETE -> CaroTheme.color.surface.complete
             }
         }
 
     val borderColor =
         when {
             isLearningUnavailable -> CaroTheme.color.border.warning
-            currentLearningStatus == DeckState.COMPLETE -> CaroTheme.color.border.primary
-            else -> CaroTheme.color.border.info
+            currentLearningStatus == DeckState.NOT_STARTED -> CaroTheme.color.border.ready
+            currentLearningStatus == DeckState.LEARNING -> CaroTheme.color.border.progress
+            else -> CaroTheme.color.border.complete
         }
 
     Box(
@@ -309,6 +306,7 @@ private fun UnavailableLearningMessage(modifier: Modifier = Modifier) {
 @Composable
 private fun RestCardIcon(modifier: Modifier = Modifier) {
     val starColor = CaroTheme.color.surface.brand
+    val cardBorderColor = CaroTheme.color.border.warning
 
     Canvas(
         modifier =
@@ -330,7 +328,7 @@ private fun RestCardIcon(modifier: Modifier = Modifier) {
             cornerRadius = CornerRadius(4.dp.toPx()),
         )
         drawRoundRect(
-            color = Color(0xFFFFE494),
+            color = cardBorderColor,
             topLeft = cardOffset,
             size = cardSize,
             cornerRadius = CornerRadius(4.dp.toPx()),
