@@ -37,6 +37,7 @@ import caromobile.core.designsystem.generated.resources.deck_detail_label_daily_
 import caromobile.core.designsystem.generated.resources.deck_detail_label_daily_learning_ready
 import caromobile.core.designsystem.generated.resources.deck_detail_label_daily_learning_unavailable
 import caromobile.core.designsystem.generated.resources.deck_detail_label_learning_card_count
+import caromobile.core.designsystem.generated.resources.deck_detail_label_learning_progress
 import caromobile.core.designsystem.generated.resources.deck_detail_title_daily_learning
 import com.whatever.caro.core.designsystem.themes.CaroTheme
 import com.whatever.caro.core.model.deck.DeckState
@@ -257,7 +258,11 @@ private fun DailyLearningProgress(
             )
 
             Text(
-                text = "$learningProgress%",
+                text =
+                    stringResource(
+                        resource = Res.string.deck_detail_label_learning_progress,
+                        learningProgress,
+                    ),
                 color = CaroTheme.color.text.brand,
                 style = CaroTheme.typography.label2,
             )

@@ -42,6 +42,7 @@ import caromobile.core.designsystem.generated.resources.deck_detail_caption_dail
 import caromobile.core.designsystem.generated.resources.deck_detail_label_daily_learning_completed
 import caromobile.core.designsystem.generated.resources.deck_detail_label_daily_learning_in_progress
 import caromobile.core.designsystem.generated.resources.deck_detail_label_daily_learning_unavailable
+import caromobile.core.designsystem.generated.resources.deck_detail_label_learning_progress
 import caromobile.core.designsystem.generated.resources.deck_detail_sub_title_daily_learning
 import caromobile.core.designsystem.generated.resources.deck_detail_title_daily_learning
 import com.whatever.caro.core.designsystem.themes.CaroTheme
@@ -282,7 +283,11 @@ private fun DailyLearningCardContent(
                     Modifier
                         .align(alignment = Alignment.TopEnd)
                         .offset(y = 35.dp),
-                text = "$learningProgress%",
+                text =
+                    stringResource(
+                        resource = Res.string.deck_detail_label_learning_progress,
+                        learningProgress,
+                    ),
                 color = CaroTheme.color.text.watermark,
                 style = CaroTheme.typography.watermark,
             )
