@@ -87,6 +87,12 @@ private fun DailyLearningCardContent(
     modifier: Modifier = Modifier,
 ) {
     val isLearningUnavailable = total == 0
+    val dailyLearningCardHeight =
+        if (isLearningUnavailable) {
+            203.dp
+        } else {
+            211.dp
+        }
 
     val motivationalMessage =
         if (isLearningUnavailable) {
@@ -133,7 +139,7 @@ private fun DailyLearningCardContent(
                 modifier =
                     Modifier
                         .fillMaxWidth()
-                        .height(height = 211.dp)
+                        .height(height = dailyLearningCardHeight)
                         .background(
                             color = CaroTheme.color.surface.primary,
                             shape = CaroTheme.shape.l,
@@ -246,26 +252,28 @@ private fun DailyLearningCardContent(
                     }
                 }
 
-                Box( // TODO : CTA 버튼 컴포넌트 구현시 교체
-                    modifier =
-                        Modifier
-                            .fillMaxWidth()
-                            .background(
-                                color = CaroTheme.color.surface.brand,
-                                shape = CaroTheme.shape.xxl,
-                            ).clip(shape = CaroTheme.shape.xxl)
-                            .clickable(onClick = onDailyStudy)
-                            .padding(
-                                horizontal = CaroTheme.spacing.l,
-                                vertical = CaroTheme.spacing.m,
-                            ),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Text(
-                        text = stringResource(resource = Res.string.deck_detail_button_daily_learning),
-                        color = CaroTheme.color.text.inverse,
-                        style = CaroTheme.typography.caption1.regular,
-                    )
+                if (!isLearningUnavailable) {
+                    Box( // TODO : CTA 버튼 컴포넌트 구현시 교체
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .background(
+                                    color = CaroTheme.color.surface.brand,
+                                    shape = CaroTheme.shape.xxl,
+                                ).clip(shape = CaroTheme.shape.xxl)
+                                .clickable(onClick = onDailyStudy)
+                                .padding(
+                                    horizontal = CaroTheme.spacing.l,
+                                    vertical = CaroTheme.spacing.m,
+                                ),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Text(
+                            text = stringResource(resource = Res.string.deck_detail_button_daily_learning),
+                            color = CaroTheme.color.text.inverse,
+                            style = CaroTheme.typography.caption1.regular,
+                        )
+                    }
                 }
             }
 
