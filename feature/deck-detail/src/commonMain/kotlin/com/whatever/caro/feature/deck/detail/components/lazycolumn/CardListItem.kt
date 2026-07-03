@@ -18,6 +18,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import caromobile.core.designsystem.generated.resources.Res
+import caromobile.core.designsystem.generated.resources.deck_detail_badge_hard
+import caromobile.core.designsystem.generated.resources.deck_detail_badge_new
+import caromobile.core.designsystem.generated.resources.deck_detail_badge_review
 import caromobile.core.designsystem.generated.resources.deck_detail_caption_review_count
 import com.whatever.caro.core.designsystem.themes.CaroTheme
 import com.whatever.caro.feature.deck.detail.model.CardItem
@@ -30,7 +33,12 @@ internal fun DeckCardItem(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val badgeText = card.reviewState.name
+    val badgeText =
+        when (card.reviewState) {
+            CardReviewState.HARD -> stringResource(Res.string.deck_detail_badge_hard)
+            CardReviewState.REVIEW -> stringResource(Res.string.deck_detail_badge_review)
+            CardReviewState.NEW -> stringResource(Res.string.deck_detail_badge_new)
+        }
 
     val badgeTextColor =
         when (card.reviewState) {

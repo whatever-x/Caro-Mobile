@@ -59,6 +59,9 @@
     <string name="deck_detail_label_learning_card_count">%1$d개 카드</string>
     <string name="deck_detail_button_add_card">카드 추가하기</string>
     <string name="deck_detail_button_edit">편집</string>
+    <string name="deck_detail_badge_new">NEW</string>
+    <string name="deck_detail_badge_review">REVIEW</string>
+    <string name="deck_detail_badge_hard">HARD</string>
     <string name="deck_detail_caption_review_count">%1$d회 학습</string>
     <string name="deck_detail_label_bottom_sheet">정렬</string>
     <string name="deck_detail_button_bottom_sheet_created">생성일순</string>
