@@ -1,9 +1,11 @@
 import app.cash.turbine.test
 import com.whatever.caro.core.viewmodel.ExceptionFilter
 import com.whatever.caro.feature.home.HomeViewModel
+import com.whatever.caro.feature.home.di.homeModule
 import com.whatever.caro.feature.home.mvi.HomeIntent
 import com.whatever.caro.feature.home.mvi.HomeSideEffect
 import io.kotest.core.spec.style.FunSpec
+import io.kotest.koin.KoinExtension
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -13,10 +15,26 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import org.koin.dsl.module
+import org.koin.test.KoinTest
+import org.koin.test.get
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class HomeViewModelTest : FunSpec() {
+class HomeViewModelTest :
+    FunSpec(),
+    KoinTest {
     init {
+        extensions(
+            KoinExtension(
+                listOf(
+                    homeModule,
+                    module {
+                        single<ExceptionFilter> { ExceptionFilter.None }
+                    },
+                ),
+            ),
+        )
+
         val dispatcher = StandardTestDispatcher()
 
         beforeTest {
@@ -28,17 +46,41 @@ class HomeViewModelTest : FunSpec() {
             dispatcher.cancel()
         }
 
-        fun createViewModel() = HomeViewModel(exceptionFilter = ExceptionFilter.None)
-
-        test("ClickProfile 은 NavigateToProfile 을 emit 한다") {
+        test("ClickSettingButton 은 NavigateToSetting 을 방출한다") {
             runTest(dispatcher) {
-                val viewModel = createViewModel()
+                val viewModel: HomeViewModel = get()
+
+                viewModel.sideEffect.test {
+                    viewModel.intent(HomeIntent.ClickSettingButton)
+                    advanceUntilIdle()
+
+                    awaitItem() shouldBe HomeSideEffect.NavigateToSetting
+                }
+            }
+        }
+
+        test("ClickProfile 은 NavigateToProfile 을 방출한다") {
+            runTest(dispatcher) {
+                val viewModel: HomeViewModel = get()
 
                 viewModel.sideEffect.test {
                     viewModel.intent(HomeIntent.ClickProfile)
                     advanceUntilIdle()
 
                     awaitItem() shouldBe HomeSideEffect.NavigateToProfile
+                }
+            }
+        }
+
+        test("ClickCreateDeck 은 NavigateToCreateDeck 을 방출한다") {
+            runTest(dispatcher) {
+                val viewModel: HomeViewModel = get()
+
+                viewModel.sideEffect.test {
+                    viewModel.intent(HomeIntent.ClickCreateDeck)
+                    advanceUntilIdle()
+
+                    awaitItem() shouldBe HomeSideEffect.NavigateToCreateDeck
                 }
             }
         }

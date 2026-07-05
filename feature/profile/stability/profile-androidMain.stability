@@ -5,7 +5,42 @@
 //   ./gradlew :profile:stabilityDump
 
 @Composable
-public fun com.whatever.caro.feature.profile.CreateProfileRoute(viewModel: com.whatever.caro.feature.profile.CreateProfileViewModel, navDispatcher: com.whatever.caro.core.navigator.dispatcher.NavigationDispatcher): kotlin.Unit
+internal fun com.whatever.caro.feature.profile.components.NicknameField(value: kotlin.String, onValueChange: kotlin.Function1<kotlin.String, kotlin.Unit>, onRefreshClick: kotlin.Function0<kotlin.Unit>, characterCount: kotlin.String, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - value: STABLE (String is immutable)
+    - onValueChange: STABLE (function type)
+    - onRefreshClick: STABLE (function type)
+    - characterCount: STABLE (String is immutable)
+    - modifier: STABLE (marked @Stable or @Immutable)
+
+@Composable
+private fun com.whatever.caro.feature.profile.components.NicknameFooter(characterCount: kotlin.String): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - characterCount: STABLE (String is immutable)
+
+@Composable
+private fun com.whatever.caro.feature.profile.components.NicknameHeader(onRefreshClick: kotlin.Function0<kotlin.Unit>): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - onRefreshClick: STABLE (function type)
+
+@Composable
+internal fun com.whatever.caro.feature.profile.components.ProfileCtaButton(text: kotlin.String, enabled: kotlin.Boolean, onClick: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - text: STABLE (String is immutable)
+    - enabled: STABLE (primitive type)
+    - onClick: STABLE (function type)
+    - modifier: STABLE (marked @Stable or @Immutable)
+
+@Composable
+public fun com.whatever.caro.feature.profile.create.CreateProfileRoute(viewModel: com.whatever.caro.feature.profile.create.CreateProfileViewModel, navDispatcher: com.whatever.caro.core.navigator.dispatcher.NavigationDispatcher): kotlin.Unit
   skippable: false
   restartable: true
   params:
@@ -13,7 +48,7 @@ public fun com.whatever.caro.feature.profile.CreateProfileRoute(viewModel: com.w
     - navDispatcher: RUNTIME (requires runtime check)
 
 @Composable
-internal fun com.whatever.caro.feature.profile.CreateProfileScreen(state: com.whatever.caro.feature.profile.mvi.CreateProfileState, onIntent: kotlin.Function1<com.whatever.caro.feature.profile.mvi.CreateProfileIntent, kotlin.Unit>): kotlin.Unit
+internal fun com.whatever.caro.feature.profile.create.CreateProfileScreen(state: com.whatever.caro.feature.profile.create.mvi.CreateProfileState, onIntent: kotlin.Function1<com.whatever.caro.feature.profile.create.mvi.CreateProfileIntent, kotlin.Unit>): kotlin.Unit
   skippable: true
   restartable: true
   params:
@@ -21,33 +56,18 @@ internal fun com.whatever.caro.feature.profile.CreateProfileScreen(state: com.wh
     - onIntent: STABLE (function type)
 
 @Composable
-private fun com.whatever.caro.feature.profile.CtaButton(enabled: kotlin.Boolean, onClick: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
-  skippable: true
+public fun com.whatever.caro.feature.profile.edit.EditProfileRoute(viewModel: com.whatever.caro.feature.profile.edit.EditProfileViewModel, navDispatcher: com.whatever.caro.core.navigator.dispatcher.NavigationDispatcher): kotlin.Unit
+  skippable: false
   restartable: true
   params:
-    - enabled: STABLE (primitive type)
-    - onClick: STABLE (function type)
-    - modifier: STABLE (marked @Stable or @Immutable)
+    - viewModel: UNSTABLE (has mutable properties or unstable members)
+    - navDispatcher: RUNTIME (requires runtime check)
 
 @Composable
-private fun com.whatever.caro.feature.profile.NicknameField(state: com.whatever.caro.feature.profile.mvi.CreateProfileState, onIntent: kotlin.Function1<com.whatever.caro.feature.profile.mvi.CreateProfileIntent, kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+internal fun com.whatever.caro.feature.profile.edit.EditProfileScreen(state: com.whatever.caro.feature.profile.edit.mvi.EditProfileState, onIntent: kotlin.Function1<com.whatever.caro.feature.profile.edit.mvi.EditProfileIntent, kotlin.Unit>): kotlin.Unit
   skippable: true
   restartable: true
   params:
     - state: STABLE (class with no mutable properties)
     - onIntent: STABLE (function type)
-    - modifier: STABLE (marked @Stable or @Immutable)
 
-@Composable
-private fun com.whatever.caro.feature.profile.NicknameFooter(characterCount: kotlin.String): kotlin.Unit
-  skippable: true
-  restartable: true
-  params:
-    - characterCount: STABLE (String is immutable)
-
-@Composable
-private fun com.whatever.caro.feature.profile.NicknameHeader(onRefreshClick: kotlin.Function0<kotlin.Unit>): kotlin.Unit
-  skippable: true
-  restartable: true
-  params:
-    - onRefreshClick: STABLE (function type)

@@ -256,7 +256,7 @@ private fun CaroTextAreaWithCaptionPreview() {
             footer = {
                 Text(
                     text = "최대 200자까지 입력할 수 있어요",
-                    style = CaroTheme.typography.caption1,
+                    style = CaroTheme.typography.caption1.regular,
                     color = CaroTheme.color.text.secondary,
                 )
             },
@@ -289,7 +289,7 @@ private fun CaroTextAreaWithCounterPreview() {
                     Spacer(modifier = Modifier.weight(1f))
                     Text(
                         text = "${value.length}/$max",
-                        style = CaroTheme.typography.caption1,
+                        style = CaroTheme.typography.caption1.regular,
                         color = CaroTheme.color.text.secondary,
                         textAlign = TextAlign.End,
                     )
@@ -334,13 +334,13 @@ private fun CaroTextAreaFilledPreview() {
                 ) {
                     Text(
                         text = "최대 ${max}자까지 입력할 수 있어요",
-                        style = CaroTheme.typography.caption1,
+                        style = CaroTheme.typography.caption1.regular,
                         color = CaroTheme.color.text.secondary,
                     )
                     Spacer(modifier = Modifier.weight(1f))
                     Text(
                         text = "${value.length}/$max",
-                        style = CaroTheme.typography.caption1,
+                        style = CaroTheme.typography.caption1.regular,
                         color = CaroTheme.color.text.secondary,
                         textAlign = TextAlign.End,
                     )
@@ -381,7 +381,7 @@ private fun CaroTextAreaOverflowPreview() {
                     Spacer(modifier = Modifier.weight(1f))
                     Text(
                         text = "${value.length}/$max",
-                        style = CaroTheme.typography.caption1,
+                        style = CaroTheme.typography.caption1.regular,
                         color = CaroTheme.color.text.secondary,
                         textAlign = TextAlign.End,
                     )
@@ -409,7 +409,7 @@ private fun CaroTextAreaCustomFooterPreview() {
             footer = {
                 Text(
                     text = "필수 입력 항목이에요",
-                    style = CaroTheme.typography.caption1,
+                    style = CaroTheme.typography.caption1.regular,
                     color = CaroTheme.color.text.accent,
                 )
             },

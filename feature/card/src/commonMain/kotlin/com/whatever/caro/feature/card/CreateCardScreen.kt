@@ -198,7 +198,7 @@ private fun FieldCounter(count: String) {
         Spacer(modifier = Modifier.weight(1f))
         Text(
             text = count,
-            style = CaroTheme.typography.caption1,
+            style = CaroTheme.typography.caption1.regular,
             color = CaroTheme.color.text.tertiary,
             textAlign = TextAlign.End,
         )
@@ -265,7 +265,7 @@ private fun TipRow(text: String) {
         )
         Text(
             text = text,
-            style = CaroTheme.typography.caption1,
+            style = CaroTheme.typography.caption1.regular,
             color = CaroTheme.color.text.tertiary,
         )
     }
@@ -319,7 +319,7 @@ private fun AddedCounterChip(count: Int) {
     ) {
         Text(
             text = stringResource(Res.string.card_counter_added, count),
-            style = CaroTheme.typography.caption1,
+            style = CaroTheme.typography.caption1.regular,
             color = CaroTheme.color.text.inverse,
         )
     }
@@ -344,7 +344,7 @@ private fun CardPreview(
             Text(
                 modifier = Modifier.fillMaxWidth().weight(1f),
                 text = card.front,
-                style = CaroTheme.typography.caption1,
+                style = CaroTheme.typography.caption1.regular,
                 color = CaroTheme.color.text.primary,
                 textAlign = TextAlign.Center,
                 maxLines = PREVIEW_TEXT_MAX_LINES,
@@ -360,7 +360,7 @@ private fun CardPreview(
             Text(
                 modifier = Modifier.fillMaxWidth().weight(1f),
                 text = card.back,
-                style = CaroTheme.typography.caption1,
+                style = CaroTheme.typography.caption1.regular,
                 color = CaroTheme.color.text.secondary,
                 textAlign = TextAlign.Center,
                 maxLines = PREVIEW_TEXT_MAX_LINES,

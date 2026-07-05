@@ -1,5 +1,6 @@
 package com.whatever.caro.feature.splash
 
+import com.whatever.caro.core.data.repository.auth.AuthRepository
 import com.whatever.caro.core.viewmodel.BaseViewModel
 import com.whatever.caro.core.viewmodel.ExceptionFilter
 import com.whatever.caro.feature.splash.mvi.SplashIntent
@@ -15,11 +16,17 @@ import dev.icerock.moko.permissions.notifications.REMOTE_NOTIFICATION
 import kotlinx.coroutines.delay
 
 class SplashViewModel(
+    private val authRepository: AuthRepository,
     exceptionFilter: ExceptionFilter,
 ) : BaseViewModel<SplashState, SplashIntent, SplashSideEffect>(
         initialState = SplashState(),
         exceptionFilter = exceptionFilter,
     ) {
+    override fun handleClientException(throwable: Throwable) {
+        super.handleClientException(throwable)
+        postSideEffect(SplashSideEffect.NavigateLogin)
+    }
+
     override suspend fun handleIntent(intent: SplashIntent) {
         when (intent) {
             SplashIntent.Initialize -> initialize()
@@ -28,8 +35,10 @@ class SplashViewModel(
 
     private suspend fun initialize() {
         delay(MINIMUM_SPLASH_DURATION_MILLIS)
+        // TODO : 서버에서 세션 확인 API 만들어지면 변경
+        authRepository.refreshToken()
         reduce { copy(isInitializing = false) }
-        postSideEffect(SplashSideEffect.NavigateLogin)
+        postSideEffect(SplashSideEffect.NavigateHome)
     }
 
     private suspend fun ensureNotificationPermission(controller: PermissionsController) {

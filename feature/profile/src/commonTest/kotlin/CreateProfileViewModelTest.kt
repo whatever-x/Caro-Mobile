@@ -1,13 +1,13 @@
 import app.cash.turbine.test
-import com.whatever.caro.core.data.repository.AuthRepository
+import com.whatever.caro.core.data.repository.auth.AuthRepository
 import com.whatever.caro.core.data.repository.profile.ProfileRepository
 import com.whatever.caro.core.model.auth.AuthSession
 import com.whatever.caro.core.viewmodel.ExceptionFilter
-import com.whatever.caro.feature.profile.CreateProfileViewModel
 import com.whatever.caro.feature.profile.NicknameValidationResult
 import com.whatever.caro.feature.profile.NicknameValidator
-import com.whatever.caro.feature.profile.mvi.CreateProfileIntent
-import com.whatever.caro.feature.profile.mvi.CreateProfileSideEffect
+import com.whatever.caro.feature.profile.create.CreateProfileViewModel
+import com.whatever.caro.feature.profile.create.mvi.CreateProfileIntent
+import com.whatever.caro.feature.profile.create.mvi.CreateProfileSideEffect
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
@@ -18,7 +18,6 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
@@ -36,7 +35,6 @@ class CreateProfileViewModelTest : FunSpec() {
 
         afterTest {
             Dispatchers.resetMain()
-            dispatcher.cancel()
         }
 
         fun createViewModel(
