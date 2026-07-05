@@ -34,6 +34,7 @@ kotlin {
             implementation(projects.feature.deck)
             implementation(projects.feature.card)
             implementation(projects.feature.setting)
+            implementation(projects.feature.deckDetail)
 
             implementation(libs.koin.compose.viewmodel)
             implementation(libs.koin.compose.navigation3)

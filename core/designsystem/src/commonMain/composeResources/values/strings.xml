@@ -22,8 +22,6 @@
 	<string name="profile_field_rule_nickname">2-20 characters. Korean, English, numbers, -, and _ only</string>
 	<string name="profile_button_create">Create</string>
 	<string name="profile_button_done">Done</string>
-
-
 	<!-- deck -->
 	<string name="deck_title_create">Create Deck</string>
 	<string name="deck_content_description_back">Go back</string>
@@ -37,6 +35,42 @@
 	<string name="deck_tip_max_cards">You can add up to 200 cards per deck.</string>
 	<string name="deck_button_create">Create</string>
 	<string name="deck_snackbar_create_error">Failed to create the deck. Please try again.</string>
+	<!-- deck detail -->
+	<string name="deck_detail_screen_name">Deck Detail</string>
+	<string name="deck_detail_label_screen_name">Deck Detail</string>
+	<string name="deck_detail_title_empty_guid">Create your first card\nto start learning</string>
+	<string name="deck_detail_sub_title_empty_guid">Add cards to create\na daily study schedule</string>
+	<string name="deck_detail_button_empty_guid">Add your first card</string>
+	<string name="deck_detail_title_daily_learning">Daily Study</string>
+	<string name="deck_detail_sub_title_daily_learning">Cards studied</string>
+	<string name="deck_detail_caption_daily_learning_ready">Start today's study 🌱</string>
+	<string name="deck_detail_caption_daily_learning_in_progress">Let’s finish your learning streak! ⚡️</string>
+	<string name="deck_detail_caption_daily_learning_completed">You reached today's goal! 🔥</string>
+	<string name="deck_detail_caption_daily_learning_unavailable">No cards to study today</string>
+	<string name="deck_detail_label_daily_learning_in_progress">In progress</string>
+	<string name="deck_detail_label_daily_learning_ready">Not started</string>
+	<string name="deck_detail_label_daily_learning_completed">Completed</string>
+	<string name="deck_detail_label_daily_learning_unavailable">Rest</string>
+	<string name="deck_detail_caption_daily_learning_unavailable_title">No review needed today</string>
+	<string name="deck_detail_caption_daily_learning_unavailable_body_1">The algorithm decided there is nothing to review today.</string>
+	<string name="deck_detail_caption_daily_learning_unavailable_body_2">New questions will be ready tomorrow!</string>
+	<string name="deck_detail_button_daily_learning">Start daily study</string>
+	<string name="deck_detail_button_all_learning">Cram mode (all cards)</string>
+	<string name="deck_detail_label_total_count">Total %1$d</string>
+	<string name="deck_detail_label_learning_card_count">%1$d cards</string>
+	<string name="deck_detail_label_learning_progress">%1$d%%</string>
+	<string name="deck_detail_button_add_card">Add card</string>
+	<string name="deck_detail_button_edit">Edit</string>
+	<string name="deck_detail_badge_new">NEW</string>
+	<string name="deck_detail_badge_review">REVIEW</string>
+	<string name="deck_detail_badge_hard">HARD</string>
+	<string name="deck_detail_caption_review_count">Studied %1$d times</string>
+	<string name="deck_detail_label_bottom_sheet">Sort</string>
+	<string name="deck_detail_button_bottom_sheet_created">Created date order</string>
+	<string name="deck_detail_button_bottom_sheet_last_reviewed">Recently studied</string>
+	<string name="deck_detail_button_bottom_sheet_last_frequency">Frequency</string>
+	<string name="deck_detail_button_bottom_sheet_deck_edit">Edit deck</string>
+	<string name="deck_detail_button_bottom_sheet_deck_delete">Delete deck</string>
 	<!-- card -->
 	<string name="card_title_create">Create Card</string>
 	<string name="card_content_description_back">Go back</string>

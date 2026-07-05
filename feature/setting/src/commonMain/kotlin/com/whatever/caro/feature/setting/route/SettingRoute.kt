@@ -158,7 +158,7 @@ private fun DeleteAccountDialog(
                         Modifier
                             .fillMaxWidth()
                             .background(
-                                color = CaroTheme.color.badge.surface.error,
+                                color = CaroTheme.color.surface.error,
                                 shape = CaroTheme.shape.xxl,
                             ).padding(
                                 horizontal = CaroTheme.spacing.l,
