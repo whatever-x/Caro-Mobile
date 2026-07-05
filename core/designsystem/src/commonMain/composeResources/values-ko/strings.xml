@@ -34,6 +34,24 @@
     <string name="deck_tip_max_cards">한 덱에 최대 200장의 카드를 담을 수 있어요.</string>
     <string name="deck_button_create">만들기</string>
     <string name="deck_snackbar_create_error">덱 만들기에 실패했어요. 잠시 후 다시 시도해주세요.</string>
+    <!-- card -->
+    <string name="card_title_create">카드 생성</string>
+    <string name="card_content_description_back">뒤로 가기</string>
+    <string name="card_field_label_front">앞면</string>
+    <string name="card_field_label_back">뒷면</string>
+    <string name="card_field_required">*</string>
+    <string name="card_field_placeholder_front">앞 면에 들어갈 텍스트를 입력하세요.</string>
+    <string name="card_field_placeholder_back">뒷 면에 들어갈 텍스트를 입력하세요.</string>
+    <string name="card_content_description_swap">앞면과 뒷면 바꾸기</string>
+    <string name="card_tip_label">TIP</string>
+    <string name="card_tip_max_cards">한 덱에 최대 200장의 카드를 담을 수 있어요.</string>
+    <string name="card_tip_split_by_topic">주제별로 덱을 나누면 복습이 훨씬 쉬워져요.</string>
+    <string name="card_counter_added">%1$d장 추가됨</string>
+    <string name="card_content_description_remove">카드 삭제</string>
+    <string name="card_button_add">카드 추가하기</string>
+    <string name="card_button_add_more">이어서 추가하기</string>
+    <string name="card_button_save">저장하기</string>
+    <string name="card_save_error">카드 저장에 실패했어요. 다시 시도해 주세요.</string>
     <!-- home -->
     <string name="home_banner_title">%1$s님, 안녕하세요!</string>
     <string name="home_learning_days">%1$d일 연속 학습중</string>

@@ -1,5 +1,6 @@
 package com.whatever.caro.composeApp.di
 
+import com.whatever.caro.core.navigator.entries.CreateCardEntry
 import com.whatever.caro.core.navigator.entries.CreateDeckEntry
 import com.whatever.caro.core.navigator.entries.CreateProfileEntry
 import com.whatever.caro.core.navigator.entries.EditProfileEntry
@@ -7,6 +8,8 @@ import com.whatever.caro.core.navigator.entries.HomeEntry
 import com.whatever.caro.core.navigator.entries.LoginEntry
 import com.whatever.caro.core.navigator.entries.SettingEntry
 import com.whatever.caro.core.navigator.entries.SplashEntry
+import com.whatever.caro.feature.card.CreateCardViewModel
+import com.whatever.caro.feature.card.route.CreateCardRoute
 import com.whatever.caro.feature.deck.CreateDeckRoute
 import com.whatever.caro.feature.home.HomeViewModel
 import com.whatever.caro.feature.home.route.HomeRoute
@@ -67,6 +70,14 @@ val navEntryModule: Module =
             HomeRoute(
                 viewModel = koinViewModel<HomeViewModel> { parametersOf(navKey) },
                 navDispatcher = get(),
+            )
+        }
+
+        navigation<CreateCardEntry> { navKey ->
+            CreateCardRoute(
+                viewModel = koinViewModel<CreateCardViewModel> { parametersOf(navKey.payload.deckId) },
+                navDispatcher = get(),
+                snackbarController = get(),
             )
         }
 
