@@ -20,7 +20,7 @@ class HomeViewModel(
         when (intent) {
             HomeIntent.ClickCreateDeckButton -> Napier.d { "intent: $intent" }
             is HomeIntent.ClickDeckButton -> Napier.d { "intent: $intent" }
-            HomeIntent.ClickSettingButton -> Napier.d { "intent: $intent" }
+            HomeIntent.ClickSettingButton -> postSideEffect(HomeSideEffect.NavigateToSetting)
             HomeIntent.ClickProfile -> postSideEffect(HomeSideEffect.NavigateToProfile)
             HomeIntent.ClickCreateDeck -> postSideEffect(HomeSideEffect.NavigateToCreateDeck)
         }

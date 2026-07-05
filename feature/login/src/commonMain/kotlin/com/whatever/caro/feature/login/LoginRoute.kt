@@ -7,15 +7,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import caromobile.core.designsystem.generated.resources.Res
-import caromobile.core.designsystem.generated.resources.login_toast_cancel
-import caromobile.core.designsystem.generated.resources.login_toast_error
-import com.whatever.caro.core.designsystem.components.LocalSnackbarHostState
-import com.whatever.caro.core.designsystem.components.showSnackbarMessage
+import caromobile.core.designsystem.generated.resources.login_snackbar_cancel
+import caromobile.core.designsystem.generated.resources.login_snackbar_error
+import com.whatever.caro.core.designsystem.components.CaroSnackbarStyle
 import com.whatever.caro.core.model.auth.SocialLoginType
 import com.whatever.caro.core.navigator.contract.NavCommand.To
 import com.whatever.caro.core.navigator.dispatcher.NavigationDispatcher
 import com.whatever.caro.core.navigator.entries.HomeEntry
 import com.whatever.caro.core.navigator.entries.Payload
+import com.whatever.caro.core.ui.snackbar.SnackBarMessage
+import com.whatever.caro.core.ui.snackbar.SnackbarController
 import com.whatever.caro.feature.login.model.AppleUser
 import com.whatever.caro.feature.login.model.GoogleUser
 import com.whatever.caro.feature.login.model.LoginError
@@ -32,14 +33,14 @@ import org.koin.compose.koinInject
 fun LoginRoute(
     viewModel: LoginViewModel,
     navDispatcher: NavigationDispatcher,
+    snackbarController: SnackbarController,
     googleAuthenticator: SocialAuthenticator<GoogleUser> = koinInject<GoogleAuthProvider>().get(),
     appleAuthenticator: SocialAuthenticator<AppleUser> = koinInject<AppleAuthProvider>().get(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
-    val snackbarHost = LocalSnackbarHostState.current
     val coroutineScope = rememberCoroutineScope()
-    val loginErrorMessage = stringResource(Res.string.login_toast_error)
-    val loginCancelledMessage = stringResource(Res.string.login_toast_cancel)
+    val loginErrorMessage = stringResource(Res.string.login_snackbar_error)
+    val loginCancelledMessage = stringResource(Res.string.login_snackbar_cancel)
     val socialLoginAuth: (SocialLoginType) -> Unit =
         remember {
             { type ->
@@ -54,6 +55,8 @@ fun LoginRoute(
                             val result = appleAuthenticator.authenticate()
                             viewModel.intent(LoginIntent.ClickAppleLoginButton(result))
                         }
+
+                        SocialLoginType.NONE -> {}
                     }
                 }
             }
@@ -78,16 +81,17 @@ fun LoginRoute(
                     )
                 }
 
-                is LoginSideEffect.ShowErrorToast -> {
+                is LoginSideEffect.ShowErrorSnackbar -> {
                     val message =
                         when (sideEffect.error) {
                             LoginError.UNKNOWN -> loginErrorMessage
                             LoginError.USER_CANCELLED -> loginCancelledMessage
                         }
-                    showSnackbarMessage(
-                        coroutineScope = this,
-                        snackbarHostState = snackbarHost,
-                        message = message,
+                    snackbarController.show(
+                        SnackBarMessage(
+                            message = message,
+                            style = CaroSnackbarStyle.Error,
+                        ),
                     )
                 }
             }

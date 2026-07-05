@@ -281,7 +281,7 @@ private fun CaroTextFieldWithCtaPreview() {
                         )
                         Text(
                             text = "랜덤 생성",
-                            style = CaroTheme.typography.caption1,
+                            style = CaroTheme.typography.caption1.regular,
                             color = CaroTheme.color.text.brand,
                         )
                     }
@@ -309,7 +309,7 @@ private fun CaroTextFieldWithCaptionPreview() {
             footer = {
                 Text(
                     text = "2자 이상 10자 이하로 입력해주세요",
-                    style = CaroTheme.typography.caption1,
+                    style = CaroTheme.typography.caption1.regular,
                     color = CaroTheme.color.text.secondary,
                 )
             },
@@ -342,7 +342,7 @@ private fun CaroTextFieldWithCounterPreview() {
                     Spacer(modifier = Modifier.weight(1f))
                     Text(
                         text = "${value.length}/$max",
-                        style = CaroTheme.typography.caption1,
+                        style = CaroTheme.typography.caption1.regular,
                         color = CaroTheme.color.text.secondary,
                         textAlign = TextAlign.End,
                     )
@@ -386,13 +386,13 @@ private fun CaroTextFieldFilledPreview() {
                 ) {
                     Text(
                         text = "2자 이상 10자 이하로 입력해주세요",
-                        style = CaroTheme.typography.caption1,
+                        style = CaroTheme.typography.caption1.regular,
                         color = CaroTheme.color.text.secondary,
                     )
                     Spacer(modifier = Modifier.weight(1f))
                     Text(
                         text = "${value.length}/$max",
-                        style = CaroTheme.typography.caption1,
+                        style = CaroTheme.typography.caption1.regular,
                         color = CaroTheme.color.text.secondary,
                         textAlign = TextAlign.End,
                     )
@@ -427,7 +427,7 @@ private fun CaroTextFieldCustomFooterPreview() {
             footer = {
                 Text(
                     text = "이미 사용 중인 닉네임이에요",
-                    style = CaroTheme.typography.caption1,
+                    style = CaroTheme.typography.caption1.regular,
                     color = CaroTheme.color.text.accent,
                 )
             },

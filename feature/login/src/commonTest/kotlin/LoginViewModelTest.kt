@@ -1,5 +1,5 @@
 import app.cash.turbine.test
-import com.whatever.caro.core.data.repository.AuthRepository
+import com.whatever.caro.core.data.repository.auth.AuthRepository
 import com.whatever.caro.core.model.auth.AuthSession
 import com.whatever.caro.core.model.auth.SocialLoginType
 import com.whatever.caro.core.viewmodel.ExceptionFilter
@@ -43,7 +43,7 @@ class LoginViewModelTest : FunSpec() {
             Dispatchers.resetMain()
         }
 
-        test("Google 로그인 취소는 USER_CANCELLED 토스트를 emit 한다") {
+        test("Google 로그인 취소는 USER_CANCELLED 스낵바를 emit 한다") {
             runTest(testDispatcher) {
                 val viewModel = createViewModel()
 
@@ -51,7 +51,7 @@ class LoginViewModelTest : FunSpec() {
                     viewModel.intent(LoginIntent.ClickGoogleLoginButton(SocialLoginResult.UserCancelled))
                     advanceUntilIdle()
 
-                    awaitItem() shouldBe LoginSideEffect.ShowErrorToast(LoginError.USER_CANCELLED)
+                    awaitItem() shouldBe LoginSideEffect.ShowErrorSnackbar(LoginError.USER_CANCELLED)
                 }
             }
         }

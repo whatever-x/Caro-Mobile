@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -15,7 +14,7 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.savedstate.serialization.SavedStateConfiguration
 import com.whatever.caro.core.designsystem.components.CaroSnackBarHost
 import com.whatever.caro.core.designsystem.components.CaroSnackbar
-import com.whatever.caro.core.designsystem.components.LocalSnackbarHostState
+import com.whatever.caro.core.designsystem.components.showSnackbarMessage
 import com.whatever.caro.core.designsystem.themes.CaroTheme
 import com.whatever.caro.core.model.auth.AuthSessionEvent
 import com.whatever.caro.core.model.auth.AuthSessionEventBus
@@ -24,10 +23,13 @@ import com.whatever.caro.core.navigator.dispatcher.NavigationDispatcher
 import com.whatever.caro.core.navigator.entries.CreateCardEntry
 import com.whatever.caro.core.navigator.entries.CreateDeckEntry
 import com.whatever.caro.core.navigator.entries.CreateProfileEntry
+import com.whatever.caro.core.navigator.entries.EditProfileEntry
 import com.whatever.caro.core.navigator.entries.HomeEntry
 import com.whatever.caro.core.navigator.entries.LoginEntry
+import com.whatever.caro.core.navigator.entries.SettingEntry
 import com.whatever.caro.core.navigator.entries.SplashEntry
 import com.whatever.caro.core.ui.image.ConfigureCaroImageLoader
+import com.whatever.caro.core.ui.snackbar.SnackbarController
 import io.github.aakira.napier.Napier
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
@@ -37,6 +39,7 @@ import org.koin.compose.koinInject
 fun CaroApp(
     navDispatcher: NavigationDispatcher = koinInject(),
     authSessionEventBus: AuthSessionEventBus = koinInject(),
+    snackbarController: SnackbarController = koinInject(),
 ) {
     ConfigureCaroImageLoader()
 
@@ -49,9 +52,11 @@ fun CaroApp(
                             subclass(SplashEntry::class, SplashEntry.serializer())
                             subclass(LoginEntry::class, LoginEntry.serializer())
                             subclass(CreateProfileEntry::class, CreateProfileEntry.serializer())
+                            subclass(EditProfileEntry::class, EditProfileEntry.serializer())
                             subclass(CreateDeckEntry::class, CreateDeckEntry.serializer())
                             subclass(CreateCardEntry::class, CreateCardEntry.serializer())
                             subclass(HomeEntry::class, HomeEntry.serializer())
+                            subclass(SettingEntry::class, SettingEntry.serializer())
                         }
                     }
             }
@@ -88,9 +93,12 @@ fun CaroApp(
         authSessionEventBus.events.collect { event ->
             when (event) {
                 AuthSessionEvent.Expired -> {
-                    // TODO: 팝업 처리 이후 emit
                     Napier.w { "Auth session expired → navigate to LoginEntry" }
-                    navDispatcher.emit(NavCommand.ResetTo(LoginEntry))
+                    if (backStack.first() == SplashEntry) {
+                        navDispatcher.emit(NavCommand.ResetTo(LoginEntry))
+                    } else {
+                        // TODO: 팝업 처리 이후 emit
+                    }
                 }
             }
         }
@@ -98,33 +106,41 @@ fun CaroApp(
     CaroTheme {
         val snackBarHostState = remember { SnackbarHostState() }
 
-        CompositionLocalProvider(
-            LocalSnackbarHostState provides snackBarHostState,
-        ) {
-            Scaffold(
-                modifier = Modifier.fillMaxSize(),
-                snackbarHost = {
-                    CaroSnackBarHost(
-                        modifier = Modifier,
-                        hostState = LocalSnackbarHostState.current,
-                        snackbar = { snackbarData ->
-                            CaroSnackbar(
-                                snackbarData = snackbarData,
-                            )
-                        },
-                    )
-                },
-            ) { innerPadding ->
-                Box(
-                    modifier =
-                        Modifier
-                            .fillMaxSize()
-                            .padding(paddingValues = innerPadding),
-                ) {
-                    CaroNavHost(
-                        backStack = backStack,
-                    )
-                }
+        LaunchedEffect(snackbarController, snackBarHostState) {
+            snackbarController.messages.collect { snackbar ->
+                showSnackbarMessage(
+                    coroutineScope = this,
+                    snackbarHostState = snackBarHostState,
+                    message = snackbar.message,
+                    style = snackbar.style,
+                    duration = snackbar.duration,
+                )
+            }
+        }
+
+        Scaffold(
+            modifier = Modifier.fillMaxSize(),
+            snackbarHost = {
+                CaroSnackBarHost(
+                    modifier = Modifier,
+                    hostState = snackBarHostState,
+                    snackbar = { snackbarData ->
+                        CaroSnackbar(
+                            snackbarData = snackbarData,
+                        )
+                    },
+                )
+            },
+        ) { innerPadding ->
+            Box(
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues = innerPadding),
+            ) {
+                CaroNavHost(
+                    backStack = backStack,
+                )
             }
         }
     }

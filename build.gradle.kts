@@ -45,11 +45,27 @@ subprojects {
             ktlint(ktlintCliVersion)
         }
 
+        // Compose Multiplatform string resources: Compose Resources renders any
+        // line break injected into <string> text literally at runtime (unlike
+        // Android aapt, which collapses whitespace). Raise lineWidth so the WTP
+        // formatter never wraps long string values.
+        format("xmlComposeResources") {
+            target(
+                fileTree("src") {
+                    include("**/composeResources/**/values/*.xml")
+                    exclude("**/generated/**")
+                }
+            )
+
+            eclipseWtp(EclipseWtpFormatterStep.XML)
+                .configFile(rootProject.file("spotless/eclipse-wtp-xml.prefs"))
+        }
+
         format("xml") {
             target(
                 fileTree("src") {
                     include(
-                        "**/values/*.xml",
+                        "**/res/values/*.xml",
                         "**/AndroidManifest.xml"
                     )
                     exclude("**/generated/**")

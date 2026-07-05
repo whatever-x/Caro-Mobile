@@ -17,6 +17,7 @@ import com.whatever.caro.feature.home.di.homeModule
 import com.whatever.caro.feature.login.di.loginModule
 import com.whatever.caro.feature.login.di.socialModule
 import com.whatever.caro.feature.profile.di.profileModule
+import com.whatever.caro.feature.setting.di.settingModule
 import com.whatever.caro.feature.splash.di.splashModule
 import org.koin.core.context.startKoin
 import org.koin.dsl.KoinAppDeclaration
@@ -31,6 +32,7 @@ fun initKoin(configuration: KoinAppDeclaration? = null) {
             navigatorModule,
             // app
             appPolicyModule,
+            snackbar,
             // data
             repositoryModule,
             dataModule,
@@ -50,6 +52,7 @@ fun initKoin(configuration: KoinAppDeclaration? = null) {
             profileModule,
             deckModule,
             cardModule,
+            settingModule,
         )
     }
 }
