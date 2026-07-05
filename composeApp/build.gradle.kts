@@ -32,6 +32,7 @@ kotlin {
             implementation(projects.feature.splash)
             implementation(projects.feature.profile)
             implementation(projects.feature.deck)
+            implementation(projects.feature.card)
             implementation(projects.feature.setting)
             implementation(projects.feature.deckDetail)
 

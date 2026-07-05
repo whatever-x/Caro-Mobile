@@ -11,7 +11,9 @@ import io.kotest.koin.KoinExtension
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
@@ -43,6 +45,7 @@ class HomeViewModelTest :
 
         afterTest {
             Dispatchers.resetMain()
+            dispatcher.cancel()
         }
 
         test("ClickSettingButton 은 NavigateToSetting 을 방출한다") {
@@ -51,6 +54,8 @@ class HomeViewModelTest :
 
                 viewModel.sideEffect.test {
                     viewModel.intent(HomeIntent.ClickSettingButton)
+                    advanceUntilIdle()
+
                     awaitItem() shouldBe HomeSideEffect.NavigateToSetting
                 }
             }
@@ -62,6 +67,8 @@ class HomeViewModelTest :
 
                 viewModel.sideEffect.test {
                     viewModel.intent(HomeIntent.ClickProfile)
+                    advanceUntilIdle()
+
                     awaitItem() shouldBe HomeSideEffect.NavigateToProfile
                 }
             }
@@ -73,6 +80,8 @@ class HomeViewModelTest :
 
                 viewModel.sideEffect.test {
                     viewModel.intent(HomeIntent.ClickCreateDeck)
+                    advanceUntilIdle()
+
                     awaitItem() shouldBe HomeSideEffect.NavigateToCreateDeck
                 }
             }

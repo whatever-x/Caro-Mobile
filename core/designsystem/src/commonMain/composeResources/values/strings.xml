@@ -71,6 +71,25 @@
 	<string name="deck_detail_button_bottom_sheet_last_frequency">Frequency</string>
 	<string name="deck_detail_button_bottom_sheet_deck_edit">Edit deck</string>
 	<string name="deck_detail_button_bottom_sheet_deck_delete">Delete deck</string>
+	<!-- card -->
+	<string name="card_title_create">Create Card</string>
+	<string name="card_content_description_back">Go back</string>
+	<string name="card_field_label_front">Front</string>
+	<string name="card_field_label_back">Back</string>
+	<string name="card_field_required">*</string>
+	<string name="card_field_placeholder_front">Enter the text for the front.</string>
+	<string name="card_field_placeholder_back">Enter the text for the back.</string>
+	<string name="card_content_description_swap">Swap front and back</string>
+	<string name="card_tip_label">TIP</string>
+	<string name="card_tip_max_cards">You can add up to 200 cards per deck.</string>
+	<string name="card_tip_split_by_topic">Splitting decks by topic makes reviewing much
+		easier.</string>
+	<string name="card_counter_added">%1$d added</string>
+	<string name="card_content_description_remove">Remove card</string>
+	<string name="card_button_add">Add card</string>
+	<string name="card_button_add_more">Add another</string>
+	<string name="card_button_save">Save</string>
+	<string name="card_save_error">Failed to save cards. Please try again.</string>
 	<!-- home -->
 	<string name="home_banner_title">Hello, %1$s!</string>
 	<string name="home_learning_days">Learning Streak: %1$d Days</string>
