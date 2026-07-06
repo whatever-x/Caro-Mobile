@@ -77,6 +77,15 @@ subprojects {
     }
 }
 
+// caro.kover 를 적용한 모듈을 자동 수집한다. 새 모듈이 caro.kover 를 적용하면
+// 이 목록을 직접 수정하지 않아도 koverAll* 집계 대상에 자동으로 포함된다.
+val koverEnabledProjects = mutableListOf<Project>()
+subprojects {
+    plugins.withId("caro.kover") {
+        koverEnabledProjects.add(this@subprojects)
+    }
+}
+
 /**
  * Kover 적용된 모듈에 대한 XML 리포트 생성
  * 터미널에서 ./gradlew koverAllXmlReport 를 실행
@@ -85,12 +94,7 @@ tasks.register("koverAllXmlReport") {
     group = "verification"
     description = "Generate Kover XML reports for all coverage-enabled modules"
 
-    dependsOn(
-        ":feature:login:koverXmlReport",
-        ":feature:home:koverXmlReport",
-        ":feature:profile:koverXmlReport",
-        ":core:data:koverXmlReport"
-    )
+    dependsOn(provider { koverEnabledProjects.map { "${it.path}:koverXmlReport" } })
 }
 
 /**
@@ -101,10 +105,5 @@ tasks.register("koverAllVerify") {
     group = "verification"
     description = "Verify Kover coverage for all coverage-enabled modules"
 
-    dependsOn(
-        ":feature:login:koverVerify",
-        ":feature:home:koverVerify",
-        ":feature:profile:koverVerify",
-        ":core:data:koverVerify"
-    )
+    dependsOn(provider { koverEnabledProjects.map { "${it.path}:koverVerify" } })
 }
