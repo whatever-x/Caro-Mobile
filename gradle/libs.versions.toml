@@ -50,7 +50,7 @@ ktorfit = "2.7.1"
 
 # Image Loader
 coil3 = "3.4.0"
-compottie="2.2.2"
+compottie = "2.2.2"
 
 # Permission
 moko = "0.20.1"

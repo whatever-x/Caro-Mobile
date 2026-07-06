@@ -8,6 +8,7 @@ import io.kotest.assertions.throwables.shouldNotThrowAny
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.string.shouldContain
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.engine.mock.MockEngine
@@ -79,6 +80,8 @@ class ApiResponseObjectConverterTest : FunSpec() {
                           "error": {
                             "code": "AUTH-401",
                             "message": "사용자 토큰 인증에 실패했습니다.",
+                            "debugMessage": "사용자 토큰 인증 실패",
+                            "description": "login again",
                             "traceId": null,
                             "fieldErrors": null
                           }
@@ -93,6 +96,7 @@ class ApiResponseObjectConverterTest : FunSpec() {
 
             exception.code shouldBe "AUTH-401"
             exception.message shouldBe "사용자 토큰 인증에 실패했습니다."
+            exception.debugMessage shouldContain "CaroBaseResponseConverterPlugin"
         }
 
         test("success=false 인데 error 가 없으면 CaroInvalidResponseException 예외를 던진다") {

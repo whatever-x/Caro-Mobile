@@ -2,6 +2,8 @@ package com.whatever.caro.core.data.di
 
 import com.whatever.caro.core.data.repository.auth.AuthRepository
 import com.whatever.caro.core.data.repository.auth.AuthRepositoryImpl
+import com.whatever.caro.core.data.repository.card.CardRepository
+import com.whatever.caro.core.data.repository.card.CardRepositoryImpl
 import com.whatever.caro.core.data.repository.deck.DeckRepository
 import com.whatever.caro.core.data.repository.deck.DeckRepositoryImpl
 import com.whatever.caro.core.data.repository.fcm.FcmTokenRepository
@@ -17,5 +19,6 @@ val repositoryModule =
         single<FcmTokenRepositoryImpl>() bind FcmTokenRepository::class
         single<AuthRepositoryImpl>() bind AuthRepository::class
         single<ProfileRepositoryImpl>() bind ProfileRepository::class
+        single<CardRepositoryImpl>() bind CardRepository::class
         single<DeckRepositoryImpl>() bind DeckRepository::class
     }

@@ -31,7 +31,7 @@ internal fun ProfileCtaButton(
         if (enabled) {
             CaroTheme.color.surface.brand to CaroTheme.color.text.inverse
         } else {
-            CaroTheme.color.badge.surface.info to Color(0xFFA4B5FB)
+            CaroTheme.color.surface.info to Color(0xFFA4B5FB)
         }
 
     Box(
@@ -49,7 +49,7 @@ internal fun ProfileCtaButton(
     ) {
         Text(
             text = text,
-            style = CaroTheme.typography.label1,
+            style = CaroTheme.typography.label1.bold,
             color = textColor,
         )
     }

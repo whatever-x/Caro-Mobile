@@ -32,7 +32,9 @@ kotlin {
             implementation(projects.feature.splash)
             implementation(projects.feature.profile)
             implementation(projects.feature.deck)
+            implementation(projects.feature.card)
             implementation(projects.feature.setting)
+            implementation(projects.feature.deckDetail)
 
             implementation(libs.koin.compose.viewmodel)
             implementation(libs.koin.compose.navigation3)

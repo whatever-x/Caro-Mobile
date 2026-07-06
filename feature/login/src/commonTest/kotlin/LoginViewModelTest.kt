@@ -35,7 +35,7 @@ class LoginViewModelTest : FunSpec() {
             authRepository: AuthRepository =
                 mock {
                     everySuspend { loginWithSocial(any(), any()) } returns
-                        AuthSession(accessToken = "access", refreshToken = "refresh")
+                            AuthSession(accessToken = "access", refreshToken = "refresh")
                 },
         ) = LoginViewModel(authRepository, ExceptionFilter.None)
 
@@ -52,7 +52,7 @@ class LoginViewModelTest : FunSpec() {
                 val authRepository =
                     mock<AuthRepository> {
                         everySuspend { loginWithSocial(any(), any()) } returns
-                            AuthSession(accessToken = "access", refreshToken = "refresh")
+                                AuthSession(accessToken = "access", refreshToken = "refresh")
                     }
                 val viewModel = viewModelWith(authRepository)
 
@@ -80,7 +80,7 @@ class LoginViewModelTest : FunSpec() {
                 val authRepository =
                     mock<AuthRepository> {
                         everySuspend { loginWithSocial(any(), any()) } returns
-                            AuthSession(accessToken = "access", refreshToken = "refresh")
+                                AuthSession(accessToken = "access", refreshToken = "refresh")
                     }
                 val viewModel = viewModelWith(authRepository)
 

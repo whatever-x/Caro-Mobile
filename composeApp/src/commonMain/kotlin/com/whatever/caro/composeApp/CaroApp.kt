@@ -20,8 +20,10 @@ import com.whatever.caro.core.model.auth.AuthSessionEvent
 import com.whatever.caro.core.model.auth.AuthSessionEventBus
 import com.whatever.caro.core.navigator.contract.NavCommand
 import com.whatever.caro.core.navigator.dispatcher.NavigationDispatcher
+import com.whatever.caro.core.navigator.entries.CreateCardEntry
 import com.whatever.caro.core.navigator.entries.CreateDeckEntry
 import com.whatever.caro.core.navigator.entries.CreateProfileEntry
+import com.whatever.caro.core.navigator.entries.DeckDetailEntry
 import com.whatever.caro.core.navigator.entries.EditProfileEntry
 import com.whatever.caro.core.navigator.entries.HomeEntry
 import com.whatever.caro.core.navigator.entries.LoginEntry
@@ -53,6 +55,8 @@ fun CaroApp(
                             subclass(CreateProfileEntry::class, CreateProfileEntry.serializer())
                             subclass(EditProfileEntry::class, EditProfileEntry.serializer())
                             subclass(CreateDeckEntry::class, CreateDeckEntry.serializer())
+                            subclass(DeckDetailEntry::class, DeckDetailEntry.serializer())
+                            subclass(CreateCardEntry::class, CreateCardEntry.serializer())
                             subclass(HomeEntry::class, HomeEntry.serializer())
                             subclass(SettingEntry::class, SettingEntry.serializer())
                         }

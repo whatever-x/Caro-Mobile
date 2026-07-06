@@ -1,5 +1,8 @@
 package com.whatever.caro.core.model.deck
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class Deck(
     val id: Long,
     val title: String,
