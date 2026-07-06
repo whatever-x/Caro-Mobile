@@ -32,12 +32,16 @@ class ProfileRepositoryImplTest : FunSpec() {
             runTest {
                 val profileDataSource =
                     mock<ProfileDataSource> {
-                        everySuspend { checkNicknameAvailability(any()) } returns
+                        everySuspend { checkNicknameAvailability("캐로") } returns
                             NicknameCheckResponse(nickname = "캐로", available = true)
                     }
                 val repository = ProfileRepositoryImpl(profileDataSource)
 
                 repository.isNicknameAvailable("캐로") shouldBe true
+
+                verifySuspend {
+                    profileDataSource.checkNicknameAvailability("캐로")
+                }
             }
         }
 

@@ -6,6 +6,7 @@ import com.whatever.caro.core.model.auth.SocialLoginType
 import com.whatever.caro.core.model.exception.CaroAuthException
 import com.whatever.caro.core.remote.datasource.RemoteAuthDataSource
 import com.whatever.caro.core.remote.datasource.RemoteNonAuthDataSource
+import com.whatever.caro.core.remote.dto.auth.request.CompleteRegistrationRequest
 import com.whatever.caro.core.remote.dto.auth.request.RefreshTokenRequest
 import com.whatever.caro.core.remote.dto.auth.request.SocialLoginRequest
 import com.whatever.caro.core.remote.dto.auth.response.SocialLoginResponse
@@ -115,6 +116,12 @@ class AuthRepositoryImplTest : FunSpec() {
 
                 result shouldBe AuthSession(accessToken = "access", refreshToken = "refresh")
                 verifySuspend {
+                    remoteAuthDataSource.completeRegistration(
+                        CompleteRegistrationRequest(
+                            nickname = "caro",
+                            isTermsAgreed = true,
+                        ),
+                    )
                     localAuthDataSource.saveTokens(accessToken = "access", refreshToken = "refresh")
                 }
             }

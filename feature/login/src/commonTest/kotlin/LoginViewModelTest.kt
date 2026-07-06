@@ -15,6 +15,7 @@ import dev.mokkery.answering.throws
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
 import dev.mokkery.mock
+import dev.mokkery.verify.VerifyMode.Companion.exactly
 import dev.mokkery.verifySuspend
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
@@ -101,46 +102,66 @@ class LoginViewModelTest : FunSpec() {
             }
         }
 
-        test("구글 로그인 결과가 Failed면 UNKNOWN 에러 스낵바를 방출한다") {
+        test("구글 로그인 결과가 Failed면 UNKNOWN 에러 스낵바를 방출하고 레포지토리를 호출하지 않는다") {
             runTest(testDispatcher) {
-                val viewModel = viewModelWith()
+                val authRepository = mock<AuthRepository>()
+                val viewModel = viewModelWith(authRepository)
 
                 viewModel.sideEffect.test {
                     viewModel.intent(LoginIntent.ClickGoogleLoginButton(SocialLoginResult.Failed))
                     awaitItem() shouldBe LoginSideEffect.ShowErrorSnackbar(LoginError.UNKNOWN)
                 }
+
+                verifySuspend(exactly(0)) {
+                    authRepository.loginWithSocial(any(), any())
+                }
             }
         }
 
-        test("구글 로그인 결과가 UserCancelled면 USER_CANCELLED 에러 스낵바를 방출한다") {
+        test("구글 로그인 결과가 UserCancelled면 USER_CANCELLED 에러 스낵바를 방출하고 레포지토리를 호출하지 않는다") {
             runTest(testDispatcher) {
-                val viewModel = viewModelWith()
+                val authRepository = mock<AuthRepository>()
+                val viewModel = viewModelWith(authRepository)
 
                 viewModel.sideEffect.test {
                     viewModel.intent(LoginIntent.ClickGoogleLoginButton(SocialLoginResult.UserCancelled))
                     awaitItem() shouldBe LoginSideEffect.ShowErrorSnackbar(LoginError.USER_CANCELLED)
                 }
+
+                verifySuspend(exactly(0)) {
+                    authRepository.loginWithSocial(any(), any())
+                }
             }
         }
 
-        test("애플 로그인 결과가 Failed면 UNKNOWN 에러 스낵바를 방출한다") {
+        test("애플 로그인 결과가 Failed면 UNKNOWN 에러 스낵바를 방출하고 레포지토리를 호출하지 않는다") {
             runTest(testDispatcher) {
-                val viewModel = viewModelWith()
+                val authRepository = mock<AuthRepository>()
+                val viewModel = viewModelWith(authRepository)
 
                 viewModel.sideEffect.test {
                     viewModel.intent(LoginIntent.ClickAppleLoginButton(SocialLoginResult.Failed))
                     awaitItem() shouldBe LoginSideEffect.ShowErrorSnackbar(LoginError.UNKNOWN)
                 }
+
+                verifySuspend(exactly(0)) {
+                    authRepository.loginWithSocial(any(), any())
+                }
             }
         }
 
-        test("애플 로그인 결과가 UserCancelled면 USER_CANCELLED 에러 스낵바를 방출한다") {
+        test("애플 로그인 결과가 UserCancelled면 USER_CANCELLED 에러 스낵바를 방출하고 레포지토리를 호출하지 않는다") {
             runTest(testDispatcher) {
-                val viewModel = viewModelWith()
+                val authRepository = mock<AuthRepository>()
+                val viewModel = viewModelWith(authRepository)
 
                 viewModel.sideEffect.test {
                     viewModel.intent(LoginIntent.ClickAppleLoginButton(SocialLoginResult.UserCancelled))
                     awaitItem() shouldBe LoginSideEffect.ShowErrorSnackbar(LoginError.USER_CANCELLED)
+                }
+
+                verifySuspend(exactly(0)) {
+                    authRepository.loginWithSocial(any(), any())
                 }
             }
         }
