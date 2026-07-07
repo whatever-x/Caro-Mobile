@@ -4,12 +4,15 @@ import com.whatever.caro.core.navigator.entries.CreateCardEntry
 import com.whatever.caro.core.navigator.entries.CreateDeckEntry
 import com.whatever.caro.core.navigator.entries.CreateProfileEntry
 import com.whatever.caro.core.navigator.entries.DeckDetailEntry
+import com.whatever.caro.core.navigator.entries.DeleteCardsEntry
 import com.whatever.caro.core.navigator.entries.EditProfileEntry
 import com.whatever.caro.core.navigator.entries.HomeEntry
 import com.whatever.caro.core.navigator.entries.LoginEntry
 import com.whatever.caro.core.navigator.entries.SettingEntry
 import com.whatever.caro.core.navigator.entries.SplashEntry
 import com.whatever.caro.feature.card.CreateCardViewModel
+import com.whatever.caro.feature.card.delete.DeleteCardsViewModel
+import com.whatever.caro.feature.card.delete.route.DeleteCardsRoute
 import com.whatever.caro.feature.card.route.CreateCardRoute
 import com.whatever.caro.feature.deck.CreateDeckRoute
 import com.whatever.caro.feature.deck.detail.DeckDetailViewModel
@@ -91,6 +94,14 @@ val navEntryModule: Module =
         navigation<CreateCardEntry> { navKey ->
             CreateCardRoute(
                 viewModel = koinViewModel<CreateCardViewModel> { parametersOf(navKey.payload.deckId) },
+                navDispatcher = get(),
+                snackbarController = get(),
+            )
+        }
+
+        navigation<DeleteCardsEntry> { navKey ->
+            DeleteCardsRoute(
+                viewModel = koinViewModel<DeleteCardsViewModel> { parametersOf(navKey.payload.deckId) },
                 navDispatcher = get(),
                 snackbarController = get(),
             )
