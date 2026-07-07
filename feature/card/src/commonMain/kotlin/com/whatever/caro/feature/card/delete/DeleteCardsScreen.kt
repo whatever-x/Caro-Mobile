@@ -1,7 +1,6 @@
 package com.whatever.caro.feature.card.delete
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,6 +24,7 @@ import caromobile.core.designsystem.generated.resources.card_title_edit
 import caromobile.core.designsystem.generated.resources.ic_chevron_left_24
 import com.whatever.caro.core.designsystem.components.CaroTopBar
 import com.whatever.caro.core.designsystem.themes.CaroTheme
+import com.whatever.caro.core.ui.modifier.noRippleClickable
 import com.whatever.caro.feature.card.delete.components.DeleteBottomBar
 import com.whatever.caro.feature.card.delete.components.DeleteCardListItem
 import com.whatever.caro.feature.card.delete.components.DeleteConfirmDialog
@@ -60,7 +60,7 @@ internal fun DeleteCardsScreen(
                             modifier =
                                 Modifier
                                     .size(TopBarIconSize)
-                                    .clickable { onIntent(DeleteCardsIntent.ClickBack) },
+                                    .noRippleClickable { onIntent(DeleteCardsIntent.ClickBack) },
                             painter = painterResource(Res.drawable.ic_chevron_left_24),
                             contentDescription = stringResource(Res.string.card_content_description_back),
                             tint = CaroTheme.color.icon.brand,

@@ -2,7 +2,6 @@ package com.whatever.caro.feature.card.delete.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -24,6 +23,7 @@ import caromobile.core.designsystem.generated.resources.Res
 import caromobile.core.designsystem.generated.resources.card_content_description_checkbox
 import caromobile.core.designsystem.generated.resources.ic_check_16
 import com.whatever.caro.core.designsystem.themes.CaroTheme
+import com.whatever.caro.core.ui.modifier.noRippleClickable
 import com.whatever.caro.feature.card.delete.model.DeleteCardItem
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
@@ -52,7 +52,7 @@ internal fun DeleteCardListItem(
                     width = HairlineThickness,
                     color = CaroTheme.color.border.primary,
                     shape = CaroTheme.shape.m,
-                ).clickable(onClick = onClick)
+                ).noRippleClickable(onClick = onClick)
                 .padding(
                     horizontal = CardItemHorizontalPadding,
                     vertical = CardItemVerticalPadding,
