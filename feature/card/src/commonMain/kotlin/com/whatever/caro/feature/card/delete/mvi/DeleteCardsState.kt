@@ -19,4 +19,10 @@ data class DeleteCardsState(
 
     val isDeleteEnabled: Boolean
         get() = selectedCardIds.isNotEmpty() && isDeleting.not()
+
+    val isAllCardsSelected: Boolean
+        get() = cards.isNotEmpty() && selectedCardIds.size == cards.size
+
+    val isSelectAllEnabled: Boolean
+        get() = cards.isNotEmpty() && isAllCardsSelected.not() && isDeleting.not()
 }

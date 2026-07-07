@@ -11,6 +11,8 @@ sealed interface DeleteCardsIntent : UiIntent {
         val cardId: Long,
     ) : DeleteCardsIntent
 
+    data object ClickSelectAll : DeleteCardsIntent
+
     data object ClickDeleteSelected : DeleteCardsIntent
 
     data object ClickDeleteConfirm : DeleteCardsIntent

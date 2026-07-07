@@ -29,6 +29,8 @@ class DeleteCardsViewModel(
 
             is DeleteCardsIntent.ClickCard -> toggleCard(intent.cardId)
 
+            DeleteCardsIntent.ClickSelectAll -> selectAllCards()
+
             DeleteCardsIntent.ClickDeleteSelected -> showDeleteConfirmDialog()
 
             DeleteCardsIntent.ClickDeleteCancel -> reduce { copy(isDeleteConfirmDialogVisible = false) }
@@ -79,6 +81,18 @@ class DeleteCardsViewModel(
                         .map { item ->
                             item.copy(isSelected = item.card.id in selectedIds)
                         }.toPersistentList(),
+            )
+        }
+    }
+
+    private fun selectAllCards() {
+        if (currentState.isSelectAllEnabled.not()) return
+        val selectedIds = currentState.cards.map { item -> item.card.id }.toPersistentSet()
+
+        reduce {
+            copy(
+                selectedCardIds = selectedIds,
+                cards = cards.map { item -> item.copy(isSelected = true) }.toPersistentList(),
             )
         }
     }

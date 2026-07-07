@@ -95,6 +95,27 @@ class DeleteCardsViewModelTest : FunSpec() {
             }
         }
 
+        test("ClickSelectAll 은 모든 카드를 선택한다") {
+            runTest(dispatcher) {
+                val cardRepository =
+                    mock<CardRepository> {
+                        everySuspend { getCards(any()) } returns cards
+                    }
+                val viewModel = createViewModel(cardRepository)
+
+                viewModel.intent(DeleteCardsIntent.Initialize)
+                advanceUntilIdle()
+                viewModel.intent(DeleteCardsIntent.ClickSelectAll)
+                advanceUntilIdle()
+
+                viewModel.state.value.selectedCardIds shouldBe setOf(1L, 2L)
+                viewModel.state.value.cards
+                    .map { item -> item.isSelected } shouldBe listOf(true, true)
+                viewModel.state.value.isAllCardsSelected shouldBe true
+                viewModel.state.value.isSelectAllEnabled shouldBe false
+            }
+        }
+
         test("선택된 카드가 없으면 ClickDeleteSelected 는 다이얼로그를 열지 않는다") {
             runTest(dispatcher) {
                 val cardRepository =
