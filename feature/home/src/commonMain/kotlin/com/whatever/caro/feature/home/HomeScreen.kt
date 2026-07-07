@@ -175,7 +175,7 @@ internal fun HomeScreen(
                         todayLearningPercentage = it.todayProgress,
                         state = it.state,
                         onLearnClick = {
-                            onIntent(HomeIntent.ClickDeckButton(deckId = it.id))
+                            onIntent(HomeIntent.ClickDeckButton(deckId = it.id, deckTitle = it.title))
                         },
                     )
                     Spacer(modifier = Modifier.size(size = CaroTheme.spacing.m))

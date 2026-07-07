@@ -8,6 +8,7 @@ import com.whatever.caro.core.navigator.contract.NavCommand.To
 import com.whatever.caro.core.navigator.dispatcher.NavigationDispatcher
 import com.whatever.caro.core.navigator.entries.CreateDeckEntry
 import com.whatever.caro.core.navigator.entries.CreateProfileEntry
+import com.whatever.caro.core.navigator.entries.DeckCardsEntry
 import com.whatever.caro.core.navigator.entries.SettingEntry
 import com.whatever.caro.feature.home.HomeScreen
 import com.whatever.caro.feature.home.HomeViewModel
@@ -32,6 +33,22 @@ fun HomeRoute(
 
                 HomeSideEffect.NavigateToSetting -> {
                     navDispatcher.emit(command = To(key = SettingEntry))
+                }
+
+                is HomeSideEffect.NavigateToDeckCards -> {
+                    navDispatcher.emit(
+                        command =
+                            To(
+                                key =
+                                    DeckCardsEntry(
+                                        payload =
+                                            DeckCardsEntry.Payload(
+                                                deckId = sideEffect.deckId,
+                                                deckTitle = sideEffect.deckTitle,
+                                            ),
+                                    ),
+                            ),
+                    )
                 }
             }
         }

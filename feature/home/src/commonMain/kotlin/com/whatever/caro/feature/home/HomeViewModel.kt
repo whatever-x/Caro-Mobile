@@ -18,11 +18,30 @@ class HomeViewModel(
 
     override suspend fun handleIntent(intent: HomeIntent) {
         when (intent) {
-            HomeIntent.ClickCreateDeckButton -> Napier.d { "intent: $intent" }
-            is HomeIntent.ClickDeckButton -> Napier.d { "intent: $intent" }
-            HomeIntent.ClickSettingButton -> postSideEffect(HomeSideEffect.NavigateToSetting)
-            HomeIntent.ClickProfile -> postSideEffect(HomeSideEffect.NavigateToProfile)
-            HomeIntent.ClickCreateDeck -> postSideEffect(HomeSideEffect.NavigateToCreateDeck)
+            HomeIntent.ClickCreateDeckButton -> {
+                Napier.d { "intent: $intent" }
+            }
+
+            is HomeIntent.ClickDeckButton -> {
+                postSideEffect(
+                    HomeSideEffect.NavigateToDeckCards(
+                        deckId = intent.deckId,
+                        deckTitle = intent.deckTitle,
+                    ),
+                )
+            }
+
+            HomeIntent.ClickSettingButton -> {
+                postSideEffect(HomeSideEffect.NavigateToSetting)
+            }
+
+            HomeIntent.ClickProfile -> {
+                postSideEffect(HomeSideEffect.NavigateToProfile)
+            }
+
+            HomeIntent.ClickCreateDeck -> {
+                postSideEffect(HomeSideEffect.NavigateToCreateDeck)
+            }
         }
     }
 }

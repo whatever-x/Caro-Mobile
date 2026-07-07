@@ -9,6 +9,7 @@ sealed interface HomeIntent : UiIntent {
 
     data class ClickDeckButton(
         val deckId: Long,
+        val deckTitle: String,
     ) : HomeIntent
 
     data object ClickProfile : HomeIntent

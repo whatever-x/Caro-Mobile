@@ -84,5 +84,22 @@ class HomeViewModelTest :
                 }
             }
         }
+
+        test("ClickDeckButton 은 NavigateToDeckCards 를 방출한다") {
+            runTest(dispatcher) {
+                val viewModel: HomeViewModel = get()
+
+                viewModel.sideEffect.test {
+                    viewModel.intent(HomeIntent.ClickDeckButton(deckId = 42L, deckTitle = "English"))
+                    advanceUntilIdle()
+
+                    awaitItem() shouldBe
+                        HomeSideEffect.NavigateToDeckCards(
+                            deckId = 42L,
+                            deckTitle = "English",
+                        )
+                }
+            }
+        }
     }
 }

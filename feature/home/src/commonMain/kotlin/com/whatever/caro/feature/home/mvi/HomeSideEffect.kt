@@ -8,4 +8,9 @@ sealed interface HomeSideEffect : UiSideEffect {
     data object NavigateToProfile : HomeSideEffect
 
     data object NavigateToCreateDeck : HomeSideEffect
+
+    data class NavigateToDeckCards(
+        val deckId: Long,
+        val deckTitle: String,
+    ) : HomeSideEffect
 }
