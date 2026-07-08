@@ -29,10 +29,7 @@ import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
 private val CardItemHeight = 81.dp
-private val CardItemHorizontalPadding = 24.dp
-private val CardItemVerticalPadding = 20.dp
 private val CheckboxSize = 22.dp
-private val CheckboxIconSize = 16.dp
 private val HairlineThickness = 1.dp
 private const val CARD_TEXT_MAX_LINES = 1
 
@@ -54,8 +51,8 @@ internal fun DeleteCardListItem(
                     shape = CaroTheme.shape.m,
                 ).noRippleClickable(onClick = onClick)
                 .padding(
-                    horizontal = CardItemHorizontalPadding,
-                    vertical = CardItemVerticalPadding,
+                    horizontal = CaroTheme.spacing.xl2,
+                    vertical = CaroTheme.spacing.xl,
                 ),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -112,7 +109,7 @@ internal fun SelectCheckbox(isSelected: Boolean) {
     ) {
         if (isSelected) {
             Icon(
-                modifier = Modifier.size(CheckboxIconSize),
+                modifier = Modifier.size(CaroTheme.spacing.l),
                 painter = painterResource(Res.drawable.ic_check_16),
                 contentDescription = stringResource(Res.string.card_content_description_checkbox),
                 tint = CaroTheme.color.icon.inverse,
