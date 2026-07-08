@@ -46,6 +46,20 @@ class CmpPlugin : Plugin<Project> {
                     ignoreNonRegressiveChanges.set(true) // 안정성 저하가 발생하지 않으면 통과
                 }
             }
+
+            tasks
+                .matching { task ->
+                    task.name == "androidMainStabilityCheck" ||
+                        task.name == "androidMainStabilityDump"
+                }.configureEach {
+                    dependsOn("compileAndroidMain")
+                    mustRunAfter(
+                        tasks.matching { task ->
+                            task.name.startsWith("compile") &&
+                                task.name != "compileAndroidMain"
+                        },
+                    )
+                }
         }
     }
 }
