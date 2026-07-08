@@ -8,9 +8,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import caromobile.core.designsystem.generated.resources.Res
 import caromobile.core.designsystem.generated.resources.card_content_description_back
 import caromobile.core.designsystem.generated.resources.card_text_select_all
@@ -51,11 +49,7 @@ internal fun SelectAllTextButton(onClick: () -> Unit) {
     Text(
         modifier = Modifier.noRippleClickable(onClick = onClick),
         text = stringResource(Res.string.card_text_select_all),
-        style =
-            CaroTheme.typography.body1.copy(
-                fontWeight = FontWeight.W600,
-                lineHeight = 24.sp,
-            ),
+        style = CaroTheme.typography.body1SemiBold,
         color = CaroTheme.color.text.brand,
     )
 }

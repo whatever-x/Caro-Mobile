@@ -15,6 +15,7 @@ data class CaroTypography(
     val heading2: TextStyle,
     val heading3: TextStyle,
     val body1: TextStyle,
+    val body1SemiBold: TextStyle,
     val body2: Body2Style,
     val body3: TextStyle,
     val body4: Body4Style,
@@ -109,6 +110,13 @@ data class CaroTypography(
                     fontFamily = pretendard,
                     fontWeight = FontWeight.W500,
                     fontSize = 16.sp,
+                ),
+            body1SemiBold =
+                TextStyle(
+                    fontFamily = pretendard,
+                    fontWeight = FontWeight.W600,
+                    fontSize = 16.sp,
+                    lineHeight = 24.sp,
                 ),
             body2 =
                 Body2Style(
