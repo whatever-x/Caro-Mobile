@@ -22,7 +22,4 @@ data class DeleteCardsState(
 
     val isAllCardsSelected: Boolean
         get() = cards.isNotEmpty() && selectedCardIds.size == cards.size
-
-    val isSelectAllEnabled: Boolean
-        get() = cards.isNotEmpty() && isAllCardsSelected.not() && isDeleting.not()
 }

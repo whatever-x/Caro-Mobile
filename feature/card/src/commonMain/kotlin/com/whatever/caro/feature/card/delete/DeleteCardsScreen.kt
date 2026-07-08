@@ -48,7 +48,6 @@ internal fun DeleteCardsScreen(
                 },
                 trailingContent = {
                     SelectAllTextButton(
-                        enabled = state.isSelectAllEnabled,
                         onClick = { onIntent(DeleteCardsIntent.ClickSelectAll) },
                     )
                 },

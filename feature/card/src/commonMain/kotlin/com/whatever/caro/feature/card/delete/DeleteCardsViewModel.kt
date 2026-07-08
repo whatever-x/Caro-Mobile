@@ -29,7 +29,7 @@ class DeleteCardsViewModel(
 
             is DeleteCardsIntent.ClickCard -> toggleCard(intent.cardId)
 
-            DeleteCardsIntent.ClickSelectAll -> selectAllCards()
+            DeleteCardsIntent.ClickSelectAll -> toggleAllCards()
 
             DeleteCardsIntent.ClickDeleteSelected -> showDeleteConfirmDialog()
 
@@ -85,14 +85,22 @@ class DeleteCardsViewModel(
         }
     }
 
-    private fun selectAllCards() {
-        if (currentState.isSelectAllEnabled.not()) return
-        val selectedIds = currentState.cards.map { item -> item.card.id }.toPersistentSet()
+    private fun toggleAllCards() {
+        if (currentState.isDeleting || currentState.cards.isEmpty()) return
+        val selectedIds =
+            if (currentState.isAllCardsSelected) {
+                emptySet<Long>().toPersistentSet()
+            } else {
+                currentState.cards.map { item -> item.card.id }.toPersistentSet()
+            }
 
         reduce {
             copy(
                 selectedCardIds = selectedIds,
-                cards = cards.map { item -> item.copy(isSelected = true) }.toPersistentList(),
+                cards =
+                    cards
+                        .map { item -> item.copy(isSelected = item.card.id in selectedIds) }
+                        .toPersistentList(),
             )
         }
     }

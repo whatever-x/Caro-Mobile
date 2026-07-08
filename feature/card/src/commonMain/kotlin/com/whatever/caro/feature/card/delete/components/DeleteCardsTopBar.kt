@@ -8,8 +8,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import caromobile.core.designsystem.generated.resources.Res
 import caromobile.core.designsystem.generated.resources.card_content_description_back
 import caromobile.core.designsystem.generated.resources.card_text_select_all
@@ -46,27 +47,15 @@ internal fun DeleteCardsTopBarTitle(onBackClick: () -> Unit) {
 }
 
 @Composable
-internal fun SelectAllTextButton(
-    enabled: Boolean,
-    onClick: () -> Unit,
-) {
-    val textColor: Color =
-        if (enabled) {
-            CaroTheme.color.text.brand
-        } else {
-            CaroTheme.color.text.tertiary
-        }
-    val clickableModifier =
-        if (enabled) {
-            Modifier.noRippleClickable(onClick = onClick)
-        } else {
-            Modifier
-        }
-
+internal fun SelectAllTextButton(onClick: () -> Unit) {
     Text(
-        modifier = clickableModifier,
+        modifier = Modifier.noRippleClickable(onClick = onClick),
         text = stringResource(Res.string.card_text_select_all),
-        style = CaroTheme.typography.body2.semiBold,
-        color = textColor,
+        style =
+            CaroTheme.typography.body1.copy(
+                fontWeight = FontWeight.W600,
+                lineHeight = 24.sp,
+            ),
+        color = CaroTheme.color.text.brand,
     )
 }

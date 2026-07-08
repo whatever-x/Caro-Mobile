@@ -95,7 +95,7 @@ class DeleteCardsViewModelTest : FunSpec() {
             }
         }
 
-        test("ClickSelectAll 은 모든 카드를 선택한다") {
+        test("ClickSelectAll 은 전체 선택 상태를 토글한다") {
             runTest(dispatcher) {
                 val cardRepository =
                     mock<CardRepository> {
@@ -112,7 +112,36 @@ class DeleteCardsViewModelTest : FunSpec() {
                 viewModel.state.value.cards
                     .map { item -> item.isSelected } shouldBe listOf(true, true)
                 viewModel.state.value.isAllCardsSelected shouldBe true
-                viewModel.state.value.isSelectAllEnabled shouldBe false
+
+                viewModel.intent(DeleteCardsIntent.ClickSelectAll)
+                advanceUntilIdle()
+
+                viewModel.state.value.selectedCardIds shouldBe emptySet()
+                viewModel.state.value.cards
+                    .map { item -> item.isSelected } shouldBe listOf(false, false)
+                viewModel.state.value.isAllCardsSelected shouldBe false
+            }
+        }
+
+        test("ClickSelectAll 은 일부 선택 상태에서 모든 카드를 선택한다") {
+            runTest(dispatcher) {
+                val cardRepository =
+                    mock<CardRepository> {
+                        everySuspend { getCards(any()) } returns cards
+                    }
+                val viewModel = createViewModel(cardRepository)
+
+                viewModel.intent(DeleteCardsIntent.Initialize)
+                advanceUntilIdle()
+                viewModel.intent(DeleteCardsIntent.ClickCard(cardId = 1L))
+                advanceUntilIdle()
+                viewModel.intent(DeleteCardsIntent.ClickSelectAll)
+                advanceUntilIdle()
+
+                viewModel.state.value.selectedCardIds shouldBe setOf(1L, 2L)
+                viewModel.state.value.cards
+                    .map { item -> item.isSelected } shouldBe listOf(true, true)
+                viewModel.state.value.isAllCardsSelected shouldBe true
             }
         }
 
