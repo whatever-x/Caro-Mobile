@@ -156,7 +156,7 @@ private fun CtaButton(
     ) {
         Text(
             text = stringResource(resource = stringRes),
-            style = CaroTheme.typography.body1,
+            style = CaroTheme.typography.body1.regular,
             color = CaroTheme.color.text.brand,
         )
     }
