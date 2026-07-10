@@ -1,4 +1,4 @@
-package com.whatever.caro.feature.deck
+package com.whatever.caro.feature.deck.edit
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -11,12 +11,12 @@ import com.whatever.caro.core.navigator.contract.NavCommand
 import com.whatever.caro.core.navigator.dispatcher.NavigationDispatcher
 import com.whatever.caro.core.ui.snackbar.SnackBarMessage
 import com.whatever.caro.core.ui.snackbar.SnackbarController
-import com.whatever.caro.feature.deck.mvi.CreateDeckSideEffect
+import com.whatever.caro.feature.deck.edit.mvi.EditDeckSideEffect
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
-fun CreateDeckRoute(
-    viewModel: CreateDeckViewModel,
+fun EditDeckRoute(
+    viewModel: EditDeckViewModel,
     navDispatcher: NavigationDispatcher,
     snackbarController: SnackbarController,
 ) {
@@ -26,11 +26,11 @@ fun CreateDeckRoute(
     LaunchedEffect(Unit) {
         viewModel.sideEffect.collect { sideEffect ->
             when (sideEffect) {
-                is CreateDeckSideEffect.NavigateBack -> {
+                is EditDeckSideEffect.NavigateBack -> {
                     navDispatcher.emit(command = NavCommand.Back)
                 }
 
-                is CreateDeckSideEffect.ShowError -> {
+                is EditDeckSideEffect.ShowError -> {
                     snackbarController.show(
                         SnackBarMessage(
                             message = createErrorMessage,
@@ -42,7 +42,7 @@ fun CreateDeckRoute(
         }
     }
 
-    CreateDeckScreen(
+    EditDeckScreen(
         state = state,
         onIntent = viewModel::intent,
     )

@@ -1,10 +1,10 @@
 import app.cash.turbine.test
 import com.whatever.caro.core.data.repository.deck.DeckRepository
+import com.whatever.caro.core.model.deck.DeckInputLimits
 import com.whatever.caro.core.viewmodel.ExceptionFilter
-import com.whatever.caro.feature.deck.CreateDeckViewModel
-import com.whatever.caro.feature.deck.DeckInputLimits
-import com.whatever.caro.feature.deck.mvi.CreateDeckIntent
-import com.whatever.caro.feature.deck.mvi.CreateDeckSideEffect
+import com.whatever.caro.feature.deck.create.CreateDeckViewModel
+import com.whatever.caro.feature.deck.create.mvi.CreateDeckIntent
+import com.whatever.caro.feature.deck.create.mvi.CreateDeckSideEffect
 import dev.mokkery.answering.returns
 import dev.mokkery.answering.throws
 import dev.mokkery.everySuspend

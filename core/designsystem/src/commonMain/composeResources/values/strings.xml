@@ -22,7 +22,7 @@
 	<string name="profile_field_rule_nickname">2-20 characters. Korean, English, numbers, -, and _ only</string>
 	<string name="profile_button_create">Create</string>
 	<string name="profile_button_done">Done</string>
-	<!-- deck -->
+	<!-- deck create-->
 	<string name="deck_title_create">Create Deck</string>
 	<string name="deck_content_description_back">Go back</string>
 	<string name="deck_content_description_clear">Clear</string>
@@ -118,4 +118,7 @@
 	<string name="setting_dialog_content">All your saved data will be permanently removed.</string>
 	<string name="setting_dialog_button_delete_account">Delete Account</string>
 	<string name="setting_dialog_button_cancel">Cancel</string>
+    <!-- deck edit -->
+    <string name="deck_edit_title">Edit Deck</string>
+    <string name="deck_button_edit">Edit</string>
 </resources>

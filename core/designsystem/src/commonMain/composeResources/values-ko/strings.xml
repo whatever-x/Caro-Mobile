@@ -113,4 +113,7 @@
     <string name="setting_dialog_content">저장된 모든 기록이 소멸될 수 있습니다.</string>
     <string name="setting_dialog_button_delete_account">탈퇴하기</string>
     <string name="setting_dialog_button_cancel">취소</string>
+    <!-- deck edit -->
+    <string name="deck_edit_title">덱 수정</string>
+    <string name="deck_button_edit">수정하기</string>
 </resources>

@@ -1,7 +1,7 @@
-package com.whatever.caro.feature.deck.mvi
+package com.whatever.caro.feature.deck.create.mvi
 
+import com.whatever.caro.core.model.deck.DeckInputLimits
 import com.whatever.caro.core.viewmodel.contract.UiState
-import com.whatever.caro.feature.deck.DeckInputLimits
 
 data class CreateDeckState(
     val name: String = "",

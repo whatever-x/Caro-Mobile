@@ -1,12 +1,13 @@
-package com.whatever.caro.feature.deck
+package com.whatever.caro.feature.deck.create
 
 import com.whatever.caro.core.data.repository.deck.DeckRepository
 import com.whatever.caro.core.data.util.suspendRunCatching
+import com.whatever.caro.core.model.deck.DeckInputLimits
 import com.whatever.caro.core.viewmodel.BaseViewModel
 import com.whatever.caro.core.viewmodel.ExceptionFilter
-import com.whatever.caro.feature.deck.mvi.CreateDeckIntent
-import com.whatever.caro.feature.deck.mvi.CreateDeckSideEffect
-import com.whatever.caro.feature.deck.mvi.CreateDeckState
+import com.whatever.caro.feature.deck.create.mvi.CreateDeckIntent
+import com.whatever.caro.feature.deck.create.mvi.CreateDeckSideEffect
+import com.whatever.caro.feature.deck.create.mvi.CreateDeckState
 import io.github.aakira.napier.Napier
 
 class CreateDeckViewModel(

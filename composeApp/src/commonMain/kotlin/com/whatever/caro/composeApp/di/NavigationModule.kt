@@ -11,7 +11,7 @@ import com.whatever.caro.core.navigator.entries.SettingEntry
 import com.whatever.caro.core.navigator.entries.SplashEntry
 import com.whatever.caro.feature.card.CreateCardViewModel
 import com.whatever.caro.feature.card.route.CreateCardRoute
-import com.whatever.caro.feature.deck.CreateDeckRoute
+import com.whatever.caro.feature.deck.create.CreateDeckRoute
 import com.whatever.caro.feature.deck.detail.DeckDetailViewModel
 import com.whatever.caro.feature.deck.detail.route.DeckDetailRoute
 import com.whatever.caro.feature.home.HomeViewModel

@@ -12,6 +12,7 @@ import com.whatever.caro.core.navigator.entries.DeckDetailEntry
 import com.whatever.caro.core.navigator.entries.SettingEntry
 import com.whatever.caro.feature.home.HomeScreen
 import com.whatever.caro.feature.home.HomeViewModel
+import com.whatever.caro.feature.home.mvi.HomeIntent
 import com.whatever.caro.feature.home.mvi.HomeSideEffect
 
 @Composable
@@ -21,6 +22,7 @@ fun HomeRoute(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     LaunchedEffect(Unit) {
+        viewModel.intent(HomeIntent.Initialize)
         viewModel.sideEffect.collect { sideEffect ->
             when (sideEffect) {
                 is HomeSideEffect.NavigateToProfile -> {
