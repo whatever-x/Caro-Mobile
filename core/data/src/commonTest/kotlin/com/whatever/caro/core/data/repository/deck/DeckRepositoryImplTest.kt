@@ -1,14 +1,21 @@
 package com.whatever.caro.core.data.repository.deck
 
+import com.whatever.caro.core.model.deck.DeckState
 import com.whatever.caro.core.remote.datasource.deck.DeckDataSource
 import com.whatever.caro.core.remote.dto.deck.request.CreateDeckRequest
+import com.whatever.caro.core.remote.dto.deck.request.UpdateDeckRequest
 import com.whatever.caro.core.remote.dto.deck.response.CreateDeckResponse
+import com.whatever.caro.core.remote.dto.deck.response.DeleteDeckResponse
+import com.whatever.caro.core.remote.dto.deck.response.UpdateDeckResponse
+import com.whatever.caro.core.remote.dto.deckCardInformation.response.DeckListResponse
+import com.whatever.caro.core.remote.dto.studySession.response.StudySessionProgressResponseDto
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
 import dev.mokkery.mock
 import dev.mokkery.verifySuspend
 import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.test.runTest
 
 class DeckRepositoryImplTest : FunSpec() {
@@ -29,6 +36,79 @@ class DeckRepositoryImplTest : FunSpec() {
                         CreateDeckRequest(name = "영어 단어", description = "일상 단어"),
                     )
                 }
+            }
+        }
+
+        test("updateDeck은 덱 id와 함께 이름/설명 수정 요청을 전달한다") {
+            runTest {
+                val deckDataSource =
+                    mock<DeckDataSource> {
+                        everySuspend { updateDeck(any(), any()) } returns
+                            UpdateDeckResponse(id = 7L, deckName = "새 이름", deckDescription = "새 설명")
+                    }
+                val repository = DeckRepositoryImpl(deckDataSource)
+
+                repository.updateDeck(deckId = 7L, name = "새 이름", description = "새 설명")
+
+                verifySuspend {
+                    deckDataSource.updateDeck(
+                        deckId = 7L,
+                        request = UpdateDeckRequest(name = "새 이름", description = "새 설명"),
+                    )
+                }
+            }
+        }
+
+        test("deleteDeck은 덱 id로 삭제 요청을 전달한다") {
+            runTest {
+                val deckDataSource =
+                    mock<DeckDataSource> {
+                        everySuspend { deleteDeck(any()) } returns DeleteDeckResponse(id = 3L)
+                    }
+                val repository = DeckRepositoryImpl(deckDataSource)
+
+                repository.deleteDeck(deckId = 3L)
+
+                verifySuspend {
+                    deckDataSource.deleteDeck(deckId = 3L)
+                }
+            }
+        }
+
+        test("getDecks는 데이터소스 응답을 Deck 모델로 매핑한다") {
+            runTest {
+                val deckDataSource =
+                    mock<DeckDataSource> {
+                        everySuspend { getDecks() } returns
+                            listOf(
+                                DeckListResponse(
+                                    deckId = 5L,
+                                    name = "영어 단어",
+                                    description = "일상 단어",
+                                    cardCount = 30,
+                                    progress =
+                                        StudySessionProgressResponseDto(
+                                            state = StudySessionProgressResponseDto.StateDto.IN_PROGRESS,
+                                            sessionId = 1L,
+                                            studiedCardCount = 12,
+                                            totalCardCount = 24,
+                                        ),
+                                ),
+                            )
+                    }
+                val repository = DeckRepositoryImpl(deckDataSource)
+
+                val decks = repository.getDecks()
+
+                decks.size shouldBe 1
+                val deck = decks.first()
+                deck.id shouldBe 5L
+                deck.title shouldBe "영어 단어"
+                deck.description shouldBe "일상 단어"
+                deck.cardTotalCount shouldBe 30
+                deck.todayLearningCount shouldBe 24
+                deck.todayCompleteCount shouldBe 12
+                deck.state shouldBe DeckState.LEARNING
             }
         }
     }
