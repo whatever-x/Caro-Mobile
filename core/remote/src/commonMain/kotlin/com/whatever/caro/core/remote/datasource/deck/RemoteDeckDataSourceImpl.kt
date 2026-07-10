@@ -13,17 +13,18 @@ internal class RemoteDeckDataSourceImpl(
     private val deckApi: DeckApi,
     private val deckCardInformationApi: DeckCardInformationApi,
 ) : DeckDataSource {
-    override suspend fun createDeck(request: CreateDeckRequest): CreateDeckResponse =
-        deckApi.requestCreateDeck(request = request)
+    override suspend fun createDeck(request: CreateDeckRequest): CreateDeckResponse = deckApi.requestCreateDeck(request = request)
 
-    override suspend fun updateDeck(deckId: Long, request: UpdateDeckRequest): UpdateDeckResponse =
+    override suspend fun updateDeck(
+        deckId: Long,
+        request: UpdateDeckRequest,
+    ): UpdateDeckResponse =
         deckApi.requestUpdateDeck(
             deckId = deckId,
             request = request,
         )
 
-    override suspend fun deleteDeck(deckId: Long): DeleteDeckResponse =
-        deckApi.requestDeleteDeck(deckId = deckId)
+    override suspend fun deleteDeck(deckId: Long): DeleteDeckResponse = deckApi.requestDeleteDeck(deckId = deckId)
 
     override suspend fun getDecks(): List<DeckListResponse> = deckCardInformationApi.requestDecks()
 }

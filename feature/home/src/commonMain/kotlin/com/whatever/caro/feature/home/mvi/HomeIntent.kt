@@ -5,6 +5,7 @@ import com.whatever.caro.core.viewmodel.contract.UiIntent
 
 sealed interface HomeIntent : UiIntent {
     data object Initialize : HomeIntent
+
     data object ClickSettingButton : HomeIntent
 
     data object ClickCreateDeckButton : HomeIntent

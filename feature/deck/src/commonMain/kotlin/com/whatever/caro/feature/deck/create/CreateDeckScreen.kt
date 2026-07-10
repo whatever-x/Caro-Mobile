@@ -27,14 +27,14 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import caromobile.core.designsystem.generated.resources.Res
-import caromobile.core.designsystem.generated.resources.deck_button_edit
+import caromobile.core.designsystem.generated.resources.deck_button_create
 import caromobile.core.designsystem.generated.resources.deck_content_description_back
 import caromobile.core.designsystem.generated.resources.deck_content_description_clear
-import caromobile.core.designsystem.generated.resources.deck_edit_title
 import caromobile.core.designsystem.generated.resources.deck_field_label_description
 import caromobile.core.designsystem.generated.resources.deck_field_label_name
 import caromobile.core.designsystem.generated.resources.deck_field_placeholder_description
 import caromobile.core.designsystem.generated.resources.deck_field_placeholder_name
+import caromobile.core.designsystem.generated.resources.deck_title_create
 import caromobile.core.designsystem.generated.resources.ic_chevron_left_24
 import caromobile.core.designsystem.generated.resources.ic_x_circle_24
 import com.whatever.caro.core.designsystem.components.CaroTextArea
@@ -83,7 +83,7 @@ internal fun CreateDeckScreen(
             },
             centerContent = {
                 Text(
-                    text = stringResource(Res.string.deck_edit_title),
+                    text = stringResource(Res.string.deck_title_create),
                     style = CaroTheme.typography.heading2,
                     color = CaroTheme.color.text.primary,
                 )
@@ -100,7 +100,7 @@ internal fun CreateDeckScreen(
                         horizontal = CaroTheme.spacing.xl,
                         vertical = CaroTheme.spacing.m,
                     ),
-            verticalArrangement = Arrangement.spacedBy(CaroTheme.spacing.l)
+            verticalArrangement = Arrangement.spacedBy(CaroTheme.spacing.l),
         ) {
             CaroTextField(
                 value = state.name,
@@ -150,7 +150,7 @@ internal fun CreateDeckScreen(
                         horizontal = PageHorizontalPadding,
                         vertical = CaroTheme.spacing.l,
                     ),
-            text = stringResource(Res.string.deck_button_edit)
+            text = stringResource(Res.string.deck_button_create),
         )
     }
 }

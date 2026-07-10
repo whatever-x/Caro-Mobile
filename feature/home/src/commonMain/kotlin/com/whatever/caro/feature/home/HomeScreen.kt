@@ -165,6 +165,7 @@ internal fun HomeScreen(
                     items = state.decks,
                     key = { deck -> deck.id },
                 ) {
+                    Spacer(modifier = Modifier.size(size = CaroTheme.spacing.m))
                     Deck(
                         modifier = Modifier.padding(horizontal = CaroTheme.spacing.xl2),
                         title = it.title,
@@ -180,7 +181,6 @@ internal fun HomeScreen(
                             )
                         },
                     )
-                    Spacer(modifier = Modifier.size(size = CaroTheme.spacing.m))
                 }
             }
         }

@@ -12,18 +12,21 @@ class HomeViewModel(
     private val deckRepository: DeckRepository,
     exceptionFilter: ExceptionFilter,
 ) : BaseViewModel<HomeState, HomeIntent, HomeSideEffect>(
-    initialState = HomeState(),
-    exceptionFilter = exceptionFilter,
-) {
+        initialState = HomeState(),
+        exceptionFilter = exceptionFilter,
+    ) {
     override fun handleClientException(throwable: Throwable) {
     }
 
     override suspend fun handleIntent(intent: HomeIntent) {
         when (intent) {
-            HomeIntent.Initialize -> initialize()
+            HomeIntent.Initialize -> {
+                initialize()
+            }
+
             HomeIntent.ClickCreateDeckButton -> {
                 postSideEffect(
-                    HomeSideEffect.NavigateToCreateDeck
+                    HomeSideEffect.NavigateToCreateDeck,
                 )
             }
 

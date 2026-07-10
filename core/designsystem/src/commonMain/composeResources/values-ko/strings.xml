@@ -98,6 +98,11 @@
     <string name="home_deck_button_learning">이어서 학습</string>
     <string name="home_floating_button">덱 만들기</string>
     <string name="home_deck_field_empty">덱을 먼저 만들고\n학습을 시작해 보세요.</string>
+    <string name="home_deck_badge_rest">휴식</string>
+    <string name="home_deck_rest_title">오늘은 복습이 필요 없어요</string>
+    <string name="home_deck_rest_description1">알고리즘이 오늘은 복습이 필요 없다고 판단했어요.</string>
+    <string name="home_deck_rest_description2">내일 새로운 문제를 준비할게요!</string>
+    <string name="home_deck_card_total_count">%1$s개 카드</string>
     <!-- setting -->
     <string name="setting_title">설정</string>
     <string name="setting_userinfo_nickname_change">닉네임 변경</string>

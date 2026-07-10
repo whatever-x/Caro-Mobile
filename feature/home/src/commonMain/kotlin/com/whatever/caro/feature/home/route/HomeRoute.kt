@@ -3,6 +3,8 @@ package com.whatever.caro.feature.home.route
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.whatever.caro.core.navigator.contract.NavCommand.To
 import com.whatever.caro.core.navigator.dispatcher.NavigationDispatcher
@@ -21,8 +23,12 @@ fun HomeRoute(
     navDispatcher: NavigationDispatcher,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
-    LaunchedEffect(Unit) {
+
+    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
         viewModel.intent(HomeIntent.Initialize)
+    }
+
+    LaunchedEffect(Unit) {
         viewModel.sideEffect.collect { sideEffect ->
             when (sideEffect) {
                 is HomeSideEffect.NavigateToProfile -> {

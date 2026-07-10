@@ -9,7 +9,13 @@ import com.whatever.caro.core.remote.dto.deckCardInformation.response.DeckListRe
 
 interface DeckDataSource {
     suspend fun createDeck(request: CreateDeckRequest): CreateDeckResponse
-    suspend fun updateDeck(deckId: Long, request: UpdateDeckRequest): UpdateDeckResponse
+
+    suspend fun updateDeck(
+        deckId: Long,
+        request: UpdateDeckRequest,
+    ): UpdateDeckResponse
+
     suspend fun deleteDeck(deckId: Long): DeleteDeckResponse
+
     suspend fun getDecks(): List<DeckListResponse>
 }

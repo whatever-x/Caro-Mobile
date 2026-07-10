@@ -1,5 +1,6 @@
 package com.whatever.caro.feature.home.component
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -27,9 +28,15 @@ import caromobile.core.designsystem.generated.resources.Res
 import caromobile.core.designsystem.generated.resources.home_deck_badge_complete
 import caromobile.core.designsystem.generated.resources.home_deck_badge_learning
 import caromobile.core.designsystem.generated.resources.home_deck_badge_not_started
+import caromobile.core.designsystem.generated.resources.home_deck_badge_rest
 import caromobile.core.designsystem.generated.resources.home_deck_button_learning
 import caromobile.core.designsystem.generated.resources.home_deck_button_not_started
+import caromobile.core.designsystem.generated.resources.home_deck_card_total_count
+import caromobile.core.designsystem.generated.resources.home_deck_rest_description1
+import caromobile.core.designsystem.generated.resources.home_deck_rest_description2
+import caromobile.core.designsystem.generated.resources.home_deck_rest_title
 import caromobile.core.designsystem.generated.resources.ic_dot
+import caromobile.core.designsystem.generated.resources.img_card
 import com.whatever.caro.core.designsystem.themes.CaroTheme
 import com.whatever.caro.core.model.deck.DeckState
 import com.whatever.caro.core.ui.modifier.noRippleClickable
@@ -51,6 +58,7 @@ internal fun Deck(
         when (state) {
             DeckState.NOT_STARTED, DeckState.LEARNING -> CaroTheme.spacing.m
             DeckState.COMPLETE -> CaroTheme.spacing.l
+            DeckState.REST_DAY -> CaroTheme.spacing.s
         }
 
     Column(
@@ -85,16 +93,10 @@ internal fun Deck(
             overflow = TextOverflow.Ellipsis,
         )
         Spacer(modifier = Modifier.size(size = progressSpace))
-        LinearProgressIndicator(
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .height(height = 8.dp)
-                    .clip(shape = CaroTheme.shape.xs),
-            drawStopIndicator = {},
-            progress = { todayLearningPercentage.coerceIn(0, 100).toFloat() / 100f },
-            color = CaroTheme.color.surface.brand,
-            trackColor = CaroTheme.color.surface.tertiary,
+        ProgressContent(
+            modifier = Modifier.fillMaxWidth(),
+            todayLearningPercentage = todayLearningPercentage,
+            deckState = state,
         )
         Spacer(modifier = Modifier.size(size = progressSpace))
         Row(
@@ -106,25 +108,93 @@ internal fun Deck(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
-                    text = cardTotalCount.formatWithComma(),
+                    text =
+                        stringResource(
+                            Res.string.home_deck_card_total_count,
+                            cardTotalCount.formatWithComma(),
+                        ),
                     style = CaroTheme.typography.body3,
                     color = CaroTheme.color.text.tertiary,
                 )
-                Icon(
-                    painter = painterResource(resource = Res.drawable.ic_dot),
-                    tint = CaroTheme.color.icon.tertiary,
-                    contentDescription = null,
-                )
-                Text(
-                    text = "$todayLearningPercentage%",
-                    style = CaroTheme.typography.body2.semiBold,
-                    color = CaroTheme.color.text.brand,
-                )
+                if (state != DeckState.REST_DAY) {
+                    Icon(
+                        painter = painterResource(resource = Res.drawable.ic_dot),
+                        tint = CaroTheme.color.icon.tertiary,
+                        contentDescription = null,
+                    )
+                    Text(
+                        text = "$todayLearningPercentage%",
+                        style = CaroTheme.typography.body2.semiBold,
+                        color = CaroTheme.color.text.brand,
+                    )
+                }
             }
             CtaButton(
                 state = state,
                 onClick = onDeckClick,
             )
+        }
+    }
+}
+
+@Composable
+private fun ProgressContent(
+    modifier: Modifier = Modifier,
+    deckState: DeckState,
+    todayLearningPercentage: Int,
+) {
+    when (deckState) {
+        DeckState.NOT_STARTED, DeckState.LEARNING, DeckState.COMPLETE -> {
+            LinearProgressIndicator(
+                modifier =
+                    modifier
+                        .height(height = 8.dp)
+                        .clip(shape = CaroTheme.shape.xs),
+                drawStopIndicator = {},
+                progress = { todayLearningPercentage.coerceIn(0, 100).toFloat() / 100f },
+                color = CaroTheme.color.surface.brand,
+                trackColor = CaroTheme.color.surface.tertiary,
+            )
+        }
+
+        DeckState.REST_DAY -> {
+            Row(
+                modifier =
+                    modifier
+                        .background(color = CaroTheme.color.surface.rest, shape = CaroTheme.shape.m)
+                        .padding(all = CaroTheme.spacing.s),
+                horizontalArrangement =
+                    Arrangement.spacedBy(
+                        space = CaroTheme.spacing.s,
+                        alignment = Alignment.CenterHorizontally,
+                    ),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Image(
+                    painter = painterResource(Res.drawable.img_card),
+                    contentDescription = null,
+                )
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(space = CaroTheme.spacing.xxs),
+                ) {
+                    Text(
+                        text = stringResource(Res.string.home_deck_rest_title),
+                        color = CaroTheme.color.text.rest,
+                        style = CaroTheme.typography.caption2.bold,
+                    )
+                    Text(
+                        text = stringResource(Res.string.home_deck_rest_description1),
+                        color = CaroTheme.color.text.primary,
+                        style = CaroTheme.typography.caption2.regular,
+                    )
+                    Text(
+                        text = stringResource(Res.string.home_deck_rest_description2),
+                        color = CaroTheme.color.text.primary,
+                        style = CaroTheme.typography.caption2.regular,
+                    )
+                }
+            }
         }
     }
 }
@@ -139,7 +209,7 @@ private fun CtaButton(
         when (state) {
             DeckState.NOT_STARTED -> Res.string.home_deck_button_not_started
             DeckState.LEARNING -> Res.string.home_deck_button_learning
-            DeckState.COMPLETE -> return
+            DeckState.COMPLETE, DeckState.REST_DAY -> return
         }
     Box(
         modifier =
@@ -169,27 +239,28 @@ private fun DeckStateBadge(
 ) {
     val backgroundColor =
         when (state) {
-            DeckState.NOT_STARTED -> CaroTheme.color.surface.ready
-            DeckState.LEARNING -> CaroTheme.color.surface.progress
+            DeckState.NOT_STARTED, DeckState.LEARNING -> CaroTheme.color.surface.ready
             DeckState.COMPLETE -> CaroTheme.color.surface.complete
+            DeckState.REST_DAY -> CaroTheme.color.surface.rest
         }
     val borderColor =
         when (state) {
-            DeckState.NOT_STARTED -> CaroTheme.color.border.ready
-            DeckState.LEARNING -> CaroTheme.color.border.progress
+            DeckState.NOT_STARTED, DeckState.LEARNING -> CaroTheme.color.border.ready
             DeckState.COMPLETE -> CaroTheme.color.border.complete
+            DeckState.REST_DAY -> CaroTheme.color.border.rest
         }
     val textColor =
         when (state) {
-            DeckState.NOT_STARTED -> CaroTheme.color.text.ready
-            DeckState.LEARNING -> CaroTheme.color.text.progress
+            DeckState.NOT_STARTED, DeckState.LEARNING -> CaroTheme.color.text.ready
             DeckState.COMPLETE -> CaroTheme.color.text.complete
+            DeckState.REST_DAY -> CaroTheme.color.text.rest
         }
     val stringRes =
         when (state) {
             DeckState.NOT_STARTED -> Res.string.home_deck_badge_not_started
             DeckState.LEARNING -> Res.string.home_deck_badge_learning
             DeckState.COMPLETE -> Res.string.home_deck_badge_complete
+            DeckState.REST_DAY -> Res.string.home_deck_badge_rest
         }
 
     val badgeShape = RoundedCornerShape(size = 20.dp)
@@ -260,6 +331,21 @@ private fun CompleteDeckItemPreview() {
             cardTotalCount = 1000,
             todayLearningPercentage = 100,
             state = DeckState.COMPLETE,
+            onDeckClick = {},
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun RestDeckItemPreview() {
+    CaroTheme {
+        Deck(
+            title = "제목1",
+            description = "내용1",
+            cardTotalCount = 1000,
+            todayLearningPercentage = 0,
+            state = DeckState.REST_DAY,
             onDeckClick = {},
         )
     }

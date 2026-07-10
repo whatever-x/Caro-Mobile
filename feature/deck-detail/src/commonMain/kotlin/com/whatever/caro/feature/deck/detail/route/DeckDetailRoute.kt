@@ -6,6 +6,7 @@ import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.whatever.caro.core.navigator.contract.NavCommand
 import com.whatever.caro.core.navigator.dispatcher.NavigationDispatcher
+import com.whatever.caro.core.navigator.entries.EditDeckEntry
 import com.whatever.caro.feature.deck.detail.DeckDetailScreen
 import com.whatever.caro.feature.deck.detail.DeckDetailViewModel
 import com.whatever.caro.feature.deck.detail.mvi.DeckDetailSideEffect
@@ -41,7 +42,16 @@ fun DeckDetailRoute(
                 }
 
                 is DeckDetailSideEffect.NavigateToEditDeck -> {
-                    // TODO: 덱 수정 화면 구현 후 sideEffect.deckId 를 사용해 이동 로직을 연결합니다.
+                    navDispatcher.emit(
+                        NavCommand.To(
+                            key =
+                                EditDeckEntry(
+                                    deckId = state.deck.id,
+                                    deckName = state.deck.title,
+                                    deckDescription = state.deck.description,
+                                ),
+                        ),
+                    )
                 }
 
                 is DeckDetailSideEffect.NavigateToCardDetail -> {

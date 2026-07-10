@@ -1,9 +1,9 @@
 package com.whatever.caro.core.remote.di
 
-import com.whatever.caro.core.remote.datasource.RemoteAuthDataSource
-import com.whatever.caro.core.remote.datasource.RemoteAuthDataSourceImpl
-import com.whatever.caro.core.remote.datasource.RemoteNonAuthDataSource
-import com.whatever.caro.core.remote.datasource.RemoteNonAuthDataSourceImpl
+import com.whatever.caro.core.remote.datasource.auth.RemoteAuthDataSource
+import com.whatever.caro.core.remote.datasource.auth.RemoteAuthDataSourceImpl
+import com.whatever.caro.core.remote.datasource.auth.RemoteNonAuthDataSource
+import com.whatever.caro.core.remote.datasource.auth.RemoteNonAuthDataSourceImpl
 import com.whatever.caro.core.remote.datasource.card.CardDataSource
 import com.whatever.caro.core.remote.datasource.card.RemoteCardDataSourceImpl
 import com.whatever.caro.core.remote.datasource.deck.DeckDataSource

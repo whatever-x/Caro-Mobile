@@ -100,7 +100,7 @@ internal fun EditDeckScreen(
                         horizontal = CaroTheme.spacing.xl,
                         vertical = CaroTheme.spacing.m,
                     ),
-            verticalArrangement = Arrangement.spacedBy(CaroTheme.spacing.l)
+            verticalArrangement = Arrangement.spacedBy(CaroTheme.spacing.l),
         ) {
             CaroTextField(
                 value = state.name,
@@ -150,7 +150,7 @@ internal fun EditDeckScreen(
                         horizontal = PageHorizontalPadding,
                         vertical = CaroTheme.spacing.l,
                     ),
-            text = stringResource(Res.string.deck_button_edit)
+            text = stringResource(Res.string.deck_button_edit),
         )
     }
 }
