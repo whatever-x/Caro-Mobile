@@ -121,4 +121,5 @@
     <!-- deck edit -->
     <string name="deck_edit_title">덱 수정</string>
     <string name="deck_button_edit">수정하기</string>
+    <string name="deck_snackbar_edit_error">덱 수정에 실패했어요. 잠시 후 다시 시도해주세요.</string>
 </resources>

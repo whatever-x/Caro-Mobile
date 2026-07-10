@@ -6,6 +6,7 @@ import com.whatever.caro.core.viewmodel.ExceptionFilter
 import com.whatever.caro.feature.home.mvi.HomeIntent
 import com.whatever.caro.feature.home.mvi.HomeSideEffect
 import com.whatever.caro.feature.home.mvi.HomeState
+import io.github.aakira.napier.Napier
 import kotlinx.collections.immutable.toImmutableList
 
 class HomeViewModel(
@@ -16,6 +17,7 @@ class HomeViewModel(
         exceptionFilter = exceptionFilter,
     ) {
     override fun handleClientException(throwable: Throwable) {
+        reduce { copy(isLoading = false) }
     }
 
     override suspend fun handleIntent(intent: HomeIntent) {
@@ -53,7 +55,8 @@ class HomeViewModel(
     }
 
     private suspend fun initialize() {
+        reduce { copy(isLoading = true) }
         val decks = deckRepository.getDecks()
-        reduce { copy(decks = decks.toImmutableList()) }
+        reduce { copy(isLoading = false, decks = decks.toImmutableList()) }
     }
 }

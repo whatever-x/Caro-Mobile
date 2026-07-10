@@ -126,4 +126,6 @@
 	<!-- deck edit -->
 	<string name="deck_edit_title">Edit Deck</string>
 	<string name="deck_button_edit">Edit</string>
+	<string name="deck_snackbar_edit_error">Failed to edit the deck. Please try again.</string>
+
 </resources>

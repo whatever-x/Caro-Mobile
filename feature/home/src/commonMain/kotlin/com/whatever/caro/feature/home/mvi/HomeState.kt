@@ -10,18 +10,8 @@ data class HomeState(
     val nickname: String = "",
     val additionalDescription: String = "",
     val learningDays: Int = 0,
-    val decks: ImmutableList<Deck> =
-        persistentListOf(
-            Deck(
-                id = 1,
-                title = "2",
-                description = "3",
-                cardTotalCount = 2,
-                todayLearningCount = 1,
-                todayCompleteCount = 1,
-                state = DeckState.REST_DAY,
-            ),
-        ),
+    val decks: ImmutableList<Deck> = persistentListOf(),
+    val isLoading: Boolean = false,
 ) : UiState {
     val isDeckEmpty: Boolean
         get() = decks.isEmpty()

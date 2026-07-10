@@ -135,26 +135,23 @@ private fun DeckStateBadge(
 
     val textColor =
         when (currentLearningStatus) {
-            DeckState.NOT_STARTED -> CaroTheme.color.text.ready
-            DeckState.LEARNING -> CaroTheme.color.text.progress
+            DeckState.NOT_STARTED, DeckState.LEARNING -> CaroTheme.color.text.ready
             DeckState.COMPLETE -> CaroTheme.color.text.complete
             DeckState.REST_DAY -> CaroTheme.color.text.rest
         }
 
     val backgroundColor =
         when (currentLearningStatus) {
-            DeckState.NOT_STARTED -> CaroTheme.color.surface.ready
-            DeckState.LEARNING -> CaroTheme.color.surface.progress
+            DeckState.NOT_STARTED, DeckState.LEARNING -> CaroTheme.color.surface.ready
             DeckState.COMPLETE -> CaroTheme.color.surface.complete
             DeckState.REST_DAY -> CaroTheme.color.surface.rest
         }
 
     val borderColor =
         when (currentLearningStatus) {
-            DeckState.NOT_STARTED -> CaroTheme.color.border.rest
-            DeckState.LEARNING -> CaroTheme.color.border.ready
-            DeckState.COMPLETE -> CaroTheme.color.border.progress
-            DeckState.REST_DAY -> CaroTheme.color.border.complete
+            DeckState.NOT_STARTED, DeckState.LEARNING -> CaroTheme.color.border.ready
+            DeckState.COMPLETE -> CaroTheme.color.border.complete
+            DeckState.REST_DAY -> CaroTheme.color.border.rest
         }
 
     Box(
