@@ -153,7 +153,7 @@ internal fun SettingScreen(
                         Res.string.setting_description_app_version,
                         AppConfig.appVersion,
                     ),
-                style = CaroTheme.typography.caption2,
+                style = CaroTheme.typography.caption2.regular,
                 color = CaroTheme.color.text.tertiary,
             )
         }

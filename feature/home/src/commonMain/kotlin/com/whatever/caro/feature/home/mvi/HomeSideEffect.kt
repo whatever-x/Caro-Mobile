@@ -1,5 +1,6 @@
 package com.whatever.caro.feature.home.mvi
 
+import com.whatever.caro.core.model.deck.Deck
 import com.whatever.caro.core.viewmodel.contract.UiSideEffect
 
 sealed interface HomeSideEffect : UiSideEffect {
@@ -9,8 +10,7 @@ sealed interface HomeSideEffect : UiSideEffect {
 
     data object NavigateToCreateDeck : HomeSideEffect
 
-    data class NavigateToDeckCards(
-        val deckId: Long,
-        val deckTitle: String,
+    data class NavigateToDeckDetail(
+        val deck: Deck,
     ) : HomeSideEffect
 }

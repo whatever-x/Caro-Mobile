@@ -24,9 +24,8 @@ class HomeViewModel(
 
             is HomeIntent.ClickDeckButton -> {
                 postSideEffect(
-                    HomeSideEffect.NavigateToDeckCards(
-                        deckId = intent.deckId,
-                        deckTitle = intent.deckTitle,
+                    HomeSideEffect.NavigateToDeckDetail(
+                        deck = intent.deck,
                     ),
                 )
             }

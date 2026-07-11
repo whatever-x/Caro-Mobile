@@ -210,7 +210,7 @@ private fun RequiredFieldHeader(label: String) {
         )
         Text(
             text = stringResource(Res.string.deck_field_required),
-            style = CaroTheme.typography.label1,
+            style = CaroTheme.typography.label1.bold,
             color = CaroTheme.color.text.accent,
         )
     }
@@ -292,7 +292,7 @@ private fun CtaButton(
     ) {
         Text(
             text = stringResource(Res.string.deck_button_create),
-            style = CaroTheme.typography.label1,
+            style = CaroTheme.typography.label1.bold,
             color = CaroTheme.color.text.inverse,
         )
     }
