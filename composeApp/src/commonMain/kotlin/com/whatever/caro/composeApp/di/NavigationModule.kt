@@ -81,6 +81,7 @@ val navEntryModule: Module =
                         )
                     },
                 navDispatcher = get(),
+                snackbarController = get(),
             )
         }
 

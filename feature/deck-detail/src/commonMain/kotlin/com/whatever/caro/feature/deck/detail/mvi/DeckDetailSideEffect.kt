@@ -25,7 +25,11 @@ sealed interface DeckDetailSideEffect : UiSideEffect {
         val deckId: Long,
     ) : DeckDetailSideEffect
 
-    data class NavigateToCardDetail(
+    data class NavigateToEditCard(
         val cardId: Long,
+        val front: String,
+        val back: String,
     ) : DeckDetailSideEffect
+
+    data object ShowCardLoadError : DeckDetailSideEffect
 }

@@ -35,7 +35,7 @@
 	<string name="deck_tip_max_cards">You can add up to 200 cards per deck.</string>
 	<string name="deck_button_create">Create</string>
 	<string name="deck_snackbar_create_error">Failed to create the deck. Please try again.</string>
-=======
+	=======
 	<!-- deck detail -->
 	<string name="deck_detail_screen_name">Deck Detail</string>
 	<string name="deck_detail_label_screen_name">Deck Detail</string>

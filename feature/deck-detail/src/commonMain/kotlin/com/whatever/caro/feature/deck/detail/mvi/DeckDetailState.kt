@@ -19,12 +19,13 @@ data class DeckDetailState(
             state = DeckState.NOT_STARTED,
         ),
     val deckCardList: ImmutableList<CardItem> = persistentListOf(),
+    val isCardListLoading: Boolean = false,
     val isSortBottomSheetVisible: Boolean = false,
     val isDeckEditBottomSheetVisible: Boolean = false,
     val selectedSortOption: DeckDetailSortOption = DeckDetailSortOption.CREATED,
 ) : UiState {
     val isEmptyDeckCard: Boolean
-        get() = deckCardList.isEmpty()
+        get() = deckCardList.isEmpty() && isCardListLoading.not()
 }
 
 enum class DeckDetailSortOption {

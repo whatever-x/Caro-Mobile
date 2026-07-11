@@ -1,14 +1,19 @@
 package com.whatever.caro.feature.deck.detail
 
+import com.whatever.caro.core.data.repository.card.CardRepository
 import com.whatever.caro.core.model.deck.Deck
 import com.whatever.caro.core.viewmodel.BaseViewModel
 import com.whatever.caro.core.viewmodel.ExceptionFilter
+import com.whatever.caro.feature.deck.detail.model.CardItem
 import com.whatever.caro.feature.deck.detail.mvi.DeckDetailIntent
 import com.whatever.caro.feature.deck.detail.mvi.DeckDetailSideEffect
 import com.whatever.caro.feature.deck.detail.mvi.DeckDetailState
+import kotlinx.collections.immutable.toPersistentList
+import kotlinx.coroutines.CancellationException
 
 class DeckDetailViewModel(
     deck: Deck,
+    private val cardRepository: CardRepository,
     exceptionFilter: ExceptionFilter,
 ) : BaseViewModel<DeckDetailState, DeckDetailIntent, DeckDetailSideEffect>(
         initialState =
@@ -17,6 +22,10 @@ class DeckDetailViewModel(
             ),
         exceptionFilter = exceptionFilter,
     ) {
+    init {
+        loadCards()
+    }
+
     override suspend fun handleIntent(intent: DeckDetailIntent) {
         when (intent) {
             DeckDetailIntent.ClickBack -> {
@@ -86,7 +95,56 @@ class DeckDetailViewModel(
             }
 
             is DeckDetailIntent.ClickCard -> {
-                postSideEffect(DeckDetailSideEffect.NavigateToCardDetail(cardId = intent.cardId))
+                handleClickCard(cardId = intent.cardId)
+            }
+
+            DeckDetailIntent.RefreshCards -> {
+                loadCards()
+            }
+        }
+    }
+
+    private fun handleClickCard(cardId: Long) {
+        val card = currentState.deckCardList.firstOrNull { it.id == cardId } ?: return
+        postSideEffect(
+            DeckDetailSideEffect.NavigateToEditCard(
+                cardId = card.id,
+                front = card.front,
+                back = card.back,
+            ),
+        )
+    }
+
+    private fun loadCards() {
+        if (currentState.isCardListLoading) return
+        reduce {
+            copy(isCardListLoading = true)
+        }
+
+        launch {
+            runCatching {
+                cardRepository.getCardsByDeck(deckId = currentState.deck.id)
+            }.onSuccess { cards ->
+                reduce {
+                    copy(
+                        deckCardList =
+                            cards
+                                .map { card ->
+                                    CardItem(
+                                        id = card.id,
+                                        front = card.content.front,
+                                        back = card.content.back,
+                                    )
+                                }.toPersistentList(),
+                        isCardListLoading = false,
+                    )
+                }
+            }.onFailure { throwable ->
+                if (throwable is CancellationException) throw throwable
+                reduce {
+                    copy(isCardListLoading = false)
+                }
+                postSideEffect(DeckDetailSideEffect.ShowCardLoadError)
             }
         }
     }
