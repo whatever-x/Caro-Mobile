@@ -75,6 +75,7 @@ private val CardMinHeight = 120.dp
 private val SwipeActionWidth = 132.dp
 private val FloatingButtonBottomPadding = 24.dp
 private val FloatingButtonMinHeight = 52.dp
+private val ListBottomContentPadding = 96.dp
 private val DividerHeight = 1.dp
 private const val SWIPE_SETTLE_THRESHOLD = 0.45f
 private val SwipeActionBackground = Color(0xFF6DFD87)
@@ -167,7 +168,7 @@ internal fun DeckCardsScreen(
                                     start = PageHorizontalPadding,
                                     top = CaroTheme.spacing.m,
                                     end = PageHorizontalPadding,
-                                    bottom = 96.dp,
+                                    bottom = ListBottomContentPadding,
                                 ),
                             verticalArrangement = Arrangement.spacedBy(CaroTheme.spacing.m),
                         ) {
