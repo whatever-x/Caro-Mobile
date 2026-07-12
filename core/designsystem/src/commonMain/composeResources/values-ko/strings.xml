@@ -61,6 +61,7 @@
     <string name="deck_detail_label_learning_progress">%1$d%%</string>
     <string name="deck_detail_button_add_card">카드 추가하기</string>
     <string name="deck_detail_button_edit">편집</string>
+    <string name="deck_detail_button_card_edit">수정</string>
     <string name="deck_detail_badge_new">NEW</string>
     <string name="deck_detail_badge_review">REVIEW</string>
     <string name="deck_detail_badge_hard">HARD</string>

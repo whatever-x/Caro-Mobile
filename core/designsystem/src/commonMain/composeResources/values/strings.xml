@@ -62,6 +62,7 @@
 	<string name="deck_detail_label_learning_progress">%1$d%%</string>
 	<string name="deck_detail_button_add_card">Add card</string>
 	<string name="deck_detail_button_edit">Edit</string>
+	<string name="deck_detail_button_card_edit">Edit</string>
 	<string name="deck_detail_badge_new">NEW</string>
 	<string name="deck_detail_badge_review">REVIEW</string>
 	<string name="deck_detail_badge_hard">HARD</string>

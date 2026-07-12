@@ -17,9 +17,9 @@ import com.whatever.caro.feature.deck.detail.components.DeckDetailTopBar
 import com.whatever.caro.feature.deck.detail.components.DeckEditBottomSheet
 import com.whatever.caro.feature.deck.detail.components.SortBottomSheet
 import com.whatever.caro.feature.deck.detail.components.lazycolumn.AddCardButtonItem
-import com.whatever.caro.feature.deck.detail.components.lazycolumn.DeckCardItem
 import com.whatever.caro.feature.deck.detail.components.lazycolumn.DeckDetailHeader
 import com.whatever.caro.feature.deck.detail.components.lazycolumn.FilterAndSortSection
+import com.whatever.caro.feature.deck.detail.components.lazycolumn.SwipeToRevealCardItem
 import com.whatever.caro.feature.deck.detail.mvi.DeckDetailIntent
 import com.whatever.caro.feature.deck.detail.mvi.DeckDetailState
 
@@ -82,9 +82,9 @@ internal fun DeckDetailScreen(
                     items = state.deckCardList,
                     key = { index, card -> "${card.id}-$index" },
                 ) { index, card ->
-                    DeckCardItem(
+                    SwipeToRevealCardItem(
                         card = card,
-                        onClick = { onIntent(DeckDetailIntent.ClickCard(card.id)) },
+                        onEdit = { onIntent(DeckDetailIntent.ClickCard(card.id)) },
                         modifier =
                             Modifier
                                 .padding(
