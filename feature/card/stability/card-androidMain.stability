@@ -42,10 +42,10 @@ private fun com.whatever.caro.feature.card.BottomBar(isAddEnabled: kotlin.Boolea
 
 @Composable
 private fun com.whatever.caro.feature.card.CardPreview(card: com.whatever.caro.core.model.card.CardContent, onRemove: kotlin.Function0<kotlin.Unit>): kotlin.Unit
-  skippable: false
+  skippable: true
   restartable: true
   params:
-    - card: UNSTABLE (has mutable properties or unstable members)
+    - card: STABLE (marked @Stable or @Immutable)
     - onRemove: STABLE (function type)
 
 @Composable
@@ -97,4 +97,97 @@ private fun com.whatever.caro.feature.card.TipSection(): kotlin.Unit
   skippable: true
   restartable: true
   params:
+
+@Composable
+internal fun com.whatever.caro.feature.card.delete.DeleteCardsScreen(state: com.whatever.caro.feature.card.delete.mvi.DeleteCardsState, onIntent: kotlin.Function1<com.whatever.caro.feature.card.delete.mvi.DeleteCardsIntent, kotlin.Unit>): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - state: STABLE (class with no mutable properties)
+    - onIntent: STABLE (function type)
+
+@Composable
+internal fun com.whatever.caro.feature.card.delete.components.CancelButton(onClick: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - onClick: STABLE (function type)
+    - modifier: STABLE (marked @Stable or @Immutable)
+
+@Composable
+internal fun com.whatever.caro.feature.card.delete.components.DeleteBottomBar(enabled: kotlin.Boolean, onDelete: kotlin.Function0<kotlin.Unit>, onCancel: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - enabled: STABLE (primitive type)
+    - onDelete: STABLE (function type)
+    - onCancel: STABLE (function type)
+    - modifier: STABLE (marked @Stable or @Immutable)
+
+@Composable
+internal fun com.whatever.caro.feature.card.delete.components.DeleteCardListItem(item: com.whatever.caro.feature.card.delete.model.DeleteCardItem, onClick: kotlin.Function0<kotlin.Unit>): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - item: STABLE (marked @Stable or @Immutable)
+    - onClick: STABLE (function type)
+
+@Composable
+internal fun com.whatever.caro.feature.card.delete.components.DeleteCardsTopBarTitle(onBackClick: kotlin.Function0<kotlin.Unit>): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - onBackClick: STABLE (function type)
+
+@Composable
+internal fun com.whatever.caro.feature.card.delete.components.DeleteConfirmDialog(selectedCount: kotlin.Int, onDelete: kotlin.Function0<kotlin.Unit>, onCancel: kotlin.Function0<kotlin.Unit>): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - selectedCount: STABLE (primitive type)
+    - onDelete: STABLE (function type)
+    - onCancel: STABLE (function type)
+
+@Composable
+internal fun com.whatever.caro.feature.card.delete.components.DeleteSelectedButton(enabled: kotlin.Boolean, onClick: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - enabled: STABLE (primitive type)
+    - onClick: STABLE (function type)
+    - modifier: STABLE (marked @Stable or @Immutable)
+
+@Composable
+internal fun com.whatever.caro.feature.card.delete.components.DialogButton(text: kotlin.String, backgroundColor: androidx.compose.ui.graphics.Color, textColor: androidx.compose.ui.graphics.Color, onClick: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - text: STABLE (String is immutable)
+    - backgroundColor: STABLE (marked @Stable or @Immutable)
+    - textColor: STABLE (marked @Stable or @Immutable)
+    - onClick: STABLE (function type)
+    - modifier: STABLE (marked @Stable or @Immutable)
+
+@Composable
+internal fun com.whatever.caro.feature.card.delete.components.SelectAllTextButton(onClick: kotlin.Function0<kotlin.Unit>): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - onClick: STABLE (function type)
+
+@Composable
+internal fun com.whatever.caro.feature.card.delete.components.SelectCheckbox(isSelected: kotlin.Boolean): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - isSelected: STABLE (primitive type)
+
+@Composable
+public fun com.whatever.caro.feature.card.delete.route.DeleteCardsRoute(viewModel: com.whatever.caro.feature.card.delete.DeleteCardsViewModel, navDispatcher: com.whatever.caro.core.navigator.dispatcher.NavigationDispatcher, snackbarController: com.whatever.caro.core.ui.snackbar.SnackbarController): kotlin.Unit
+  skippable: false
+  restartable: true
+  params:
+    - viewModel: RUNTIME (requires runtime check)
+    - navDispatcher: RUNTIME (requires runtime check)
+    - snackbarController: RUNTIME (requires runtime check)
 

@@ -24,6 +24,7 @@ import com.whatever.caro.core.navigator.entries.CreateCardEntry
 import com.whatever.caro.core.navigator.entries.CreateDeckEntry
 import com.whatever.caro.core.navigator.entries.CreateProfileEntry
 import com.whatever.caro.core.navigator.entries.DeckDetailEntry
+import com.whatever.caro.core.navigator.entries.DeleteCardsEntry
 import com.whatever.caro.core.navigator.entries.EditProfileEntry
 import com.whatever.caro.core.navigator.entries.HomeEntry
 import com.whatever.caro.core.navigator.entries.LoginEntry
@@ -57,6 +58,7 @@ fun CaroApp(
                             subclass(CreateDeckEntry::class, CreateDeckEntry.serializer())
                             subclass(DeckDetailEntry::class, DeckDetailEntry.serializer())
                             subclass(CreateCardEntry::class, CreateCardEntry.serializer())
+                            subclass(DeleteCardsEntry::class, DeleteCardsEntry.serializer())
                             subclass(HomeEntry::class, HomeEntry.serializer())
                             subclass(SettingEntry::class, SettingEntry.serializer())
                         }
