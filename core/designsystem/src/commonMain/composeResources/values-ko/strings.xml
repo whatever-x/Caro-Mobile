@@ -109,6 +109,11 @@
     <string name="home_deck_button_learning">이어서 학습</string>
     <string name="home_floating_button">덱 만들기</string>
     <string name="home_deck_field_empty">덱을 먼저 만들고\n학습을 시작해 보세요.</string>
+    <string name="home_deck_badge_rest">휴식</string>
+    <string name="home_deck_rest_title">오늘은 복습이 필요 없어요</string>
+    <string name="home_deck_rest_description1">알고리즘이 오늘은 복습이 필요 없다고 판단했어요.</string>
+    <string name="home_deck_rest_description2">내일 새로운 문제를 준비할게요!</string>
+    <string name="home_deck_card_total_count">%1$s개 카드</string>
     <!-- setting -->
     <string name="setting_title">설정</string>
     <string name="setting_userinfo_nickname_change">닉네임 변경</string>
@@ -124,4 +129,8 @@
     <string name="setting_dialog_content">저장된 모든 기록이 소멸될 수 있습니다.</string>
     <string name="setting_dialog_button_delete_account">탈퇴하기</string>
     <string name="setting_dialog_button_cancel">취소</string>
+    <!-- deck edit -->
+    <string name="deck_edit_title">덱 수정</string>
+    <string name="deck_button_edit">수정하기</string>
+    <string name="deck_snackbar_edit_error">덱 수정에 실패했어요. 잠시 후 다시 시도해주세요.</string>
 </resources>

@@ -1,4 +1,4 @@
-package com.whatever.caro.core.remote.datasource
+package com.whatever.caro.core.remote.datasource.auth
 
 import com.whatever.caro.core.remote.dto.auth.request.RefreshTokenRequest
 import com.whatever.caro.core.remote.dto.auth.request.SocialLoginRequest

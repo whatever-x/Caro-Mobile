@@ -1,4 +1,4 @@
-package com.whatever.caro.feature.deck.mvi
+package com.whatever.caro.feature.deck.create.mvi
 
 import com.whatever.caro.core.viewmodel.contract.UiSideEffect
 

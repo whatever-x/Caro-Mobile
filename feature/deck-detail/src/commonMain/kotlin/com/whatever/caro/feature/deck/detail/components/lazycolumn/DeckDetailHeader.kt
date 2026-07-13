@@ -53,8 +53,6 @@ internal fun DeckDetailHeader(
     onAllStudy: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val isLearningUnavailable = learningCardTotal == 0
-
     Column(
         modifier =
             modifier
@@ -65,11 +63,7 @@ internal fun DeckDetailHeader(
                 ),
         verticalArrangement = Arrangement.spacedBy(CaroTheme.spacing.m),
     ) {
-        DailyLearningTitle(
-            currentLearningStatus = currentLearningStatus,
-            isLearningUnavailable = isLearningUnavailable,
-        )
-
+        DailyLearningTitle(currentLearningStatus = currentLearningStatus)
         Text(
             text = description,
             color = CaroTheme.color.text.secondary,
@@ -78,7 +72,7 @@ internal fun DeckDetailHeader(
             overflow = TextOverflow.Ellipsis,
         )
 
-        if (isLearningUnavailable) {
+        if (currentLearningStatus == DeckState.REST_DAY) {
             UnavailableLearningMessage()
         } else {
             DailyLearningProgress(
@@ -106,7 +100,6 @@ internal fun DeckDetailHeader(
 @Composable
 private fun DailyLearningTitle(
     currentLearningStatus: DeckState,
-    isLearningUnavailable: Boolean,
     modifier: Modifier = Modifier,
 ) {
     Row(
@@ -123,58 +116,42 @@ private fun DailyLearningTitle(
             overflow = TextOverflow.Ellipsis,
         )
 
-        DeckStateBadge(
-            currentLearningStatus = currentLearningStatus,
-            isLearningUnavailable = isLearningUnavailable,
-        )
+        DeckStateBadge(currentLearningStatus = currentLearningStatus)
     }
 }
 
 @Composable
 private fun DeckStateBadge(
     currentLearningStatus: DeckState,
-    isLearningUnavailable: Boolean,
     modifier: Modifier = Modifier,
 ) {
     val text =
-        if (isLearningUnavailable) {
-            stringResource(Res.string.deck_detail_label_daily_learning_unavailable)
-        } else {
-            when (currentLearningStatus) {
-                DeckState.NOT_STARTED -> stringResource(Res.string.deck_detail_label_daily_learning_ready)
-                DeckState.LEARNING -> stringResource(Res.string.deck_detail_label_daily_learning_in_progress)
-                DeckState.COMPLETE -> stringResource(Res.string.deck_detail_label_daily_learning_completed)
-            }
+        when (currentLearningStatus) {
+            DeckState.NOT_STARTED -> stringResource(Res.string.deck_detail_label_daily_learning_ready)
+            DeckState.LEARNING -> stringResource(Res.string.deck_detail_label_daily_learning_in_progress)
+            DeckState.COMPLETE -> stringResource(Res.string.deck_detail_label_daily_learning_completed)
+            DeckState.REST_DAY -> stringResource(Res.string.deck_detail_label_daily_learning_unavailable)
         }
 
     val textColor =
-        if (isLearningUnavailable) {
-            CaroTheme.color.text.warning
-        } else {
-            when (currentLearningStatus) {
-                DeckState.NOT_STARTED -> CaroTheme.color.text.ready
-                DeckState.LEARNING -> CaroTheme.color.text.progress
-                DeckState.COMPLETE -> CaroTheme.color.text.complete
-            }
+        when (currentLearningStatus) {
+            DeckState.NOT_STARTED, DeckState.LEARNING -> CaroTheme.color.text.ready
+            DeckState.COMPLETE -> CaroTheme.color.text.complete
+            DeckState.REST_DAY -> CaroTheme.color.text.rest
         }
 
     val backgroundColor =
-        if (isLearningUnavailable) {
-            CaroTheme.color.surface.warning
-        } else {
-            when (currentLearningStatus) {
-                DeckState.NOT_STARTED -> CaroTheme.color.surface.ready
-                DeckState.LEARNING -> CaroTheme.color.surface.progress
-                DeckState.COMPLETE -> CaroTheme.color.surface.complete
-            }
+        when (currentLearningStatus) {
+            DeckState.NOT_STARTED, DeckState.LEARNING -> CaroTheme.color.surface.ready
+            DeckState.COMPLETE -> CaroTheme.color.surface.complete
+            DeckState.REST_DAY -> CaroTheme.color.surface.rest
         }
 
     val borderColor =
-        when {
-            isLearningUnavailable -> CaroTheme.color.border.warning
-            currentLearningStatus == DeckState.NOT_STARTED -> CaroTheme.color.border.ready
-            currentLearningStatus == DeckState.LEARNING -> CaroTheme.color.border.progress
-            else -> CaroTheme.color.border.complete
+        when (currentLearningStatus) {
+            DeckState.NOT_STARTED, DeckState.LEARNING -> CaroTheme.color.border.ready
+            DeckState.COMPLETE -> CaroTheme.color.border.complete
+            DeckState.REST_DAY -> CaroTheme.color.border.rest
         }
 
     Box(

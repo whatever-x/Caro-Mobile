@@ -6,6 +6,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.whatever.caro.core.ui.swipe.SwipeGestureConfig.Companion.Default
 
 /**
  * 스와이프 제스처의 동작 기준과 애니메이션 값을 정의하는 설정 객체입니다.

@@ -5,7 +5,7 @@
 //   ./gradlew :login:stabilityDump
 
 @Composable
-public fun com.whatever.caro.feature.login.LoginRoute(viewModel: com.whatever.caro.feature.login.LoginViewModel, navDispatcher: com.whatever.caro.core.navigator.dispatcher.NavigationDispatcher, snackbarController: com.whatever.caro.core.ui.toast.snackbarController, googleAuthenticator: com.whatever.caro.feature.login.model.SocialAuthenticator<com.whatever.caro.feature.login.model.GoogleUser>, appleAuthenticator: com.whatever.caro.feature.login.model.SocialAuthenticator<com.whatever.caro.feature.login.model.AppleUser>): kotlin.Unit
+public fun com.whatever.caro.feature.login.LoginRoute(viewModel: com.whatever.caro.feature.login.LoginViewModel, navDispatcher: com.whatever.caro.core.navigator.dispatcher.NavigationDispatcher, snackbarController: com.whatever.caro.core.ui.snackbar.SnackbarController, googleAuthenticator: com.whatever.caro.feature.login.model.SocialAuthenticator<com.whatever.caro.feature.login.model.GoogleUser>, appleAuthenticator: com.whatever.caro.feature.login.model.SocialAuthenticator<com.whatever.caro.feature.login.model.AppleUser>): kotlin.Unit
   skippable: false
   restartable: true
   params:

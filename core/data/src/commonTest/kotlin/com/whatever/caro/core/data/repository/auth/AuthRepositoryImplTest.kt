@@ -4,8 +4,8 @@ import com.whatever.caro.core.datastore.datasource.LocalAuthDataSource
 import com.whatever.caro.core.model.auth.AuthSession
 import com.whatever.caro.core.model.auth.SocialLoginType
 import com.whatever.caro.core.model.exception.CaroAuthException
-import com.whatever.caro.core.remote.datasource.RemoteAuthDataSource
-import com.whatever.caro.core.remote.datasource.RemoteNonAuthDataSource
+import com.whatever.caro.core.remote.datasource.auth.RemoteAuthDataSource
+import com.whatever.caro.core.remote.datasource.auth.RemoteNonAuthDataSource
 import com.whatever.caro.core.remote.dto.auth.request.CompleteRegistrationRequest
 import com.whatever.caro.core.remote.dto.auth.request.RefreshTokenRequest
 import com.whatever.caro.core.remote.dto.auth.request.SocialLoginRequest

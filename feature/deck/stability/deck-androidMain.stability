@@ -5,7 +5,38 @@
 //   ./gradlew :deck:stabilityDump
 
 @Composable
-public fun com.whatever.caro.feature.deck.CreateDeckRoute(viewModel: com.whatever.caro.feature.deck.CreateDeckViewModel, navDispatcher: com.whatever.caro.core.navigator.dispatcher.NavigationDispatcher, snackbarController: com.whatever.caro.core.ui.toast.snackbarController): kotlin.Unit
+internal fun com.whatever.caro.feature.deck.component.CtaButton(enabled: kotlin.Boolean, text: kotlin.String, onClick: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - enabled: STABLE (primitive type)
+    - text: STABLE (String is immutable)
+    - onClick: STABLE (function type)
+    - modifier: STABLE (marked @Stable or @Immutable)
+
+@Composable
+internal fun com.whatever.caro.feature.deck.component.DeckTipSection(modifier: androidx.compose.ui.Modifier): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - modifier: STABLE (marked @Stable or @Immutable)
+
+@Composable
+internal fun com.whatever.caro.feature.deck.component.FieldCounter(count: kotlin.String): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - count: STABLE (String is immutable)
+
+@Composable
+internal fun com.whatever.caro.feature.deck.component.RequiredFieldHeader(label: kotlin.String): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - label: STABLE (String is immutable)
+
+@Composable
+public fun com.whatever.caro.feature.deck.create.CreateDeckRoute(viewModel: com.whatever.caro.feature.deck.create.CreateDeckViewModel, navDispatcher: com.whatever.caro.core.navigator.dispatcher.NavigationDispatcher, snackbarController: com.whatever.caro.core.ui.snackbar.SnackbarController): kotlin.Unit
   skippable: false
   restartable: true
   params:
@@ -14,7 +45,7 @@ public fun com.whatever.caro.feature.deck.CreateDeckRoute(viewModel: com.whateve
     - snackbarController: RUNTIME (requires runtime check)
 
 @Composable
-internal fun com.whatever.caro.feature.deck.CreateDeckScreen(state: com.whatever.caro.feature.deck.mvi.CreateDeckState, onIntent: kotlin.Function1<com.whatever.caro.feature.deck.mvi.CreateDeckIntent, kotlin.Unit>): kotlin.Unit
+internal fun com.whatever.caro.feature.deck.edit.CreateDeckScreen(state: com.whatever.caro.feature.deck.create.mvi.CreateDeckState, onIntent: kotlin.Function1<com.whatever.caro.feature.deck.create.mvi.CreateDeckIntent, kotlin.Unit>): kotlin.Unit
   skippable: true
   restartable: true
   params:
@@ -22,53 +53,19 @@ internal fun com.whatever.caro.feature.deck.CreateDeckScreen(state: com.whatever
     - onIntent: STABLE (function type)
 
 @Composable
-private fun com.whatever.caro.feature.deck.CtaButton(enabled: kotlin.Boolean, onClick: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
-  skippable: true
+public fun com.whatever.caro.feature.deck.edit.EditDeckRoute(viewModel: com.whatever.caro.feature.deck.edit.EditDeckViewModel, navDispatcher: com.whatever.caro.core.navigator.dispatcher.NavigationDispatcher, snackbarController: com.whatever.caro.core.ui.snackbar.SnackbarController): kotlin.Unit
+  skippable: false
   restartable: true
   params:
-    - enabled: STABLE (primitive type)
-    - onClick: STABLE (function type)
-    - modifier: STABLE (marked @Stable or @Immutable)
+    - viewModel: RUNTIME (requires runtime check)
+    - navDispatcher: RUNTIME (requires runtime check)
+    - snackbarController: RUNTIME (requires runtime check)
 
 @Composable
-private fun com.whatever.caro.feature.deck.DeckDescriptionField(state: com.whatever.caro.feature.deck.mvi.CreateDeckState, onIntent: kotlin.Function1<com.whatever.caro.feature.deck.mvi.CreateDeckIntent, kotlin.Unit>, focusRequester: androidx.compose.ui.focus.FocusRequester, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+internal fun com.whatever.caro.feature.deck.edit.EditDeckScreen(state: com.whatever.caro.feature.deck.edit.mvi.EditDeckState, onIntent: kotlin.Function1<com.whatever.caro.feature.deck.edit.mvi.EditDeckIntent, kotlin.Unit>): kotlin.Unit
   skippable: true
   restartable: true
   params:
     - state: STABLE (class with no mutable properties)
     - onIntent: STABLE (function type)
-    - focusRequester: STABLE (marked @Stable or @Immutable)
-    - modifier: STABLE (marked @Stable or @Immutable)
-
-@Composable
-private fun com.whatever.caro.feature.deck.DeckNameField(state: com.whatever.caro.feature.deck.mvi.CreateDeckState, onIntent: kotlin.Function1<com.whatever.caro.feature.deck.mvi.CreateDeckIntent, kotlin.Unit>, focusRequester: androidx.compose.ui.focus.FocusRequester, onNext: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
-  skippable: true
-  restartable: true
-  params:
-    - state: STABLE (class with no mutable properties)
-    - onIntent: STABLE (function type)
-    - focusRequester: STABLE (marked @Stable or @Immutable)
-    - onNext: STABLE (function type)
-    - modifier: STABLE (marked @Stable or @Immutable)
-
-@Composable
-private fun com.whatever.caro.feature.deck.DeckTipSection(modifier: androidx.compose.ui.Modifier): kotlin.Unit
-  skippable: true
-  restartable: true
-  params:
-    - modifier: STABLE (marked @Stable or @Immutable)
-
-@Composable
-private fun com.whatever.caro.feature.deck.FieldCounter(count: kotlin.String): kotlin.Unit
-  skippable: true
-  restartable: true
-  params:
-    - count: STABLE (String is immutable)
-
-@Composable
-private fun com.whatever.caro.feature.deck.RequiredFieldHeader(label: kotlin.String): kotlin.Unit
-  skippable: true
-  restartable: true
-  params:
-    - label: STABLE (String is immutable)
 

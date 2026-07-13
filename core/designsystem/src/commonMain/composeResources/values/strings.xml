@@ -22,7 +22,7 @@
 	<string name="profile_field_rule_nickname">2-20 characters. Korean, English, numbers, -, and _ only</string>
 	<string name="profile_button_create">Create</string>
 	<string name="profile_button_done">Done</string>
-	<!-- deck -->
+	<!-- deck create -->
 	<string name="deck_title_create">Create Deck</string>
 	<string name="deck_content_description_back">Go back</string>
 	<string name="deck_content_description_clear">Clear</string>
@@ -111,6 +111,11 @@
 	<string name="home_deck_button_learning">Continue Learning</string>
 	<string name="home_floating_button">Create Deck</string>
 	<string name="home_deck_field_empty">Create a deck to begin learning.</string>
+	<string name="home_deck_badge_rest">Rest</string>
+	<string name="home_deck_rest_title">No review needed today</string>
+	<string name="home_deck_rest_description1">Our algorithm determined that you don't need to review today.</string>
+	<string name="home_deck_rest_description2">We'll have new questions ready for you tomorrow!</string>
+	<string name="home_deck_card_total_count">%1$s cards</string>
 	<!-- setting -->
 	<string name="setting_title">Settings</string>
 	<string name="setting_userinfo_nickname_change">Change Nickname</string>
@@ -129,4 +134,9 @@
 	<string name="setting_dialog_content">All your saved data will be permanently removed.</string>
 	<string name="setting_dialog_button_delete_account">Delete Account</string>
 	<string name="setting_dialog_button_cancel">Cancel</string>
+	<!-- deck edit -->
+	<string name="deck_edit_title">Edit Deck</string>
+	<string name="deck_button_edit">Edit</string>
+	<string name="deck_snackbar_edit_error">Failed to edit the deck. Please try again.</string>
+
 </resources>

@@ -89,12 +89,11 @@ private fun com.whatever.caro.feature.deck.detail.components.lazycolumn.DailyLea
     - modifier: STABLE (marked @Stable or @Immutable)
 
 @Composable
-private fun com.whatever.caro.feature.deck.detail.components.lazycolumn.DailyLearningTitle(currentLearningStatus: com.whatever.caro.core.model.deck.DeckState, isLearningUnavailable: kotlin.Boolean, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+private fun com.whatever.caro.feature.deck.detail.components.lazycolumn.DailyLearningTitle(currentLearningStatus: com.whatever.caro.core.model.deck.DeckState, modifier: androidx.compose.ui.Modifier): kotlin.Unit
   skippable: true
   restartable: true
   params:
     - currentLearningStatus: STABLE (class with no mutable properties)
-    - isLearningUnavailable: STABLE (primitive type)
     - modifier: STABLE (marked @Stable or @Immutable)
 
 @Composable
@@ -130,12 +129,11 @@ internal fun com.whatever.caro.feature.deck.detail.components.lazycolumn.DeckDet
     - modifier: STABLE (marked @Stable or @Immutable)
 
 @Composable
-private fun com.whatever.caro.feature.deck.detail.components.lazycolumn.DeckStateBadge(currentLearningStatus: com.whatever.caro.core.model.deck.DeckState, isLearningUnavailable: kotlin.Boolean, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+private fun com.whatever.caro.feature.deck.detail.components.lazycolumn.DeckStateBadge(currentLearningStatus: com.whatever.caro.core.model.deck.DeckState, modifier: androidx.compose.ui.Modifier): kotlin.Unit
   skippable: true
   restartable: true
   params:
     - currentLearningStatus: STABLE (class with no mutable properties)
-    - isLearningUnavailable: STABLE (primitive type)
     - modifier: STABLE (marked @Stable or @Immutable)
 
 @Composable

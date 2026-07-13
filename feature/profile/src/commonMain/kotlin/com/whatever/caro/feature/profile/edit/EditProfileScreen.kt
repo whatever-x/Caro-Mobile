@@ -16,10 +16,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import caromobile.core.designsystem.generated.resources.Res
 import caromobile.core.designsystem.generated.resources.ic_arrow_left_24
-import caromobile.core.designsystem.generated.resources.profile_button_create
 import caromobile.core.designsystem.generated.resources.profile_button_done
 import caromobile.core.designsystem.generated.resources.profile_content_description_back
-import caromobile.core.designsystem.generated.resources.profile_title_create
 import caromobile.core.designsystem.generated.resources.profile_title_edit
 import com.whatever.caro.core.designsystem.components.CaroTopBar
 import com.whatever.caro.core.designsystem.themes.CaroTheme

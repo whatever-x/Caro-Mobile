@@ -38,6 +38,7 @@ import com.whatever.caro.core.designsystem.foundation.TextProgress
 import com.whatever.caro.core.designsystem.foundation.TextReady
 import com.whatever.caro.core.designsystem.foundation.White100
 import com.whatever.caro.core.designsystem.foundation.Yellow100
+import com.whatever.caro.core.designsystem.foundation.Yellow200
 import com.whatever.caro.core.designsystem.foundation.Yellow300
 import com.whatever.caro.core.designsystem.foundation.Yellow600
 import com.whatever.caro.core.designsystem.foundation.Yellow700
@@ -72,6 +73,7 @@ data class CaroColor(
         val complete: Color = TextComplete,
         val watermark: Color = Gray100,
         val accent: Color = Red500,
+        val rest: Color = Red800,
     )
 
     @Immutable
@@ -108,6 +110,7 @@ data class CaroColor(
         val progress: Color = SurfaceProgress,
         val complete: Color = SurfaceComplete,
         val accent: Color = Red500,
+        val rest: Color = Yellow200,
     )
 
     @Immutable
@@ -123,6 +126,7 @@ data class CaroColor(
         val ready: Color = BorderReady,
         val progress: Color = BorderProgress,
         val complete: Color = BorderComplete,
+        val rest: Color = Yellow200,
     )
 
     @Immutable
