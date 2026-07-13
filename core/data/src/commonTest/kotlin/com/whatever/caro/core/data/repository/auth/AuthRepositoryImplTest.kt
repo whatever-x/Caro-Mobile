@@ -4,8 +4,8 @@ import com.whatever.caro.core.datastore.datasource.LocalAuthDataSource
 import com.whatever.caro.core.model.auth.AuthSession
 import com.whatever.caro.core.model.auth.SocialLoginType
 import com.whatever.caro.core.model.exception.CaroAuthException
-import com.whatever.caro.core.remote.datasource.auth.RemoteAuthDataSource
-import com.whatever.caro.core.remote.datasource.auth.RemoteNonAuthDataSource
+import com.whatever.caro.core.remote.datasource.auth.AuthDataSource
+import com.whatever.caro.core.remote.datasource.auth.NonAuthDataSource
 import com.whatever.caro.core.remote.dto.auth.request.CompleteRegistrationRequest
 import com.whatever.caro.core.remote.dto.auth.request.RefreshTokenRequest
 import com.whatever.caro.core.remote.dto.auth.request.SocialLoginRequest
@@ -24,8 +24,8 @@ import kotlinx.coroutines.test.runTest
 class AuthRepositoryImplTest : FunSpec() {
     init {
         fun repositoryWith(
-            remoteAuthDataSource: RemoteAuthDataSource = mock(),
-            remoteNonAuthDataSource: RemoteNonAuthDataSource = mock(),
+            remoteAuthDataSource: AuthDataSource = mock(),
+            remoteNonAuthDataSource: NonAuthDataSource = mock(),
             localAuthDataSource: LocalAuthDataSource = mock(),
         ) = AuthRepositoryImpl(
             remoteAuthDataSource = remoteAuthDataSource,
@@ -36,7 +36,7 @@ class AuthRepositoryImplTest : FunSpec() {
         test("loginWithSocial은 발급된 토큰을 저장하고 AuthSession을 반환한다") {
             runTest {
                 val remoteNonAuthDataSource =
-                    mock<RemoteNonAuthDataSource> {
+                    mock<NonAuthDataSource> {
                         everySuspend { socialLogin(any()) } returns
                             SocialLoginResponse(
                                 accessToken = "access",
@@ -73,7 +73,7 @@ class AuthRepositoryImplTest : FunSpec() {
         test("logout은 원격 로그아웃 후 로컬 토큰을 비운다") {
             runTest {
                 val remoteAuthDataSource =
-                    mock<RemoteAuthDataSource> { everySuspend { logout() } returns Unit }
+                    mock<AuthDataSource> { everySuspend { logout() } returns Unit }
                 val localAuthDataSource =
                     mock<LocalAuthDataSource> { everySuspend { clear() } returns Unit }
                 val repository =
@@ -94,7 +94,7 @@ class AuthRepositoryImplTest : FunSpec() {
         test("completeRegistration은 발급된 토큰을 저장하고 AuthSession을 반환한다") {
             runTest {
                 val remoteAuthDataSource =
-                    mock<RemoteAuthDataSource> {
+                    mock<AuthDataSource> {
                         everySuspend { completeRegistration(any()) } returns
                             TokenResponse(accessToken = "access", refreshToken = "refresh")
                     }
@@ -136,7 +136,7 @@ class AuthRepositoryImplTest : FunSpec() {
                         everySuspend { saveTokens(any(), any()) } returns Unit
                     }
                 val remoteNonAuthDataSource =
-                    mock<RemoteNonAuthDataSource> {
+                    mock<NonAuthDataSource> {
                         everySuspend { refreshToken(any()) } returns
                             TokenResponse(accessToken = "newAccess", refreshToken = "newRefresh")
                     }

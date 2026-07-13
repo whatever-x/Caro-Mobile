@@ -6,7 +6,7 @@ import com.whatever.caro.core.remote.dto.auth.response.TokenResponse
 
 internal class RemoteAuthDataSourceImpl(
     private val authApi: AuthApi,
-) : RemoteAuthDataSource {
+) : AuthDataSource {
     override suspend fun completeRegistration(request: CompleteRegistrationRequest): TokenResponse =
         authApi.requestCompleteRegistration(request = request)
 

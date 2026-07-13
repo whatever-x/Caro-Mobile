@@ -5,13 +5,13 @@ import com.whatever.caro.core.model.auth.AuthSessionEvent
 import com.whatever.caro.core.model.auth.AuthSessionEventBus
 import com.whatever.caro.core.model.exception.CaroAuthException
 import com.whatever.caro.core.remote.auth.AuthTokenProvider
-import com.whatever.caro.core.remote.datasource.auth.RemoteNonAuthDataSource
+import com.whatever.caro.core.remote.datasource.auth.NonAuthDataSource
 import com.whatever.caro.core.remote.dto.auth.request.RefreshTokenRequest
 import kotlinx.coroutines.CancellationException
 
 internal class AuthTokenProviderImpl(
     private val localAuthDataSource: LocalAuthDataSource,
-    private val remoteNonAuthDatasource: RemoteNonAuthDataSource,
+    private val remoteNonAuthDatasource: NonAuthDataSource,
     private val authSessionEventBus: AuthSessionEventBus,
 ) : AuthTokenProvider {
     override suspend fun getAccessToken(): String? = localAuthDataSource.fetchAccessToken()
