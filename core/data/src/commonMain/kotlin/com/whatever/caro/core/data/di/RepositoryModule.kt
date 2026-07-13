@@ -10,6 +10,8 @@ import com.whatever.caro.core.data.repository.fcm.FcmTokenRepository
 import com.whatever.caro.core.data.repository.fcm.FcmTokenRepositoryImpl
 import com.whatever.caro.core.data.repository.profile.ProfileRepository
 import com.whatever.caro.core.data.repository.profile.ProfileRepositoryImpl
+import com.whatever.caro.core.data.repository.study.StudySessionRepository
+import com.whatever.caro.core.data.repository.study.StudySessionRepositoryImpl
 import org.koin.dsl.bind
 import org.koin.dsl.module
 import org.koin.plugin.module.dsl.single
@@ -21,4 +23,5 @@ val repositoryModule =
         single<ProfileRepositoryImpl>() bind ProfileRepository::class
         single<CardRepositoryImpl>() bind CardRepository::class
         single<DeckRepositoryImpl>() bind DeckRepository::class
+        single<StudySessionRepositoryImpl>() bind StudySessionRepository::class
     }

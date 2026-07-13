@@ -8,23 +8,15 @@ import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 
 data class DeckDetailState(
-    val deck: Deck =
-        Deck(
-            id = 1L,
-            title = "Preview Title",
-            description = "Preview Description for Deck Detail",
-            cardTotalCount = 0,
-            todayLearningCount = 0,
-            todayCompleteCount = 0,
-            state = DeckState.NOT_STARTED,
-        ),
+    val deck: Deck,
     val deckCardList: ImmutableList<CardItem> = persistentListOf(),
     val isSortBottomSheetVisible: Boolean = false,
     val isDeckEditBottomSheetVisible: Boolean = false,
     val selectedSortOption: DeckDetailSortOption = DeckDetailSortOption.CREATED,
+    val isLoading: Boolean = false,
 ) : UiState {
     val isEmptyDeckCard: Boolean
-        get() = deckCardList.isEmpty()
+        get() = !isLoading && deckCardList.isEmpty()
 }
 
 enum class DeckDetailSortOption {

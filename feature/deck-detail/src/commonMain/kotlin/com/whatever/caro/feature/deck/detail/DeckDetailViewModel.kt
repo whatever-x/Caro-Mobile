@@ -1,13 +1,18 @@
 package com.whatever.caro.feature.deck.detail
 
+import com.whatever.caro.core.data.repository.card.CardRepository
+import com.whatever.caro.core.data.repository.deck.DeckRepository
 import com.whatever.caro.core.model.deck.Deck
 import com.whatever.caro.core.viewmodel.BaseViewModel
 import com.whatever.caro.core.viewmodel.ExceptionFilter
+import com.whatever.caro.feature.deck.detail.model.CardItem
 import com.whatever.caro.feature.deck.detail.mvi.DeckDetailIntent
 import com.whatever.caro.feature.deck.detail.mvi.DeckDetailSideEffect
 import com.whatever.caro.feature.deck.detail.mvi.DeckDetailState
+import kotlinx.collections.immutable.toImmutableList
 
 class DeckDetailViewModel(
+    private val cardRepository: CardRepository,
     deck: Deck,
     exceptionFilter: ExceptionFilter,
 ) : BaseViewModel<DeckDetailState, DeckDetailIntent, DeckDetailSideEffect>(
@@ -19,6 +24,10 @@ class DeckDetailViewModel(
     ) {
     override suspend fun handleIntent(intent: DeckDetailIntent) {
         when (intent) {
+            DeckDetailIntent.Initialize -> {
+                initialize()
+            }
+
             DeckDetailIntent.ClickBack -> {
                 postSideEffect(DeckDetailSideEffect.NavigateBack)
             }
@@ -88,6 +97,18 @@ class DeckDetailViewModel(
             is DeckDetailIntent.ClickCard -> {
                 postSideEffect(DeckDetailSideEffect.NavigateToCardDetail(cardId = intent.cardId))
             }
+        }
+    }
+
+    private suspend fun initialize() {
+        reduce { copy(isLoading = true) }
+        val cards =
+            cardRepository
+                .getCards(deckId = currentState.deck.id)
+                .map { CardItem.toUiModel(it) }
+                .toImmutableList()
+        reduce {
+            copy(isLoading = false, deckCardList = cards)
         }
     }
 }

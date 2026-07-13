@@ -12,6 +12,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.whatever.caro.core.designsystem.themes.CaroTheme
+import com.whatever.caro.core.model.deck.Deck
+import com.whatever.caro.core.model.deck.DeckState
 import com.whatever.caro.feature.deck.detail.components.DeckDetailGuid
 import com.whatever.caro.feature.deck.detail.components.DeckDetailTopBar
 import com.whatever.caro.feature.deck.detail.components.DeckEditBottomSheet
@@ -129,7 +131,18 @@ internal fun DeckDetailScreen(
 private fun DeckDetailScreenPreview() {
     CaroTheme {
         DeckDetailScreen(
-            state = DeckDetailState(),
+            state =
+                DeckDetailState(
+                    Deck(
+                        id = 1,
+                        title = "Android",
+                        description = "기초 학습",
+                        cardTotalCount = 100,
+                        todayLearningCount = 10,
+                        todayCompleteCount = 0,
+                        state = DeckState.NOT_STARTED,
+                    ),
+                ),
             onIntent = { },
         )
     }

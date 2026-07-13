@@ -6,10 +6,14 @@ import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.whatever.caro.core.navigator.contract.NavCommand
 import com.whatever.caro.core.navigator.dispatcher.NavigationDispatcher
+import com.whatever.caro.core.navigator.entries.AllLearningEntry
+import com.whatever.caro.core.navigator.entries.CreateCardEntry
+import com.whatever.caro.core.navigator.entries.DailyLearningEntry
 import com.whatever.caro.core.navigator.entries.DeleteCardsEntry
 import com.whatever.caro.core.navigator.entries.EditDeckEntry
 import com.whatever.caro.feature.deck.detail.DeckDetailScreen
 import com.whatever.caro.feature.deck.detail.DeckDetailViewModel
+import com.whatever.caro.feature.deck.detail.mvi.DeckDetailIntent
 import com.whatever.caro.feature.deck.detail.mvi.DeckDetailSideEffect
 
 @Composable
@@ -20,6 +24,7 @@ fun DeckDetailRoute(
     val state by viewModel.state.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
+        viewModel.intent(DeckDetailIntent.Initialize)
         viewModel.sideEffect.collect { sideEffect ->
             when (sideEffect) {
                 DeckDetailSideEffect.NavigateBack -> {
@@ -27,15 +32,23 @@ fun DeckDetailRoute(
                 }
 
                 is DeckDetailSideEffect.NavigateToCreateCard -> {
-                    // TODO: 카드 생성 화면 구현 후 sideEffect.deckId 를 사용해 이동 로직을 연결합니다.
+                    navDispatcher.emit(
+                        NavCommand.To(
+                            CreateCardEntry(
+                                CreateCardEntry.Payload(
+                                    sideEffect.deckId,
+                                ),
+                            ),
+                        ),
+                    )
                 }
 
                 is DeckDetailSideEffect.NavigateToAllStudy -> {
-                    // TODO: 전체 학습 화면 구현 후 sideEffect.deckId 를 사용해 이동 로직을 연결합니다.
+                    navDispatcher.emit(NavCommand.To(AllLearningEntry(sideEffect.deckId)))
                 }
 
                 is DeckDetailSideEffect.NavigateToDailyStudy -> {
-                    // TODO: 일일 학습 화면 구현 후 sideEffect.deckId 를 사용해 이동 로직을 연결합니다.
+                    navDispatcher.emit(NavCommand.To(DailyLearningEntry(sideEffect.deckId)))
                 }
 
                 is DeckDetailSideEffect.NavigateToEditCardList -> {

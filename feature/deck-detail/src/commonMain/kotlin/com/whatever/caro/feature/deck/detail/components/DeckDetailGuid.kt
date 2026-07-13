@@ -28,6 +28,7 @@ import caromobile.core.designsystem.generated.resources.deck_detail_sub_title_em
 import caromobile.core.designsystem.generated.resources.deck_detail_title_empty_guid
 import caromobile.core.designsystem.generated.resources.ic_add_16
 import com.whatever.caro.core.designsystem.themes.CaroTheme
+import com.whatever.caro.core.ui.modifier.noRippleClickable
 import io.github.alexzhirkevich.compottie.Compottie
 import io.github.alexzhirkevich.compottie.LottieCompositionSpec
 import io.github.alexzhirkevich.compottie.rememberLottieComposition
@@ -106,7 +107,7 @@ internal fun DeckDetailGuid(
                         ).padding(
                             horizontal = CaroTheme.spacing.l,
                             vertical = CaroTheme.spacing.m,
-                        ),
+                        ).noRippleClickable(onAddFirstCard),
                 horizontalArrangement =
                     Arrangement.spacedBy(
                         space = CaroTheme.spacing.xs,
