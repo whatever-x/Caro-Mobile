@@ -1,5 +1,6 @@
 package com.whatever.caro.core.data.repository.card
 
+import com.whatever.caro.core.model.card.Card
 import com.whatever.caro.core.model.card.CardContent
 
 interface CardRepository {
@@ -7,4 +8,8 @@ interface CardRepository {
         deckId: Long,
         cards: List<CardContent>,
     )
+
+    suspend fun getCards(deckId: Long): List<Card>
+
+    suspend fun deleteCards(cardIds: List<Long>)
 }

@@ -90,6 +90,17 @@
 	<string name="card_button_add_more">Add another</string>
 	<string name="card_button_save">Save</string>
 	<string name="card_save_error">Failed to save cards. Please try again.</string>
+	<string name="card_title_edit">Edit Cards</string>
+	<string name="card_button_delete_selected">Delete selected</string>
+	<string name="card_button_cancel">Cancel</string>
+	<string name="card_text_select_all">Select all</string>
+	<string name="card_content_description_checkbox">Select card</string>
+	<string name="card_delete_dialog_title">Delete %1$d card(s)?</string>
+	<string name="card_delete_dialog_body">This cannot be undone.</string>
+	<string name="card_delete_dialog_button_delete">Delete</string>
+	<string name="card_delete_dialog_button_cancel">Cancel</string>
+	<string name="card_load_error">Failed to load cards. Please try again.</string>
+	<string name="card_delete_error">Failed to delete cards. Please try again.</string>
 	<!-- home -->
 	<string name="home_banner_title">Hello, %1$s!</string>
 	<string name="home_learning_days">Learning Streak: %1$d Days</string>
