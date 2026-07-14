@@ -1,14 +1,18 @@
 package com.whatever.caro.core.data.repository.study
 
-import com.whatever.caro.core.model.study.StudyRating
-import com.whatever.caro.core.model.study.StudySession
+import com.whatever.caro.core.model.learning.StudyCard
+import com.whatever.caro.core.model.learning.StudyEvaluation
+import com.whatever.caro.core.model.learning.StudyRating
+import com.whatever.caro.core.model.learning.StudySession
 import com.whatever.caro.core.remote.datasource.study.StudySessionDataSource
+import com.whatever.caro.core.remote.dto.studySession.request.EvaluatedCardRequest
 import com.whatever.caro.core.remote.dto.studySession.response.InProgress
 import com.whatever.caro.core.remote.dto.studySession.response.StudyCardItemDto
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
 import dev.mokkery.mock
+import dev.mokkery.verifySuspend
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 
@@ -35,13 +39,30 @@ class StudySessionRepositoryImplTest :
                     totalCardCount = 4,
                     cards =
                         listOf(
-                            com.whatever.caro.core.model.study
-                                .StudyCard(11L, "Run", "달리다"),
+                            StudyCard(11L, "Run", "달리다"),
                         ),
                 )
         }
 
         test("rating names match the API contract") {
             StudyRating.entries.map { it.name } shouldBe listOf("AGAIN", "FAIR", "EASY")
+        }
+
+        test("evaluation time is preserved in the API request") {
+            val source =
+                mock<StudySessionDataSource> {
+                    everySuspend { evaluate(any(), any(), any()) } returns Unit
+                }
+            val repository = StudySessionRepositoryImpl(source, idempotencyKey = { "key" })
+
+            repository.submit(7L, listOf(StudyEvaluation(11L, StudyRating.EASY, 1_200)))
+
+            verifySuspend {
+                source.evaluate(
+                    7L,
+                    "key",
+                    listOf(EvaluatedCardRequest(11L, EvaluatedCardRequest.RatingDto.EASY, 1_200)),
+                )
+            }
         }
     })

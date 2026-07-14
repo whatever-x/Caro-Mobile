@@ -1,7 +1,7 @@
 package com.whatever.caro.core.data.repository.study
 
-import com.whatever.caro.core.model.study.StudyEvaluation
-import com.whatever.caro.core.model.study.StudySession
+import com.whatever.caro.core.model.learning.StudyEvaluation
+import com.whatever.caro.core.model.learning.StudySession
 import com.whatever.caro.core.remote.datasource.study.StudySessionDataSource
 import com.whatever.caro.core.remote.dto.studySession.request.EvaluatedCardRequest
 import kotlin.uuid.ExperimentalUuidApi

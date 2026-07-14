@@ -12,7 +12,7 @@ val learningModule =
                 mode = params[1],
                 repository = get(),
                 cardRepository = get(),
-                exceptionFilter = get()
+                exceptionFilter = get(),
             )
         }
     }

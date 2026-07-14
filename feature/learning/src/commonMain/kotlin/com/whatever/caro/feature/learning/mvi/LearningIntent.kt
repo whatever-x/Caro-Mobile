@@ -1,6 +1,6 @@
 package com.whatever.caro.feature.learning.mvi
 
-import com.whatever.caro.core.model.study.StudyRating
+import com.whatever.caro.core.model.learning.StudyRating
 import com.whatever.caro.core.viewmodel.contract.UiIntent
 
 sealed interface LearningIntent : UiIntent {
@@ -10,7 +10,6 @@ sealed interface LearningIntent : UiIntent {
 
     data class Evaluate(
         val rating: StudyRating,
-        val timeMs: Int = 0,
     ) : LearningIntent
 
     data object RequestStop : LearningIntent

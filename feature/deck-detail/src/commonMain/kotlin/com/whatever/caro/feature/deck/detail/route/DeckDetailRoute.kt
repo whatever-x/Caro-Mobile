@@ -7,9 +7,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.whatever.caro.core.navigator.contract.NavCommand
 import com.whatever.caro.core.navigator.dispatcher.NavigationDispatcher
 import com.whatever.caro.core.navigator.entries.CreateCardEntry
-import com.whatever.caro.core.navigator.entries.LearningEntry
 import com.whatever.caro.core.navigator.entries.DeleteCardsEntry
 import com.whatever.caro.core.navigator.entries.EditDeckEntry
+import com.whatever.caro.core.navigator.entries.LearningEntry
 import com.whatever.caro.feature.deck.detail.DeckDetailScreen
 import com.whatever.caro.feature.deck.detail.DeckDetailViewModel
 import com.whatever.caro.feature.deck.detail.mvi.DeckDetailIntent
@@ -47,9 +47,9 @@ fun DeckDetailRoute(
                         NavCommand.To(
                             LearningEntry(
                                 deckId = sideEffect.deckId,
-                                mode = sideEffect.mode
-                            )
-                        )
+                                mode = sideEffect.mode,
+                            ),
+                        ),
                     )
                 }
 

@@ -1,6 +1,6 @@
 package com.whatever.caro.feature.learning.mapper
 
-import com.whatever.caro.core.model.study.StudyRating
+import com.whatever.caro.core.model.learning.StudyRating
 import com.whatever.caro.core.ui.swipe.SwipeDirection
 
 internal fun SwipeDirection.toRating(): StudyRating =

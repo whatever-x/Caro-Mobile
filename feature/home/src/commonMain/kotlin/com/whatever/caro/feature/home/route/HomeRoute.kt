@@ -35,12 +35,14 @@ fun HomeRoute(
             when (sideEffect) {
                 is HomeSideEffect.NavigateToDailyLearning -> {
                     navDispatcher.emit(
-                        command = To(
-                            key = LearningEntry(
-                                deckId = sideEffect.deckId,
-                                mode = LearningMode.DAILY
-                            )
-                        )
+                        command =
+                            To(
+                                key =
+                                    LearningEntry(
+                                        deckId = sideEffect.deckId,
+                                        mode = LearningMode.DAILY,
+                                    ),
+                            ),
                     )
                 }
 

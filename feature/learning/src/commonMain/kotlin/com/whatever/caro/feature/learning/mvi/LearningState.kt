@@ -1,10 +1,12 @@
 package com.whatever.caro.feature.learning.mvi
 
-import com.whatever.caro.core.model.study.StudyCard
-import com.whatever.caro.core.model.study.StudyEvaluation
+import com.whatever.caro.core.model.learning.LearningMode
+import com.whatever.caro.core.model.learning.StudyCard
+import com.whatever.caro.core.model.learning.StudyEvaluation
 import com.whatever.caro.core.viewmodel.contract.UiState
 
 data class LearningState(
+    val mode: LearningMode = LearningMode.ALL,
     val isLoading: Boolean = true,
     val isSubmitting: Boolean = false,
     val sessionId: Long = 0,

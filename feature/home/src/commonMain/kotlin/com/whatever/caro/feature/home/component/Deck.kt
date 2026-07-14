@@ -53,7 +53,7 @@ internal fun Deck(
     todayLearningPercentage: Int,
     state: DeckState,
     onDeckClick: () -> Unit,
-    onStartLearningClick : () -> Unit,
+    onStartLearningClick: () -> Unit,
 ) {
     val progressSpace =
         when (state) {
@@ -69,8 +69,11 @@ internal fun Deck(
                 .clip(shape = CaroTheme.shape.xl)
                 .noRippleClickable(onClick = onDeckClick)
                 .background(color = CaroTheme.color.surface.primary)
-                .border(width = 1.dp, color = CaroTheme.color.border.secondary)
-                .padding(vertical = CaroTheme.spacing.xl, horizontal = CaroTheme.spacing.xl2),
+                .border(
+                    width = 1.dp,
+                    color = CaroTheme.color.border.secondary,
+                    shape = CaroTheme.shape.xl,
+                ).padding(vertical = CaroTheme.spacing.xl, horizontal = CaroTheme.spacing.xl2),
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -303,7 +306,7 @@ private fun NotStartedDeckItemPreview() {
             todayLearningPercentage = 0,
             state = DeckState.NOT_STARTED,
             onDeckClick = {},
-            onStartLearningClick = {}
+            onStartLearningClick = {},
         )
     }
 }
@@ -319,7 +322,7 @@ private fun LearningDeckItemPreview() {
             todayLearningPercentage = 70,
             state = DeckState.LEARNING,
             onDeckClick = {},
-            onStartLearningClick = {}
+            onStartLearningClick = {},
         )
     }
 }
@@ -335,7 +338,7 @@ private fun CompleteDeckItemPreview() {
             todayLearningPercentage = 100,
             state = DeckState.COMPLETE,
             onDeckClick = {},
-            onStartLearningClick = {}
+            onStartLearningClick = {},
         )
     }
 }
@@ -351,7 +354,7 @@ private fun RestDeckItemPreview() {
             todayLearningPercentage = 0,
             state = DeckState.REST_DAY,
             onDeckClick = {},
-            onStartLearningClick = {}
+            onStartLearningClick = {},
         )
     }
 }

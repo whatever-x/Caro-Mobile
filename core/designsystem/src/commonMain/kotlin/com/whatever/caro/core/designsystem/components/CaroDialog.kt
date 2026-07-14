@@ -74,7 +74,7 @@ private fun CaroDialogContent(
                 .background(
                     color = CaroTheme.color.surface.primary,
                     shape = CaroTheme.shape.l,
-                ).padding(CaroTheme.spacing.xl2),
+                ).padding(CaroTheme.spacing.xl),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         title?.let { titleContent ->

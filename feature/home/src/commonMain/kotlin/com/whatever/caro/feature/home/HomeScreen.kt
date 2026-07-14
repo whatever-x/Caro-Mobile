@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -110,7 +111,7 @@ internal fun HomeScreen(
                                 .fillMaxWidth()
                                 .background(color = CaroTheme.color.background.brand)
                                 .padding(horizontal = CaroTheme.spacing.xl2)
-                                .padding(bottom = 24.dp),
+                                .padding(bottom = CaroTheme.spacing.xl2),
                     ) {
                         Column(
                             modifier = Modifier.weight(1f),
@@ -161,33 +162,36 @@ internal fun HomeScreen(
                     }
                 }
 
-                items(
+                itemsIndexed(
                     items = state.decks,
-                    key = { deck -> deck.id },
-                ) {
+                    key = { _, deck -> deck.id },
+                ) { index, deck ->
                     Spacer(modifier = Modifier.size(size = CaroTheme.spacing.m))
                     Deck(
                         modifier = Modifier.padding(horizontal = CaroTheme.spacing.xl2),
-                        title = it.title,
-                        description = it.description,
-                        cardTotalCount = it.cardTotalCount,
-                        todayLearningPercentage = it.todayProgress,
-                        state = it.state,
+                        title = deck.title,
+                        description = deck.description,
+                        cardTotalCount = deck.cardTotalCount,
+                        todayLearningPercentage = deck.todayProgress,
+                        state = deck.state,
                         onDeckClick = {
                             onIntent(
                                 HomeIntent.ClickDeckButton(
-                                    deck = it,
+                                    deck = deck,
                                 ),
                             )
                         },
                         onStartLearningClick = {
                             onIntent(
                                 HomeIntent.ClickStartLearning(
-                                    deckId = it.id,
+                                    deckId = deck.id,
                                 ),
                             )
-                        }
+                        },
                     )
+                    if (index == state.decks.lastIndex) {
+                        Spacer(modifier = Modifier.size(size = CaroTheme.spacing.l))
+                    }
                 }
             }
         }

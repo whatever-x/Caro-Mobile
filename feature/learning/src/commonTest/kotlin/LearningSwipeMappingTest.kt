@@ -1,4 +1,4 @@
-import com.whatever.caro.core.model.study.StudyRating
+import com.whatever.caro.core.model.learning.StudyRating
 import com.whatever.caro.core.ui.swipe.SwipeDirection
 import com.whatever.caro.feature.learning.mapper.toRating
 import com.whatever.caro.feature.learning.mapper.toSwipeDirection

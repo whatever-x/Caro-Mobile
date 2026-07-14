@@ -1,7 +1,7 @@
 package com.whatever.caro.core.data.repository.study
 
-import com.whatever.caro.core.model.study.StudyEvaluation
-import com.whatever.caro.core.model.study.StudySession
+import com.whatever.caro.core.model.learning.StudyEvaluation
+import com.whatever.caro.core.model.learning.StudySession
 
 interface StudySessionRepository {
     suspend fun startDaily(deckId: Long): StudySession

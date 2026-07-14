@@ -1,4 +1,4 @@
-package com.whatever.caro.core.model.study
+package com.whatever.caro.core.model.learning
 
 sealed interface StudySession {
     data class InProgress(
@@ -16,16 +16,7 @@ sealed interface StudySession {
     data object RestDay : StudySession
 }
 
-data class StudyCard(
-    val id: Long,
-    val front: String,
-    val back: String,
-)
 
-data class StudyEvaluation(
-    val cardId: Long,
-    val rating: StudyRating,
-    val timeMs: Int,
-)
 
-enum class StudyRating { AGAIN, FAIR, EASY }
+
+

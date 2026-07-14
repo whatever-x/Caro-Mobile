@@ -1,7 +1,7 @@
 package com.whatever.caro.core.data.repository.study
 
-import com.whatever.caro.core.model.study.StudyCard
-import com.whatever.caro.core.model.study.StudySession
+import com.whatever.caro.core.model.learning.StudyCard
+import com.whatever.caro.core.model.learning.StudySession
 import com.whatever.caro.core.remote.dto.studySession.response.Completed
 import com.whatever.caro.core.remote.dto.studySession.response.DailyStudyResponse
 import com.whatever.caro.core.remote.dto.studySession.response.InProgress

@@ -7,5 +7,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class LearningEntry(
     val deckId: Long,
-    val mode : LearningMode,
+    val mode: LearningMode,
 ) : NavKey

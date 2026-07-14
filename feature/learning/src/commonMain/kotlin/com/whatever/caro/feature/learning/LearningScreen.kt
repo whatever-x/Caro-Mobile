@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Text
@@ -23,6 +22,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -34,9 +34,10 @@ import caromobile.feature.learning.generated.resources.learning_rest
 import caromobile.feature.learning.generated.resources.learning_retry
 import caromobile.feature.learning.generated.resources.learning_swipe_instruction
 import com.whatever.caro.core.designsystem.themes.CaroTheme
-import com.whatever.caro.core.model.study.StudyCard
-import com.whatever.caro.core.model.study.StudyEvaluation
-import com.whatever.caro.core.model.study.StudyRating
+import com.whatever.caro.core.model.learning.LearningMode
+import com.whatever.caro.core.model.learning.StudyCard
+import com.whatever.caro.core.model.learning.StudyEvaluation
+import com.whatever.caro.core.model.learning.StudyRating
 import com.whatever.caro.core.ui.modifier.swipeGesture
 import com.whatever.caro.core.ui.swipe.SwipeDirection
 import com.whatever.caro.core.ui.swipe.SwipeGestureConfig
@@ -50,6 +51,7 @@ import com.whatever.caro.feature.learning.mapper.toRating
 import com.whatever.caro.feature.learning.mapper.toSwipeDirection
 import com.whatever.caro.feature.learning.mvi.LearningIntent
 import com.whatever.caro.feature.learning.mvi.LearningState
+import kotlinx.coroutines.withTimeoutOrNull
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -90,6 +92,8 @@ fun LearningScreen(
 
     if (state.showStopDialog) {
         LearningStopDialog(
+            evaluatedCount = state.progress.takeIf { state.mode == LearningMode.DAILY },
+            totalCount = state.totalCount,
             onDismiss = { onIntent(LearningIntent.DismissStop) },
             onConfirm = { onIntent(LearningIntent.ConfirmStop) },
         )
@@ -110,9 +114,9 @@ private fun LearningContent(
         )
         LinearProgressIndicator(
             progress = { ((state.progress + 1).toFloat() / state.totalCount.coerceAtLeast(1)).coerceIn(0f, 1f) },
-            modifier = Modifier.fillMaxWidth().height(5.dp),
-            color = CaroTheme.color.surface.brand,
-            trackColor = CaroTheme.color.surface.tertiary,
+            modifier = Modifier.fillMaxWidth().height(LearningProgressHeight),
+            color = LearningProgressFillColor,
+            trackColor = LearningProgressTrackColor,
         )
         key(card.id) {
             val swipeState = rememberSwipeGestureState()
@@ -122,15 +126,20 @@ private fun LearningContent(
 
             LaunchedEffect(pendingRating) {
                 val rating = pendingRating ?: return@LaunchedEffect
-                swipeState.animateTo(
-                    targetOffset = rating.toSwipeDirection().exitOffset,
-                    animationSpec = SwipeGestureConfig.Default.exitAnimationSpec,
+                runEvaluationTransition(
+                    rating = rating,
+                    animate = {
+                        swipeState.animateTo(
+                            targetOffset = rating.toSwipeDirection().exitOffset,
+                            animationSpec = SwipeGestureConfig.Default.exitAnimationSpec,
+                        )
+                    },
+                    onEvaluate = { onIntent(LearningIntent.Evaluate(it)) },
                 )
-                onIntent(LearningIntent.Evaluate(rating))
             }
 
             Box(
-                modifier = Modifier.weight(1f).fillMaxWidth().padding(20.dp),
+                modifier = Modifier.weight(1f).fillMaxWidth().padding(CaroTheme.spacing.xl),
                 contentAlignment = Alignment.Center,
             ) {
                 LearningCard(
@@ -163,12 +172,26 @@ private fun LearningContent(
                 stringResource(
                     if (state.isFlipped) Res.string.learning_swipe_instruction else Res.string.learning_front_instruction,
                 ),
-            modifier = Modifier.fillMaxWidth().height(44.dp).padding(top = 12.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .height(LearningInstructionHeight)
+                    .padding(top = CaroTheme.spacing.m),
             style = CaroTheme.typography.body3,
             color = CaroTheme.color.text.primary,
             textAlign = TextAlign.Center,
         )
     }
+}
+
+internal suspend fun runEvaluationTransition(
+    rating: StudyRating,
+    animate: suspend () -> Unit,
+    onEvaluate: (StudyRating) -> Unit,
+    timeoutMillis: Long = EVALUATION_ANIMATION_TIMEOUT_MILLIS,
+) {
+    withTimeoutOrNull(timeoutMillis) { animate() }
+    onEvaluate(rating)
 }
 
 @Composable
@@ -210,9 +233,17 @@ private val SwipeDirection.exitOffset: Offset
             SwipeDirection.RIGHT -> Offset(x = 1_200f, y = 0f)
         }
 
+private const val EVALUATION_ANIMATION_TIMEOUT_MILLIS = 500L
+
 @Composable
 private fun LoadingContent() {
-    Box(Modifier.fillMaxSize().background(CaroTheme.color.background.primary), contentAlignment = Alignment.Center) {
+    Box(
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .background(CaroTheme.color.background.primary),
+        contentAlignment = Alignment.Center,
+    ) {
         CircularProgressIndicator(color = CaroTheme.color.icon.primary)
     }
 }
@@ -224,7 +255,10 @@ private fun LearningMessage(
     onClick: () -> Unit,
 ) {
     Box(
-        Modifier.fillMaxSize().background(CaroTheme.color.background.primary).padding(24.dp),
+        Modifier
+            .fillMaxSize()
+            .background(CaroTheme.color.background.primary)
+            .padding(CaroTheme.spacing.xl2),
         contentAlignment = Alignment.Center,
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -234,13 +268,13 @@ private fun LearningMessage(
                 color = CaroTheme.color.text.primary,
                 textAlign = TextAlign.Center,
             )
-            Spacer(Modifier.height(24.dp))
+            Spacer(Modifier.height(CaroTheme.spacing.xl2))
             Box(
                 modifier =
                     Modifier
                         .fillMaxWidth()
-                        .height(52.dp)
-                        .background(CaroTheme.color.surface.brand, CaroTheme.shape.xl)
+                        .height(LearningMessageActionHeight)
+                        .background(CaroTheme.color.surface.brand, CaroTheme.shape.xxl)
                         .clickable(onClick = onClick),
                 contentAlignment = Alignment.Center,
             ) {
@@ -249,6 +283,12 @@ private fun LearningMessage(
         }
     }
 }
+
+private val LearningProgressHeight = 5.dp
+private val LearningProgressFillColor = Color(0xFF7DB4FF)
+private val LearningProgressTrackColor = Color(0xFFEFF4F8)
+private val LearningInstructionHeight = 44.dp
+private val LearningMessageActionHeight = 52.dp
 
 private val learningPreviewState =
     LearningState(

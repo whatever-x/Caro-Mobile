@@ -3,14 +3,16 @@ package com.whatever.caro.feature.learning
 import com.whatever.caro.core.data.repository.card.CardRepository
 import com.whatever.caro.core.data.repository.study.StudySessionRepository
 import com.whatever.caro.core.model.learning.LearningMode
-import com.whatever.caro.core.model.study.StudyCard
-import com.whatever.caro.core.model.study.StudyEvaluation
-import com.whatever.caro.core.model.study.StudySession
+import com.whatever.caro.core.model.learning.StudyCard
+import com.whatever.caro.core.model.learning.StudyEvaluation
+import com.whatever.caro.core.model.learning.StudySession
 import com.whatever.caro.core.viewmodel.BaseViewModel
 import com.whatever.caro.core.viewmodel.ExceptionFilter
 import com.whatever.caro.feature.learning.mvi.LearningIntent
 import com.whatever.caro.feature.learning.mvi.LearningSideEffect
 import com.whatever.caro.feature.learning.mvi.LearningState
+import kotlin.time.TimeMark
+import kotlin.time.TimeSource
 
 class LearningViewModel(
     private val deckId: Long,
@@ -18,7 +20,9 @@ class LearningViewModel(
     private val repository: StudySessionRepository,
     private val cardRepository: CardRepository,
     exceptionFilter: ExceptionFilter,
-) : BaseViewModel<LearningState, LearningIntent, LearningSideEffect>(LearningState(), exceptionFilter) {
+    private val timeSource: TimeSource = TimeSource.Monotonic,
+) : BaseViewModel<LearningState, LearningIntent, LearningSideEffect>(LearningState(mode = mode), exceptionFilter) {
+    private var cardStartedAt: TimeMark? = null
 
     override suspend fun handleIntent(intent: LearningIntent) {
         when (intent) {
@@ -44,6 +48,7 @@ class LearningViewModel(
         if (mode == LearningMode.ALL) {
             val cards = cardRepository.getCards(deckId).map { StudyCard(it.id, it.content.front, it.content.back) }
             reduce { copy(isLoading = false, totalCount = cards.size, cards = cards, isCompleted = cards.isEmpty()) }
+            startCardTimer()
             return
         }
         when (val session = repository.startDaily(deckId)) {
@@ -57,6 +62,7 @@ class LearningViewModel(
                         cards = session.cards,
                     )
                 }
+                startCardTimer()
             }
 
             is StudySession.Completed -> {
@@ -71,7 +77,7 @@ class LearningViewModel(
 
     private suspend fun evaluate(intent: LearningIntent.Evaluate) {
         val card = currentState.currentCard ?: return
-        val all = currentState.evaluations + StudyEvaluation(card.id, intent.rating, intent.timeMs)
+        val all = currentState.evaluations + StudyEvaluation(card.id, intent.rating, elapsedCardTimeMs())
         if (currentState.index == currentState.cards.lastIndex) {
             if (mode == LearningMode.ALL) {
                 reduce { copy(evaluations = all, isCompleted = true) }
@@ -82,8 +88,21 @@ class LearningViewModel(
             }
         } else {
             reduce { copy(index = index + 1, isFlipped = false, evaluations = all) }
+            startCardTimer()
         }
     }
+
+    private fun startCardTimer() {
+        cardStartedAt = currentState.currentCard?.let { timeSource.markNow() }
+    }
+
+    private fun elapsedCardTimeMs(): Int =
+        cardStartedAt
+            ?.elapsedNow()
+            ?.inWholeMilliseconds
+            ?.coerceIn(0L, Int.MAX_VALUE.toLong())
+            ?.toInt()
+            ?: 0
 
     override fun handleClientException(throwable: Throwable) {
         reduce { copy(isLoading = false, isSubmitting = false, errorMessage = throwable.message ?: "학습 정보를 불러오지 못했어요") }
