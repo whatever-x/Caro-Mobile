@@ -6,9 +6,8 @@ import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.whatever.caro.core.navigator.contract.NavCommand
 import com.whatever.caro.core.navigator.dispatcher.NavigationDispatcher
-import com.whatever.caro.core.navigator.entries.AllLearningEntry
 import com.whatever.caro.core.navigator.entries.CreateCardEntry
-import com.whatever.caro.core.navigator.entries.DailyLearningEntry
+import com.whatever.caro.core.navigator.entries.LearningEntry
 import com.whatever.caro.core.navigator.entries.DeleteCardsEntry
 import com.whatever.caro.core.navigator.entries.EditDeckEntry
 import com.whatever.caro.feature.deck.detail.DeckDetailScreen
@@ -43,12 +42,15 @@ fun DeckDetailRoute(
                     )
                 }
 
-                is DeckDetailSideEffect.NavigateToAllStudy -> {
-                    navDispatcher.emit(NavCommand.To(AllLearningEntry(sideEffect.deckId)))
-                }
-
-                is DeckDetailSideEffect.NavigateToDailyStudy -> {
-                    navDispatcher.emit(NavCommand.To(DailyLearningEntry(sideEffect.deckId)))
+                is DeckDetailSideEffect.NavigateToLearning -> {
+                    navDispatcher.emit(
+                        NavCommand.To(
+                            LearningEntry(
+                                deckId = sideEffect.deckId,
+                                mode = sideEffect.mode
+                            )
+                        )
+                    )
                 }
 
                 is DeckDetailSideEffect.NavigateToEditCardList -> {

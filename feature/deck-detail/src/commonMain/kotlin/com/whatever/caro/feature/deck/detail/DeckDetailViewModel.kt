@@ -1,8 +1,8 @@
 package com.whatever.caro.feature.deck.detail
 
 import com.whatever.caro.core.data.repository.card.CardRepository
-import com.whatever.caro.core.data.repository.deck.DeckRepository
 import com.whatever.caro.core.model.deck.Deck
+import com.whatever.caro.core.model.learning.LearningMode
 import com.whatever.caro.core.viewmodel.BaseViewModel
 import com.whatever.caro.core.viewmodel.ExceptionFilter
 import com.whatever.caro.feature.deck.detail.model.CardItem
@@ -37,11 +37,11 @@ class DeckDetailViewModel(
             }
 
             DeckDetailIntent.ClickAllStudy -> {
-                postSideEffect(DeckDetailSideEffect.NavigateToAllStudy(deckId = currentState.deck.id))
+                postSideEffect(DeckDetailSideEffect.NavigateToLearning(deckId = currentState.deck.id, mode = LearningMode.ALL))
             }
 
             DeckDetailIntent.ClickDailyStudy -> {
-                postSideEffect(DeckDetailSideEffect.NavigateToDailyStudy(deckId = currentState.deck.id))
+                postSideEffect(DeckDetailSideEffect.NavigateToLearning(deckId = currentState.deck.id, mode = LearningMode.DAILY))
             }
 
             DeckDetailIntent.ClickSortCardList -> {

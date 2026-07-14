@@ -26,6 +26,10 @@ class HomeViewModel(
                 initialize()
             }
 
+            is HomeIntent.ClickStartLearning -> {
+                postSideEffect(HomeSideEffect.NavigateToDailyLearning(deckId = intent.deckId))
+            }
+
             HomeIntent.ClickCreateDeckButton -> {
                 postSideEffect(
                     HomeSideEffect.NavigateToCreateDeck,

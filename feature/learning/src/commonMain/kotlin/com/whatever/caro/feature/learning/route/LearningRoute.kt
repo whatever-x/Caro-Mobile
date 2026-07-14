@@ -26,7 +26,12 @@ fun LearningRoute(
         onBackCompleted = { viewModel.intent(LearningIntent.RequestStop) },
     )
     LaunchedEffect(Unit) {
-        viewModel.sideEffect.collect { if (it == LearningSideEffect.NavigateBack) navDispatcher.emit(NavCommand.Back) }
+        viewModel.intent(LearningIntent.Load)
+        viewModel.sideEffect.collect {
+            when (it) {
+                LearningSideEffect.NavigateBack -> navDispatcher.emit(NavCommand.Back)
+            }
+        }
     }
     LearningScreen(state, viewModel::intent)
 }

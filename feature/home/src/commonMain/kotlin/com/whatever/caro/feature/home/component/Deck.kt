@@ -53,6 +53,7 @@ internal fun Deck(
     todayLearningPercentage: Int,
     state: DeckState,
     onDeckClick: () -> Unit,
+    onStartLearningClick : () -> Unit,
 ) {
     val progressSpace =
         when (state) {
@@ -131,7 +132,7 @@ internal fun Deck(
             }
             CtaButton(
                 state = state,
-                onClick = onDeckClick,
+                onClick = onStartLearningClick,
             )
         }
     }
@@ -302,6 +303,7 @@ private fun NotStartedDeckItemPreview() {
             todayLearningPercentage = 0,
             state = DeckState.NOT_STARTED,
             onDeckClick = {},
+            onStartLearningClick = {}
         )
     }
 }
@@ -317,6 +319,7 @@ private fun LearningDeckItemPreview() {
             todayLearningPercentage = 70,
             state = DeckState.LEARNING,
             onDeckClick = {},
+            onStartLearningClick = {}
         )
     }
 }
@@ -332,6 +335,7 @@ private fun CompleteDeckItemPreview() {
             todayLearningPercentage = 100,
             state = DeckState.COMPLETE,
             onDeckClick = {},
+            onStartLearningClick = {}
         )
     }
 }
@@ -347,6 +351,7 @@ private fun RestDeckItemPreview() {
             todayLearningPercentage = 0,
             state = DeckState.REST_DAY,
             onDeckClick = {},
+            onStartLearningClick = {}
         )
     }
 }

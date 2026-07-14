@@ -2,12 +2,12 @@ package com.whatever.caro.feature.learning
 
 import com.whatever.caro.core.data.repository.card.CardRepository
 import com.whatever.caro.core.data.repository.study.StudySessionRepository
+import com.whatever.caro.core.model.learning.LearningMode
 import com.whatever.caro.core.model.study.StudyCard
 import com.whatever.caro.core.model.study.StudyEvaluation
 import com.whatever.caro.core.model.study.StudySession
 import com.whatever.caro.core.viewmodel.BaseViewModel
 import com.whatever.caro.core.viewmodel.ExceptionFilter
-import com.whatever.caro.feature.learning.model.LearningMode
 import com.whatever.caro.feature.learning.mvi.LearningIntent
 import com.whatever.caro.feature.learning.mvi.LearningSideEffect
 import com.whatever.caro.feature.learning.mvi.LearningState
@@ -19,9 +19,6 @@ class LearningViewModel(
     private val cardRepository: CardRepository,
     exceptionFilter: ExceptionFilter,
 ) : BaseViewModel<LearningState, LearningIntent, LearningSideEffect>(LearningState(), exceptionFilter) {
-    init {
-        intent(LearningIntent.Load)
-    }
 
     override suspend fun handleIntent(intent: LearningIntent) {
         when (intent) {

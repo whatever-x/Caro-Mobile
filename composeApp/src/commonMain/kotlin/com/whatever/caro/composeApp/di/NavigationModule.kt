@@ -1,15 +1,14 @@
 package com.whatever.caro.composeApp.di
 
-import com.whatever.caro.core.navigator.entries.AllLearningEntry
 import com.whatever.caro.core.navigator.entries.CreateCardEntry
 import com.whatever.caro.core.navigator.entries.CreateDeckEntry
 import com.whatever.caro.core.navigator.entries.CreateProfileEntry
-import com.whatever.caro.core.navigator.entries.DailyLearningEntry
 import com.whatever.caro.core.navigator.entries.DeckDetailEntry
 import com.whatever.caro.core.navigator.entries.DeleteCardsEntry
 import com.whatever.caro.core.navigator.entries.EditDeckEntry
 import com.whatever.caro.core.navigator.entries.EditProfileEntry
 import com.whatever.caro.core.navigator.entries.HomeEntry
+import com.whatever.caro.core.navigator.entries.LearningEntry
 import com.whatever.caro.core.navigator.entries.LoginEntry
 import com.whatever.caro.core.navigator.entries.SettingEntry
 import com.whatever.caro.core.navigator.entries.SplashEntry
@@ -25,7 +24,6 @@ import com.whatever.caro.feature.deck.edit.EditDeckViewModel
 import com.whatever.caro.feature.home.HomeViewModel
 import com.whatever.caro.feature.home.route.HomeRoute
 import com.whatever.caro.feature.learning.LearningViewModel
-import com.whatever.caro.feature.learning.model.LearningMode
 import com.whatever.caro.feature.learning.route.LearningRoute
 import com.whatever.caro.feature.login.LoginRoute
 import com.whatever.caro.feature.profile.create.CreateProfileRoute
@@ -138,16 +136,9 @@ val navEntryModule: Module =
             )
         }
 
-        navigation<DailyLearningEntry> { navKey ->
+        navigation<LearningEntry> { navKey ->
             LearningRoute(
-                viewModel = koinViewModel<LearningViewModel> { parametersOf(navKey.deckId, LearningMode.DAILY) },
-                navDispatcher = get(),
-            )
-        }
-
-        navigation<AllLearningEntry> { navKey ->
-            LearningRoute(
-                viewModel = koinViewModel<LearningViewModel> { parametersOf(navKey.deckId, LearningMode.ALL) },
+                viewModel = koinViewModel<LearningViewModel> { parametersOf(navKey.deckId, navKey.mode) },
                 navDispatcher = get(),
             )
         }

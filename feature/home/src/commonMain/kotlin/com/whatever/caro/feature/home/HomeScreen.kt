@@ -180,6 +180,13 @@ internal fun HomeScreen(
                                 ),
                             )
                         },
+                        onStartLearningClick = {
+                            onIntent(
+                                HomeIntent.ClickStartLearning(
+                                    deckId = it.id,
+                                ),
+                            )
+                        }
                     )
                 }
             }
