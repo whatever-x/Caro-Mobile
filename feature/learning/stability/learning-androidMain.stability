@@ -36,7 +36,7 @@ private fun com.whatever.caro.feature.learning.LoadingContent(): kotlin.Unit
   params:
 
 @Composable
-private fun com.whatever.caro.feature.learning.components.CompletionStat(count: kotlin.Int, label: org.jetbrains.compose.resources.StringResource, backgroundColor: androidx.compose.ui.graphics.Color, contentColor: androidx.compose.ui.graphics.Color, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+private fun com.whatever.caro.feature.learning.components.CompletionStat(count: kotlin.Int, label: org.jetbrains.compose.resources.StringResource, backgroundColor: androidx.compose.ui.graphics.Color, contentColor: androidx.compose.ui.graphics.Color, isTotal: kotlin.Boolean, modifier: androidx.compose.ui.Modifier): kotlin.Unit
   skippable: true
   restartable: true
   params:
@@ -44,26 +44,29 @@ private fun com.whatever.caro.feature.learning.components.CompletionStat(count: 
     - label: STABLE (marked @Stable or @Immutable)
     - backgroundColor: STABLE (marked @Stable or @Immutable)
     - contentColor: STABLE (marked @Stable or @Immutable)
+    - isTotal: STABLE (primitive type)
     - modifier: STABLE (marked @Stable or @Immutable)
 
 @Composable
-private fun com.whatever.caro.feature.learning.components.DialogAction(text: kotlin.String, backgroundColor: androidx.compose.ui.graphics.Color, textColor: androidx.compose.ui.graphics.Color, onClick: kotlin.Function0<kotlin.Unit>): kotlin.Unit
+private fun com.whatever.caro.feature.learning.components.DialogAction(text: kotlin.String, backgroundColor: androidx.compose.ui.graphics.Color, textColor: androidx.compose.ui.graphics.Color, borderColor: androidx.compose.ui.graphics.Color?, onClick: kotlin.Function0<kotlin.Unit>): kotlin.Unit
   skippable: true
   restartable: true
   params:
     - text: STABLE (String is immutable)
     - backgroundColor: STABLE (marked @Stable or @Immutable)
     - textColor: STABLE (marked @Stable or @Immutable)
+    - borderColor: STABLE (marked @Stable or @Immutable)
     - onClick: STABLE (function type)
 
 @Composable
-private fun com.whatever.caro.feature.learning.components.EvaluationButton(label: org.jetbrains.compose.resources.StringResource, icon: org.jetbrains.compose.resources.DrawableResource, color: androidx.compose.ui.graphics.Color, enabled: kotlin.Boolean, onClick: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+private fun com.whatever.caro.feature.learning.components.EvaluationButton(label: org.jetbrains.compose.resources.StringResource, icon: org.jetbrains.compose.resources.DrawableResource, color: androidx.compose.ui.graphics.Color, selected: kotlin.Boolean, enabled: kotlin.Boolean, onClick: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
   skippable: true
   restartable: true
   params:
     - label: STABLE (marked @Stable or @Immutable)
     - icon: STABLE (marked @Stable or @Immutable)
     - color: STABLE (marked @Stable or @Immutable)
+    - selected: STABLE (primitive type)
     - enabled: STABLE (primitive type)
     - onClick: STABLE (function type)
     - modifier: STABLE (marked @Stable or @Immutable)
@@ -79,6 +82,23 @@ internal fun com.whatever.caro.feature.learning.components.LearningCard(frontTex
     - swipeColorArgb: STABLE (primitive type)
     - swipeProgress: STABLE (primitive type)
     - onFlip: STABLE (function type)
+    - modifier: STABLE (marked @Stable or @Immutable)
+
+@Composable
+internal fun com.whatever.caro.feature.learning.components.LearningCardFullTextDialog(text: kotlin.String, onDismissRequest: kotlin.Function0<kotlin.Unit>): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - text: STABLE (String is immutable)
+    - onDismissRequest: STABLE (function type)
+
+@Composable
+internal fun com.whatever.caro.feature.learning.components.LearningCardPrimaryText(text: kotlin.String, onShowMore: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - text: STABLE (String is immutable)
+    - onShowMore: STABLE (function type)
     - modifier: STABLE (marked @Stable or @Immutable)
 
 @Composable
@@ -104,10 +124,12 @@ internal fun com.whatever.caro.feature.learning.components.LearningEvaluationCon
     - onAgain: STABLE (function type)
 
 @Composable
-internal fun com.whatever.caro.feature.learning.components.LearningStopDialog(onDismiss: kotlin.Function0<kotlin.Unit>, onConfirm: kotlin.Function0<kotlin.Unit>): kotlin.Unit
+internal fun com.whatever.caro.feature.learning.components.LearningStopDialog(evaluatedCount: kotlin.Int?, totalCount: kotlin.Int, onDismiss: kotlin.Function0<kotlin.Unit>, onConfirm: kotlin.Function0<kotlin.Unit>): kotlin.Unit
   skippable: true
   restartable: true
   params:
+    - evaluatedCount: STABLE (class with no mutable properties)
+    - totalCount: STABLE (primitive type)
     - onDismiss: STABLE (function type)
     - onConfirm: STABLE (function type)
 
@@ -125,3 +147,4 @@ private fun com.whatever.caro.feature.learning.feedbackColorArgb(): kotlin.Int
   skippable: true
   restartable: true
   params:
+

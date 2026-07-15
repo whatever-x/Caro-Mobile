@@ -15,8 +15,3 @@ sealed interface StudySession {
 
     data object RestDay : StudySession
 }
-
-
-
-
-

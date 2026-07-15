@@ -137,7 +137,7 @@ internal fun LearningCard(
                         color = CaroTheme.color.text.disable,
                         textAlign = TextAlign.Center,
                         maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
+                        overflow = TextOverflow.Ellipsis,
                     )
                     Spacer(Modifier.height(CaroTheme.spacing.m))
                     Box(
@@ -413,11 +413,9 @@ internal fun LearningCompletion(
                             LearningCompletionBorderWidth,
                             CaroTheme.color.border.secondary,
                             CaroTheme.shape.m,
-                        ).padding(
-                            horizontal = CaroTheme.spacing.xl2,
-                            vertical = CaroTheme.spacing.xl,
-                        ),
+                        ).padding(horizontal = CaroTheme.spacing.xl2),
                 horizontalArrangement = Arrangement.spacedBy(CaroTheme.spacing.s),
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 CompletionStat(
                     count = total,
@@ -504,10 +502,9 @@ private fun CompletionStat(
     Column(
         modifier =
             modifier
-                .fillMaxSize()
+                .height(LearningCompletionStatHeight)
                 .clip(if (isTotal) CaroTheme.shape.m else CaroTheme.shape.l)
-                .background(backgroundColor)
-                .padding(CaroTheme.spacing.m),
+                .background(backgroundColor),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
@@ -521,6 +518,9 @@ private fun CompletionStat(
             text = stringResource(label),
             style = CaroTheme.typography.body2.semiBold,
             color = contentColor,
+            maxLines = 1,
+            softWrap = false,
+            overflow = TextOverflow.Ellipsis,
         )
     }
 }
@@ -538,6 +538,7 @@ private val LearningDialogBorderWidth = 1.dp
 private val LearningCompletionAssetSize = 70.dp
 private val LearningCompletionCheckIconSize = 36.dp
 private val LearningCompletionStatsHeight = 100.dp
+private val LearningCompletionStatHeight = 69.dp
 private val LearningCompletionBorderWidth = 1.dp
 
 @Preview(name = "Learning Card / Front", showBackground = true)
