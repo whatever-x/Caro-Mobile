@@ -27,12 +27,12 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import caromobile.feature.learning.generated.resources.Res
-import caromobile.feature.learning.generated.resources.learning_close
-import caromobile.feature.learning.generated.resources.learning_front_instruction
-import caromobile.feature.learning.generated.resources.learning_rest
-import caromobile.feature.learning.generated.resources.learning_retry
-import caromobile.feature.learning.generated.resources.learning_swipe_instruction
+import caromobile.core.designsystem.generated.resources.Res
+import caromobile.core.designsystem.generated.resources.learning_close
+import caromobile.core.designsystem.generated.resources.learning_dialog_submit_error
+import caromobile.core.designsystem.generated.resources.learning_front_instruction
+import caromobile.core.designsystem.generated.resources.learning_rest
+import caromobile.core.designsystem.generated.resources.learning_swipe_instruction
 import com.whatever.caro.core.designsystem.themes.CaroTheme
 import com.whatever.caro.core.model.learning.LearningMode
 import com.whatever.caro.core.model.learning.StudyCard
@@ -44,6 +44,7 @@ import com.whatever.caro.core.ui.swipe.SwipeGestureConfig
 import com.whatever.caro.core.ui.swipe.rememberSwipeGestureState
 import com.whatever.caro.feature.learning.components.LearningCard
 import com.whatever.caro.feature.learning.components.LearningCompletion
+import com.whatever.caro.feature.learning.components.LearningErrorDialog
 import com.whatever.caro.feature.learning.components.LearningEvaluationControls
 import com.whatever.caro.feature.learning.components.LearningStopDialog
 import com.whatever.caro.feature.learning.components.LearningTopBar
@@ -62,10 +63,6 @@ fun LearningScreen(
     when {
         state.isLoading -> {
             LoadingContent()
-        }
-
-        state.errorMessage != null -> {
-            LearningMessage(state.errorMessage, stringResource(Res.string.learning_retry)) { onIntent(LearningIntent.Load) }
         }
 
         state.isRestDay -> {
@@ -96,6 +93,13 @@ fun LearningScreen(
             totalCount = state.totalCount,
             onDismiss = { onIntent(LearningIntent.DismissStop) },
             onConfirm = { onIntent(LearningIntent.ConfirmStop) },
+        )
+    }
+
+    if (state.isShowErrorDialog) {
+        LearningErrorDialog(
+            message = state.errorMessage ?: stringResource(Res.string.learning_dialog_submit_error),
+            onConfirm = { onIntent(LearningIntent.ConfirmError) },
         )
     }
 }

@@ -30,8 +30,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import caromobile.feature.learning.generated.resources.Res
-import caromobile.feature.learning.generated.resources.learning_more
+import caromobile.core.designsystem.generated.resources.Res
+import caromobile.core.designsystem.generated.resources.learning_more
 import com.whatever.caro.core.designsystem.themes.CaroTheme
 import com.whatever.caro.core.model.learning.LearningPolicy
 import org.jetbrains.compose.resources.stringResource

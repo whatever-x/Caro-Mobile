@@ -18,5 +18,7 @@ sealed interface LearningIntent : UiIntent {
 
     data object ConfirmStop : LearningIntent
 
+    data object ConfirmError : LearningIntent
+
     data object Close : LearningIntent
 }

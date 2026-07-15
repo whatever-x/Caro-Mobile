@@ -33,25 +33,28 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.DialogProperties
+import caromobile.core.designsystem.generated.resources.Res
 import caromobile.core.designsystem.generated.resources.ic_arrow_left_24
 import caromobile.core.designsystem.generated.resources.ic_arrow_right_24
 import caromobile.core.designsystem.generated.resources.ic_arrow_up_24
 import caromobile.core.designsystem.generated.resources.ic_check_24
-import caromobile.feature.learning.generated.resources.Res
-import caromobile.feature.learning.generated.resources.learning_again
-import caromobile.feature.learning.generated.resources.learning_back
-import caromobile.feature.learning.generated.resources.learning_complete_title
-import caromobile.feature.learning.generated.resources.learning_continue
-import caromobile.feature.learning.generated.resources.learning_easy
-import caromobile.feature.learning.generated.resources.learning_evaluated_cards
-import caromobile.feature.learning.generated.resources.learning_fair
-import caromobile.feature.learning.generated.resources.learning_flip_back_hint
-import caromobile.feature.learning.generated.resources.learning_flip_hint
-import caromobile.feature.learning.generated.resources.learning_home
-import caromobile.feature.learning.generated.resources.learning_stop
-import caromobile.feature.learning.generated.resources.learning_stop_body
-import caromobile.feature.learning.generated.resources.learning_stop_title
-import caromobile.feature.learning.generated.resources.learning_total
+import caromobile.core.designsystem.generated.resources.learning_again
+import caromobile.core.designsystem.generated.resources.learning_back
+import caromobile.core.designsystem.generated.resources.learning_complete_title
+import caromobile.core.designsystem.generated.resources.learning_continue
+import caromobile.core.designsystem.generated.resources.learning_dialog_confirm
+import caromobile.core.designsystem.generated.resources.learning_dialog_title
+import caromobile.core.designsystem.generated.resources.learning_easy
+import caromobile.core.designsystem.generated.resources.learning_evaluated_cards
+import caromobile.core.designsystem.generated.resources.learning_fair
+import caromobile.core.designsystem.generated.resources.learning_flip_back_hint
+import caromobile.core.designsystem.generated.resources.learning_flip_hint
+import caromobile.core.designsystem.generated.resources.learning_home
+import caromobile.core.designsystem.generated.resources.learning_stop
+import caromobile.core.designsystem.generated.resources.learning_stop_body
+import caromobile.core.designsystem.generated.resources.learning_stop_title
+import caromobile.core.designsystem.generated.resources.learning_total
 import com.whatever.caro.core.designsystem.components.CaroDialog
 import com.whatever.caro.core.designsystem.themes.CaroTheme
 import com.whatever.caro.core.model.learning.LearningPolicy
@@ -321,6 +324,44 @@ internal fun LearningStopDialog(
                     backgroundColor = CaroTheme.color.surface.primary,
                     textColor = CaroTheme.color.text.brand,
                     borderColor = CaroTheme.color.border.primary,
+                    onClick = onConfirm,
+                )
+            }
+        },
+    )
+}
+
+@Composable
+internal fun LearningErrorDialog(
+    message: String,
+    onConfirm: () -> Unit,
+) {
+    CaroDialog(
+        onDismissRequest = {},
+        properties =
+            DialogProperties(
+                dismissOnBackPress = false,
+                dismissOnClickOutside = false,
+                usePlatformDefaultWidth = false,
+            ),
+        content = {
+            Column(Modifier.fillMaxWidth()) {
+                Text(
+                    text = stringResource(Res.string.learning_dialog_title),
+                    style = CaroTheme.typography.heading2,
+                    color = CaroTheme.color.text.primary,
+                )
+                Spacer(Modifier.height(CaroTheme.spacing.s))
+                Text(
+                    text = message,
+                    style = CaroTheme.typography.body3,
+                    color = CaroTheme.color.text.secondary,
+                )
+                Spacer(Modifier.height(CaroTheme.spacing.m))
+                DialogAction(
+                    text = stringResource(Res.string.learning_dialog_confirm),
+                    backgroundColor = CaroTheme.color.surface.brand,
+                    textColor = CaroTheme.color.text.inverse,
                     onClick = onConfirm,
                 )
             }

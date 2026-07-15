@@ -39,8 +39,11 @@ fun HomeRoute(
                             To(
                                 key =
                                     LearningEntry(
-                                        deckId = sideEffect.deckId,
-                                        mode = LearningMode.DAILY,
+                                        payload =
+                                            LearningEntry.Payload(
+                                                deckId = sideEffect.deckId,
+                                                mode = LearningMode.DAILY,
+                                            ),
                                     ),
                             ),
                     )

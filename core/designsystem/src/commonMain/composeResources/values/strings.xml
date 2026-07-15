@@ -138,5 +138,28 @@
 	<string name="deck_edit_title">Edit Deck</string>
 	<string name="deck_button_edit">Edit</string>
 	<string name="deck_snackbar_edit_error">Failed to edit the deck. Please try again.</string>
-
+	<!-- learning -->
+	<string name="learning_back">Go back</string>
+	<string name="learning_flip_hint">Tap to flip</string>
+	<string name="learning_flip_back_hint">Tap to see the front</string>
+	<string name="learning_more">More</string>
+	<string name="learning_easy">Easy</string>
+	<string name="learning_fair">Unsure</string>
+	<string name="learning_again">Don’t know</string>
+	<string name="learning_swipe_instruction">Swipe the card to rate it</string>
+	<string name="learning_front_instruction">Tip) Tap the card to see the back</string>
+	<string name="learning_stop_title">Stop learning?</string>
+	<string name="learning_stop_body">Your current learning progress won’t be saved</string>
+	<string name="learning_evaluated_cards">Rated cards</string>
+	<string name="learning_continue">Continue learning</string>
+	<string name="learning_stop">Stop</string>
+	<string name="learning_complete_title">You studied\nall the cards!</string>
+	<string name="learning_total">Total</string>
+	<string name="learning_home">Back to home</string>
+	<string name="learning_retry">Retry</string>
+	<string name="learning_rest">No cards to review today</string>
+	<string name="learning_close">Go back</string>
+	<string name="learning_dialog_title">Notice</string>
+	<string name="learning_dialog_submit_error">An unknown error occurred.</string>
+	<string name="learning_dialog_confirm">OK</string>
 </resources>

@@ -138,7 +138,13 @@ val navEntryModule: Module =
 
         navigation<LearningEntry> { navKey ->
             LearningRoute(
-                viewModel = koinViewModel<LearningViewModel> { parametersOf(navKey.deckId, navKey.mode) },
+                viewModel =
+                    koinViewModel<LearningViewModel> {
+                        parametersOf(
+                            navKey.payload.deckId,
+                            navKey.payload.mode,
+                        )
+                    },
                 navDispatcher = get(),
             )
         }

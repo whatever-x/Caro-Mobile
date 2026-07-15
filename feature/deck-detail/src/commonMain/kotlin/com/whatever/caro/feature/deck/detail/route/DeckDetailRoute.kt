@@ -46,8 +46,11 @@ fun DeckDetailRoute(
                     navDispatcher.emit(
                         NavCommand.To(
                             LearningEntry(
-                                deckId = sideEffect.deckId,
-                                mode = sideEffect.mode,
+                                payload =
+                                    LearningEntry.Payload(
+                                        deckId = sideEffect.deckId,
+                                        mode = sideEffect.mode,
+                                    ),
                             ),
                         ),
                     )

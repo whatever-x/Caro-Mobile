@@ -20,6 +20,7 @@ data class LearningState(
     val isCompleted: Boolean = false,
     val isRestDay: Boolean = false,
     val errorMessage: String? = null,
+    val isShowErrorDialog: Boolean = false,
 ) : UiState {
     val currentCard: StudyCard? get() = cards.getOrNull(index)
     val progress: Int get() = studiedBefore + index + if (isCompleted) 1 else 0

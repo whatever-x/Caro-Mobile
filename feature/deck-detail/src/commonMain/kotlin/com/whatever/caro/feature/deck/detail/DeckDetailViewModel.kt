@@ -22,6 +22,11 @@ class DeckDetailViewModel(
             ),
         exceptionFilter = exceptionFilter,
     ) {
+    override fun handleClientException(throwable: Throwable) {
+        super.handleClientException(throwable)
+        reduce { copy(isLoading = false) }
+    }
+
     override suspend fun handleIntent(intent: DeckDetailIntent) {
         when (intent) {
             DeckDetailIntent.Initialize -> {
@@ -37,11 +42,21 @@ class DeckDetailViewModel(
             }
 
             DeckDetailIntent.ClickAllStudy -> {
-                postSideEffect(DeckDetailSideEffect.NavigateToLearning(deckId = currentState.deck.id, mode = LearningMode.ALL))
+                postSideEffect(
+                    DeckDetailSideEffect.NavigateToLearning(
+                        deckId = currentState.deck.id,
+                        mode = LearningMode.ALL,
+                    ),
+                )
             }
 
             DeckDetailIntent.ClickDailyStudy -> {
-                postSideEffect(DeckDetailSideEffect.NavigateToLearning(deckId = currentState.deck.id, mode = LearningMode.DAILY))
+                postSideEffect(
+                    DeckDetailSideEffect.NavigateToLearning(
+                        deckId = currentState.deck.id,
+                        mode = LearningMode.DAILY,
+                    ),
+                )
             }
 
             DeckDetailIntent.ClickSortCardList -> {
