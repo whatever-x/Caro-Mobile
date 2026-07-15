@@ -21,6 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -155,9 +156,11 @@ private fun ProgressContent(
                         .height(height = 8.dp)
                         .clip(shape = CaroTheme.shape.xs),
                 drawStopIndicator = {},
+                gapSize = 0.dp,
                 progress = { todayLearningPercentage.coerceIn(0, 100).toFloat() / 100f },
                 color = CaroTheme.color.surface.brand,
                 trackColor = CaroTheme.color.surface.tertiary,
+                strokeCap = StrokeCap.Butt,
             )
         }
 
