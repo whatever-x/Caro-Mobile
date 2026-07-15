@@ -16,11 +16,20 @@ internal class StudySessionRepositoryImpl(
     override suspend fun submit(
         sessionId: Long,
         evaluations: List<StudyEvaluation>,
-    ) = source.evaluate(
-        sessionId,
-        idempotencyKey(),
-        evaluations.map { EvaluatedCardRequest(it.cardId, EvaluatedCardRequest.RatingDto.valueOf(it.rating.name), it.timeMs) },
-    )
+    ) {
+        if (evaluations.isEmpty()) return
+        source.evaluate(
+            sessionId,
+            idempotencyKey(),
+            evaluations.map {
+                EvaluatedCardRequest(
+                    it.cardId,
+                    EvaluatedCardRequest.RatingDto.valueOf(it.rating.name),
+                    it.timeMs,
+                )
+            },
+        )
+    }
 }
 
 @OptIn(ExperimentalUuidApi::class)
