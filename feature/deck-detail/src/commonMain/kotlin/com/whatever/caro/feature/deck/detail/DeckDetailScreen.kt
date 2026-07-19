@@ -80,7 +80,7 @@ internal fun DeckDetailScreen(
 
                 itemsIndexed(
                     items = state.deckCardList,
-                    key = { index, card -> "${card.id}-$index" },
+                    key = { _, card -> card.id },
                 ) { index, card ->
                     SwipeToRevealCardItem(
                         card = card,
