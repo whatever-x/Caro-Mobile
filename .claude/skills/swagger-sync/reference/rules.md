@@ -115,3 +115,87 @@
 - **신규 엔드포인트(기존 태그)**: 해당 `{Tag}Api.kt`에 메서드만 추가.
 - **삭제된 엔드포인트**: 메서드 제거. 호출부도 함께 정리한다.
 - **삭제된 태그**: 인터페이스 파일 삭제 + `apiModule` binding 제거 + 모든 호출부 정리.
+
+---
+
+# RemoteDataSource 매핑
+
+- API 인터페이스는 인프라(Ktorfit)의 호출 창구일 뿐이고, `:core:data`(Repository)가 실제로
+  소비하는 진입점은 **DataSource**다. 태그별 Ktorfit API를 **도메인 단위 DataSource**로 감싸고
+  Koin `remoteModule`에 binding까지 추가한다. (DTO·API만 만들면 Repository가 쓸 수 없다.)
+
+## 위치 / 네이밍
+
+- 패키지: `com.whatever.caro.core.remote.datasource.{domain}`
+- `{domain}` 디렉토리: **도메인(기능) 단위** (예: `auth`, `card`, `deck`, `profile`).
+  태그명과 반드시 1:1일 필요는 없다 — 한 도메인 DataSource가 **여러 태그 API를 묶을 수 있다**
+  (예: `deck` = `DeckApi` + `DeckCardInformationApi`, `profile` = `NicknameApi` + `UserApi`).
+- 인터페이스: `public interface {Domain}DataSource` — **`Remote` 접두를 붙이지 않고** 도메인 이름
+  그대로 (예: `CardDataSource`, `DeckDataSource`, `ProfileDataSource`).
+- 구현체: `internal class Remote{Domain}DataSourceImpl(...) : {Domain}DataSource` — **구현체에만**
+  `Remote` 접두를 붙인다(리포지토리/데이터 계층 타입과 혼동 방지).
+- `Local{Domain}DataSource`(datastore)와 짝을 이루는 도메인이라도 원격 인터페이스는 도메인 이름
+  (`AuthDataSource`)을 쓴다. 원격/로컬 구분은 **구현체 접두**(`Remote…Impl` / `Local…Impl`)와
+  **소비처 파라미터명**(`remoteAuthDataSource` vs `localAuthDataSource`)으로 표현한다.
+- 형식 참고: 같은 패키지의 `CardDataSource` / `RemoteCardDataSourceImpl`.
+
+## 메서드 시그니처
+
+- DataSource 메서드는 감싸는 API 메서드를 **그대로 위임**한다(추가 로직·매핑 없음). 도메인 모델
+  변환은 Repository의 몫이다.
+- 메서드 명: API의 `request` 접두를 떼고 **도메인 관점에서 자연스러운 이름**으로 짓는다.
+  조회는 관례적으로 `get…`을 쓴다 (예: `requestCreateDeck` → `createDeck`,
+  `requestDecks` → `getDecks`, `requestRandomNickname` → `getRandomNickname`,
+  `requestUpdateNickname` → `changeNickname`).
+- 파라미터: 경로/쿼리/바디를 도메인 친화적 이름으로 노출한다
+  (예: API `requestDeleteCard(id)` → DataSource `deleteCard(cardId: Long)`).
+- 반환 타입: **감싸는 API 메서드의 반환 타입(응답 DTO, inner) 그대로.** 래퍼 unwrap은 이미
+  API 계층(`ApiResponseDto<T>` → `T`)에서 처리되었다.
+
+## 인증 qualifier 분리 (같은 API, 다른 qualifier → DataSource 2개)
+
+- 한 API 인터페이스가 `apiModule`에서 **AUTH·NON_AUTH 두 qualifier로 모두 등록**된 경우
+  (= 같은 인터페이스의 엔드포인트가 인증/비인증을 혼용, 예: `AuthApi`), 이를 감싸는 DataSource도
+  **qualifier별로 2개**로 나눈다.
+- **이유(단순 분류가 아님)**: 두 그룹은 서로 다른 HTTP 클라이언트(AUTH = auth interceptor 有 /
+  NON_AUTH = 無)를 탄다. 특히 토큰 재발급(`refresh`)·소셜 로그인은 반드시 NON_AUTH 클라이언트를
+  타야 한다(AUTH 클라이언트로 보내면 만료 토큰 → 인터셉터가 재발급 호출 → 다시 만료… 무한 루프).
+  그래서 인프라(`AuthTokenProvider`)가 **NON_AUTH DataSource에만** 의존할 수 있도록 분리한다.
+  → 분리는 유지한다. 합치지 않는다.
+- 네이밍: qualifier를 반영해 `AuthDataSource`(AUTH) / `NonAuthDataSource`(NON_AUTH),
+  구현체 `RemoteAuthDataSourceImpl` / `RemoteNonAuthDataSourceImpl`.
+- 형식 참고: `AuthDataSource` / `NonAuthDataSource` (둘 다 `AuthApi`를 서로 다른 qualifier로 감쌈).
+
+## Koin 바인딩
+
+- 등록 위치: `core/remote/src/commonMain/kotlin/com/whatever/caro/core/remote/di/RemoteModule.kt`
+- **일반(전부 AUTH, qualifier 모호성 없음)**: shortcut DSL로 구현체를 바인딩하고 인터페이스로
+  노출한다. 생성자의 API 인자는 Koin 컴파일러 플러그인이 `get()`으로 자동 주입한다.
+  ```kotlin
+  single<RemoteCardDataSourceImpl>() bind CardDataSource::class
+  single<RemoteDeckDataSourceImpl>() bind DeckDataSource::class
+  ```
+- **qualifier 분리**: 생성자 API 인자에 qualifier가 필요하므로 plain DSL로 명시 주입한다.
+  (같은 타입 `AuthApi`를 서로 다른 qualifier로 주입해야 해 shortcut DSL이 모호성을 해소할 수 없다.)
+  ```kotlin
+  single<AuthDataSource> {
+      RemoteAuthDataSourceImpl(
+          authApi = get(named(NetworkClient.Caro.AUTH)),
+      )
+  }
+  single<NonAuthDataSource> {
+      RemoteNonAuthDataSourceImpl(
+          nonAuthApi = get(named(NetworkClient.Caro.NON_AUTH)),
+      )
+  }
+  ```
+
+## 변경 처리
+
+- **신규 태그/도메인**: `{Domain}DataSource` + `Remote{Domain}DataSourceImpl` 새로 만들고
+  `remoteModule`에 binding 추가. 여러 태그를 한 도메인으로 묶을지는 기존 구조(deck/profile)를
+  참고해 판단하고, 애매하면 태그당 1개로 두거나 사용자에게 확인한다.
+- **신규 엔드포인트(기존 도메인)**: 해당 DataSource 인터페이스 + 구현체에 메서드만 추가.
+- **삭제된 엔드포인트**: 메서드 제거. Repository 등 호출부도 함께 정리한다.
+- **삭제된 태그/도메인**: DataSource 인터페이스·구현체 삭제 + `remoteModule` binding 제거 +
+  모든 호출부 정리.
