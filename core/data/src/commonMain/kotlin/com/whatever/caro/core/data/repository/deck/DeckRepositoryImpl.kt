@@ -1,6 +1,8 @@
 package com.whatever.caro.core.data.repository.deck
 
+import com.whatever.caro.core.data.mapper.toDeckCardModel
 import com.whatever.caro.core.data.mapper.toDeckModel
+import com.whatever.caro.core.model.card.DeckCard
 import com.whatever.caro.core.model.deck.Deck
 import com.whatever.caro.core.remote.datasource.deck.DeckDataSource
 import com.whatever.caro.core.remote.dto.deck.request.CreateDeckRequest
@@ -13,6 +15,11 @@ internal class DeckRepositoryImpl(
         val deckResponse = deckDataSource.getDecks()
         return deckResponse.map { it.toDeckModel() }
     }
+
+    override suspend fun getDeckCards(deckId: Long): List<DeckCard> =
+        deckDataSource
+            .getDeckCards(deckId = deckId)
+            .mapNotNull { it.toDeckCardModel() }
 
     override suspend fun createDeck(
         name: String,

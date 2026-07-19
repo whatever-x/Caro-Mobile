@@ -5,6 +5,7 @@ import com.whatever.caro.core.remote.dto.deck.request.UpdateDeckRequest
 import com.whatever.caro.core.remote.dto.deck.response.CreateDeckResponse
 import com.whatever.caro.core.remote.dto.deck.response.DeleteDeckResponse
 import com.whatever.caro.core.remote.dto.deck.response.UpdateDeckResponse
+import com.whatever.caro.core.remote.dto.deckCardInformation.response.DeckCardResponse
 import com.whatever.caro.core.remote.dto.deckCardInformation.response.DeckListResponse
 
 interface DeckDataSource {
@@ -18,4 +19,6 @@ interface DeckDataSource {
     suspend fun deleteDeck(deckId: Long): DeleteDeckResponse
 
     suspend fun getDecks(): List<DeckListResponse>
+
+    suspend fun getDeckCards(deckId: Long): List<DeckCardResponse>
 }

@@ -1,10 +1,12 @@
 package com.whatever.caro.feature.deck.detail
 
-import com.whatever.caro.core.data.repository.card.CardRepository
+import com.whatever.caro.core.data.repository.deck.DeckRepository
+import com.whatever.caro.core.model.card.CardBadge
 import com.whatever.caro.core.model.deck.Deck
 import com.whatever.caro.core.viewmodel.BaseViewModel
 import com.whatever.caro.core.viewmodel.ExceptionFilter
 import com.whatever.caro.feature.deck.detail.model.CardItem
+import com.whatever.caro.feature.deck.detail.model.CardReviewState
 import com.whatever.caro.feature.deck.detail.mvi.DeckDetailIntent
 import com.whatever.caro.feature.deck.detail.mvi.DeckDetailSideEffect
 import com.whatever.caro.feature.deck.detail.mvi.DeckDetailState
@@ -13,7 +15,7 @@ import kotlinx.coroutines.CancellationException
 
 class DeckDetailViewModel(
     deck: Deck,
-    private val cardRepository: CardRepository,
+    private val deckRepository: DeckRepository,
     exceptionFilter: ExceptionFilter,
 ) : BaseViewModel<DeckDetailState, DeckDetailIntent, DeckDetailSideEffect>(
         initialState =
@@ -123,7 +125,7 @@ class DeckDetailViewModel(
 
         launch {
             runCatching {
-                cardRepository.getCards(deckId = currentState.deck.id)
+                deckRepository.getDeckCards(deckId = currentState.deck.id)
             }.onSuccess { cards ->
                 reduce {
                     copy(
@@ -134,6 +136,8 @@ class DeckDetailViewModel(
                                         id = card.id,
                                         front = card.content.front,
                                         back = card.content.back,
+                                        reviewCount = card.reviewCount,
+                                        reviewState = card.badge.toCardReviewState(),
                                     )
                                 }.toPersistentList(),
                         isCardListLoading = false,
@@ -148,4 +152,11 @@ class DeckDetailViewModel(
             }
         }
     }
+
+    private fun CardBadge.toCardReviewState(): CardReviewState =
+        when (this) {
+            CardBadge.NEW -> CardReviewState.NEW
+            CardBadge.REVIEW -> CardReviewState.REVIEW
+            CardBadge.HARD -> CardReviewState.HARD
+        }
 }

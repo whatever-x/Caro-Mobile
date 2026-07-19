@@ -1,12 +1,14 @@
 import app.cash.turbine.test
-import com.whatever.caro.core.data.repository.card.CardRepository
-import com.whatever.caro.core.model.card.Card
+import com.whatever.caro.core.data.repository.deck.DeckRepository
+import com.whatever.caro.core.model.card.CardBadge
 import com.whatever.caro.core.model.card.CardContent
+import com.whatever.caro.core.model.card.DeckCard
 import com.whatever.caro.core.model.deck.Deck
 import com.whatever.caro.core.model.deck.DeckState
 import com.whatever.caro.core.viewmodel.ExceptionFilter
 import com.whatever.caro.feature.deck.detail.DeckDetailViewModel
 import com.whatever.caro.feature.deck.detail.model.CardItem
+import com.whatever.caro.feature.deck.detail.model.CardReviewState
 import com.whatever.caro.feature.deck.detail.mvi.DeckDetailIntent
 import com.whatever.caro.feature.deck.detail.mvi.DeckDetailSideEffect
 import com.whatever.caro.feature.deck.detail.mvi.DeckDetailSortOption
@@ -65,17 +67,54 @@ class DeckDetailViewModelTest :
             }
         }
 
-        test("RefreshCards 는 카드 목록을 다시 로드한다") {
+        test("덱 카드의 badge/복습 수가 CardItem 에 매핑된다") {
             runTest(dispatcher) {
-                val cardRepository =
-                    mock<CardRepository> {
-                        everySuspend { getCards(any()) } returns createCards()
+                val deckRepository =
+                    mock<DeckRepository> {
+                        everySuspend { getDeckCards(any()) } returns
+                            listOf(
+                                DeckCard(
+                                    id = 7L,
+                                    content = CardContent(front = "Run", back = "달리다"),
+                                    badge = CardBadge.HARD,
+                                    reviewCount = 5,
+                                ),
+                            )
                     }
-                val viewModel = createViewModel(deck = createDeck(), cardRepository = cardRepository)
+                val viewModel = createViewModel(deck = createDeck(), deckRepository = deckRepository)
+
                 advanceUntilIdle()
 
-                everySuspend { cardRepository.getCards(any()) } returns
-                    createCards() + Card(id = 3L, content = CardContent(front = "Jump", back = "뛰다"))
+                viewModel.state.value.deckCardList shouldBe
+                    persistentListOf(
+                        CardItem(
+                            id = 7L,
+                            front = "Run",
+                            back = "달리다",
+                            reviewCount = 5,
+                            reviewState = CardReviewState.HARD,
+                        ),
+                    )
+            }
+        }
+
+        test("RefreshCards 는 카드 목록을 다시 로드한다") {
+            runTest(dispatcher) {
+                val deckRepository =
+                    mock<DeckRepository> {
+                        everySuspend { getDeckCards(any()) } returns createDeckCards()
+                    }
+                val viewModel = createViewModel(deck = createDeck(), deckRepository = deckRepository)
+                advanceUntilIdle()
+
+                everySuspend { deckRepository.getDeckCards(any()) } returns
+                    createDeckCards() +
+                    DeckCard(
+                        id = 3L,
+                        content = CardContent(front = "Jump", back = "뛰다"),
+                        badge = CardBadge.NEW,
+                        reviewCount = 0,
+                    )
                 viewModel.intent(DeckDetailIntent.RefreshCards)
                 advanceUntilIdle()
 
@@ -85,11 +124,11 @@ class DeckDetailViewModelTest :
 
         test("카드 목록 로드 실패 시 ShowCardLoadError 를 방출한다") {
             runTest(dispatcher) {
-                val cardRepository =
-                    mock<CardRepository> {
-                        everySuspend { getCards(any()) } throws RuntimeException("network")
+                val deckRepository =
+                    mock<DeckRepository> {
+                        everySuspend { getDeckCards(any()) } throws RuntimeException("network")
                     }
-                val viewModel = createViewModel(deck = createDeck(), cardRepository = cardRepository)
+                val viewModel = createViewModel(deck = createDeck(), deckRepository = deckRepository)
 
                 viewModel.sideEffect.test {
                     advanceUntilIdle()
@@ -191,22 +230,32 @@ class DeckDetailViewModelTest :
         }
     })
 
-private fun createCards(): List<Card> =
+private fun createDeckCards(): List<DeckCard> =
     listOf(
-        Card(id = 1L, content = CardContent(front = "Run", back = "달리다")),
-        Card(id = 2L, content = CardContent(front = "Walk", back = "걷다")),
+        DeckCard(
+            id = 1L,
+            content = CardContent(front = "Run", back = "달리다"),
+            badge = CardBadge.NEW,
+            reviewCount = 0,
+        ),
+        DeckCard(
+            id = 2L,
+            content = CardContent(front = "Walk", back = "걷다"),
+            badge = CardBadge.NEW,
+            reviewCount = 0,
+        ),
     )
 
 private fun createViewModel(
     deck: Deck,
-    cardRepository: CardRepository =
+    deckRepository: DeckRepository =
         mock {
-            everySuspend { getCards(any()) } returns createCards()
+            everySuspend { getDeckCards(any()) } returns createDeckCards()
         },
 ): DeckDetailViewModel =
     DeckDetailViewModel(
         deck = deck,
-        cardRepository = cardRepository,
+        deckRepository = deckRepository,
         exceptionFilter = ExceptionFilter.None,
     )
 
