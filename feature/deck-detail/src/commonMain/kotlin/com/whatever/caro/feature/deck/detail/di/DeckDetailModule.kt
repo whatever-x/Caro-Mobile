@@ -9,6 +9,7 @@ val deckDetailModule =
         viewModel<DeckDetailViewModel> { params ->
             DeckDetailViewModel(
                 deck = params[0],
+                deckRepository = get(),
                 exceptionFilter = get(),
             )
         }

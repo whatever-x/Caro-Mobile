@@ -6,6 +6,8 @@ import com.whatever.caro.core.remote.datasource.card.CardDataSource
 import com.whatever.caro.core.remote.dto.cardController.request.CreateCardItemDto
 import com.whatever.caro.core.remote.dto.cardController.request.CreateCardItemDto.CardTypeDto
 import com.whatever.caro.core.remote.dto.cardController.request.CreateCardsRequest
+import com.whatever.caro.core.remote.dto.cardController.request.UpdateCardRequest
+import com.whatever.caro.core.remote.dto.cardController.response.CardResponse
 
 internal class CardRepositoryImpl(
     private val cardDataSource: CardDataSource,
@@ -32,24 +34,46 @@ internal class CardRepositoryImpl(
     }
 
     override suspend fun getCards(deckId: Long): List<Card> =
-        cardDataSource.getCards(deckId = deckId).mapNotNull { response ->
-            val cardId = response.cardId ?: return@mapNotNull null
-            val fields = response.fields.orEmpty()
-            Card(
-                id = cardId,
-                content =
-                    CardContent(
-                        front = fields[FIELD_FRONT].orEmpty(),
-                        back = fields[FIELD_BACK].orEmpty(),
-                    ),
+        cardDataSource
+            .getCards(deckId = deckId)
+            .mapNotNull { response -> response.toModel() }
+
+    override suspend fun updateCard(
+        cardId: Long,
+        content: CardContent,
+    ) {
+        val request =
+            UpdateCardRequest(
+                fields = content.toFields(),
             )
-        }
+        cardDataSource.updateCard(cardId = cardId, request = request)
+    }
 
     override suspend fun deleteCards(cardIds: List<Long>) {
         cardIds.forEach { cardId ->
             cardDataSource.deleteCard(cardId = cardId)
         }
     }
+
+    private fun CardResponse.toModel(): Card? {
+        val id = cardId ?: return null
+        return Card(
+            id = id,
+            content = fields.toCardContent(),
+        )
+    }
+
+    private fun CardContent.toFields(): Map<String, String> =
+        mapOf(
+            FIELD_FRONT to front,
+            FIELD_BACK to back,
+        )
+
+    private fun Map<String, String>?.toCardContent(): CardContent =
+        CardContent(
+            front = this?.get(FIELD_FRONT).orEmpty(),
+            back = this?.get(FIELD_BACK).orEmpty(),
+        )
 
     private companion object {
         const val FIELD_FRONT = "front"

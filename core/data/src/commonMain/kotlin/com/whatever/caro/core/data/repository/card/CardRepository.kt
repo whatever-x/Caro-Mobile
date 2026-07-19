@@ -11,5 +11,10 @@ interface CardRepository {
 
     suspend fun getCards(deckId: Long): List<Card>
 
+    suspend fun updateCard(
+        cardId: Long,
+        content: CardContent,
+    )
+
     suspend fun deleteCards(cardIds: List<Long>)
 }
