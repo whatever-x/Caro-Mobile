@@ -1,4 +1,4 @@
-package com.whatever.caro.feature.deck
+package com.whatever.caro.core.model.deck
 
 object DeckInputLimits {
     const val NAME_MAX = 50

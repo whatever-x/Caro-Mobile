@@ -12,11 +12,6 @@ import com.whatever.caro.core.remote.dto.cardController.response.CardResponse
 internal class CardRepositoryImpl(
     private val cardDataSource: CardDataSource,
 ) : CardRepository {
-    override suspend fun getCardsByDeck(deckId: Long): List<Card> =
-        cardDataSource
-            .getCardsByDeck(deckId = deckId)
-            .mapNotNull { response -> response.toModel() }
-
     override suspend fun createCards(
         deckId: Long,
         cards: List<CardContent>,
@@ -38,6 +33,11 @@ internal class CardRepositoryImpl(
         cardDataSource.createCards(deckId = deckId, request = request)
     }
 
+    override suspend fun getCards(deckId: Long): List<Card> =
+        cardDataSource
+            .getCards(deckId = deckId)
+            .mapNotNull { response -> response.toModel() }
+
     override suspend fun updateCard(
         cardId: Long,
         content: CardContent,
@@ -47,6 +47,12 @@ internal class CardRepositoryImpl(
                 fields = content.toFields(),
             )
         cardDataSource.updateCard(cardId = cardId, request = request)
+    }
+
+    override suspend fun deleteCards(cardIds: List<Long>) {
+        cardIds.forEach { cardId ->
+            cardDataSource.deleteCard(cardId = cardId)
+        }
     }
 
     private fun CardResponse.toModel(): Card? {

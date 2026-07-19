@@ -123,7 +123,7 @@ class DeckDetailViewModel(
 
         launch {
             runCatching {
-                cardRepository.getCardsByDeck(deckId = currentState.deck.id)
+                cardRepository.getCards(deckId = currentState.deck.id)
             }.onSuccess { cards ->
                 reduce {
                     copy(

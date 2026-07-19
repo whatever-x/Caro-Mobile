@@ -69,12 +69,12 @@ class DeckDetailViewModelTest :
             runTest(dispatcher) {
                 val cardRepository =
                     mock<CardRepository> {
-                        everySuspend { getCardsByDeck(any()) } returns createCards()
+                        everySuspend { getCards(any()) } returns createCards()
                     }
                 val viewModel = createViewModel(deck = createDeck(), cardRepository = cardRepository)
                 advanceUntilIdle()
 
-                everySuspend { cardRepository.getCardsByDeck(any()) } returns
+                everySuspend { cardRepository.getCards(any()) } returns
                     createCards() + Card(id = 3L, content = CardContent(front = "Jump", back = "뛰다"))
                 viewModel.intent(DeckDetailIntent.RefreshCards)
                 advanceUntilIdle()
@@ -87,7 +87,7 @@ class DeckDetailViewModelTest :
             runTest(dispatcher) {
                 val cardRepository =
                     mock<CardRepository> {
-                        everySuspend { getCardsByDeck(any()) } throws RuntimeException("network")
+                        everySuspend { getCards(any()) } throws RuntimeException("network")
                     }
                 val viewModel = createViewModel(deck = createDeck(), cardRepository = cardRepository)
 
@@ -201,7 +201,7 @@ private fun createViewModel(
     deck: Deck,
     cardRepository: CardRepository =
         mock {
-            everySuspend { getCardsByDeck(any()) } returns createCards()
+            everySuspend { getCards(any()) } returns createCards()
         },
 ): DeckDetailViewModel =
     DeckDetailViewModel(

@@ -7,4 +7,5 @@ enum class DeckState {
     NOT_STARTED,
     LEARNING,
     COMPLETE,
+    REST_DAY,
 }

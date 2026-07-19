@@ -13,7 +13,7 @@ internal fun com.whatever.caro.feature.setting.SettingScreen(state: com.whatever
     - onIntent: STABLE (function type)
 
 @Composable
-private fun com.whatever.caro.feature.setting.UserInfo(modifier: androidx.compose.ui.Modifier, nickname: kotlin.String, emailAddress: kotlin.String, socialLoginType: com.whatever.caro.core.model.auth.SocialLoginType?, onNicknameChangeClick: kotlin.Function0<kotlin.Unit>): kotlin.Unit
+private fun com.whatever.caro.feature.setting.UserInfo(modifier: androidx.compose.ui.Modifier, nickname: kotlin.String, emailAddress: kotlin.String, socialLoginType: com.whatever.caro.core.model.auth.SocialLoginType, onNicknameChangeClick: kotlin.Function0<kotlin.Unit>): kotlin.Unit
   skippable: true
   restartable: true
   params:

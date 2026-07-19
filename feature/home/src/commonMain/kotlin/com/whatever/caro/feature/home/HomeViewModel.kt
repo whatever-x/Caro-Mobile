@@ -1,25 +1,35 @@
 package com.whatever.caro.feature.home
 
+import com.whatever.caro.core.data.repository.deck.DeckRepository
 import com.whatever.caro.core.viewmodel.BaseViewModel
 import com.whatever.caro.core.viewmodel.ExceptionFilter
 import com.whatever.caro.feature.home.mvi.HomeIntent
 import com.whatever.caro.feature.home.mvi.HomeSideEffect
 import com.whatever.caro.feature.home.mvi.HomeState
 import io.github.aakira.napier.Napier
+import kotlinx.collections.immutable.toImmutableList
 
 class HomeViewModel(
+    private val deckRepository: DeckRepository,
     exceptionFilter: ExceptionFilter,
 ) : BaseViewModel<HomeState, HomeIntent, HomeSideEffect>(
         initialState = HomeState(),
         exceptionFilter = exceptionFilter,
     ) {
     override fun handleClientException(throwable: Throwable) {
+        reduce { copy(isLoading = false) }
     }
 
     override suspend fun handleIntent(intent: HomeIntent) {
         when (intent) {
+            HomeIntent.Initialize -> {
+                initialize()
+            }
+
             HomeIntent.ClickCreateDeckButton -> {
-                Napier.d { "intent: $intent" }
+                postSideEffect(
+                    HomeSideEffect.NavigateToCreateDeck,
+                )
             }
 
             is HomeIntent.ClickDeckButton -> {
@@ -42,5 +52,11 @@ class HomeViewModel(
                 postSideEffect(HomeSideEffect.NavigateToCreateDeck)
             }
         }
+    }
+
+    private suspend fun initialize() {
+        reduce { copy(isLoading = true) }
+        val decks = deckRepository.getDecks()
+        reduce { copy(isLoading = false, decks = decks.toImmutableList()) }
     }
 }

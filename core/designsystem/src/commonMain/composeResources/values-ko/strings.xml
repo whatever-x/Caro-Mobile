@@ -34,7 +34,6 @@
     <string name="deck_tip_max_cards">한 덱에 최대 200장의 카드를 담을 수 있어요.</string>
     <string name="deck_button_create">만들기</string>
     <string name="deck_snackbar_create_error">덱 만들기에 실패했어요. 잠시 후 다시 시도해주세요.</string>
-=======
     <!-- deck detail -->
     <string name="deck_detail_screen_name">덱 상세</string>
     <string name="deck_detail_label_screen_name">덱 상세</string>
@@ -74,7 +73,7 @@
     <string name="deck_detail_button_bottom_sheet_deck_delete">덱 삭제</string>
     <!-- card -->
     <string name="card_title_create">카드 생성</string>
-    <string name="card_title_edit">카드 수정</string>
+    <string name="card_title_edit_content">카드 수정</string>
     <string name="card_content_description_back">뒤로 가기</string>
     <string name="card_field_label_front">앞면</string>
     <string name="card_field_label_back">뒷면</string>
@@ -94,6 +93,17 @@
     <string name="card_save_error">카드 저장에 실패했어요. 다시 시도해 주세요.</string>
     <string name="card_update_error">카드 수정에 실패했어요. 다시 시도해 주세요.</string>
     <string name="card_list_error">카드를 불러오지 못했어요. 다시 시도해 주세요.</string>
+    <string name="card_title_edit">카드 편집</string>
+    <string name="card_button_delete_selected">선택삭제</string>
+    <string name="card_button_cancel">취소</string>
+    <string name="card_text_select_all">전체 선택</string>
+    <string name="card_content_description_checkbox">카드 선택</string>
+    <string name="card_delete_dialog_title">%1$d장의 카드를 삭제할까요?</string>
+    <string name="card_delete_dialog_body">삭제 후에는 복구할 수 없어요</string>
+    <string name="card_delete_dialog_button_delete">삭제</string>
+    <string name="card_delete_dialog_button_cancel">취소</string>
+    <string name="card_load_error">카드 목록을 불러오지 못했어요. 다시 시도해 주세요.</string>
+    <string name="card_delete_error">카드 삭제에 실패했어요. 다시 시도해 주세요.</string>
     <!-- home -->
     <string name="home_banner_title">%1$s님, 안녕하세요!</string>
     <string name="home_learning_days">%1$d일 연속 학습중</string>
@@ -104,6 +114,11 @@
     <string name="home_deck_button_learning">이어서 학습</string>
     <string name="home_floating_button">덱 만들기</string>
     <string name="home_deck_field_empty">덱을 먼저 만들고\n학습을 시작해 보세요.</string>
+    <string name="home_deck_badge_rest">휴식</string>
+    <string name="home_deck_rest_title">오늘은 복습이 필요 없어요</string>
+    <string name="home_deck_rest_description1">알고리즘이 오늘은 복습이 필요 없다고 판단했어요.</string>
+    <string name="home_deck_rest_description2">내일 새로운 문제를 준비할게요!</string>
+    <string name="home_deck_card_total_count">%1$s개 카드</string>
     <!-- setting -->
     <string name="setting_title">설정</string>
     <string name="setting_userinfo_nickname_change">닉네임 변경</string>
@@ -119,4 +134,8 @@
     <string name="setting_dialog_content">저장된 모든 기록이 소멸될 수 있습니다.</string>
     <string name="setting_dialog_button_delete_account">탈퇴하기</string>
     <string name="setting_dialog_button_cancel">취소</string>
+    <!-- deck edit -->
+    <string name="deck_edit_title">덱 수정</string>
+    <string name="deck_button_edit">수정하기</string>
+    <string name="deck_snackbar_edit_error">덱 수정에 실패했어요. 잠시 후 다시 시도해주세요.</string>
 </resources>

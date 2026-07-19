@@ -1,9 +1,9 @@
-package com.whatever.caro.core.remote.datasource
+package com.whatever.caro.core.remote.datasource.auth
 
 import com.whatever.caro.core.remote.dto.auth.request.CompleteRegistrationRequest
 import com.whatever.caro.core.remote.dto.auth.response.TokenResponse
 
-interface RemoteAuthDataSource {
+interface AuthDataSource {
     suspend fun completeRegistration(request: CompleteRegistrationRequest): TokenResponse
 
     suspend fun logout()

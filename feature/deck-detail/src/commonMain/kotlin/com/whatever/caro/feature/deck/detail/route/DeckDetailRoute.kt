@@ -14,7 +14,9 @@ import caromobile.core.designsystem.generated.resources.card_list_error
 import com.whatever.caro.core.designsystem.components.CaroSnackbarStyle
 import com.whatever.caro.core.navigator.contract.NavCommand
 import com.whatever.caro.core.navigator.dispatcher.NavigationDispatcher
+import com.whatever.caro.core.navigator.entries.DeleteCardsEntry
 import com.whatever.caro.core.navigator.entries.EditCardEntry
+import com.whatever.caro.core.navigator.entries.EditDeckEntry
 import com.whatever.caro.core.ui.snackbar.SnackBarMessage
 import com.whatever.caro.core.ui.snackbar.SnackbarController
 import com.whatever.caro.feature.deck.detail.DeckDetailScreen
@@ -61,11 +63,30 @@ fun DeckDetailRoute(
                 }
 
                 is DeckDetailSideEffect.NavigateToEditCardList -> {
-                    // TODO: 카드 목록 편집 화면 구현 후 sideEffect.deckId 를 사용해 이동 로직을 연결합니다.
+                    navDispatcher.emit(
+                        NavCommand.To(
+                            key =
+                                DeleteCardsEntry(
+                                    payload =
+                                        DeleteCardsEntry.Payload(
+                                            deckId = sideEffect.deckId,
+                                        ),
+                                ),
+                        ),
+                    )
                 }
 
                 is DeckDetailSideEffect.NavigateToEditDeck -> {
-                    // TODO: 덱 수정 화면 구현 후 sideEffect.deckId 를 사용해 이동 로직을 연결합니다.
+                    navDispatcher.emit(
+                        NavCommand.To(
+                            key =
+                                EditDeckEntry(
+                                    deckId = state.deck.id,
+                                    deckName = state.deck.title,
+                                    deckDescription = state.deck.description,
+                                ),
+                        ),
+                    )
                 }
 
                 is DeckDetailSideEffect.NavigateToEditCard -> {

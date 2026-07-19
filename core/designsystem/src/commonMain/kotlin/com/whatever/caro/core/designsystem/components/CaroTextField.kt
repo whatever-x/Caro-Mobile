@@ -120,7 +120,9 @@ private fun TextFieldBox(
             isFocused -> CaroTheme.color.border.brand
             else -> CaroTheme.color.border.secondary
         }
-    val mergedTextStyle = CaroTheme.typography.body1.copy(color = textColor)
+    val mergedTextStyle =
+        CaroTheme.typography.body1.regular
+            .copy(color = textColor)
     val selectionColors =
         TextSelectionColors(
             handleColor = CaroTheme.color.text.brand,
@@ -173,7 +175,7 @@ private fun TextFieldBox(
                 if (value.isEmpty() && placeholder != null) {
                     Text(
                         text = placeholder,
-                        style = CaroTheme.typography.body1,
+                        style = CaroTheme.typography.body1.regular,
                         color = CaroTheme.color.text.tertiary,
                     )
                 }

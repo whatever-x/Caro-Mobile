@@ -21,10 +21,10 @@ import io.kotest.matchers.shouldBe
 
 class CardRepositoryImplTest : FunSpec() {
     init {
-        test("getCardsByDeck 은 응답 DTO 를 Card 모델로 매핑한다") {
+        test("getCards 는 응답 DTO 를 Card 모델로 매핑한다") {
             val cardDataSource =
                 mock<CardDataSource> {
-                    everySuspend { getCardsByDeck(any()) } returns
+                    everySuspend { getCards(any()) } returns
                         listOf(
                             CardResponse(
                                 cardId = 1L,
@@ -42,7 +42,7 @@ class CardRepositoryImplTest : FunSpec() {
                 }
             val repository = CardRepositoryImpl(cardDataSource = cardDataSource)
 
-            repository.getCardsByDeck(deckId = 42L) shouldBe
+            repository.getCards(deckId = 42L) shouldBe
                 listOf(
                     Card(id = 1L, content = CardContent(front = "Run", back = "달리다")),
                     Card(id = 2L, content = CardContent(front = "Walk", back = "걷다")),

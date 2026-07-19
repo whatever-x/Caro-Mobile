@@ -42,7 +42,7 @@ import caromobile.core.designsystem.generated.resources.card_field_label_front
 import caromobile.core.designsystem.generated.resources.card_field_placeholder_back
 import caromobile.core.designsystem.generated.resources.card_field_placeholder_front
 import caromobile.core.designsystem.generated.resources.card_field_required
-import caromobile.core.designsystem.generated.resources.card_title_edit
+import caromobile.core.designsystem.generated.resources.card_title_edit_content
 import caromobile.core.designsystem.generated.resources.ic_chevron_left_24
 import caromobile.core.designsystem.generated.resources.ic_switch_16
 import com.whatever.caro.core.designsystem.components.CaroTextArea
@@ -89,7 +89,7 @@ internal fun EditCardScreen(
                         tint = CaroTheme.color.icon.brand,
                     )
                     Text(
-                        text = stringResource(Res.string.card_title_edit),
+                        text = stringResource(Res.string.card_title_edit_content),
                         style = CaroTheme.typography.heading2,
                         color = CaroTheme.color.text.primary,
                     )

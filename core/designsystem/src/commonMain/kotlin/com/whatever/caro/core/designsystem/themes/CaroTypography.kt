@@ -14,7 +14,7 @@ data class CaroTypography(
     val heading1: TextStyle,
     val heading2: TextStyle,
     val heading3: TextStyle,
-    val body1: TextStyle,
+    val body1: Body1Style,
     val body2: Body2Style,
     val body3: TextStyle,
     val body4: Body4Style,
@@ -35,6 +35,12 @@ data class CaroTypography(
     interface RegularStyle {
         val regular: TextStyle
     }
+
+    @Immutable
+    data class Body1Style(
+        val semiBold: TextStyle,
+        override val regular: TextStyle,
+    ) : RegularStyle
 
     @Immutable
     data class Body2Style(
@@ -105,10 +111,20 @@ data class CaroTypography(
                     fontSize = 16.sp,
                 ),
             body1 =
-                TextStyle(
-                    fontFamily = pretendard,
-                    fontWeight = FontWeight.W500,
-                    fontSize = 16.sp,
+                Body1Style(
+                    semiBold =
+                        TextStyle(
+                            fontFamily = pretendard,
+                            fontWeight = FontWeight.W600,
+                            fontSize = 16.sp,
+                            lineHeight = 24.sp,
+                        ),
+                    regular =
+                        TextStyle(
+                            fontFamily = pretendard,
+                            fontWeight = FontWeight.W500,
+                            fontSize = 16.sp,
+                        ),
                 ),
             body2 =
                 Body2Style(

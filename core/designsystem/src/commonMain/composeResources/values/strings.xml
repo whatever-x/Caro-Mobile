@@ -22,7 +22,7 @@
 	<string name="profile_field_rule_nickname">2-20 characters. Korean, English, numbers, -, and _ only</string>
 	<string name="profile_button_create">Create</string>
 	<string name="profile_button_done">Done</string>
-	<!-- deck -->
+	<!-- deck create -->
 	<string name="deck_title_create">Create Deck</string>
 	<string name="deck_content_description_back">Go back</string>
 	<string name="deck_content_description_clear">Clear</string>
@@ -35,7 +35,6 @@
 	<string name="deck_tip_max_cards">You can add up to 200 cards per deck.</string>
 	<string name="deck_button_create">Create</string>
 	<string name="deck_snackbar_create_error">Failed to create the deck. Please try again.</string>
-	=======
 	<!-- deck detail -->
 	<string name="deck_detail_screen_name">Deck Detail</string>
 	<string name="deck_detail_label_screen_name">Deck Detail</string>
@@ -75,7 +74,7 @@
 	<string name="deck_detail_button_bottom_sheet_deck_delete">Delete deck</string>
 	<!-- card -->
 	<string name="card_title_create">Create Card</string>
-	<string name="card_title_edit">Edit Card</string>
+	<string name="card_title_edit_content">Edit Card</string>
 	<string name="card_content_description_back">Go back</string>
 	<string name="card_field_label_front">Front</string>
 	<string name="card_field_label_back">Back</string>
@@ -96,6 +95,17 @@
 	<string name="card_save_error">Failed to save cards. Please try again.</string>
 	<string name="card_update_error">Failed to update the card. Please try again.</string>
 	<string name="card_list_error">Failed to load cards. Please try again.</string>
+	<string name="card_title_edit">Edit Cards</string>
+	<string name="card_button_delete_selected">Delete selected</string>
+	<string name="card_button_cancel">Cancel</string>
+	<string name="card_text_select_all">Select all</string>
+	<string name="card_content_description_checkbox">Select card</string>
+	<string name="card_delete_dialog_title">Delete %1$d card(s)?</string>
+	<string name="card_delete_dialog_body">This cannot be undone.</string>
+	<string name="card_delete_dialog_button_delete">Delete</string>
+	<string name="card_delete_dialog_button_cancel">Cancel</string>
+	<string name="card_load_error">Failed to load cards. Please try again.</string>
+	<string name="card_delete_error">Failed to delete cards. Please try again.</string>
 	<!-- home -->
 	<string name="home_banner_title">Hello, %1$s!</string>
 	<string name="home_learning_days">Learning Streak: %1$d Days</string>
@@ -106,6 +116,11 @@
 	<string name="home_deck_button_learning">Continue Learning</string>
 	<string name="home_floating_button">Create Deck</string>
 	<string name="home_deck_field_empty">Create a deck to begin learning.</string>
+	<string name="home_deck_badge_rest">Rest</string>
+	<string name="home_deck_rest_title">No review needed today</string>
+	<string name="home_deck_rest_description1">Our algorithm determined that you don't need to review today.</string>
+	<string name="home_deck_rest_description2">We'll have new questions ready for you tomorrow!</string>
+	<string name="home_deck_card_total_count">%1$s cards</string>
 	<!-- setting -->
 	<string name="setting_title">Settings</string>
 	<string name="setting_userinfo_nickname_change">Change Nickname</string>
@@ -124,4 +139,9 @@
 	<string name="setting_dialog_content">All your saved data will be permanently removed.</string>
 	<string name="setting_dialog_button_delete_account">Delete Account</string>
 	<string name="setting_dialog_button_cancel">Cancel</string>
+	<!-- deck edit -->
+	<string name="deck_edit_title">Edit Deck</string>
+	<string name="deck_button_edit">Edit</string>
+	<string name="deck_snackbar_edit_error">Failed to edit the deck. Please try again.</string>
+
 </resources>
