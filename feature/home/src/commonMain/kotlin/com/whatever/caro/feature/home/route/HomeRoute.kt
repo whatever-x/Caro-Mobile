@@ -45,10 +45,7 @@ fun HomeRoute(
                             To(
                                 key =
                                     DeckDetailEntry(
-                                        payload =
-                                            DeckDetailEntry.Payload(
-                                                deck = sideEffect.deck,
-                                            ),
+                                        deck = sideEffect.deck,
                                     ),
                             ),
                     )
