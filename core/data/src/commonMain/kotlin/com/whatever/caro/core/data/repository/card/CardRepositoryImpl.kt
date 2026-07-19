@@ -1,5 +1,7 @@
 package com.whatever.caro.core.data.repository.card
 
+import com.whatever.caro.core.data.mapper.toFields
+import com.whatever.caro.core.data.mapper.toModel
 import com.whatever.caro.core.model.card.Card
 import com.whatever.caro.core.model.card.CardContent
 import com.whatever.caro.core.remote.datasource.card.CardDataSource
@@ -7,7 +9,6 @@ import com.whatever.caro.core.remote.dto.cardController.request.CreateCardItemDt
 import com.whatever.caro.core.remote.dto.cardController.request.CreateCardItemDto.CardTypeDto
 import com.whatever.caro.core.remote.dto.cardController.request.CreateCardsRequest
 import com.whatever.caro.core.remote.dto.cardController.request.UpdateCardRequest
-import com.whatever.caro.core.remote.dto.cardController.response.CardResponse
 
 internal class CardRepositoryImpl(
     private val cardDataSource: CardDataSource,
@@ -21,11 +22,7 @@ internal class CardRepositoryImpl(
                 items =
                     cards.map { card ->
                         CreateCardItemDto(
-                            fields =
-                                mapOf(
-                                    FIELD_FRONT to card.front,
-                                    FIELD_BACK to card.back,
-                                ),
+                            fields = card.toFields(),
                             cardType = CardTypeDto.BASIC,
                         )
                     },
@@ -53,30 +50,5 @@ internal class CardRepositoryImpl(
         cardIds.forEach { cardId ->
             cardDataSource.deleteCard(cardId = cardId)
         }
-    }
-
-    private fun CardResponse.toModel(): Card? {
-        val id = cardId ?: return null
-        return Card(
-            id = id,
-            content = fields.toCardContent(),
-        )
-    }
-
-    private fun CardContent.toFields(): Map<String, String> =
-        mapOf(
-            FIELD_FRONT to front,
-            FIELD_BACK to back,
-        )
-
-    private fun Map<String, String>?.toCardContent(): CardContent =
-        CardContent(
-            front = this?.get(FIELD_FRONT).orEmpty(),
-            back = this?.get(FIELD_BACK).orEmpty(),
-        )
-
-    private companion object {
-        const val FIELD_FRONT = "front"
-        const val FIELD_BACK = "back"
     }
 }
