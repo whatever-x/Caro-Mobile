@@ -6,6 +6,7 @@ import com.whatever.caro.core.remote.datasource.card.CardDataSource
 import com.whatever.caro.core.remote.dto.cardController.request.CreateCardItemDto
 import com.whatever.caro.core.remote.dto.cardController.request.CreateCardItemDto.CardTypeDto
 import com.whatever.caro.core.remote.dto.cardController.request.CreateCardsRequest
+import com.whatever.caro.core.remote.dto.cardController.request.DeleteCardsRequest
 import com.whatever.caro.core.remote.dto.cardController.request.UpdateCardRequest
 import com.whatever.caro.core.remote.dto.cardController.response.CardResponse
 
@@ -50,9 +51,8 @@ internal class CardRepositoryImpl(
     }
 
     override suspend fun deleteCards(cardIds: List<Long>) {
-        cardIds.forEach { cardId ->
-            cardDataSource.deleteCard(cardId = cardId)
-        }
+        val request = DeleteCardsRequest(cardIds = cardIds.toSet())
+        cardDataSource.deleteCards(request = request)
     }
 
     private fun CardResponse.toModel(): Card? {

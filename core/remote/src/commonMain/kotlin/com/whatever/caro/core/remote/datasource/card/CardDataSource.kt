@@ -1,6 +1,7 @@
 package com.whatever.caro.core.remote.datasource.card
 
 import com.whatever.caro.core.remote.dto.cardController.request.CreateCardsRequest
+import com.whatever.caro.core.remote.dto.cardController.request.DeleteCardsRequest
 import com.whatever.caro.core.remote.dto.cardController.request.UpdateCardRequest
 import com.whatever.caro.core.remote.dto.cardController.response.CardResponse
 import com.whatever.caro.core.remote.dto.cardController.response.CreateCardsResponse
@@ -20,5 +21,5 @@ interface CardDataSource {
         request: UpdateCardRequest,
     ): UpdateCardResponse
 
-    suspend fun deleteCard(cardId: Long): DeleteCardResponse
+    suspend fun deleteCards(request: DeleteCardsRequest): DeleteCardResponse
 }
