@@ -113,6 +113,14 @@ internal fun com.whatever.caro.feature.learning.components.LearningCompletion(to
     - onClose: STABLE (function type)
 
 @Composable
+internal fun com.whatever.caro.feature.learning.components.LearningErrorDialog(message: kotlin.String, onConfirm: kotlin.Function0<kotlin.Unit>): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - message: STABLE (String is immutable)
+    - onConfirm: STABLE (function type)
+
+@Composable
 internal fun com.whatever.caro.feature.learning.components.LearningEvaluationControls(enabled: kotlin.Boolean, selectedIndex: kotlin.Int?, onEasy: kotlin.Function0<kotlin.Unit>, onFair: kotlin.Function0<kotlin.Unit>, onAgain: kotlin.Function0<kotlin.Unit>): kotlin.Unit
   skippable: true
   restartable: true
