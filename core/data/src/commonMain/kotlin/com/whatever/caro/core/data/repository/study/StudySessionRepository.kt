@@ -4,10 +4,14 @@ import com.whatever.caro.core.model.learning.StudyEvaluation
 import com.whatever.caro.core.model.learning.StudySession
 
 interface StudySessionRepository {
-    suspend fun startDaily(deckId: Long): StudySession
+    suspend fun startDaily(
+        deckId: Long,
+        idempotencyKey: String,
+    ): StudySession
 
     suspend fun submit(
         sessionId: Long,
         evaluations: List<StudyEvaluation>,
+        idempotencyKey: String,
     )
 }

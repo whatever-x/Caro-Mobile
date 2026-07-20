@@ -9,18 +9,21 @@ import kotlin.uuid.Uuid
 
 internal class StudySessionRepositoryImpl(
     private val source: StudySessionDataSource,
-    private val idempotencyKey: () -> String = ::newUuid,
 ) : StudySessionRepository {
-    override suspend fun startDaily(deckId: Long): StudySession = source.startDaily(deckId, idempotencyKey()).toModel()
+    override suspend fun startDaily(
+        deckId: Long,
+        idempotencyKey: String,
+    ): StudySession = source.startDaily(deckId, idempotencyKey).toModel()
 
     override suspend fun submit(
         sessionId: Long,
         evaluations: List<StudyEvaluation>,
+        idempotencyKey: String,
     ) {
         if (evaluations.isEmpty()) return
         source.evaluate(
             sessionId,
-            idempotencyKey(),
+            idempotencyKey,
             evaluations.map {
                 EvaluatedCardRequest(
                     it.cardId,
@@ -31,6 +34,3 @@ internal class StudySessionRepositoryImpl(
         )
     }
 }
-
-@OptIn(ExperimentalUuidApi::class)
-private fun newUuid(): String = Uuid.random().toString()

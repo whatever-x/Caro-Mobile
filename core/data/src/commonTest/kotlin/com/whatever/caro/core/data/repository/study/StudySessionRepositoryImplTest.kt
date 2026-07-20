@@ -30,7 +30,7 @@ class StudySessionRepositoryImplTest :
                         )
                 }
 
-            val result = StudySessionRepositoryImpl(source, idempotencyKey = { "key" }).startDaily(3L)
+            val result = StudySessionRepositoryImpl(source).startDaily(3L, "key")
 
             result shouldBe
                 StudySession.InProgress(
@@ -42,6 +42,8 @@ class StudySessionRepositoryImplTest :
                             StudyCard(11L, "Run", "달리다"),
                         ),
                 )
+
+            verifySuspend { source.startDaily(3L, "key") }
         }
 
         test("rating names match the API contract") {
@@ -53,9 +55,9 @@ class StudySessionRepositoryImplTest :
                 mock<StudySessionDataSource> {
                     everySuspend { evaluate(any(), any(), any()) } returns Unit
                 }
-            val repository = StudySessionRepositoryImpl(source, idempotencyKey = { "key" })
+            val repository = StudySessionRepositoryImpl(source)
 
-            repository.submit(7L, listOf(StudyEvaluation(11L, StudyRating.EASY, 1_200)))
+            repository.submit(7L, listOf(StudyEvaluation(11L, StudyRating.EASY, 1_200)), "key")
 
             verifySuspend {
                 source.evaluate(

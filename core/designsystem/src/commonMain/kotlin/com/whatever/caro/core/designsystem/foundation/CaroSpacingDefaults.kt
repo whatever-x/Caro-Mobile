@@ -13,7 +13,6 @@ internal enum class CaroSpacingDefaults(
     SPACING_L(spacing = 16.dp),
     SPACING_XL(spacing = 20.dp),
     SPACING_2XL(spacing = 24.dp),
-    SPACING_2XL_2(spacing = 28.dp),
     SPACING_3XL(spacing = 32.dp),
     SPACING_4XL(spacing = 40.dp),
     SPACING_5XL(spacing = 48.dp),

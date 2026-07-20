@@ -14,6 +14,8 @@ import com.whatever.caro.feature.learning.mvi.LearningSideEffect
 import com.whatever.caro.feature.learning.mvi.LearningState
 import kotlin.time.TimeMark
 import kotlin.time.TimeSource
+import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 
 class LearningViewModel(
     private val deckId: Long,
@@ -67,7 +69,11 @@ class LearningViewModel(
         try {
             if (mode == LearningMode.DAILY && evaluations.isNotEmpty()) {
                 reduce { copy(isSubmitting = true) }
-                repository.submit(currentState.sessionId, evaluations)
+                repository.submit(
+                    sessionId = currentState.sessionId,
+                    evaluations = evaluations,
+                    idempotencyKey = newUuid(),
+                )
                 reduce { copy(isSubmitting = false) }
             }
             postSideEffect(LearningSideEffect.NavigateBack)
@@ -104,7 +110,13 @@ class LearningViewModel(
             startCardTimer()
             return
         }
-        when (val session = repository.startDaily(deckId)) {
+        when (
+            val session =
+                repository.startDaily(
+                    deckId = deckId,
+                    idempotencyKey = newUuid(),
+                )
+        ) {
             is StudySession.InProgress -> {
                 reduce {
                     copy(
@@ -144,7 +156,11 @@ class LearningViewModel(
                 reduce { copy(evaluations = all, isCompleted = true) }
             } else {
                 reduce { copy(evaluations = all, isSubmitting = true) }
-                repository.submit(currentState.sessionId, all)
+                repository.submit(
+                    sessionId = currentState.sessionId,
+                    evaluations = all,
+                    idempotencyKey = newUuid(),
+                )
                 reduce { copy(isSubmitting = false, isCompleted = true) }
             }
         } else {
@@ -164,4 +180,7 @@ class LearningViewModel(
             ?.coerceIn(0L, Int.MAX_VALUE.toLong())
             ?.toInt()
             ?: 0
+
+    @OptIn(ExperimentalUuidApi::class)
+    private fun newUuid(): String = Uuid.random().toString()
 }

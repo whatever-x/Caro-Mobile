@@ -103,6 +103,7 @@ class LearningViewModelTest :
                 val viewModel = createViewModel(cards = emptyList(), study = study, mode = LearningMode.DAILY)
                 viewModel.intent(LearningIntent.Load)
                 advanceUntilIdle()
+                study.startDailyIdempotencyKey?.isNotBlank() shouldBe true
                 viewModel.intent(LearningIntent.Evaluate(StudyRating.EASY))
                 advanceUntilIdle()
                 study.submitGate = CompletableDeferred()
@@ -115,6 +116,7 @@ class LearningViewModelTest :
                     awaitItem() shouldBe LearningSideEffect.NavigateBack
                     study.submittedSessionId shouldBe 42L
                     study.submittedEvaluations shouldBe viewModel.state.value.evaluations
+                    study.submittedIdempotencyKey?.isNotBlank() shouldBe true
                     cancelAndIgnoreRemainingEvents()
                 }
             }
@@ -359,20 +361,30 @@ private class FakeStudyRepository(
     private val session: StudySession? = null,
 ) : StudySessionRepository {
     var submitCount = 0
+    var startDailyIdempotencyKey: String? = null
     var submittedSessionId: Long? = null
     var submittedEvaluations: List<StudyEvaluation> = emptyList()
+    var submittedIdempotencyKey: String? = null
     var submitGate: CompletableDeferred<Unit>? = null
     var submitError: Throwable? = null
 
-    override suspend fun startDaily(deckId: Long): StudySession = session ?: error("daily API must not be called")
+    override suspend fun startDaily(
+        deckId: Long,
+        idempotencyKey: String,
+    ): StudySession {
+        startDailyIdempotencyKey = idempotencyKey
+        return session ?: error("daily API must not be called")
+    }
 
     override suspend fun submit(
         sessionId: Long,
         evaluations: List<StudyEvaluation>,
+        idempotencyKey: String,
     ) {
         submitCount++
         submittedSessionId = sessionId
         submittedEvaluations = evaluations
+        submittedIdempotencyKey = idempotencyKey
         submitGate?.await()
         submitError?.let { throw it }
     }

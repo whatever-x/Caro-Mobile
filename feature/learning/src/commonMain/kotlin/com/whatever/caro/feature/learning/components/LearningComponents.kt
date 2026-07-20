@@ -503,8 +503,8 @@ internal fun LearningCompletion(
                                     ),
                             ),
                     ).padding(
-                        start = CaroTheme.spacing.xl2_2,
-                        end = CaroTheme.spacing.xl2_2,
+                        start = CaroTheme.spacing.xl,
+                        end = CaroTheme.spacing.xl,
                         bottom = CaroTheme.spacing.l,
                     ),
         ) {
