@@ -3,6 +3,7 @@ package com.whatever.caro.core.data.repository.card
 import com.whatever.caro.core.model.card.Card
 import com.whatever.caro.core.model.card.CardContent
 import com.whatever.caro.core.remote.datasource.card.CardDataSource
+import com.whatever.caro.core.remote.dto.cardController.request.DeleteCardsRequest
 import com.whatever.caro.core.remote.dto.cardController.response.CardResponse
 import com.whatever.caro.core.remote.dto.cardController.response.DeleteCardResponse
 import dev.mokkery.answering.returns
@@ -42,20 +43,17 @@ class CardRepositoryImplDeleteTest : FunSpec() {
                 )
         }
 
-        test("deleteCards 는 선택된 카드 id 를 각각 datasource 에 위임한다") {
+        test("deleteCards 는 선택된 카드 id 를 request body 로 datasource 에 위임한다") {
             val cardDataSource =
                 mock<CardDataSource> {
-                    everySuspend { deleteCard(any()) } returns DeleteCardResponse(cardId = null)
+                    everySuspend { deleteCards(any()) } returns DeleteCardResponse(deletedCardsCount = null)
                 }
             val repository = CardRepositoryImpl(cardDataSource = cardDataSource)
 
             repository.deleteCards(cardIds = listOf(1L, 2L))
 
             verifySuspend(exactly(1)) {
-                cardDataSource.deleteCard(cardId = 1L)
-            }
-            verifySuspend(exactly(1)) {
-                cardDataSource.deleteCard(cardId = 2L)
+                cardDataSource.deleteCards(request = DeleteCardsRequest(cardIds = setOf(1L, 2L)))
             }
         }
     }
