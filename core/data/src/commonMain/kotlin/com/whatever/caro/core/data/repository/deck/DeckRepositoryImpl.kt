@@ -2,7 +2,6 @@ package com.whatever.caro.core.data.repository.deck
 
 import com.whatever.caro.core.data.mapper.toDeckCardModel
 import com.whatever.caro.core.data.mapper.toDeckModel
-import com.whatever.caro.core.model.card.Card
 import com.whatever.caro.core.model.card.DeckCard
 import com.whatever.caro.core.model.deck.Deck
 import com.whatever.caro.core.remote.datasource.deck.DeckDataSource

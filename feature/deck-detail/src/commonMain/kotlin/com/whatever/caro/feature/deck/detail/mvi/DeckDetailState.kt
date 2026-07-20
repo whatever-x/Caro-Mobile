@@ -1,7 +1,6 @@
 package com.whatever.caro.feature.deck.detail.mvi
 
 import com.whatever.caro.core.model.deck.Deck
-import com.whatever.caro.core.model.deck.DeckState
 import com.whatever.caro.core.viewmodel.contract.UiState
 import com.whatever.caro.feature.deck.detail.model.CardItem
 import kotlinx.collections.immutable.ImmutableList

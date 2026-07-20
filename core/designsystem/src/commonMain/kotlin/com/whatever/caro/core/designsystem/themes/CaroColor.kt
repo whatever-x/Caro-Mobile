@@ -3,7 +3,6 @@ package com.whatever.caro.core.designsystem.themes
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
 import com.whatever.caro.core.designsystem.foundation.Alpha20
-import com.whatever.caro.core.designsystem.foundation.Black100
 import com.whatever.caro.core.designsystem.foundation.BlackAlpha60
 import com.whatever.caro.core.designsystem.foundation.Blue100
 import com.whatever.caro.core.designsystem.foundation.Blue200

@@ -156,12 +156,19 @@ class LearningViewModel(
                 reduce { copy(evaluations = all, isCompleted = true) }
             } else {
                 reduce { copy(evaluations = all, isSubmitting = true) }
-                repository.submit(
-                    sessionId = currentState.sessionId,
-                    evaluations = all,
-                    idempotencyKey = newUuid(),
-                )
-                reduce { copy(isSubmitting = false, isCompleted = true) }
+                val ratingCounts =
+                    repository.submit(
+                        sessionId = currentState.sessionId,
+                        evaluations = all,
+                        idempotencyKey = newUuid(),
+                    )
+                reduce {
+                    copy(
+                        isSubmitting = false,
+                        isCompleted = true,
+                        ratingCounts = ratingCounts,
+                    )
+                }
             }
         } else {
             reduce { copy(index = index + 1, isFlipped = false, evaluations = all) }

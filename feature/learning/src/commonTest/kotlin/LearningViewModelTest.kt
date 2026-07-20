@@ -8,6 +8,7 @@ import com.whatever.caro.core.model.learning.LearningMode
 import com.whatever.caro.core.model.learning.StudyCard
 import com.whatever.caro.core.model.learning.StudyEvaluation
 import com.whatever.caro.core.model.learning.StudyRating
+import com.whatever.caro.core.model.learning.StudyRatingCounts
 import com.whatever.caro.core.model.learning.StudySession
 import com.whatever.caro.core.viewmodel.ExceptionFilter
 import com.whatever.caro.feature.learning.LearningViewModel
@@ -68,6 +69,32 @@ class LearningViewModelTest :
                 advanceUntilIdle()
                 viewModel.state.value.isCompleted shouldBe true
                 viewModel.state.value.totalCount shouldBe 0
+            }
+        }
+
+        test("중단한 일일 학습을 완료하면 서버의 전체 누적 평가 결과를 저장한다") {
+            runTest(dispatcher) {
+                val expected = StudyRatingCounts(again = 1, fair = 1, easy = 1)
+                val study =
+                    FakeStudyRepository(
+                        session =
+                            StudySession.InProgress(
+                                sessionId = 42L,
+                                studiedCardCount = 2,
+                                totalCardCount = 3,
+                                cards = listOf(StudyCard(3L, "앞", "뒤")),
+                            ),
+                        submitResult = expected,
+                    )
+                val viewModel = createViewModel(cards = emptyList(), study = study, mode = LearningMode.DAILY)
+                viewModel.intent(LearningIntent.Load)
+                advanceUntilIdle()
+
+                viewModel.intent(LearningIntent.Evaluate(StudyRating.EASY))
+                advanceUntilIdle()
+
+                viewModel.state.value.isCompleted shouldBe true
+                viewModel.state.value.ratingCounts shouldBe expected
             }
         }
 
@@ -359,6 +386,7 @@ private class FakeCardRepository(
 
 private class FakeStudyRepository(
     private val session: StudySession? = null,
+    private val submitResult: StudyRatingCounts = StudyRatingCounts(),
 ) : StudySessionRepository {
     var submitCount = 0
     var startDailyIdempotencyKey: String? = null
@@ -380,12 +408,13 @@ private class FakeStudyRepository(
         sessionId: Long,
         evaluations: List<StudyEvaluation>,
         idempotencyKey: String,
-    ) {
+    ): StudyRatingCounts {
         submitCount++
         submittedSessionId = sessionId
         submittedEvaluations = evaluations
         submittedIdempotencyKey = idempotencyKey
         submitGate?.await()
         submitError?.let { throw it }
+        return submitResult
     }
 }

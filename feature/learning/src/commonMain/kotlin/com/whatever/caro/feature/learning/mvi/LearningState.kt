@@ -3,6 +3,7 @@ package com.whatever.caro.feature.learning.mvi
 import com.whatever.caro.core.model.learning.LearningMode
 import com.whatever.caro.core.model.learning.StudyCard
 import com.whatever.caro.core.model.learning.StudyEvaluation
+import com.whatever.caro.core.model.learning.StudyRatingCounts
 import com.whatever.caro.core.viewmodel.contract.UiState
 
 data class LearningState(
@@ -16,6 +17,7 @@ data class LearningState(
     val index: Int = 0,
     val isFlipped: Boolean = false,
     val evaluations: List<StudyEvaluation> = emptyList(),
+    val ratingCounts: StudyRatingCounts? = null,
     val showStopDialog: Boolean = false,
     val isCompleted: Boolean = false,
     val isRestDay: Boolean = false,

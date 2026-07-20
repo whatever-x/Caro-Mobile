@@ -3,10 +3,13 @@ package com.whatever.caro.core.data.repository.study
 import com.whatever.caro.core.model.learning.StudyCard
 import com.whatever.caro.core.model.learning.StudyEvaluation
 import com.whatever.caro.core.model.learning.StudyRating
+import com.whatever.caro.core.model.learning.StudyRatingCounts
 import com.whatever.caro.core.model.learning.StudySession
 import com.whatever.caro.core.remote.datasource.study.StudySessionDataSource
 import com.whatever.caro.core.remote.dto.studySession.request.EvaluatedCardRequest
+import com.whatever.caro.core.remote.dto.studySession.response.EvaluationResponse
 import com.whatever.caro.core.remote.dto.studySession.response.InProgress
+import com.whatever.caro.core.remote.dto.studySession.response.RatingCountsDto
 import com.whatever.caro.core.remote.dto.studySession.response.StudyCardItemDto
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
@@ -53,7 +56,7 @@ class StudySessionRepositoryImplTest :
         test("evaluation time is preserved in the API request") {
             val source =
                 mock<StudySessionDataSource> {
-                    everySuspend { evaluate(any(), any(), any()) } returns Unit
+                    everySuspend { evaluate(any(), any(), any()) } returns evaluationResponse()
                 }
             val repository = StudySessionRepositoryImpl(source)
 
@@ -67,4 +70,31 @@ class StudySessionRepositoryImplTest :
                 )
             }
         }
+
+        test("evaluation response rating counts are mapped to the domain result") {
+            val source =
+                mock<StudySessionDataSource> {
+                    everySuspend { evaluate(any(), any(), any()) } returns
+                        evaluationResponse(
+                            RatingCountsDto(
+                                again = 2,
+                                fair = 3,
+                                easy = 5,
+                            ),
+                        )
+                }
+            val repository = StudySessionRepositoryImpl(source)
+
+            val result = repository.submit(7L, listOf(StudyEvaluation(11L, StudyRating.EASY, 1_200)), "key")
+
+            result shouldBe StudyRatingCounts(again = 2, fair = 3, easy = 5)
+        }
     })
+
+private fun evaluationResponse(ratingCounts: RatingCountsDto? = null) =
+    EvaluationResponse(
+        evaluatedCardIds = emptyList(),
+        failedCardIds = emptyList(),
+        sessionStatus = EvaluationResponse.SessionStatusDto.ACTIVE,
+        ratingCounts = ratingCounts,
+    )

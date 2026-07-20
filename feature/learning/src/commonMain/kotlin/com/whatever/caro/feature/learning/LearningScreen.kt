@@ -73,11 +73,12 @@ fun LearningScreen(
         }
 
         state.isCompleted -> {
+            val ratingCounts = state.ratingCounts
             LearningCompletion(
                 total = state.totalCount,
-                easy = state.evaluations.count { it.rating == StudyRating.EASY },
-                fair = state.evaluations.count { it.rating == StudyRating.FAIR },
-                again = state.evaluations.count { it.rating == StudyRating.AGAIN },
+                easy = ratingCounts?.easy ?: state.evaluations.count { it.rating == StudyRating.EASY },
+                fair = ratingCounts?.fair ?: state.evaluations.count { it.rating == StudyRating.FAIR },
+                again = ratingCounts?.again ?: state.evaluations.count { it.rating == StudyRating.AGAIN },
                 onClose = { onIntent(LearningIntent.Close) },
             )
         }

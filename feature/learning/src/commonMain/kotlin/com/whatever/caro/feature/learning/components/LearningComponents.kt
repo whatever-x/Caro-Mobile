@@ -57,7 +57,6 @@ import caromobile.core.designsystem.generated.resources.learning_stop_title
 import caromobile.core.designsystem.generated.resources.learning_total
 import com.whatever.caro.core.designsystem.components.CaroDialog
 import com.whatever.caro.core.designsystem.themes.CaroTheme
-import com.whatever.caro.core.model.learning.LearningPolicy
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.painterResource

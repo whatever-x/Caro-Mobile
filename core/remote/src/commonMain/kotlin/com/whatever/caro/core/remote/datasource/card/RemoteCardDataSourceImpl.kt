@@ -4,7 +4,6 @@ import com.whatever.caro.core.remote.api.CardControllerApi
 import com.whatever.caro.core.remote.dto.cardController.request.CreateCardsRequest
 import com.whatever.caro.core.remote.dto.cardController.request.DeleteCardsRequest
 import com.whatever.caro.core.remote.dto.cardController.request.UpdateCardRequest
-import com.whatever.caro.core.remote.dto.cardController.response.CardResponse
 import com.whatever.caro.core.remote.dto.cardController.response.CreateCardsResponse
 import com.whatever.caro.core.remote.dto.cardController.response.DeleteCardResponse
 import com.whatever.caro.core.remote.dto.cardController.response.UpdateCardResponse

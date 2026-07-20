@@ -16,7 +16,5 @@ internal class RemoteStudySessionDataSourceImpl(
         sessionId: Long,
         idempotencyKey: String,
         evaluations: List<EvaluatedCardRequest>,
-    ) {
-        api.requestEvaluate(sessionId, idempotencyKey, evaluations)
-    }
+    ) = api.requestEvaluate(sessionId, idempotencyKey, evaluations)
 }
