@@ -6,7 +6,6 @@ import com.whatever.caro.core.viewmodel.ExceptionFilter
 import com.whatever.caro.feature.home.mvi.HomeIntent
 import com.whatever.caro.feature.home.mvi.HomeSideEffect
 import com.whatever.caro.feature.home.mvi.HomeState
-import io.github.aakira.napier.Napier
 import kotlinx.collections.immutable.toImmutableList
 
 class HomeViewModel(
@@ -24,6 +23,10 @@ class HomeViewModel(
         when (intent) {
             HomeIntent.Initialize -> {
                 initialize()
+            }
+
+            is HomeIntent.ClickStartLearning -> {
+                postSideEffect(HomeSideEffect.NavigateToDailyLearning(deckId = intent.deckId))
             }
 
             HomeIntent.ClickCreateDeckButton -> {

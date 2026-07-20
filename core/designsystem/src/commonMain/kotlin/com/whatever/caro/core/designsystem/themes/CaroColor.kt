@@ -3,7 +3,7 @@ package com.whatever.caro.core.designsystem.themes
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
 import com.whatever.caro.core.designsystem.foundation.Alpha20
-import com.whatever.caro.core.designsystem.foundation.Alpha60
+import com.whatever.caro.core.designsystem.foundation.BlackAlpha60
 import com.whatever.caro.core.designsystem.foundation.Blue100
 import com.whatever.caro.core.designsystem.foundation.Blue200
 import com.whatever.caro.core.designsystem.foundation.Blue300
@@ -11,11 +11,15 @@ import com.whatever.caro.core.designsystem.foundation.Blue400
 import com.whatever.caro.core.designsystem.foundation.Blue500
 import com.whatever.caro.core.designsystem.foundation.Blue600
 import com.whatever.caro.core.designsystem.foundation.Blue700
-import com.whatever.caro.core.designsystem.foundation.Blue800
 import com.whatever.caro.core.designsystem.foundation.Blue900
 import com.whatever.caro.core.designsystem.foundation.BorderComplete
 import com.whatever.caro.core.designsystem.foundation.BorderProgress
 import com.whatever.caro.core.designsystem.foundation.BorderReady
+import com.whatever.caro.core.designsystem.foundation.ButtonFairDefault
+import com.whatever.caro.core.designsystem.foundation.ButtonFairPressed
+import com.whatever.caro.core.designsystem.foundation.ButtonHardPressed
+import com.whatever.caro.core.designsystem.foundation.GradientTertiaryEnd
+import com.whatever.caro.core.designsystem.foundation.GradientTertiaryStart
 import com.whatever.caro.core.designsystem.foundation.Gray100
 import com.whatever.caro.core.designsystem.foundation.Gray200
 import com.whatever.caro.core.designsystem.foundation.Gray300
@@ -24,23 +28,23 @@ import com.whatever.caro.core.designsystem.foundation.Gray500
 import com.whatever.caro.core.designsystem.foundation.Gray700
 import com.whatever.caro.core.designsystem.foundation.Gray800
 import com.whatever.caro.core.designsystem.foundation.Gray900
+import com.whatever.caro.core.designsystem.foundation.IconDisabled
 import com.whatever.caro.core.designsystem.foundation.Red100
 import com.whatever.caro.core.designsystem.foundation.Red300
 import com.whatever.caro.core.designsystem.foundation.Red500
-import com.whatever.caro.core.designsystem.foundation.Red600
 import com.whatever.caro.core.designsystem.foundation.Red700
 import com.whatever.caro.core.designsystem.foundation.Red800
 import com.whatever.caro.core.designsystem.foundation.SurfaceComplete
 import com.whatever.caro.core.designsystem.foundation.SurfaceProgress
 import com.whatever.caro.core.designsystem.foundation.SurfaceReady
 import com.whatever.caro.core.designsystem.foundation.TextComplete
+import com.whatever.caro.core.designsystem.foundation.TextDisabled
 import com.whatever.caro.core.designsystem.foundation.TextProgress
 import com.whatever.caro.core.designsystem.foundation.TextReady
 import com.whatever.caro.core.designsystem.foundation.White100
 import com.whatever.caro.core.designsystem.foundation.Yellow100
 import com.whatever.caro.core.designsystem.foundation.Yellow200
 import com.whatever.caro.core.designsystem.foundation.Yellow300
-import com.whatever.caro.core.designsystem.foundation.Yellow600
 import com.whatever.caro.core.designsystem.foundation.Yellow700
 import com.whatever.caro.core.designsystem.foundation.Yellow800
 
@@ -62,12 +66,12 @@ data class CaroColor(
         val primary: Color = Gray900,
         val secondary: Color = Gray700,
         val tertiary: Color = Gray500,
-        val disable: Color = Gray400,
+        val disable: Color = TextDisabled,
         val inverse: Color = White100,
         val brand: Color = Blue500,
         val warning: Color = Yellow800,
         val error: Color = Red700,
-        val info: Color = Blue800,
+        val info: Color = Blue500,
         val ready: Color = TextReady,
         val progress: Color = TextProgress,
         val complete: Color = TextComplete,
@@ -80,8 +84,8 @@ data class CaroColor(
     data class IconColor(
         val primary: Color = Blue500,
         val secondary: Color = Gray700,
-        val tertiary: Color = Gray500,
-        val disable: Color = Gray400,
+        val tertiary: Color = Blue400,
+        val disable: Color = IconDisabled,
         val inverse: Color = White100,
         val brand: Color = Blue500,
         val warning: Color = Yellow700,
@@ -99,7 +103,7 @@ data class CaroColor(
     data class SurfaceColor(
         val primary: Color = White100,
         val secondary: Color = Gray100,
-        val tertiary: Color = Gray200,
+        val tertiary: Color = Blue100,
         val inverse: Color = Gray900,
         val brand: Color = Blue500,
         val warning: Color = Yellow100,
@@ -115,8 +119,8 @@ data class CaroColor(
 
     @Immutable
     data class BorderColor(
-        val primary: Color = Gray300,
-        val secondary: Color = Gray200,
+        val primary: Color = SurfaceReady,
+        val secondary: Color = Gray500,
         val tertiary: Color = Gray100,
         val disabled: Color = Gray200,
         val brand: Color = Blue500,
@@ -137,7 +141,7 @@ data class CaroColor(
 
     @Immutable
     data class OverlayColor(
-        val dim: Color = Alpha60,
+        val dim: Color = BlackAlpha60,
         val light: Color = Alpha20,
     )
 
@@ -155,6 +159,8 @@ data class CaroColor(
         val secondaryStart: Color = Blue200,
         val secondaryCenter: Color = Blue400,
         val secondaryEnd: Color = Blue600,
+        val tertiaryStart: Color = GradientTertiaryStart,
+        val tertiaryEnd: Color = GradientTertiaryEnd,
     )
 
     @Immutable
@@ -165,16 +171,16 @@ data class CaroColor(
         @Immutable
         data class ButtonSurfaceDefaultColor(
             val floating: Color = Gray800,
-            val easy: Color = Blue600,
-            val fair: Color = Yellow600,
-            val hard: Color = Red600,
+            val easy: Color = BorderProgress,
+            val fair: Color = ButtonFairDefault,
+            val hard: Color = Red300,
         )
 
         @Immutable
         data class ButtonSurfacePressedColor(
-            val easy: Color = Blue800,
-            val fair: Color = Yellow800,
-            val hard: Color = Red800,
+            val easy: Color = Blue400,
+            val fair: Color = ButtonFairPressed,
+            val hard: Color = ButtonHardPressed,
         )
     }
 

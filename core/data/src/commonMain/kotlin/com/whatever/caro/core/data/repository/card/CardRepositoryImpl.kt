@@ -1,6 +1,5 @@
 package com.whatever.caro.core.data.repository.card
 
-import com.whatever.caro.core.model.card.Card
 import com.whatever.caro.core.model.card.CardContent
 import com.whatever.caro.core.remote.datasource.card.CardDataSource
 import com.whatever.caro.core.remote.dto.cardController.request.CreateCardItemDto
@@ -8,7 +7,6 @@ import com.whatever.caro.core.remote.dto.cardController.request.CreateCardItemDt
 import com.whatever.caro.core.remote.dto.cardController.request.CreateCardsRequest
 import com.whatever.caro.core.remote.dto.cardController.request.DeleteCardsRequest
 import com.whatever.caro.core.remote.dto.cardController.request.UpdateCardRequest
-import com.whatever.caro.core.remote.dto.cardController.response.CardResponse
 
 internal class CardRepositoryImpl(
     private val cardDataSource: CardDataSource,
@@ -34,11 +32,6 @@ internal class CardRepositoryImpl(
         cardDataSource.createCards(deckId = deckId, request = request)
     }
 
-    override suspend fun getCards(deckId: Long): List<Card> =
-        cardDataSource
-            .getCards(deckId = deckId)
-            .mapNotNull { response -> response.toModel() }
-
     override suspend fun updateCard(
         cardId: Long,
         content: CardContent,
@@ -55,24 +48,10 @@ internal class CardRepositoryImpl(
         cardDataSource.deleteCards(request = request)
     }
 
-    private fun CardResponse.toModel(): Card? {
-        val id = cardId ?: return null
-        return Card(
-            id = id,
-            content = fields.toCardContent(),
-        )
-    }
-
     private fun CardContent.toFields(): Map<String, String> =
         mapOf(
             FIELD_FRONT to front,
             FIELD_BACK to back,
-        )
-
-    private fun Map<String, String>?.toCardContent(): CardContent =
-        CardContent(
-            front = this?.get(FIELD_FRONT).orEmpty(),
-            back = this?.get(FIELD_BACK).orEmpty(),
         )
 
     private companion object {

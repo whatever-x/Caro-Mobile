@@ -90,24 +90,25 @@ data class CaroTypography(
                 TextStyle(
                     fontFamily = pretendard,
                     fontWeight = FontWeight.W700,
-                    fontSize = 28.sp,
+                    fontSize = 24.sp,
                 ),
             heading1 =
                 TextStyle(
                     fontFamily = pretendard,
                     fontWeight = FontWeight.W700,
-                    fontSize = 22.sp,
+                    fontSize = 20.sp,
                 ),
             heading2 =
                 TextStyle(
                     fontFamily = pretendard,
-                    fontWeight = FontWeight.W700,
+                    fontWeight = FontWeight.W600,
                     fontSize = 18.sp,
+                    lineHeight = 24.sp,
                 ),
             heading3 =
                 TextStyle(
                     fontFamily = pretendard,
-                    fontWeight = FontWeight.W700,
+                    fontWeight = FontWeight.W600,
                     fontSize = 16.sp,
                 ),
             body1 =
@@ -133,6 +134,7 @@ data class CaroTypography(
                             fontFamily = pretendard,
                             fontWeight = FontWeight.W600,
                             fontSize = 14.sp,
+                            lineHeight = 20.sp,
                         ),
                     regular =
                         TextStyle(
@@ -151,9 +153,9 @@ data class CaroTypography(
             body3 =
                 TextStyle(
                     fontFamily = pretendard,
-                    fontWeight = FontWeight.W400,
+                    fontWeight = FontWeight.W500,
                     fontSize = 14.sp,
-                    lineHeight = 22.sp,
+                    lineHeight = 20.sp,
                 ),
             body4 =
                 Body4Style(
@@ -176,8 +178,9 @@ data class CaroTypography(
                     regular =
                         TextStyle(
                             fontFamily = pretendard,
-                            fontWeight = FontWeight.W400,
+                            fontWeight = FontWeight.W500,
                             fontSize = 14.sp,
+                            lineHeight = 20.sp,
                         ),
                 ),
             label2 =

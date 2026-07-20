@@ -15,6 +15,7 @@ import com.whatever.caro.feature.card.di.cardModule
 import com.whatever.caro.feature.deck.detail.di.deckDetailModule
 import com.whatever.caro.feature.deck.di.deckModule
 import com.whatever.caro.feature.home.di.homeModule
+import com.whatever.caro.feature.learning.di.learningModule
 import com.whatever.caro.feature.login.di.loginModule
 import com.whatever.caro.feature.login.di.socialModule
 import com.whatever.caro.feature.profile.di.profileModule
@@ -55,6 +56,7 @@ fun initKoin(configuration: KoinAppDeclaration? = null) {
             deckModule,
             cardModule,
             settingModule,
+            learningModule,
         )
     }
 }

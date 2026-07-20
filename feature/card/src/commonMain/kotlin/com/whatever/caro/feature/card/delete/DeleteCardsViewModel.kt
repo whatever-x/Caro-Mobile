@@ -1,6 +1,7 @@
 package com.whatever.caro.feature.card.delete
 
 import com.whatever.caro.core.data.repository.card.CardRepository
+import com.whatever.caro.core.data.repository.deck.DeckRepository
 import com.whatever.caro.core.data.util.suspendRunCatching
 import com.whatever.caro.core.viewmodel.BaseViewModel
 import com.whatever.caro.core.viewmodel.ExceptionFilter
@@ -13,6 +14,7 @@ import kotlinx.collections.immutable.toPersistentSet
 
 class DeleteCardsViewModel(
     private val cardRepository: CardRepository,
+    private val deckRepository: DeckRepository,
     private val deckId: Long,
     exceptionFilter: ExceptionFilter,
 ) : BaseViewModel<DeleteCardsState, DeleteCardsIntent, DeleteCardsSideEffect>(
@@ -45,7 +47,7 @@ class DeleteCardsViewModel(
 
         launch {
             suspendRunCatching {
-                cardRepository.getCards(deckId = deckId)
+                deckRepository.getDeckCards(deckId = deckId)
             }.onSuccess { cards ->
                 reduce {
                     copy(

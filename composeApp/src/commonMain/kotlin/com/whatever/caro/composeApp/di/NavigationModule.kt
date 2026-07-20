@@ -9,6 +9,7 @@ import com.whatever.caro.core.navigator.entries.EditCardEntry
 import com.whatever.caro.core.navigator.entries.EditDeckEntry
 import com.whatever.caro.core.navigator.entries.EditProfileEntry
 import com.whatever.caro.core.navigator.entries.HomeEntry
+import com.whatever.caro.core.navigator.entries.LearningEntry
 import com.whatever.caro.core.navigator.entries.LoginEntry
 import com.whatever.caro.core.navigator.entries.SettingEntry
 import com.whatever.caro.core.navigator.entries.SplashEntry
@@ -25,6 +26,8 @@ import com.whatever.caro.feature.deck.edit.EditDeckRoute
 import com.whatever.caro.feature.deck.edit.EditDeckViewModel
 import com.whatever.caro.feature.home.HomeViewModel
 import com.whatever.caro.feature.home.route.HomeRoute
+import com.whatever.caro.feature.learning.LearningViewModel
+import com.whatever.caro.feature.learning.route.LearningRoute
 import com.whatever.caro.feature.login.LoginRoute
 import com.whatever.caro.feature.profile.create.CreateProfileRoute
 import com.whatever.caro.feature.profile.edit.EditProfileRoute
@@ -149,6 +152,19 @@ val navEntryModule: Module =
                 viewModel = koinViewModel(),
                 navDispatcher = get(),
                 snackbarController = get(),
+            )
+        }
+
+        navigation<LearningEntry> { navKey ->
+            LearningRoute(
+                viewModel =
+                    koinViewModel<LearningViewModel> {
+                        parametersOf(
+                            navKey.payload.deckId,
+                            navKey.payload.mode,
+                        )
+                    },
+                navDispatcher = get(),
             )
         }
     }

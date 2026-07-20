@@ -3,6 +3,7 @@ package com.whatever.caro.feature.deck.detail
 import com.whatever.caro.core.data.repository.deck.DeckRepository
 import com.whatever.caro.core.model.card.CardBadge
 import com.whatever.caro.core.model.deck.Deck
+import com.whatever.caro.core.model.learning.LearningMode
 import com.whatever.caro.core.viewmodel.BaseViewModel
 import com.whatever.caro.core.viewmodel.ExceptionFilter
 import com.whatever.caro.feature.deck.detail.model.CardItem
@@ -14,8 +15,8 @@ import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.CancellationException
 
 class DeckDetailViewModel(
-    deck: Deck,
     private val deckRepository: DeckRepository,
+    deck: Deck,
     exceptionFilter: ExceptionFilter,
 ) : BaseViewModel<DeckDetailState, DeckDetailIntent, DeckDetailSideEffect>(
         initialState =
@@ -26,6 +27,11 @@ class DeckDetailViewModel(
     ) {
     init {
         loadCards()
+    }
+
+    override fun handleClientException(throwable: Throwable) {
+        super.handleClientException(throwable)
+        reduce { copy(isCardListLoading = false) }
     }
 
     override suspend fun handleIntent(intent: DeckDetailIntent) {
@@ -39,11 +45,21 @@ class DeckDetailViewModel(
             }
 
             DeckDetailIntent.ClickAllStudy -> {
-                postSideEffect(DeckDetailSideEffect.NavigateToAllStudy(deckId = currentState.deck.id))
+                postSideEffect(
+                    DeckDetailSideEffect.NavigateToLearning(
+                        deckId = currentState.deck.id,
+                        mode = LearningMode.ALL,
+                    ),
+                )
             }
 
             DeckDetailIntent.ClickDailyStudy -> {
-                postSideEffect(DeckDetailSideEffect.NavigateToDailyStudy(deckId = currentState.deck.id))
+                postSideEffect(
+                    DeckDetailSideEffect.NavigateToLearning(
+                        deckId = currentState.deck.id,
+                        mode = LearningMode.DAILY,
+                    ),
+                )
             }
 
             DeckDetailIntent.ClickSortCardList -> {
