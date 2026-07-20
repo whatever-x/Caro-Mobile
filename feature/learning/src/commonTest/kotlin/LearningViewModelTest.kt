@@ -1,8 +1,11 @@
 import app.cash.turbine.test
-import com.whatever.caro.core.data.repository.card.CardRepository
+import com.whatever.caro.core.data.repository.deck.DeckRepository
 import com.whatever.caro.core.data.repository.study.StudySessionRepository
 import com.whatever.caro.core.model.card.Card
+import com.whatever.caro.core.model.card.CardBadge
 import com.whatever.caro.core.model.card.CardContent
+import com.whatever.caro.core.model.card.DeckCard
+import com.whatever.caro.core.model.deck.Deck
 import com.whatever.caro.core.model.exception.CaroServerException
 import com.whatever.caro.core.model.learning.LearningMode
 import com.whatever.caro.core.model.learning.StudyCard
@@ -37,7 +40,7 @@ class LearningViewModelTest :
         beforeTest { Dispatchers.setMain(dispatcher) }
         afterTest { Dispatchers.resetMain() }
 
-        test("전체 학습은 카드 저장소의 모든 카드를 로컬 세션으로 불러온다") {
+        test("전체 학습은 덱 저장소의 모든 카드를 로컬 세션으로 불러온다") {
             runTest(dispatcher) {
                 val cards = listOf(Card(1, CardContent("앞1", "뒤1")), Card(2, CardContent("앞2", "뒤2")))
                 val viewModel = createViewModel(cards)
@@ -369,19 +372,35 @@ private fun createViewModel(
     study: FakeStudyRepository = FakeStudyRepository(),
     timeSource: TimeSource = TimeSource.Monotonic,
     mode: LearningMode = LearningMode.ALL,
-) = LearningViewModel(1L, mode, study, FakeCardRepository(cards), ExceptionFilter.None, timeSource)
+) = LearningViewModel(1L, mode, study, FakeDeckRepository(cards), ExceptionFilter.None, timeSource)
 
-private class FakeCardRepository(
+private class FakeDeckRepository(
     private val cards: List<Card>,
-) : CardRepository {
-    override suspend fun getCards(deckId: Long) = cards
+) : DeckRepository {
+    override suspend fun getDecks(): List<Deck> = emptyList()
 
-    override suspend fun createCards(
-        deckId: Long,
-        cards: List<CardContent>,
+    override suspend fun getDeckCards(deckId: Long): List<DeckCard> =
+        cards.map { card ->
+            DeckCard(
+                id = card.id,
+                content = card.content,
+                badge = CardBadge.NEW,
+                reviewCount = 0,
+            )
+        }
+
+    override suspend fun createDeck(
+        name: String,
+        description: String,
     ) = Unit
 
-    override suspend fun deleteCards(cardIds: List<Long>) = Unit
+    override suspend fun updateDeck(
+        deckId: Long,
+        name: String,
+        description: String,
+    ) = Unit
+
+    override suspend fun deleteDeck(deckId: Long) = Unit
 }
 
 private class FakeStudyRepository(

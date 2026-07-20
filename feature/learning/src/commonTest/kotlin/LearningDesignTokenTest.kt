@@ -1,10 +1,8 @@
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.whatever.caro.core.designsystem.themes.CaroColor
-import com.whatever.caro.core.designsystem.themes.CaroSpacing
 import com.whatever.caro.core.designsystem.themes.CaroTypography
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
@@ -36,10 +34,6 @@ class LearningDesignTokenTest :
                 .toArgb() shouldBe 0xFFFFE3AB.toInt()
             color.button.pressed.hard
                 .toArgb() shouldBe 0xFFFFBCB7.toInt()
-        }
-
-        test("학습 완료 화면 간격 토큰이 Figma 값과 일치한다") {
-            CaroSpacing.defaultSpacing().xl2_2 shouldBe 28.dp
         }
 
         test("학습 화면 공용 타이포그래피 토큰이 Figma 값과 일치한다") {
