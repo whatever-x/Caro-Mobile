@@ -5,6 +5,7 @@ import com.whatever.caro.core.navigator.entries.CreateDeckEntry
 import com.whatever.caro.core.navigator.entries.CreateProfileEntry
 import com.whatever.caro.core.navigator.entries.DeckDetailEntry
 import com.whatever.caro.core.navigator.entries.DeleteCardsEntry
+import com.whatever.caro.core.navigator.entries.EditCardEntry
 import com.whatever.caro.core.navigator.entries.EditDeckEntry
 import com.whatever.caro.core.navigator.entries.EditProfileEntry
 import com.whatever.caro.core.navigator.entries.HomeEntry
@@ -13,9 +14,11 @@ import com.whatever.caro.core.navigator.entries.LoginEntry
 import com.whatever.caro.core.navigator.entries.SettingEntry
 import com.whatever.caro.core.navigator.entries.SplashEntry
 import com.whatever.caro.feature.card.CreateCardViewModel
+import com.whatever.caro.feature.card.EditCardViewModel
 import com.whatever.caro.feature.card.delete.DeleteCardsViewModel
 import com.whatever.caro.feature.card.delete.route.DeleteCardsRoute
 import com.whatever.caro.feature.card.route.CreateCardRoute
+import com.whatever.caro.feature.card.route.EditCardRoute
 import com.whatever.caro.feature.deck.create.CreateDeckRoute
 import com.whatever.caro.feature.deck.detail.DeckDetailViewModel
 import com.whatever.caro.feature.deck.detail.route.DeckDetailRoute
@@ -102,6 +105,7 @@ val navEntryModule: Module =
                         )
                     },
                 navDispatcher = get(),
+                snackbarController = get(),
             )
         }
 
@@ -115,6 +119,21 @@ val navEntryModule: Module =
         navigation<CreateCardEntry> { navKey ->
             CreateCardRoute(
                 viewModel = koinViewModel<CreateCardViewModel> { parametersOf(navKey.payload.deckId) },
+                navDispatcher = get(),
+                snackbarController = get(),
+            )
+        }
+
+        navigation<EditCardEntry> { navKey ->
+            EditCardRoute(
+                viewModel =
+                    koinViewModel<EditCardViewModel> {
+                        parametersOf(
+                            navKey.payload.cardId,
+                            navKey.payload.front,
+                            navKey.payload.back,
+                        )
+                    },
                 navDispatcher = get(),
                 snackbarController = get(),
             )

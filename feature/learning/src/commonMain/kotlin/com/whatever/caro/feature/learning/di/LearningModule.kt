@@ -11,7 +11,7 @@ val learningModule =
                 deckId = params[0],
                 mode = params[1],
                 repository = get(),
-                cardRepository = get(),
+                deckRepository = get(),
                 exceptionFilter = get(),
             )
         }

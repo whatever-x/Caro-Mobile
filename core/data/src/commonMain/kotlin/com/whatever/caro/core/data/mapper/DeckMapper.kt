@@ -1,9 +1,38 @@
 package com.whatever.caro.core.data.mapper
 
+import com.whatever.caro.core.model.card.CardBadge
+import com.whatever.caro.core.model.card.CardContent
+import com.whatever.caro.core.model.card.DeckCard
 import com.whatever.caro.core.model.deck.Deck
 import com.whatever.caro.core.model.deck.DeckState
+import com.whatever.caro.core.remote.dto.deckCardInformation.response.DeckCardResponse
 import com.whatever.caro.core.remote.dto.deckCardInformation.response.DeckListResponse
 import com.whatever.caro.core.remote.dto.studySession.response.StudySessionProgressResponseDto
+
+private const val FIELD_FRONT = "front"
+private const val FIELD_BACK = "back"
+
+internal fun DeckCardResponse.toDeckCardModel(): DeckCard? {
+    val id = cardId ?: return null
+    return DeckCard(
+        id = id,
+        content =
+            CardContent(
+                front = fields?.get(FIELD_FRONT).orEmpty(),
+                back = fields?.get(FIELD_BACK).orEmpty(),
+            ),
+        badge = badge.toCardBadge(),
+        reviewCount = reviewCount ?: 0,
+    )
+}
+
+private fun DeckCardResponse.BadgeDto?.toCardBadge(): CardBadge =
+    when (this) {
+        DeckCardResponse.BadgeDto.NEW -> CardBadge.NEW
+        DeckCardResponse.BadgeDto.REVIEW -> CardBadge.REVIEW
+        DeckCardResponse.BadgeDto.HARD -> CardBadge.HARD
+        null -> CardBadge.NEW
+    }
 
 internal fun DeckListResponse.toDeckModel() =
     Deck(

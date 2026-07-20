@@ -1,5 +1,6 @@
 package com.whatever.caro.core.data.repository.deck
 
+import com.whatever.caro.core.model.card.CardBadge
 import com.whatever.caro.core.model.deck.DeckState
 import com.whatever.caro.core.remote.datasource.deck.DeckDataSource
 import com.whatever.caro.core.remote.dto.deck.request.CreateDeckRequest
@@ -7,6 +8,7 @@ import com.whatever.caro.core.remote.dto.deck.request.UpdateDeckRequest
 import com.whatever.caro.core.remote.dto.deck.response.CreateDeckResponse
 import com.whatever.caro.core.remote.dto.deck.response.DeleteDeckResponse
 import com.whatever.caro.core.remote.dto.deck.response.UpdateDeckResponse
+import com.whatever.caro.core.remote.dto.deckCardInformation.response.DeckCardResponse
 import com.whatever.caro.core.remote.dto.deckCardInformation.response.DeckListResponse
 import com.whatever.caro.core.remote.dto.studySession.response.StudySessionProgressResponseDto
 import dev.mokkery.answering.returns
@@ -109,6 +111,40 @@ class DeckRepositoryImplTest : FunSpec() {
                 deck.todayLearningCount shouldBe 24
                 deck.todayCompleteCount shouldBe 12
                 deck.state shouldBe DeckState.LEARNING
+            }
+        }
+
+        test("getDeckCards는 badge/복습 수를 포함해 DeckCard 모델로 매핑하고 cardId 가 없는 응답은 제외한다") {
+            runTest {
+                val deckDataSource =
+                    mock<DeckDataSource> {
+                        everySuspend { getDeckCards(any()) } returns
+                            listOf(
+                                DeckCardResponse(
+                                    cardId = 1L,
+                                    fields = mapOf("front" to "Run", "back" to "달리다"),
+                                    badge = DeckCardResponse.BadgeDto.HARD,
+                                    reviewCount = 5,
+                                ),
+                                DeckCardResponse(
+                                    cardId = null,
+                                    fields = mapOf("front" to "Skip", "back" to "제외"),
+                                    badge = DeckCardResponse.BadgeDto.NEW,
+                                    reviewCount = 0,
+                                ),
+                            )
+                    }
+                val repository = DeckRepositoryImpl(deckDataSource)
+
+                val cards = repository.getDeckCards(deckId = 42L)
+
+                cards.size shouldBe 1
+                val card = cards.first()
+                card.id shouldBe 1L
+                card.content.front shouldBe "Run"
+                card.content.back shouldBe "달리다"
+                card.badge shouldBe CardBadge.HARD
+                card.reviewCount shouldBe 5
             }
         }
     }

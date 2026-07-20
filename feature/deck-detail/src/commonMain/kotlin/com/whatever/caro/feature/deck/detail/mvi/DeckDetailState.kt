@@ -10,13 +10,13 @@ import kotlinx.collections.immutable.persistentListOf
 data class DeckDetailState(
     val deck: Deck,
     val deckCardList: ImmutableList<CardItem> = persistentListOf(),
+    val isCardListLoading: Boolean = false,
     val isSortBottomSheetVisible: Boolean = false,
     val isDeckEditBottomSheetVisible: Boolean = false,
     val selectedSortOption: DeckDetailSortOption = DeckDetailSortOption.CREATED,
-    val isLoading: Boolean = false,
 ) : UiState {
     val isEmptyDeckCard: Boolean
-        get() = !isLoading && deckCardList.isEmpty()
+        get() = deckCardList.isEmpty() && isCardListLoading.not()
 }
 
 enum class DeckDetailSortOption {

@@ -1,6 +1,6 @@
 package com.whatever.caro.feature.learning
 
-import com.whatever.caro.core.data.repository.card.CardRepository
+import com.whatever.caro.core.data.repository.deck.DeckRepository
 import com.whatever.caro.core.data.repository.study.StudySessionRepository
 import com.whatever.caro.core.model.exception.CaroException
 import com.whatever.caro.core.model.learning.LearningMode
@@ -21,7 +21,7 @@ class LearningViewModel(
     private val deckId: Long,
     private val mode: LearningMode,
     private val repository: StudySessionRepository,
-    private val cardRepository: CardRepository,
+    private val deckRepository: DeckRepository,
     exceptionFilter: ExceptionFilter,
     private val timeSource: TimeSource = TimeSource.Monotonic,
 ) : BaseViewModel<LearningState, LearningIntent, LearningSideEffect>(
@@ -96,8 +96,8 @@ class LearningViewModel(
         reduce { copy(isLoading = true, errorMessage = null) }
         if (mode == LearningMode.ALL) {
             val cards =
-                cardRepository
-                    .getCards(deckId)
+                deckRepository
+                    .getDeckCards(deckId)
                     .map { StudyCard(it.id, it.content.front, it.content.back) }
             reduce {
                 copy(

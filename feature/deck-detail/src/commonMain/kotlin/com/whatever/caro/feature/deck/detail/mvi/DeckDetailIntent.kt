@@ -3,8 +3,6 @@ package com.whatever.caro.feature.deck.detail.mvi
 import com.whatever.caro.core.viewmodel.contract.UiIntent
 
 sealed interface DeckDetailIntent : UiIntent {
-    data object Initialize : DeckDetailIntent
-
     data object ClickBack : DeckDetailIntent
 
     data object ClickAddCard : DeckDetailIntent
@@ -34,4 +32,6 @@ sealed interface DeckDetailIntent : UiIntent {
     data class ClickCard(
         val cardId: Long,
     ) : DeckDetailIntent
+
+    data object RefreshCards : DeckDetailIntent
 }

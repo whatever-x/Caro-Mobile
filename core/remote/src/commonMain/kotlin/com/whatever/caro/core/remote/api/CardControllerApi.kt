@@ -1,6 +1,7 @@
 package com.whatever.caro.core.remote.api
 
 import com.whatever.caro.core.remote.dto.cardController.request.CreateCardsRequest
+import com.whatever.caro.core.remote.dto.cardController.request.DeleteCardsRequest
 import com.whatever.caro.core.remote.dto.cardController.request.UpdateCardRequest
 import com.whatever.caro.core.remote.dto.cardController.response.CardResponse
 import com.whatever.caro.core.remote.dto.cardController.response.CreateCardsResponse
@@ -36,8 +37,8 @@ internal interface CardControllerApi {
         @Body request: UpdateCardRequest,
     ): UpdateCardResponse
 
-    @DELETE("v1/cards/{id}")
-    suspend fun requestDeleteCard(
-        @Path("id") id: Long,
+    @DELETE("v1/cards")
+    suspend fun requestDeleteCards(
+        @Body request: DeleteCardsRequest,
     ): DeleteCardResponse
 }

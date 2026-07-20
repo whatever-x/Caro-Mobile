@@ -3,27 +3,49 @@ package com.whatever.caro.feature.deck.detail.route
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import caromobile.core.designsystem.generated.resources.Res
+import caromobile.core.designsystem.generated.resources.card_list_error
+import com.whatever.caro.core.designsystem.components.CaroSnackbarStyle
 import com.whatever.caro.core.navigator.contract.NavCommand
 import com.whatever.caro.core.navigator.dispatcher.NavigationDispatcher
 import com.whatever.caro.core.navigator.entries.CreateCardEntry
 import com.whatever.caro.core.navigator.entries.DeleteCardsEntry
+import com.whatever.caro.core.navigator.entries.EditCardEntry
 import com.whatever.caro.core.navigator.entries.EditDeckEntry
 import com.whatever.caro.core.navigator.entries.LearningEntry
+import com.whatever.caro.core.ui.snackbar.SnackBarMessage
+import com.whatever.caro.core.ui.snackbar.SnackbarController
 import com.whatever.caro.feature.deck.detail.DeckDetailScreen
 import com.whatever.caro.feature.deck.detail.DeckDetailViewModel
 import com.whatever.caro.feature.deck.detail.mvi.DeckDetailIntent
 import com.whatever.caro.feature.deck.detail.mvi.DeckDetailSideEffect
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun DeckDetailRoute(
     viewModel: DeckDetailViewModel,
     navDispatcher: NavigationDispatcher,
+    snackbarController: SnackbarController,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val cardLoadErrorMessage = stringResource(Res.string.card_list_error)
+    var hasResumed by rememberSaveable { mutableStateOf(false) }
+
+    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
+        if (hasResumed) {
+            viewModel.intent(DeckDetailIntent.RefreshCards)
+        } else {
+            hasResumed = true
+        }
+    }
 
     LaunchedEffect(Unit) {
-        viewModel.intent(DeckDetailIntent.Initialize)
         viewModel.sideEffect.collect { sideEffect ->
             when (sideEffect) {
                 DeckDetailSideEffect.NavigateBack -> {
@@ -83,8 +105,29 @@ fun DeckDetailRoute(
                     )
                 }
 
-                is DeckDetailSideEffect.NavigateToCardDetail -> {
-                    // TODO: 카드 상세 화면 구현 후 sideEffect.cardId 를 사용해 이동 로직을 연결합니다.
+                is DeckDetailSideEffect.NavigateToEditCard -> {
+                    navDispatcher.emit(
+                        NavCommand.To(
+                            key =
+                                EditCardEntry(
+                                    payload =
+                                        EditCardEntry.Payload(
+                                            cardId = sideEffect.cardId,
+                                            front = sideEffect.front,
+                                            back = sideEffect.back,
+                                        ),
+                                ),
+                        ),
+                    )
+                }
+
+                DeckDetailSideEffect.ShowCardLoadError -> {
+                    snackbarController.show(
+                        SnackBarMessage(
+                            message = cardLoadErrorMessage,
+                            style = CaroSnackbarStyle.Error,
+                        ),
+                    )
                 }
             }
         }
