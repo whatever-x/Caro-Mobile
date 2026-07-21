@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <resources>
+    <!-- splash -->
+    <string name="splash_content">Build your daily study habit\nwith just one card</string>
 	<!-- login -->
 	<string name="login_snackbar_cancel">Cancelled.</string>
 	<string name="login_snackbar_error">An error occurred.</string>

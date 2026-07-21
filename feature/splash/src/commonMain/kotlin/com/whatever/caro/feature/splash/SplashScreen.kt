@@ -3,50 +3,40 @@ package com.whatever.caro.feature.splash
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import caromobile.feature.splash.generated.resources.Res
-import caromobile.feature.splash.generated.resources.img_splash
+import androidx.compose.ui.text.style.TextAlign
+import caromobile.core.designsystem.generated.resources.Res
+import caromobile.core.designsystem.generated.resources.img_splash
+import caromobile.core.designsystem.generated.resources.splash_content
 import com.whatever.caro.core.designsystem.themes.CaroTheme
 import com.whatever.caro.feature.splash.mvi.SplashState
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 internal fun SplashScreen(state: SplashState) {
-    Box(
+    Column(
         modifier =
             Modifier
                 .fillMaxSize()
-                .background(CaroTheme.color.background.primary),
-        contentAlignment = Alignment.Center,
+                .background(CaroTheme.color.background.brand),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Image(
             painter = painterResource(Res.drawable.img_splash),
             contentDescription = null,
-            modifier = Modifier.size(80.dp),
         )
-
-        if (state.isInitializing) {
-            Column(
-                modifier =
-                    Modifier
-                        .fillMaxSize()
-                        .padding(bottom = 48.dp),
-                verticalArrangement = Arrangement.Bottom,
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                CircularProgressIndicator(
-                    color = CaroTheme.color.icon.brand,
-                )
-            }
-        }
+        Text(
+            text = stringResource(Res.string.splash_content),
+            style = CaroTheme.typography.heading1,
+            color = CaroTheme.color.text.inverse,
+            textAlign = TextAlign.Center,
+        )
     }
 }
