@@ -19,9 +19,11 @@ import caromobile.core.designsystem.generated.resources.Res
 import caromobile.core.designsystem.generated.resources.ic_logo
 import caromobile.core.designsystem.generated.resources.ic_logo_apple
 import caromobile.core.designsystem.generated.resources.ic_logo_google
+import caromobile.core.designsystem.generated.resources.img_splash
 import caromobile.core.designsystem.generated.resources.login_button_apple
 import caromobile.core.designsystem.generated.resources.login_button_google
 import caromobile.core.designsystem.generated.resources.login_text_bottom_terms_of_service
+import caromobile.core.designsystem.generated.resources.login_text_logo_description
 import com.whatever.caro.core.designsystem.themes.CaroTheme
 import com.whatever.caro.core.model.auth.SocialLoginType
 import com.whatever.caro.feature.login.component.SocialLoginButton
@@ -42,16 +44,23 @@ internal fun LoginScreen(
                 .fillMaxSize()
                 .background(color = CaroTheme.color.background.brand),
     ) {
-        Box(
+        Column(
             modifier =
                 Modifier
                     .fillMaxWidth()
                     .weight(1f),
-            contentAlignment = Alignment.Center,
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Image(
-                painter = painterResource(Res.drawable.ic_logo),
+                painter = painterResource(Res.drawable.img_splash),
                 contentDescription = null,
+            )
+            Text(
+                text = stringResource(resource = Res.string.login_text_logo_description),
+                style = CaroTheme.typography.heading1,
+                color = CaroTheme.color.text.inverse,
+                textAlign = TextAlign.Center
             )
         }
 
@@ -90,7 +99,7 @@ internal fun LoginScreen(
 
             Text(
                 text = stringResource(resource = Res.string.login_text_bottom_terms_of_service),
-                style = CaroTheme.typography.label1.bold,
+                style = CaroTheme.typography.caption1.regular,
                 color = CaroTheme.color.text.tertiary,
                 textAlign = TextAlign.Center,
             )
