@@ -2,9 +2,9 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Show a Figma-matching `바로가기` action after deck creation and navigate to the newly created deck detail when the action is selected.
+**Goal:** Show a Figma-matching `바로가기` action above Home's floating deck-create button after deck creation and navigate to the newly created deck detail when the action is selected.
 
-**Architecture:** The data layer returns the created `Deck`, the create feature emits it as a one-shot side effect, and the Route sends an app-wide snackbar message containing an optional action callback. The design-system snackbar uses Material's `SnackbarVisuals.actionLabel`, `SnackbarData.performAction()`, and `SnackbarResult.ActionPerformed` contract so callbacks run only for an explicit selection.
+**Architecture:** The data layer returns the created `Deck`, the create feature emits it as a one-shot side effect, and the Route sends an app-wide snackbar message containing an optional action callback. The design-system snackbar uses Material's standard action contract, while the root `CaroApp` offsets the snackbar host only when `HomeEntry` is the current destination so the global host remains stable across navigation.
 
 **Tech Stack:** Kotlin Multiplatform, Compose Multiplatform Material 3, Navigation3, Kotlin coroutines/Flow, Kotest, Mokkery, Turbine, Gradle.
 
@@ -16,6 +16,7 @@
 - Existing snackbars without an action must retain their current behavior and layout without reserved action space.
 - A snackbar timeout, replacement, or dismissal must not execute the action callback.
 - Do not change snackbar duration, animation, or the general `DeckDetailEntry` payload contract.
+- On Home, add exactly 88 dp of snackbar bottom padding: 48 dp floating button height + 16 dp gap + 24 dp button bottom padding. Do not add another system-bar inset because Material 3 `Scaffold` already accounts for it.
 
 ---
 
@@ -379,4 +380,110 @@ Expected: build succeeds with zero test or formatting failures.
 ```bash
 git add core/designsystem/src/commonMain/composeResources/values-ko/strings.xml core/designsystem/src/commonMain/composeResources/values/strings.xml feature/deck/src/commonMain/kotlin/com/whatever/caro/feature/deck/create/CreateDeckRoute.kt
 git commit -m "feat: open created deck from snackbar"
+```
+
+### Task 5: Position the Snackbar Above Home's Floating Button
+
+**Files:**
+- Modify: `composeApp/build.gradle.kts`
+- Modify: `composeApp/src/commonMain/kotlin/com/whatever/caro/composeApp/CaroApp.kt`
+- Create: `composeApp/src/commonTest/kotlin/com/whatever/caro/composeApp/SnackbarPlacementTest.kt`
+
+**Interfaces:**
+- Consumes: the current `NavKey` from `rememberNavBackStack` and the existing `CaroSnackBarHost(modifier, hostState, snackbar)` API.
+- Produces: `internal fun snackbarHostBottomPadding(currentDestination: NavKey?): Dp`, returning 88 dp for `HomeEntry` and zero for every other destination.
+
+- [ ] **Step 1: Enable composeApp tests and write the failing placement test**
+
+Add `id("caro.kmp.test")` to `composeApp/build.gradle.kts`. Create the test:
+
+```kotlin
+package com.whatever.caro.composeApp
+
+import androidx.compose.ui.unit.dp
+import com.whatever.caro.core.navigator.entries.HomeEntry
+import com.whatever.caro.core.navigator.entries.Payload as HomePayload
+import com.whatever.caro.core.navigator.entries.SplashEntry
+import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.shouldBe
+
+class SnackbarPlacementTest : FunSpec() {
+    init {
+        test("Home에서는 플로팅 버튼 위 여백을 반환한다") {
+            val home = HomeEntry(payload = HomePayload(id = 1, name = "Tester"))
+
+            snackbarHostBottomPadding(home) shouldBe 88.dp
+        }
+
+        test("Home이 아니면 추가 여백을 반환하지 않는다") {
+            snackbarHostBottomPadding(SplashEntry) shouldBe 0.dp
+        }
+    }
+}
+```
+
+- [ ] **Step 2: Run the focused test and verify RED**
+
+Run: `./gradlew :composeApp:testAndroidHostTest --tests '*SnackbarPlacementTest*'`
+
+Expected: compilation failure because `snackbarHostBottomPadding` does not exist.
+
+- [ ] **Step 3: Implement destination-aware host padding**
+
+Add this pure placement rule to `CaroApp.kt`:
+
+```kotlin
+private val HomeSnackbarBottomPadding = 88.dp
+
+internal fun snackbarHostBottomPadding(currentDestination: NavKey?): Dp =
+    if (currentDestination is HomeEntry) HomeSnackbarBottomPadding else 0.dp
+```
+
+Resolve the padding from the current back-stack destination and apply it only to the snackbar host:
+
+```kotlin
+val snackbarBottomPadding = snackbarHostBottomPadding(backStack.lastOrNull())
+
+Scaffold(
+    modifier = Modifier.fillMaxSize(),
+    snackbarHost = {
+        CaroSnackBarHost(
+            modifier = Modifier.padding(bottom = snackbarBottomPadding),
+            hostState = snackBarHostState,
+            snackbar = { snackbarData ->
+                CaroSnackbar(snackbarData = snackbarData)
+            },
+        )
+    },
+) { innerPadding ->
+    Box(
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .padding(paddingValues = innerPadding),
+    ) {
+        CaroNavHost(backStack = backStack)
+    }
+}
+```
+
+Do not add `navigationBarsPadding()`; `Scaffold` already places the snackbar above its configured bottom inset.
+
+- [ ] **Step 4: Run the placement tests and verify GREEN**
+
+Run: `./gradlew :composeApp:testAndroidHostTest --tests '*SnackbarPlacementTest*'`
+
+Expected: both placement tests pass.
+
+- [ ] **Step 5: Run formatting and integration verification**
+
+Run: `./gradlew :composeApp:spotlessCheck :composeApp:testAndroidHostTest :androidApp:assembleDevDebug`
+
+Expected: all composeApp formatting and tests pass, and the Android dev debug app assembles successfully.
+
+- [ ] **Step 6: Commit only Task 5 files**
+
+```bash
+git add composeApp/build.gradle.kts composeApp/src/commonMain/kotlin/com/whatever/caro/composeApp/CaroApp.kt composeApp/src/commonTest/kotlin/com/whatever/caro/composeApp/SnackbarPlacementTest.kt
+git commit -m "fix: position home snackbar above floating button"
 ```
