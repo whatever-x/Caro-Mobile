@@ -19,7 +19,7 @@ data class CaroTypography(
     val body3: TextStyle,
     val body4: Body4Style,
     val label1: Label1Style,
-    val label2: TextStyle,
+    val label2: Label2Style,
     val caption1: Caption1Style,
     val caption2: Caption2Style,
     val robotoLabel1: TextStyle,
@@ -36,6 +36,10 @@ data class CaroTypography(
         val regular: TextStyle
     }
 
+    interface MediumStyle {
+        val medium: TextStyle
+    }
+
     @Immutable
     data class Body1Style(
         val semiBold: TextStyle,
@@ -47,8 +51,10 @@ data class CaroTypography(
         val semiBold: TextStyle,
         override val regular: TextStyle,
         override val reading: TextStyle,
+        override val medium: TextStyle,
     ) : ReadingStyle,
-        RegularStyle
+        RegularStyle,
+        MediumStyle
 
     @Immutable
     data class Body4Style(
@@ -59,8 +65,15 @@ data class CaroTypography(
     data class Label1Style(
         override val bold: TextStyle,
         override val regular: TextStyle,
+        override val medium: TextStyle,
     ) : BoldStyle,
-        RegularStyle
+        RegularStyle,
+        MediumStyle
+
+    @Immutable
+    data class Label2Style(
+        override val regular: TextStyle,
+    ) : RegularStyle
 
     @Immutable
     data class Caption1Style(
@@ -149,6 +162,11 @@ data class CaroTypography(
                             fontSize = 14.sp,
                             lineHeight = 22.sp,
                         ),
+                    medium = TextStyle(
+                        fontFamily = pretendard,
+                        fontWeight = FontWeight.W500,
+                        fontSize = 14.sp,
+                    ),
                 ),
             body3 =
                 TextStyle(
@@ -182,13 +200,20 @@ data class CaroTypography(
                             fontSize = 14.sp,
                             lineHeight = 20.sp,
                         ),
+                    medium =
+                        TextStyle(
+                            fontFamily = pretendard,
+                            fontWeight = FontWeight.W500,
+                            fontSize = 14.sp,
+                        ),
                 ),
-            label2 =
-                TextStyle(
+            label2 = Label2Style(
+                regular = TextStyle(
                     fontFamily = pretendard,
-                    fontWeight = FontWeight.W500,
-                    fontSize = 14.sp,
+                    fontWeight = FontWeight.W400,
+                    fontSize = 12.sp,
                 ),
+            ),
             caption1 =
                 Caption1Style(
                     regular =

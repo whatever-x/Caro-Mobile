@@ -115,7 +115,7 @@ fun CaroSnackbar(
         contentAlignment = Alignment.Center,
     ) {
         Text(
-            style = CaroTheme.typography.body3,
+            style = CaroTheme.typography.body2.medium,
             text = snackbarData.visuals.message,
             textAlign = TextAlign.Center,
             color = textColor,
