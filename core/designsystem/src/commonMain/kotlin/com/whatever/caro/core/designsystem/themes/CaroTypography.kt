@@ -83,9 +83,11 @@ data class CaroTypography(
     @Immutable
     data class Caption2Style(
         override val bold: TextStyle,
+        override val medium: TextStyle,
         override val regular: TextStyle,
     ) : BoldStyle,
-        RegularStyle
+        RegularStyle,
+        MediumStyle
 
     companion object {
         fun defaultTypography(
@@ -235,6 +237,12 @@ data class CaroTypography(
                         TextStyle(
                             fontFamily = pretendard,
                             fontWeight = FontWeight.W400,
+                            fontSize = 10.sp,
+                        ),
+                    medium =
+                        TextStyle(
+                            fontFamily = pretendard,
+                            fontWeight = FontWeight.W500,
                             fontSize = 10.sp,
                         ),
                 ),

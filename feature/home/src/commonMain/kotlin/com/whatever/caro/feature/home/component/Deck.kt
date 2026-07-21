@@ -188,7 +188,7 @@ private fun ProgressContent(
                     Text(
                         text = stringResource(Res.string.home_deck_rest_title),
                         color = CaroTheme.color.text.rest,
-                        style = CaroTheme.typography.caption2.bold,
+                        style = CaroTheme.typography.caption2.medium,
                     )
                     Text(
                         text = stringResource(Res.string.home_deck_rest_description1),

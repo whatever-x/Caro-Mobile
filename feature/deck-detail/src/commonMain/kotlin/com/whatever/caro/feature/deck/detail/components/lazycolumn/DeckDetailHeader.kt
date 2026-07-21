@@ -67,7 +67,7 @@ internal fun DeckDetailHeader(
         Text(
             text = description,
             color = CaroTheme.color.text.secondary,
-            style = CaroTheme.typography.label2,
+            style = CaroTheme.typography.label2.regular,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
         )
@@ -221,7 +221,7 @@ private fun DailyLearningProgress(
                         learningCardTotal,
                     ),
                 color = CaroTheme.color.text.tertiary,
-                style = CaroTheme.typography.label2,
+                style = CaroTheme.typography.label2.regular,
             )
 
             Box(
@@ -241,7 +241,7 @@ private fun DailyLearningProgress(
                         learningProgress,
                     ),
                 color = CaroTheme.color.text.brand,
-                style = CaroTheme.typography.label2,
+                style = CaroTheme.typography.label2.regular,
             )
         }
     }
@@ -274,12 +274,12 @@ private fun UnavailableLearningMessage(modifier: Modifier = Modifier) {
             Text(
                 text = stringResource(Res.string.deck_detail_caption_daily_learning_unavailable_body_1),
                 color = CaroTheme.color.text.primary,
-                style = CaroTheme.typography.label2,
+                style = CaroTheme.typography.label2.regular,
             )
             Text(
                 text = stringResource(Res.string.deck_detail_caption_daily_learning_unavailable_body_2),
                 color = CaroTheme.color.text.primary,
-                style = CaroTheme.typography.label2,
+                style = CaroTheme.typography.label2.regular,
             )
         }
     }

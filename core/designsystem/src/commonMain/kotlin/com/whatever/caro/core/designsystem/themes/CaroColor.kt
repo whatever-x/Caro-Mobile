@@ -45,6 +45,7 @@ import com.whatever.caro.core.designsystem.foundation.White100
 import com.whatever.caro.core.designsystem.foundation.Yellow100
 import com.whatever.caro.core.designsystem.foundation.Yellow200
 import com.whatever.caro.core.designsystem.foundation.Yellow300
+import com.whatever.caro.core.designsystem.foundation.Yellow500
 import com.whatever.caro.core.designsystem.foundation.Yellow700
 import com.whatever.caro.core.designsystem.foundation.Yellow800
 
@@ -69,7 +70,7 @@ data class CaroColor(
         val disable: Color = TextDisabled,
         val inverse: Color = White100,
         val brand: Color = Blue500,
-        val warning: Color = Yellow800,
+        val warning: Color = Yellow500,
         val error: Color = Red700,
         val info: Color = Blue500,
         val ready: Color = TextReady,
