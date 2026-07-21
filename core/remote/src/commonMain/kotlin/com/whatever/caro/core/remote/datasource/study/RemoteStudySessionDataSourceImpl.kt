@@ -7,6 +7,8 @@ import com.whatever.caro.core.remote.dto.studySession.request.StartDailyStudyReq
 internal class RemoteStudySessionDataSourceImpl(
     private val api: StudySessionApi,
 ) : StudySessionDataSource {
+    override suspend fun getTodayDailySummary(deckId: Long) = api.requestTodayDailyStudySummary(deckId)
+
     override suspend fun startDaily(
         deckId: Long,
         idempotencyKey: String,

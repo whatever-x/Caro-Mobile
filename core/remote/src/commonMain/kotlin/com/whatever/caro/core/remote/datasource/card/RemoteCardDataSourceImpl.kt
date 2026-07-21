@@ -4,6 +4,7 @@ import com.whatever.caro.core.remote.api.CardControllerApi
 import com.whatever.caro.core.remote.dto.cardController.request.CreateCardsRequest
 import com.whatever.caro.core.remote.dto.cardController.request.DeleteCardsRequest
 import com.whatever.caro.core.remote.dto.cardController.request.UpdateCardRequest
+import com.whatever.caro.core.remote.dto.cardController.response.CardResponse
 import com.whatever.caro.core.remote.dto.cardController.response.CreateCardsResponse
 import com.whatever.caro.core.remote.dto.cardController.response.DeleteCardResponse
 import com.whatever.caro.core.remote.dto.cardController.response.UpdateCardResponse
@@ -19,6 +20,10 @@ internal class RemoteCardDataSourceImpl(
             deckId = deckId,
             request = request,
         )
+
+    override suspend fun getCardsByDeck(deckId: Long): List<CardResponse> = cardControllerApi.requestCardsByDeck(deckId = deckId)
+
+    override suspend fun getCard(cardId: Long): CardResponse = cardControllerApi.requestCard(id = cardId)
 
     override suspend fun updateCard(
         cardId: Long,

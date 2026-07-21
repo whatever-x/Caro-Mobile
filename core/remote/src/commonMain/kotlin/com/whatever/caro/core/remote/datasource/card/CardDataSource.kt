@@ -3,6 +3,7 @@ package com.whatever.caro.core.remote.datasource.card
 import com.whatever.caro.core.remote.dto.cardController.request.CreateCardsRequest
 import com.whatever.caro.core.remote.dto.cardController.request.DeleteCardsRequest
 import com.whatever.caro.core.remote.dto.cardController.request.UpdateCardRequest
+import com.whatever.caro.core.remote.dto.cardController.response.CardResponse
 import com.whatever.caro.core.remote.dto.cardController.response.CreateCardsResponse
 import com.whatever.caro.core.remote.dto.cardController.response.DeleteCardResponse
 import com.whatever.caro.core.remote.dto.cardController.response.UpdateCardResponse
@@ -12,6 +13,10 @@ interface CardDataSource {
         deckId: Long,
         request: CreateCardsRequest,
     ): CreateCardsResponse
+
+    suspend fun getCardsByDeck(deckId: Long): List<CardResponse>
+
+    suspend fun getCard(cardId: Long): CardResponse
 
     suspend fun updateCard(
         cardId: Long,
