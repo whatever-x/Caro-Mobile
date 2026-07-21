@@ -31,6 +31,10 @@ fun CreateDeckRoute(
                     navDispatcher.emit(command = NavCommand.Back)
                 }
 
+                is CreateDeckSideEffect.Created -> {
+                    navDispatcher.emit(command = NavCommand.Back)
+                }
+
                 is CreateDeckSideEffect.ShowError -> {
                     snackbarController.show(
                         SnackBarMessage(
