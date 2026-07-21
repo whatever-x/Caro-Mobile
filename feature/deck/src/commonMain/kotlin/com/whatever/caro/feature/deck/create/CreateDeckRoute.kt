@@ -30,7 +30,14 @@ fun CreateDeckRoute(
     val createSuccessMessage = stringResource(Res.string.deck_snackbar_create_success)
     val openDeckActionLabel = stringResource(Res.string.deck_snackbar_action_open)
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(
+        viewModel,
+        navDispatcher,
+        snackbarController,
+        createErrorMessage,
+        createSuccessMessage,
+        openDeckActionLabel,
+    ) {
         viewModel.sideEffect.collect { sideEffect ->
             when (sideEffect) {
                 is CreateDeckSideEffect.NavigateBack -> {
