@@ -424,9 +424,11 @@ class SnackbarPlacementTest : FunSpec() {
 
 - [ ] **Step 2: Run the focused test and verify RED**
 
-Run: `./gradlew :composeApp:testAndroidHostTest --tests '*SnackbarPlacementTest*'`
+Run: `./gradlew :composeApp:testAndroidHostTest`
 
 Expected: compilation failure because `snackbarHostBottomPadding` does not exist.
+
+Do not use Gradle's `--tests` filter here. Kotest `FunSpec` tests are registered dynamically in this KMP host-test task, so the filter reports “No tests found” even though an unfiltered run discovers the spec.
 
 - [ ] **Step 3: Implement destination-aware host padding**
 
@@ -471,7 +473,7 @@ Do not add `navigationBarsPadding()`; `Scaffold` already places the snackbar abo
 
 - [ ] **Step 4: Run the placement tests and verify GREEN**
 
-Run: `./gradlew :composeApp:testAndroidHostTest --tests '*SnackbarPlacementTest*'`
+Run: `./gradlew :composeApp:testAndroidHostTest`
 
 Expected: both placement tests pass.
 
