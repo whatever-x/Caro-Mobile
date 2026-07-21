@@ -33,7 +33,7 @@ Timeouts, replacement by a newer snackbar, and ordinary dismissal do not invoke 
 
 ## Component Design
 
-`SnackBarMessage` and `CaroSnackbarVisuals` receive nullable `actionLabel` and action callback values. No action space is reserved when the label is absent, preserving current snackbars.
+`SnackBarMessage` receives a nullable `actionLabel` and action callback. `CaroSnackbarVisuals` receives the label through Material's standard property, while the app-level display helper owns the callback until `showSnackbar` returns. No action space is reserved when the label is absent, preserving current snackbars.
 
 `CaroSnackbar` uses a horizontal layout with:
 
