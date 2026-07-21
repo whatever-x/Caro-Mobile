@@ -124,6 +124,8 @@ fun CaroApp(
                     message = snackbar.message,
                     style = snackbar.style,
                     duration = snackbar.duration,
+                    actionLabel = snackbar.actionLabel,
+                    onAction = snackbar.onAction,
                 )
             }
         }
