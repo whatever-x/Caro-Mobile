@@ -6,6 +6,7 @@ import com.whatever.caro.core.model.card.CardBadge
 import com.whatever.caro.core.model.card.CardContent
 import com.whatever.caro.core.model.card.DeckCard
 import com.whatever.caro.core.model.deck.Deck
+import com.whatever.caro.core.model.deck.DeckState
 import com.whatever.caro.core.model.exception.CaroServerException
 import com.whatever.caro.core.model.learning.LearningMode
 import com.whatever.caro.core.model.learning.StudyCard
@@ -392,7 +393,16 @@ private class FakeDeckRepository(
     override suspend fun createDeck(
         name: String,
         description: String,
-    ) = Unit
+    ): Deck =
+        Deck(
+            id = 1L,
+            title = name,
+            description = description,
+            cardTotalCount = 0,
+            todayLearningCount = 0,
+            todayCompleteCount = 0,
+            state = DeckState.NOT_STARTED,
+        )
 
     override suspend fun updateDeck(
         deckId: Long,
