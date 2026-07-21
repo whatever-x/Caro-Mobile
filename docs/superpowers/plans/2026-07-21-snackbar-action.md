@@ -2,9 +2,9 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Show a Figma-matching `바로가기` action above Home's floating deck-create button after deck creation and navigate to the newly created deck detail when the action is selected.
+**Goal:** Show a Figma-matching `바로가기` action above Home's floating deck-create button after deck creation, remove it immediately when selected, and navigate to the newly created deck detail.
 
-**Architecture:** The data layer returns the created `Deck`, the create feature emits it as a one-shot side effect, and the Route sends an app-wide snackbar message containing an optional action callback. The design-system snackbar uses Material's standard action contract, while the root `CaroApp` offsets the snackbar host only when `HomeEntry` is the current destination so the global host remains stable across navigation.
+**Architecture:** The data layer returns the created `Deck`, the create feature emits it as a one-shot side effect, and the Route sends an app-wide snackbar message containing an optional action callback. The design-system snackbar uses Material's standard action contract and marks action-selected visuals for immediate removal, while the root `CaroApp` offsets the snackbar host only when `HomeEntry` is the current destination so the global host remains stable across navigation. The custom animation host filters only marked outgoing snackbars from its retained animation list; every other dismissal keeps the existing exit transition.
 
 **Tech Stack:** Kotlin Multiplatform, Compose Multiplatform Material 3, Navigation3, Kotlin coroutines/Flow, Kotest, Mokkery, Turbine, Gradle.
 
@@ -15,7 +15,8 @@
 - Use `CaroTheme` typography, color, spacing, and shape tokens; do not introduce raw color or spacing values.
 - Existing snackbars without an action must retain their current behavior and layout without reserved action space.
 - A snackbar timeout, replacement, or dismissal must not execute the action callback.
-- Do not change snackbar duration, animation, or the general `DeckDetailEntry` payload contract.
+- Do not change snackbar duration, the general `DeckDetailEntry` payload contract, or the 150 ms exit animation for timeout, replacement, accessibility dismissal, and ordinary dismissal.
+- Selecting the snackbar action must remove that snackbar from composition immediately, while `SnackbarResult.ActionPerformed` remains the only trigger for its callback.
 - On Home, add exactly 88 dp of snackbar bottom padding: 48 dp floating button height + 16 dp gap + 24 dp button bottom padding. Do not add another system-bar inset because Material 3 `Scaffold` already accounts for it.
 
 ---
@@ -488,4 +489,231 @@ Expected: all composeApp formatting and tests pass, and the Android dev debug ap
 ```bash
 git add composeApp/build.gradle.kts composeApp/src/commonMain/kotlin/com/whatever/caro/composeApp/CaroApp.kt composeApp/src/commonTest/kotlin/com/whatever/caro/composeApp/SnackbarPlacementTest.kt
 git commit -m "fix: position home snackbar above floating button"
+```
+
+### Task 6: Remove the Snackbar Immediately After Action Selection
+
+**Files:**
+- Modify: `core/designsystem/src/commonTest/kotlin/com/whatever/caro/core/designsystem/components/SnackbarTest.kt`
+- Modify: `core/designsystem/src/commonMain/kotlin/com/whatever/caro/core/designsystem/components/Snackbar.kt`
+- Modify: `core/designsystem/src/commonMain/kotlin/com/whatever/caro/core/designsystem/animation/SlideInSlideOutSnackbarHost.kt`
+
+**Interfaces:**
+- Consumes: the existing `SnackbarData.performAction()` result contract and `SlideInSlideOutSnackbarHost(current, modifier, content)` animation behavior.
+- Produces: `internal fun performCaroSnackbarAction(snackbarData: SnackbarData)`, `internal fun shouldDismissSnackbarImmediately(snackbarData: SnackbarData): Boolean`, and `internal fun retainedSnackbarKeys(keys: List<SnackbarData?>, current: SnackbarData?, dismissImmediately: (SnackbarData) -> Boolean): List<SnackbarData>`.
+
+- [ ] **Step 1: Write failing immediate-removal policy tests**
+
+Extend `SnackbarTest` with the animation retention import and replace direct action execution with the design-system action function. Assert that the action-selected outgoing item is excluded immediately:
+
+```kotlin
+import androidx.compose.material3.SnackbarData
+import com.whatever.caro.core.designsystem.animation.retainedSnackbarKeys
+
+test("액션을 수행하면 스낵바를 즉시 제거하고 onAction을 한 번 호출한다") {
+    runTest {
+        val hostState = SnackbarHostState()
+        var calls = 0
+        showSnackbarMessage(
+            coroutineScope = this,
+            snackbarHostState = hostState,
+            message = "완료",
+            actionLabel = "바로가기",
+            onAction = { calls += 1 },
+        )
+        runCurrent()
+        val snackbarData = requireNotNull(hostState.currentSnackbarData)
+
+        performCaroSnackbarAction(snackbarData)
+
+        retainedSnackbarKeys(
+            keys = listOf(snackbarData, null),
+            current = null,
+            dismissImmediately = ::shouldDismissSnackbarImmediately,
+        ) shouldBe emptyList<SnackbarData>()
+        advanceUntilIdle()
+        calls shouldBe 1
+    }
+}
+```
+
+Extend the ordinary-dismissal test to prove that it remains eligible for the existing exit animation:
+
+```kotlin
+test("액션 없이 닫히면 종료 애니메이션을 유지하고 onAction을 호출하지 않는다") {
+    runTest {
+        val hostState = SnackbarHostState()
+        var calls = 0
+        showSnackbarMessage(
+            coroutineScope = this,
+            snackbarHostState = hostState,
+            message = "완료",
+            actionLabel = "바로가기",
+            onAction = { calls += 1 },
+        )
+        runCurrent()
+        val snackbarData = requireNotNull(hostState.currentSnackbarData)
+
+        snackbarData.dismiss()
+
+        retainedSnackbarKeys(
+            keys = listOf(snackbarData, null),
+            current = null,
+            dismissImmediately = ::shouldDismissSnackbarImmediately,
+        ) shouldBe listOf(snackbarData)
+        advanceUntilIdle()
+        calls shouldBe 0
+    }
+}
+```
+
+- [ ] **Step 2: Run the focused tests and verify RED**
+
+Run: `./gradlew :core:designsystem:testAndroidHostTest`
+
+Expected: Kotlin compilation fails because `performCaroSnackbarAction`, `shouldDismissSnackbarImmediately`, and `retainedSnackbarKeys` do not exist.
+
+- [ ] **Step 3: Add the action-only immediate-dismissal marker**
+
+Add an internal marker and setter to `CaroSnackbarVisuals`:
+
+```kotlin
+internal var dismissImmediately: Boolean = false
+    private set
+
+internal fun markForImmediateDismissal() {
+    dismissImmediately = true
+}
+```
+
+Add the action function and predicate next to the snackbar component:
+
+```kotlin
+internal fun performCaroSnackbarAction(snackbarData: SnackbarData) {
+    (snackbarData.visuals as? CaroSnackbarVisuals)?.markForImmediateDismissal()
+    snackbarData.performAction()
+}
+
+internal fun shouldDismissSnackbarImmediately(snackbarData: SnackbarData): Boolean =
+    (snackbarData.visuals as? CaroSnackbarVisuals)?.dismissImmediately == true
+```
+
+Use the function only for the action text click:
+
+```kotlin
+Modifier.clickable(
+    role = Role.Button,
+    onClick = { performCaroSnackbarAction(snackbarData) },
+)
+```
+
+Pass the predicate from `CaroSnackBarHost` to the animation host:
+
+```kotlin
+SlideInSlideOutSnackbarHost(
+    current = hostState.currentSnackbarData,
+    modifier = modifier,
+    dismissImmediately = ::shouldDismissSnackbarImmediately,
+    content = snackbar,
+)
+```
+
+- [ ] **Step 4: Filter marked outgoing items from animation retention**
+
+Add the optional predicate without changing existing callers:
+
+```kotlin
+@Composable
+fun SlideInSlideOutSnackbarHost(
+    current: SnackbarData?,
+    modifier: Modifier = Modifier,
+    dismissImmediately: (SnackbarData) -> Boolean = { false },
+    content: @Composable (SnackbarData) -> Unit,
+)
+```
+
+Add and use the pure retention function:
+
+```kotlin
+internal fun retainedSnackbarKeys(
+    keys: List<SnackbarData?>,
+    current: SnackbarData?,
+    dismissImmediately: (SnackbarData) -> Boolean,
+): List<SnackbarData> =
+    keys.fastFilterNotNull().filterNot { key ->
+        key != current && dismissImmediately(key)
+    }
+```
+
+Inside the current-item update, replace direct `keys.fastFilterNotNull()` mapping and size checks with `retainedKeys`:
+
+```kotlin
+val retainedKeys = retainedSnackbarKeys(keys, current, dismissImmediately)
+retainedKeys.fastMapTo(state.items) { key ->
+    FadeInFadeOutAnimationItem(key) { children ->
+        val isVisible = key == current
+        val duration = if (isVisible) SNACK_BAR_FADE_IN_MILLIS else SNACK_BAR_FADE_OUT_MILLIS
+        val delay = SNACK_BAR_FADE_OUT_MILLIS + SNACK_BAR_IN_BETWEEN_DELAY_MILLIS
+        val animationDelay =
+            if (isVisible && retainedKeys.size != 1) {
+                delay
+            } else {
+                0
+            }
+        val offsetY =
+            animatedSlideOffsetY(
+                animation =
+                    tween(
+                        easing = LinearEasing,
+                        delayMillis = animationDelay,
+                        durationMillis = duration,
+                    ),
+                visible = isVisible,
+                onAnimationFinish = {
+                    if (key != state.current) {
+                        state.items.removeAll { it.key == key }
+                        state.scope?.invalidate()
+                    }
+                },
+            )
+        val opacity =
+            animatedOpacity(
+                animation =
+                    tween(
+                        easing = LinearEasing,
+                        delayMillis = animationDelay,
+                        durationMillis = duration,
+                    ),
+                visible = isVisible,
+            )
+        Box(
+            modifier =
+                Modifier
+                    .offset(y = offsetY.value.dp)
+                    .graphicsLayer(alpha = opacity.value)
+                    .semantics {
+                        liveRegion = LiveRegionMode.Polite
+                        dismiss {
+                            key.dismiss()
+                            true
+                        }
+                    },
+        ) {
+            children()
+        }
+    }
+}
+```
+
+- [ ] **Step 5: Run tests and integration verification**
+
+Run: `./gradlew :core:designsystem:testAndroidHostTest :composeApp:testAndroidHostTest :feature:deck:testAndroidHostTest :androidApp:assembleDevDebug`
+
+Expected: all selected tests pass and the Android dev debug app assembles. Also run `git diff --check`; do not run `spotlessApply` because unrelated user-owned design-system files are modified in the worktree.
+
+- [ ] **Step 6: Commit only Task 6 files**
+
+```bash
+git add core/designsystem/src/commonTest/kotlin/com/whatever/caro/core/designsystem/components/SnackbarTest.kt core/designsystem/src/commonMain/kotlin/com/whatever/caro/core/designsystem/components/Snackbar.kt core/designsystem/src/commonMain/kotlin/com/whatever/caro/core/designsystem/animation/SlideInSlideOutSnackbarHost.kt
+git commit -m "fix: dismiss snackbar immediately on action"
 ```
