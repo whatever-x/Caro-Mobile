@@ -12,6 +12,7 @@ Match the Figma snackbar shown after deck creation. The snackbar displays a succ
 - Emit a deck-created side effect from `CreateDeckViewModel`.
 - On success, return to the previous screen, show the snackbar, and navigate to the created deck detail only when the action is selected.
 - When the current destination is Home, place the app-wide snackbar above Home's floating deck-create button.
+- Remove the snackbar from composition immediately when its action is selected.
 - Add localized success and action strings.
 - Update focused repository and ViewModel tests.
 
@@ -20,6 +21,7 @@ Out of scope:
 - Changing the general deck-detail navigation contract to load by ID.
 - Adding actions to existing error or account snackbars.
 - Changing snackbar duration or animation.
+- Removing the existing 150 ms exit animation for timeout, replacement, accessibility dismissal, or ordinary dismissal.
 - Moving the app-wide snackbar host into `HomeScreen` or moving Home's floating button into the root `Scaffold`.
 - Adding a caller-controlled position to every `SnackBarMessage`.
 
@@ -30,8 +32,10 @@ Out of scope:
 3. The ViewModel emits `CreateDeckSideEffect.Created(deck)`.
 4. `CreateDeckRoute` emits `NavCommand.Back`, then sends a `SnackBarMessage` with the localized success message, localized action label, and an action callback.
 5. The app-level snackbar host displays the message. `CaroSnackbar` calls `SnackbarData.performAction()` when the action text is selected.
-6. `SnackbarHostState.showSnackbar` returns `SnackbarResult.ActionPerformed`; only then does the app invoke the callback, which emits `NavCommand.To(DeckDetailEntry(deck))`.
-7. Because the back command makes Home the current destination before the snackbar is shown, `CaroApp` applies Home's snackbar bottom offset while the snackbar is visible.
+6. Before calling `performAction()`, the custom visuals record that this snackbar must skip its exit animation.
+7. `SlideInSlideOutSnackbarHost` removes that outgoing snackbar immediately instead of retaining it for the 150 ms fade/slide transition.
+8. `SnackbarHostState.showSnackbar` returns `SnackbarResult.ActionPerformed`; only then does the app invoke the callback, which emits `NavCommand.To(DeckDetailEntry(deck))`.
+9. Because the back command makes Home the current destination before the snackbar is shown, `CaroApp` applies Home's snackbar bottom offset while the snackbar is visible.
 
 Timeouts, replacement by a newer snackbar, and ordinary dismissal do not invoke the action callback.
 
@@ -49,6 +53,14 @@ Timeouts, replacement by a newer snackbar, and ordinary dismissal do not invoke 
 - Button semantics on the clickable action text.
 
 The standard `SnackbarVisuals.actionLabel`/`SnackbarData.performAction()` contract is used instead of a custom composable slot because the action presentation is fixed by the design system.
+
+## Action Dismissal Design
+
+`CaroSnackbarVisuals` owns an internal, mutable action-dismissal marker. The action click handler sets the marker immediately before calling Material's `SnackbarData.performAction()`. The marker is not Compose state: `performAction()` clears `SnackbarHostState.currentSnackbarData`, which already triggers the host recomposition that reads the marker.
+
+`SlideInSlideOutSnackbarHost` receives a predicate that identifies outgoing items that should skip their exit transition. When the predicate matches the removed snackbar, the host excludes that item from its retained animation list in the same recomposition. Other removal paths keep the existing 150 ms fade/slide animation.
+
+The Material action result remains the source of truth for callback execution. The UI does not invoke `onAction` directly, preventing duplicate callbacks and preserving the existing dismissal semantics.
 
 ## Placement Design
 
@@ -72,6 +84,7 @@ This destination-aware host offset is preferred over moving the host into `HomeS
 - Existing create failure behavior remains: loading ends and the error snackbar is shown without an action.
 - A null action label produces the existing message-only snackbar.
 - If Home is no longer the current destination, the host immediately returns to its default bottom placement.
+- Only a user-selected action sets the immediate-removal marker; timeout, replacement, and ordinary dismissal do not.
 
 ## Testing
 
@@ -79,4 +92,5 @@ This destination-aware host offset is preferred over moving the host into `HomeS
 - ViewModel test: successful confirmation emits `Created(expectedDeck)` and still calls the repository with the submitted inputs.
 - ViewModel failure test remains unchanged in behavior.
 - Placement test: Home resolves to 88 dp additional bottom padding and non-Home destinations resolve to zero.
+- Action-dismissal tests: selecting the action sets the immediate-removal policy and executes the callback once; ordinary dismissal leaves the immediate-removal policy disabled and does not execute the callback.
 - Run focused module tests, `spotlessCheck`, and the Android build needed to compile the Compose integration.
