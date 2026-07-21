@@ -4,6 +4,7 @@ plugins {
     id("caro.kmp.ios")
     id("caro.cmp")
     id("caro.koin")
+    id("caro.kmp.test")
 }
 
 kotlin {
