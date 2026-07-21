@@ -44,6 +44,13 @@ class CaroSnackbarVisuals(
     override val actionLabel: String? = null,
 ) : SnackbarVisuals {
     override val withDismissAction: Boolean = false
+
+    internal var dismissImmediately: Boolean = false
+        private set
+
+    internal fun markForImmediateDismissal() {
+        dismissImmediately = true
+    }
 }
 
 /**
@@ -77,6 +84,7 @@ fun CaroSnackBarHost(
     SlideInSlideOutSnackbarHost(
         current = hostState.currentSnackbarData,
         modifier = modifier,
+        dismissImmediately = ::shouldDismissSnackbarImmediately,
         content = snackbar,
     )
 }
@@ -131,7 +139,7 @@ fun CaroSnackbar(
                 modifier =
                     Modifier.clickable(
                         role = Role.Button,
-                        onClick = snackbarData::performAction,
+                        onClick = { performCaroSnackbarAction(snackbarData) },
                     ),
                 text = actionLabel,
                 style = CaroTheme.typography.label2.regular,
@@ -140,6 +148,14 @@ fun CaroSnackbar(
         }
     }
 }
+
+internal fun performCaroSnackbarAction(snackbarData: SnackbarData) {
+    (snackbarData.visuals as? CaroSnackbarVisuals)?.markForImmediateDismissal()
+    snackbarData.performAction()
+}
+
+internal fun shouldDismissSnackbarImmediately(snackbarData: SnackbarData): Boolean =
+    (snackbarData.visuals as? CaroSnackbarVisuals)?.dismissImmediately == true
 
 fun showSnackbarMessage(
     coroutineScope: CoroutineScope,
