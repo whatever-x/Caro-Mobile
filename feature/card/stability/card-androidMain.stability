@@ -228,3 +228,106 @@ public fun com.whatever.caro.feature.card.delete.route.DeleteCardsRoute(viewMode
     - navDispatcher: RUNTIME (requires runtime check)
     - snackbarController: RUNTIME (requires runtime check)
 
+@Composable
+private fun com.whatever.caro.feature.card.detail.CardDetailBottomBar(enabled: kotlin.Boolean, onPrevious: kotlin.Function0<kotlin.Unit>, onNext: kotlin.Function0<kotlin.Unit>): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - enabled: STABLE (primitive type)
+    - onPrevious: STABLE (function type)
+    - onNext: STABLE (function type)
+
+@Composable
+private fun com.whatever.caro.feature.card.detail.CardDetailContent(cards: kotlinx.collections.immutable.ImmutableList<com.whatever.caro.core.model.card.DeckCard>, currentIndex: kotlin.Int, isFlipped: kotlin.Boolean, onIntent: kotlin.Function1<com.whatever.caro.feature.card.detail.mvi.CardDetailIntent, kotlin.Unit>): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - cards: STABLE (known stable type)
+    - currentIndex: STABLE (primitive type)
+    - isFlipped: STABLE (primitive type)
+    - onIntent: STABLE (function type)
+
+@Composable
+private fun com.whatever.caro.feature.card.detail.CardDetailDeleteDialog(isDeleting: kotlin.Boolean, onDelete: kotlin.Function0<kotlin.Unit>, onCancel: kotlin.Function0<kotlin.Unit>): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - isDeleting: STABLE (primitive type)
+    - onDelete: STABLE (function type)
+    - onCancel: STABLE (function type)
+
+@Composable
+private fun com.whatever.caro.feature.card.detail.CardDetailDialogButton(text: kotlin.String, backgroundColor: androidx.compose.ui.graphics.Color, textColor: androidx.compose.ui.graphics.Color, enabled: kotlin.Boolean, onClick: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - text: STABLE (String is immutable)
+    - backgroundColor: STABLE (marked @Stable or @Immutable)
+    - textColor: STABLE (marked @Stable or @Immutable)
+    - enabled: STABLE (primitive type)
+    - onClick: STABLE (function type)
+    - modifier: STABLE (marked @Stable or @Immutable)
+
+@Composable
+private fun com.whatever.caro.feature.card.detail.CardDetailIcon(drawable: org.jetbrains.compose.resources.DrawableResource, contentDescription: kotlin.String, tint: androidx.compose.ui.graphics.Color, onClick: kotlin.Function0<kotlin.Unit>): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - drawable: STABLE (marked @Stable or @Immutable)
+    - contentDescription: STABLE (String is immutable)
+    - tint: STABLE (marked @Stable or @Immutable)
+    - onClick: STABLE (function type)
+
+@Composable
+private fun com.whatever.caro.feature.card.detail.CardDetailPageButton(text: kotlin.String, icon: org.jetbrains.compose.resources.DrawableResource, iconAtStart: kotlin.Boolean, enabled: kotlin.Boolean, onClick: kotlin.Function0<kotlin.Unit>): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - text: STABLE (String is immutable)
+    - icon: STABLE (marked @Stable or @Immutable)
+    - iconAtStart: STABLE (primitive type)
+    - enabled: STABLE (primitive type)
+    - onClick: STABLE (function type)
+
+@Composable
+private fun com.whatever.caro.feature.card.detail.CardDetailPager(cards: kotlinx.collections.immutable.ImmutableList<com.whatever.caro.core.model.card.DeckCard>, state: androidx.compose.foundation.pager.PagerState, flippedCardId: kotlin.Long?, flipHint: kotlin.String, moreLabel: kotlin.String, onFlip: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - cards: STABLE (known stable type)
+    - state: STABLE (marked @Stable or @Immutable)
+    - flippedCardId: STABLE (class with no mutable properties)
+    - flipHint: STABLE (String is immutable)
+    - moreLabel: STABLE (String is immutable)
+    - onFlip: STABLE (function type)
+    - modifier: STABLE (marked @Stable or @Immutable)
+
+@Composable
+internal fun com.whatever.caro.feature.card.detail.CardDetailScreen(state: com.whatever.caro.feature.card.detail.mvi.CardDetailState, onIntent: kotlin.Function1<com.whatever.caro.feature.card.detail.mvi.CardDetailIntent, kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - state: STABLE (marked @Stable or @Immutable)
+    - onIntent: STABLE (function type)
+    - modifier: STABLE (marked @Stable or @Immutable)
+
+@Composable
+private fun com.whatever.caro.feature.card.detail.CardDetailTopBar(current: kotlin.Int, total: kotlin.Int, onBack: kotlin.Function0<kotlin.Unit>, onEdit: kotlin.Function0<kotlin.Unit>, onDelete: kotlin.Function0<kotlin.Unit>): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - current: STABLE (primitive type)
+    - total: STABLE (primitive type)
+    - onBack: STABLE (function type)
+    - onEdit: STABLE (function type)
+    - onDelete: STABLE (function type)
+
+@Composable
+public fun com.whatever.caro.feature.card.detail.route.CardDetailRoute(viewModel: com.whatever.caro.feature.card.detail.CardDetailViewModel, navDispatcher: com.whatever.caro.core.navigator.dispatcher.NavigationDispatcher, snackbarController: com.whatever.caro.core.ui.snackbar.SnackbarController): kotlin.Unit
+  skippable: false
+  restartable: true
+  params:
+    - viewModel: RUNTIME (requires runtime check)
+    - navDispatcher: RUNTIME (requires runtime check)
+    - snackbarController: RUNTIME (requires runtime check)
+

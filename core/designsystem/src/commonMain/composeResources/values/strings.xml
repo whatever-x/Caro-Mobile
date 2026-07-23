@@ -167,4 +167,18 @@
 	<string name="learning_dialog_title">Notice</string>
 	<string name="learning_dialog_submit_error">An unknown error occurred.</string>
 	<string name="learning_dialog_confirm">OK</string>
+	<!-- card detail -->
+	<string name="card_detail_back">Go back</string>
+	<string name="card_detail_edit">Edit card</string>
+	<string name="card_detail_delete">Delete card</string>
+	<string name="card_detail_previous">Previous</string>
+	<string name="card_detail_next">Next</string>
+	<string name="card_detail_flip_hint">Tap to flip</string>
+	<string name="card_detail_more">More</string>
+	<string name="card_detail_delete_title">Delete this card?</string>
+	<string name="card_detail_delete_body">You can’t recover it after deletion</string>
+	<string name="card_detail_delete_confirm">Delete</string>
+	<string name="card_detail_delete_cancel">Cancel</string>
+	<string name="card_detail_load_error">Failed to load the cards. Please try again.</string>
+	<string name="card_detail_delete_error">Failed to delete the card. Please try again.</string>
 </resources>
