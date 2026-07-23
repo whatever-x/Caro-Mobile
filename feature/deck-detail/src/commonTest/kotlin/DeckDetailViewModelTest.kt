@@ -30,8 +30,8 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class DeckDetailViewModelTest :
-    FunSpec({
+class DeckDetailViewModelTest : FunSpec() {
+    init {
         val dispatcher = StandardTestDispatcher()
 
         beforeTest {
@@ -256,7 +256,8 @@ class DeckDetailViewModelTest :
                 }
             }
         }
-    })
+    }
+}
 
 private fun createDeckCards(): List<DeckCard> =
     listOf(

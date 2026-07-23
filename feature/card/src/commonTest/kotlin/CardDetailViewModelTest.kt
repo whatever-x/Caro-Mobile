@@ -28,8 +28,8 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class CardDetailViewModelTest :
-    FunSpec({
+class CardDetailViewModelTest : FunSpec() {
+    init {
         val dispatcher = StandardTestDispatcher()
 
         beforeTest {
@@ -115,6 +115,50 @@ class CardDetailViewModelTest :
                 }
                 viewModel.state.value.cards shouldBe cards
                 viewModel.state.value.isLoading shouldBe false
+            }
+        }
+
+        test("새로고침 후 현재 카드가 유지되면 뒤집기 상태도 유지한다") {
+            runTest(dispatcher) {
+                val deckRepository =
+                    mock<DeckRepository> {
+                        everySuspend { getDeckCards(any()) } returns cards
+                    }
+                val viewModel = createCardDetailViewModel(deckRepository = deckRepository)
+                advanceUntilIdle()
+
+                viewModel.intent(CardDetailIntent.FlipCard)
+                viewModel.intent(CardDetailIntent.RefreshCards)
+                advanceUntilIdle()
+
+                viewModel.state.value.currentCard
+                    ?.id shouldBe 1L
+                viewModel.state.value.isFlipped shouldBe true
+            }
+        }
+
+        test("새로고침 후 같은 위치의 카드가 교체되면 뒤집기 상태를 초기화한다") {
+            runTest(dispatcher) {
+                val deckRepository =
+                    mock<DeckRepository> {
+                        everySuspend { getDeckCards(any()) } returns cards
+                    }
+                val viewModel = createCardDetailViewModel(deckRepository = deckRepository)
+                advanceUntilIdle()
+                everySuspend { deckRepository.getDeckCards(any()) } returns
+                    listOf(
+                        cards.first().copy(id = 4L),
+                        cards[1],
+                        cards[2],
+                    )
+
+                viewModel.intent(CardDetailIntent.FlipCard)
+                viewModel.intent(CardDetailIntent.RefreshCards)
+                advanceUntilIdle()
+
+                viewModel.state.value.currentCard
+                    ?.id shouldBe 4L
+                viewModel.state.value.isFlipped shouldBe false
             }
         }
 
@@ -257,7 +301,8 @@ class CardDetailViewModelTest :
             cardDetailIndexForPage(initialPage - 1, cardCount = 3) shouldBe 1
             cardDetailInitialPage(currentIndex = 0, cardCount = 1) shouldBe 0
         }
-    })
+    }
+}
 
 private val cards =
     listOf(

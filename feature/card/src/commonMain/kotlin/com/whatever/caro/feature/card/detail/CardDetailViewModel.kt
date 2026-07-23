@@ -102,12 +102,14 @@ class CardDetailViewModel(
 
                 val preferredIndex = cards.indexOfFirst { it.id == preferredCardId }
                 val fallbackIndex = currentState.currentIndex.coerceAtMost(cards.lastIndex)
+                val newIndex = preferredIndex.takeIf { it >= 0 } ?: fallbackIndex
+                val currentCardId = currentState.currentCard?.id
                 reduce {
                     copy(
                         cards = cards.toPersistentList(),
-                        currentIndex = preferredIndex.takeIf { it >= 0 } ?: fallbackIndex,
+                        currentIndex = newIndex,
                         isLoading = false,
-                        isFlipped = false,
+                        isFlipped = isFlipped && cards[newIndex].id == currentCardId,
                     )
                 }
             }.onFailure { throwable ->
