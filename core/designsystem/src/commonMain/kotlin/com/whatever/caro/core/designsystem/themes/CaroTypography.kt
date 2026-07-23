@@ -78,7 +78,9 @@ data class CaroTypography(
     @Immutable
     data class Caption1Style(
         override val regular: TextStyle,
-    ) : RegularStyle
+        override val medium: TextStyle,
+    ) : RegularStyle,
+        MediumStyle
 
     @Immutable
     data class Caption2Style(
@@ -219,6 +221,12 @@ data class CaroTypography(
             caption1 =
                 Caption1Style(
                     regular =
+                        TextStyle(
+                            fontFamily = pretendard,
+                            fontWeight = FontWeight.W500,
+                            fontSize = 12.sp,
+                        ),
+                    medium =
                         TextStyle(
                             fontFamily = pretendard,
                             fontWeight = FontWeight.W500,
