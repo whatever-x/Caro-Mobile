@@ -6,10 +6,5 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class DeckDetailEntry(
-    val payload: Payload,
-) : NavKey {
-    @Serializable
-    data class Payload(
-        val deck: Deck,
-    )
-}
+    val deck: Deck,
+) : NavKey

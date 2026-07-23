@@ -56,9 +56,7 @@ fun DeckDetailRoute(
                     navDispatcher.emit(
                         NavCommand.To(
                             CreateCardEntry(
-                                CreateCardEntry.Payload(
-                                    sideEffect.deckId,
-                                ),
+                                deckId = sideEffect.deckId,
                             ),
                         ),
                     )
@@ -68,11 +66,8 @@ fun DeckDetailRoute(
                     navDispatcher.emit(
                         NavCommand.To(
                             LearningEntry(
-                                payload =
-                                    LearningEntry.Payload(
-                                        deckId = sideEffect.deckId,
-                                        mode = sideEffect.mode,
-                                    ),
+                                deckId = sideEffect.deckId,
+                                mode = sideEffect.mode,
                             ),
                         ),
                     )
@@ -83,10 +78,7 @@ fun DeckDetailRoute(
                         NavCommand.To(
                             key =
                                 DeleteCardsEntry(
-                                    payload =
-                                        DeleteCardsEntry.Payload(
-                                            deckId = sideEffect.deckId,
-                                        ),
+                                    deckId = sideEffect.deckId,
                                 ),
                         ),
                     )
@@ -110,12 +102,9 @@ fun DeckDetailRoute(
                         NavCommand.To(
                             key =
                                 EditCardEntry(
-                                    payload =
-                                        EditCardEntry.Payload(
-                                            cardId = sideEffect.cardId,
-                                            front = sideEffect.front,
-                                            back = sideEffect.back,
-                                        ),
+                                    cardId = sideEffect.cardId,
+                                    front = sideEffect.front,
+                                    back = sideEffect.back,
                                 ),
                         ),
                     )

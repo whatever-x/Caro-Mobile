@@ -1,5 +1,6 @@
 package com.whatever.caro.core.data.repository.card
 
+import com.whatever.caro.core.data.mapper.toFields
 import com.whatever.caro.core.model.card.CardContent
 import com.whatever.caro.core.remote.datasource.card.CardDataSource
 import com.whatever.caro.core.remote.dto.cardController.request.CreateCardItemDto
@@ -20,11 +21,7 @@ internal class CardRepositoryImpl(
                 items =
                     cards.map { card ->
                         CreateCardItemDto(
-                            fields =
-                                mapOf(
-                                    FIELD_FRONT to card.front,
-                                    FIELD_BACK to card.back,
-                                ),
+                            fields = card.toFields(),
                             cardType = CardTypeDto.BASIC,
                         )
                     },
@@ -46,16 +43,5 @@ internal class CardRepositoryImpl(
     override suspend fun deleteCards(cardIds: List<Long>) {
         val request = DeleteCardsRequest(cardIds = cardIds.toSet())
         cardDataSource.deleteCards(request = request)
-    }
-
-    private fun CardContent.toFields(): Map<String, String> =
-        mapOf(
-            FIELD_FRONT to front,
-            FIELD_BACK to back,
-        )
-
-    private companion object {
-        const val FIELD_FRONT = "front"
-        const val FIELD_BACK = "back"
     }
 }
