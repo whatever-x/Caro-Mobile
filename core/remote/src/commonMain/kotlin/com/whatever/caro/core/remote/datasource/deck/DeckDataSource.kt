@@ -3,10 +3,10 @@ package com.whatever.caro.core.remote.datasource.deck
 import com.whatever.caro.core.remote.dto.deck.request.CreateDeckRequest
 import com.whatever.caro.core.remote.dto.deck.request.UpdateDeckRequest
 import com.whatever.caro.core.remote.dto.deck.response.CreateDeckResponse
+import com.whatever.caro.core.remote.dto.deck.response.DeckCardResponse
+import com.whatever.caro.core.remote.dto.deck.response.DeckListResponse
 import com.whatever.caro.core.remote.dto.deck.response.DeleteDeckResponse
 import com.whatever.caro.core.remote.dto.deck.response.UpdateDeckResponse
-import com.whatever.caro.core.remote.dto.deckCardInformation.response.DeckCardResponse
-import com.whatever.caro.core.remote.dto.deckCardInformation.response.DeckListResponse
 
 interface DeckDataSource {
     suspend fun createDeck(request: CreateDeckRequest): CreateDeckResponse
@@ -20,5 +20,8 @@ interface DeckDataSource {
 
     suspend fun getDecks(): List<DeckListResponse>
 
-    suspend fun getDeckCards(deckId: Long): List<DeckCardResponse>
+    suspend fun getDeckCards(
+        deckId: Long,
+        sortType: String? = null,
+    ): List<DeckCardResponse>
 }

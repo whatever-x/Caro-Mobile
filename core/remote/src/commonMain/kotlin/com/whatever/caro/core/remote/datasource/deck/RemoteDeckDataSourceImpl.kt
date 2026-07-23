@@ -1,18 +1,16 @@
 package com.whatever.caro.core.remote.datasource.deck
 
 import com.whatever.caro.core.remote.api.DeckApi
-import com.whatever.caro.core.remote.api.DeckCardInformationApi
 import com.whatever.caro.core.remote.dto.deck.request.CreateDeckRequest
 import com.whatever.caro.core.remote.dto.deck.request.UpdateDeckRequest
 import com.whatever.caro.core.remote.dto.deck.response.CreateDeckResponse
+import com.whatever.caro.core.remote.dto.deck.response.DeckCardResponse
+import com.whatever.caro.core.remote.dto.deck.response.DeckListResponse
 import com.whatever.caro.core.remote.dto.deck.response.DeleteDeckResponse
 import com.whatever.caro.core.remote.dto.deck.response.UpdateDeckResponse
-import com.whatever.caro.core.remote.dto.deckCardInformation.response.DeckCardResponse
-import com.whatever.caro.core.remote.dto.deckCardInformation.response.DeckListResponse
 
 internal class RemoteDeckDataSourceImpl(
     private val deckApi: DeckApi,
-    private val deckCardInformationApi: DeckCardInformationApi,
 ) : DeckDataSource {
     override suspend fun createDeck(request: CreateDeckRequest): CreateDeckResponse = deckApi.requestCreateDeck(request = request)
 
@@ -27,7 +25,14 @@ internal class RemoteDeckDataSourceImpl(
 
     override suspend fun deleteDeck(deckId: Long): DeleteDeckResponse = deckApi.requestDeleteDeck(deckId = deckId)
 
-    override suspend fun getDecks(): List<DeckListResponse> = deckCardInformationApi.requestDecks()
+    override suspend fun getDecks(): List<DeckListResponse> = deckApi.requestDecks()
 
-    override suspend fun getDeckCards(deckId: Long): List<DeckCardResponse> = deckCardInformationApi.requestCardsByDeck(deckId = deckId)
+    override suspend fun getDeckCards(
+        deckId: Long,
+        sortType: String?,
+    ): List<DeckCardResponse> =
+        deckApi.requestCardsByDeck(
+            deckId = deckId,
+            sortType = sortType,
+        )
 }
