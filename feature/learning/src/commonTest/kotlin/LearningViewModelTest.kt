@@ -115,6 +115,32 @@ class LearningViewModelTest :
             }
         }
 
+        test("ClickBackButton은 PopBackStack을 방출한다") {
+            runTest(dispatcher) {
+                val viewModel = createViewModel(emptyList())
+
+                viewModel.sideEffect.test {
+                    viewModel.intent(LearningIntent.ClickBackButton)
+
+                    awaitItem() shouldBe LearningSideEffect.PopBackStack
+                    cancelAndIgnoreRemainingEvents()
+                }
+            }
+        }
+
+        test("ClickNavigateToHome은 NavigateToHome을 방출한다") {
+            runTest(dispatcher) {
+                val viewModel = createViewModel(emptyList())
+
+                viewModel.sideEffect.test {
+                    viewModel.intent(LearningIntent.ClickNavigateToHome)
+
+                    awaitItem() shouldBe LearningSideEffect.NavigateToHome
+                    cancelAndIgnoreRemainingEvents()
+                }
+            }
+        }
+
         test("일일 학습 중단 시 이전까지 평가한 카드를 제출한 뒤 화면을 닫는다") {
             runTest(dispatcher) {
                 val study =

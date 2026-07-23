@@ -9,8 +9,8 @@ import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 
-class LearningCompletionLottieParseTest :
-    FunSpec({
+class LearningCompletionLottieParseTest : FunSpec() {
+    init {
         test("학습 완료 Lottie에는 불투명 배경 레이어가 없다") {
             runTest {
                 val json = Res.readBytes("files/lottie_check_pop.json").decodeToString()
@@ -40,4 +40,5 @@ class LearningCompletionLottieParseTest :
                 composition.height shouldBe 150f
             }
         }
-    })
+    }
+}
