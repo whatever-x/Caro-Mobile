@@ -6,6 +6,7 @@ import com.whatever.caro.core.remote.dto.auth.request.SocialLoginRequest
 import com.whatever.caro.core.remote.dto.auth.response.SocialLoginResponse
 import com.whatever.caro.core.remote.dto.auth.response.TokenResponse
 import de.jensklingenberg.ktorfit.http.Body
+import de.jensklingenberg.ktorfit.http.DELETE
 import de.jensklingenberg.ktorfit.http.POST
 
 internal interface AuthApi {
@@ -26,4 +27,7 @@ internal interface AuthApi {
 
     @POST("v1/auth/logout")
     suspend fun requestLogout()
+
+    @DELETE("v1/auth/withdraw")
+    suspend fun requestWithdraw()
 }

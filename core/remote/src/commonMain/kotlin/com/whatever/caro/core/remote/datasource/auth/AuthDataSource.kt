@@ -7,4 +7,6 @@ interface AuthDataSource {
     suspend fun completeRegistration(request: CompleteRegistrationRequest): TokenResponse
 
     suspend fun logout()
+
+    suspend fun withdraw()
 }
