@@ -64,6 +64,7 @@ class DeckDetailViewModelTest :
                         CardItem(id = 1L, front = "Run", back = "달리다"),
                         CardItem(id = 2L, front = "Walk", back = "걷다"),
                     )
+                viewModel.state.value.deck.cardTotalCount shouldBe 2
                 viewModel.state.value.isCardListLoading shouldBe false
             }
         }
@@ -120,6 +121,7 @@ class DeckDetailViewModelTest :
                 advanceUntilIdle()
 
                 viewModel.state.value.deckCardList.size shouldBe 3
+                viewModel.state.value.deck.cardTotalCount shouldBe 3
             }
         }
 
@@ -220,13 +222,30 @@ class DeckDetailViewModelTest :
             }
         }
 
-        test("ClickCard 는 현재 카드 내용으로 카드 수정 이동 side effect를 방출한다") {
+        test("ClickCard 는 선택한 카드의 상세 이동 side effect를 방출한다") {
             runTest(dispatcher) {
                 val viewModel = createViewModel(deck = createDeck())
                 advanceUntilIdle()
 
                 viewModel.sideEffect.test {
                     viewModel.intent(DeckDetailIntent.ClickCard(cardId = 1L))
+
+                    awaitItem() shouldBe
+                        DeckDetailSideEffect.NavigateToCardDetail(
+                            deckId = 1L,
+                            cardId = 1L,
+                        )
+                }
+            }
+        }
+
+        test("ClickEditCard 는 현재 카드 내용으로 카드 수정 이동 side effect를 방출한다") {
+            runTest(dispatcher) {
+                val viewModel = createViewModel(deck = createDeck())
+                advanceUntilIdle()
+
+                viewModel.sideEffect.test {
+                    viewModel.intent(DeckDetailIntent.ClickEditCard(cardId = 1L))
 
                     awaitItem() shouldBe
                         DeckDetailSideEffect.NavigateToEditCard(

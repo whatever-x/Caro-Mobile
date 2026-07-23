@@ -86,7 +86,8 @@ internal fun DeckDetailScreen(
                 ) { index, card ->
                     SwipeToRevealCardItem(
                         card = card,
-                        onEdit = { onIntent(DeckDetailIntent.ClickCard(card.id)) },
+                        onClick = { onIntent(DeckDetailIntent.ClickCard(card.id)) },
+                        onEdit = { onIntent(DeckDetailIntent.ClickEditCard(card.id)) },
                         modifier =
                             Modifier
                                 .padding(
