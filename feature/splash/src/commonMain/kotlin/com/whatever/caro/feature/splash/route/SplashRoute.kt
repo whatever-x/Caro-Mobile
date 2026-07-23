@@ -8,7 +8,6 @@ import com.whatever.caro.core.navigator.contract.NavCommand
 import com.whatever.caro.core.navigator.dispatcher.NavigationDispatcher
 import com.whatever.caro.core.navigator.entries.HomeEntry
 import com.whatever.caro.core.navigator.entries.LoginEntry
-import com.whatever.caro.core.navigator.entries.Payload
 import com.whatever.caro.feature.splash.SplashScreen
 import com.whatever.caro.feature.splash.SplashViewModel
 import com.whatever.caro.feature.splash.mvi.SplashIntent
@@ -35,12 +34,7 @@ fun SplashRoute(
                 SplashSideEffect.NavigateHome -> {
                     navDispatcher.emit(
                         command =
-                            NavCommand.ResetTo(
-                                key =
-                                    HomeEntry(
-                                        payload = Payload(id = 1, name = "test"),
-                                    ),
-                            ),
+                            NavCommand.ResetTo(key = HomeEntry),
                     )
                 }
             }

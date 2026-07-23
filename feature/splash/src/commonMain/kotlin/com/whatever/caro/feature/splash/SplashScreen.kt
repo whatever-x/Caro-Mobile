@@ -26,7 +26,7 @@ internal fun SplashScreen(state: SplashState) {
                 .fillMaxSize()
                 .background(CaroTheme.color.background.brand),
         verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Image(
             painter = painterResource(Res.drawable.img_splash),

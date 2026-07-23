@@ -109,9 +109,9 @@ val navEntryModule: Module =
             )
         }
 
-        navigation<HomeEntry> { navKey ->
+        navigation<HomeEntry> {
             HomeRoute(
-                viewModel = koinViewModel<HomeViewModel> { parametersOf(navKey) },
+                viewModel = koinViewModel(),
                 navDispatcher = get(),
             )
         }

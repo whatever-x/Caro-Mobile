@@ -144,7 +144,7 @@ class LearningViewModelTest :
                     runCurrent()
                     expectNoEvents()
                     study.submitGate?.complete(Unit)
-                    awaitItem() shouldBe LearningSideEffect.NavigateBack
+                    awaitItem() shouldBe LearningSideEffect.PopBackStack
                     study.submittedSessionId shouldBe 42L
                     study.submittedEvaluations shouldBe viewModel.state.value.evaluations
                     study.submittedIdempotencyKey?.isNotBlank() shouldBe true
@@ -179,7 +179,7 @@ class LearningViewModelTest :
                     viewModel.intent(LearningIntent.ConfirmStop)
                     advanceUntilIdle()
 
-                    awaitItem() shouldBe LearningSideEffect.NavigateBack
+                    awaitItem() shouldBe LearningSideEffect.PopBackStack
                     expectNoEvents()
                     study.submitCount shouldBe 1
                     cancelAndIgnoreRemainingEvents()
@@ -222,7 +222,7 @@ class LearningViewModelTest :
                     viewModel.state.value.showStopDialog shouldBe false
 
                     viewModel.intent(LearningIntent.ConfirmError)
-                    awaitItem() shouldBe LearningSideEffect.NavigateBack
+                    awaitItem() shouldBe LearningSideEffect.PopBackStack
                     study.submitCount shouldBe 1
                     cancelAndIgnoreRemainingEvents()
                 }
@@ -300,7 +300,7 @@ class LearningViewModelTest :
 
                 viewModel.sideEffect.test {
                     viewModel.intent(LearningIntent.ConfirmStop)
-                    awaitItem() shouldBe LearningSideEffect.NavigateBack
+                    awaitItem() shouldBe LearningSideEffect.PopBackStack
                     study.submitCount shouldBe 0
                     cancelAndIgnoreRemainingEvents()
                 }
@@ -319,7 +319,7 @@ class LearningViewModelTest :
 
                 viewModel.sideEffect.test {
                     viewModel.intent(LearningIntent.ConfirmStop)
-                    awaitItem() shouldBe LearningSideEffect.NavigateBack
+                    awaitItem() shouldBe LearningSideEffect.PopBackStack
                     study.submitCount shouldBe 0
                     cancelAndIgnoreRemainingEvents()
                 }
@@ -340,7 +340,7 @@ class LearningViewModelTest :
 
                 viewModel.sideEffect.test {
                     viewModel.intent(LearningIntent.RequestStop)
-                    awaitItem() shouldBe LearningSideEffect.NavigateBack
+                    awaitItem() shouldBe LearningSideEffect.PopBackStack
                     viewModel.state.value.showStopDialog shouldBe false
                     cancelAndIgnoreRemainingEvents()
                 }

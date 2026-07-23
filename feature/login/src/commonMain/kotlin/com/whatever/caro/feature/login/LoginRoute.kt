@@ -14,7 +14,6 @@ import com.whatever.caro.core.model.auth.SocialLoginType
 import com.whatever.caro.core.navigator.contract.NavCommand.To
 import com.whatever.caro.core.navigator.dispatcher.NavigationDispatcher
 import com.whatever.caro.core.navigator.entries.HomeEntry
-import com.whatever.caro.core.navigator.entries.Payload
 import com.whatever.caro.core.ui.snackbar.SnackBarMessage
 import com.whatever.caro.core.ui.snackbar.SnackbarController
 import com.whatever.caro.feature.login.model.AppleUser
@@ -66,19 +65,7 @@ fun LoginRoute(
         viewModel.sideEffect.collect { sideEffect ->
             when (sideEffect) {
                 is LoginSideEffect.NavigateHome -> {
-                    navDispatcher.emit(
-                        command =
-                            To(
-                                key =
-                                    HomeEntry(
-                                        payload =
-                                            Payload(
-                                                id = 1,
-                                                name = "test",
-                                            ),
-                                    ),
-                            ),
-                    )
+                    navDispatcher.emit(command = To(key = HomeEntry))
                 }
 
                 is LoginSideEffect.ShowErrorSnackbar -> {

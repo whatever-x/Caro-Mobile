@@ -50,7 +50,7 @@ internal fun LoginScreen(
                     .fillMaxWidth()
                     .weight(1f),
             verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Image(
                 painter = painterResource(Res.drawable.img_splash),
@@ -60,7 +60,7 @@ internal fun LoginScreen(
                 text = stringResource(resource = Res.string.login_text_logo_description),
                 style = CaroTheme.typography.heading1,
                 color = CaroTheme.color.text.inverse,
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
             )
         }
 

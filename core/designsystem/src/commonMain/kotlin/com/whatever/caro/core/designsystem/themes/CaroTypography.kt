@@ -166,11 +166,12 @@ data class CaroTypography(
                             fontSize = 14.sp,
                             lineHeight = 22.sp,
                         ),
-                    medium = TextStyle(
-                        fontFamily = pretendard,
-                        fontWeight = FontWeight.W500,
-                        fontSize = 14.sp,
-                    ),
+                    medium =
+                        TextStyle(
+                            fontFamily = pretendard,
+                            fontWeight = FontWeight.W500,
+                            fontSize = 14.sp,
+                        ),
                 ),
             body3 =
                 TextStyle(
@@ -211,13 +212,15 @@ data class CaroTypography(
                             fontSize = 14.sp,
                         ),
                 ),
-            label2 = Label2Style(
-                regular = TextStyle(
-                    fontFamily = pretendard,
-                    fontWeight = FontWeight.W400,
-                    fontSize = 12.sp,
+            label2 =
+                Label2Style(
+                    regular =
+                        TextStyle(
+                            fontFamily = pretendard,
+                            fontWeight = FontWeight.W400,
+                            fontSize = 12.sp,
+                        ),
                 ),
-            ),
             caption1 =
                 Caption1Style(
                     regular =

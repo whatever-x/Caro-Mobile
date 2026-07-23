@@ -9,6 +9,7 @@ import androidx.navigationevent.compose.NavigationBackHandler
 import androidx.navigationevent.compose.rememberNavigationEventState
 import com.whatever.caro.core.navigator.contract.NavCommand
 import com.whatever.caro.core.navigator.dispatcher.NavigationDispatcher
+import com.whatever.caro.core.navigator.entries.HomeEntry
 import com.whatever.caro.feature.learning.LearningScreen
 import com.whatever.caro.feature.learning.LearningViewModel
 import com.whatever.caro.feature.learning.mvi.LearningIntent
@@ -29,7 +30,8 @@ fun LearningRoute(
         viewModel.intent(LearningIntent.Load)
         viewModel.sideEffect.collect {
             when (it) {
-                LearningSideEffect.NavigateBack -> navDispatcher.emit(NavCommand.Back)
+                LearningSideEffect.PopBackStack -> navDispatcher.emit(NavCommand.Back)
+                LearningSideEffect.NavigateToHome -> navDispatcher.emit(NavCommand.ResetTo(key = HomeEntry))
             }
         }
     }
