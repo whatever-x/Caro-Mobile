@@ -10,6 +10,8 @@ import com.whatever.caro.core.remote.datasource.deck.DeckDataSource
 import com.whatever.caro.core.remote.datasource.deck.RemoteDeckDataSourceImpl
 import com.whatever.caro.core.remote.datasource.profile.ProfileDataSource
 import com.whatever.caro.core.remote.datasource.profile.RemoteProfileDataSourceImpl
+import com.whatever.caro.core.remote.datasource.study.RemoteStudySessionDataSourceImpl
+import com.whatever.caro.core.remote.datasource.study.StudySessionDataSource
 import com.whatever.caro.core.remote.di.qualifier.NetworkClient
 import org.koin.core.qualifier.named
 import org.koin.dsl.bind
@@ -34,4 +36,5 @@ val remoteModule =
 
         single<RemoteCardDataSourceImpl>() bind CardDataSource::class
         single<RemoteDeckDataSourceImpl>() bind DeckDataSource::class
+        single<RemoteStudySessionDataSourceImpl>() bind StudySessionDataSource::class
     }

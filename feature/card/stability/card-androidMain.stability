@@ -57,6 +57,29 @@ internal fun com.whatever.caro.feature.card.CreateCardScreen(state: com.whatever
     - onIntent: STABLE (function type)
 
 @Composable
+private fun com.whatever.caro.feature.card.EditBottomBar(enabled: kotlin.Boolean, onClick: kotlin.Function0<kotlin.Unit>): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - enabled: STABLE (primitive type)
+    - onClick: STABLE (function type)
+
+@Composable
+internal fun com.whatever.caro.feature.card.EditCardScreen(state: com.whatever.caro.feature.card.mvi.EditCardState, onIntent: kotlin.Function1<com.whatever.caro.feature.card.mvi.EditCardIntent, kotlin.Unit>): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - state: STABLE (class with no mutable properties)
+    - onIntent: STABLE (function type)
+
+@Composable
+private fun com.whatever.caro.feature.card.FieldCounter(count: kotlin.String): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - count: STABLE (String is immutable)
+
+@Composable
 private fun com.whatever.caro.feature.card.FieldCounter(count: kotlin.String): kotlin.Unit
   skippable: true
   restartable: true
@@ -71,11 +94,25 @@ private fun com.whatever.caro.feature.card.RequiredFieldHeader(label: kotlin.Str
     - label: STABLE (String is immutable)
 
 @Composable
+private fun com.whatever.caro.feature.card.RequiredFieldHeader(label: kotlin.String): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - label: STABLE (String is immutable)
+
+@Composable
 private fun com.whatever.caro.feature.card.SaveButton(enabled: kotlin.Boolean, onClick: kotlin.Function0<kotlin.Unit>): kotlin.Unit
   skippable: true
   restartable: true
   params:
     - enabled: STABLE (primitive type)
+    - onClick: STABLE (function type)
+
+@Composable
+private fun com.whatever.caro.feature.card.SwapButton(onClick: kotlin.Function0<kotlin.Unit>): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
     - onClick: STABLE (function type)
 
 @Composable

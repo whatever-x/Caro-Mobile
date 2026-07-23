@@ -6,11 +6,13 @@ import androidx.compose.runtime.getValue
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.whatever.caro.core.model.learning.LearningMode
 import com.whatever.caro.core.navigator.contract.NavCommand.To
 import com.whatever.caro.core.navigator.dispatcher.NavigationDispatcher
 import com.whatever.caro.core.navigator.entries.CreateDeckEntry
 import com.whatever.caro.core.navigator.entries.CreateProfileEntry
 import com.whatever.caro.core.navigator.entries.DeckDetailEntry
+import com.whatever.caro.core.navigator.entries.LearningEntry
 import com.whatever.caro.core.navigator.entries.SettingEntry
 import com.whatever.caro.feature.home.HomeScreen
 import com.whatever.caro.feature.home.HomeViewModel
@@ -31,6 +33,19 @@ fun HomeRoute(
     LaunchedEffect(Unit) {
         viewModel.sideEffect.collect { sideEffect ->
             when (sideEffect) {
+                is HomeSideEffect.NavigateToDailyLearning -> {
+                    navDispatcher.emit(
+                        command =
+                            To(
+                                key =
+                                    LearningEntry(
+                                        deckId = sideEffect.deckId,
+                                        mode = LearningMode.DAILY,
+                                    ),
+                            ),
+                    )
+                }
+
                 is HomeSideEffect.NavigateToProfile -> {
                     navDispatcher.emit(command = To(key = CreateProfileEntry))
                 }

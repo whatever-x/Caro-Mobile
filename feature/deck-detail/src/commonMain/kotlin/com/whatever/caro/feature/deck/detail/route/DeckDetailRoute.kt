@@ -14,9 +14,11 @@ import caromobile.core.designsystem.generated.resources.card_list_error
 import com.whatever.caro.core.designsystem.components.CaroSnackbarStyle
 import com.whatever.caro.core.navigator.contract.NavCommand
 import com.whatever.caro.core.navigator.dispatcher.NavigationDispatcher
+import com.whatever.caro.core.navigator.entries.CreateCardEntry
 import com.whatever.caro.core.navigator.entries.DeleteCardsEntry
 import com.whatever.caro.core.navigator.entries.EditCardEntry
 import com.whatever.caro.core.navigator.entries.EditDeckEntry
+import com.whatever.caro.core.navigator.entries.LearningEntry
 import com.whatever.caro.core.ui.snackbar.SnackBarMessage
 import com.whatever.caro.core.ui.snackbar.SnackbarController
 import com.whatever.caro.feature.deck.detail.DeckDetailScreen
@@ -51,15 +53,24 @@ fun DeckDetailRoute(
                 }
 
                 is DeckDetailSideEffect.NavigateToCreateCard -> {
-                    // TODO: 카드 생성 화면 구현 후 sideEffect.deckId 를 사용해 이동 로직을 연결합니다.
+                    navDispatcher.emit(
+                        NavCommand.To(
+                            CreateCardEntry(
+                                deckId = sideEffect.deckId,
+                            ),
+                        ),
+                    )
                 }
 
-                is DeckDetailSideEffect.NavigateToAllStudy -> {
-                    // TODO: 전체 학습 화면 구현 후 sideEffect.deckId 를 사용해 이동 로직을 연결합니다.
-                }
-
-                is DeckDetailSideEffect.NavigateToDailyStudy -> {
-                    // TODO: 일일 학습 화면 구현 후 sideEffect.deckId 를 사용해 이동 로직을 연결합니다.
+                is DeckDetailSideEffect.NavigateToLearning -> {
+                    navDispatcher.emit(
+                        NavCommand.To(
+                            LearningEntry(
+                                deckId = sideEffect.deckId,
+                                mode = sideEffect.mode,
+                            ),
+                        ),
+                    )
                 }
 
                 is DeckDetailSideEffect.NavigateToEditCardList -> {

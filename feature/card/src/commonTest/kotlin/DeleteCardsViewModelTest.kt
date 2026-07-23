@@ -1,7 +1,9 @@
 import app.cash.turbine.test
 import com.whatever.caro.core.data.repository.card.CardRepository
-import com.whatever.caro.core.model.card.Card
+import com.whatever.caro.core.data.repository.deck.DeckRepository
+import com.whatever.caro.core.model.card.CardBadge
 import com.whatever.caro.core.model.card.CardContent
+import com.whatever.caro.core.model.card.DeckCard
 import com.whatever.caro.core.viewmodel.ExceptionFilter
 import com.whatever.caro.feature.card.delete.DeleteCardsViewModel
 import com.whatever.caro.feature.card.delete.mvi.DeleteCardsIntent
@@ -31,8 +33,18 @@ class DeleteCardsViewModelTest : FunSpec() {
         val testDeckId = 42L
         val cards =
             listOf(
-                Card(id = 1L, content = CardContent(front = "apple", back = "사과")),
-                Card(id = 2L, content = CardContent(front = "run", back = "달리다")),
+                DeckCard(
+                    id = 1L,
+                    content = CardContent(front = "apple", back = "사과"),
+                    badge = CardBadge.NEW,
+                    reviewCount = 0,
+                ),
+                DeckCard(
+                    id = 2L,
+                    content = CardContent(front = "run", back = "달리다"),
+                    badge = CardBadge.NEW,
+                    reviewCount = 0,
+                ),
             )
 
         beforeTest {
@@ -44,20 +56,27 @@ class DeleteCardsViewModelTest : FunSpec() {
             dispatcher.cancel()
         }
 
-        fun createViewModel(cardRepository: CardRepository): DeleteCardsViewModel =
+        fun createViewModel(
+            cardRepository: CardRepository = mock(),
+            deckRepository: DeckRepository =
+                mock {
+                    everySuspend { getDeckCards(any()) } returns cards
+                },
+        ): DeleteCardsViewModel =
             DeleteCardsViewModel(
                 cardRepository = cardRepository,
+                deckRepository = deckRepository,
                 deckId = testDeckId,
                 exceptionFilter = ExceptionFilter.None,
             )
 
         test("Initialize 는 deckId 로 카드 목록을 조회해 state 에 반영한다") {
             runTest(dispatcher) {
-                val cardRepository =
-                    mock<CardRepository> {
-                        everySuspend { getCards(any()) } returns cards
+                val deckRepository =
+                    mock<DeckRepository> {
+                        everySuspend { getDeckCards(any()) } returns cards
                     }
-                val viewModel = createViewModel(cardRepository)
+                val viewModel = createViewModel(deckRepository = deckRepository)
 
                 viewModel.intent(DeleteCardsIntent.Initialize)
                 advanceUntilIdle()
@@ -66,18 +85,14 @@ class DeleteCardsViewModelTest : FunSpec() {
                     .map { it.card } shouldBe cards
                 viewModel.state.value.isLoading shouldBe false
                 verifySuspend(exactly(1)) {
-                    cardRepository.getCards(deckId = testDeckId)
+                    deckRepository.getDeckCards(deckId = testDeckId)
                 }
             }
         }
 
         test("ClickCard 는 선택 상태를 토글한다") {
             runTest(dispatcher) {
-                val cardRepository =
-                    mock<CardRepository> {
-                        everySuspend { getCards(any()) } returns cards
-                    }
-                val viewModel = createViewModel(cardRepository)
+                val viewModel = createViewModel()
 
                 viewModel.intent(DeleteCardsIntent.Initialize)
                 advanceUntilIdle()
@@ -97,11 +112,7 @@ class DeleteCardsViewModelTest : FunSpec() {
 
         test("ClickSelectAll 은 전체 선택 상태를 토글한다") {
             runTest(dispatcher) {
-                val cardRepository =
-                    mock<CardRepository> {
-                        everySuspend { getCards(any()) } returns cards
-                    }
-                val viewModel = createViewModel(cardRepository)
+                val viewModel = createViewModel()
 
                 viewModel.intent(DeleteCardsIntent.Initialize)
                 advanceUntilIdle()
@@ -125,11 +136,7 @@ class DeleteCardsViewModelTest : FunSpec() {
 
         test("ClickSelectAll 은 일부 선택 상태에서 모든 카드를 선택한다") {
             runTest(dispatcher) {
-                val cardRepository =
-                    mock<CardRepository> {
-                        everySuspend { getCards(any()) } returns cards
-                    }
-                val viewModel = createViewModel(cardRepository)
+                val viewModel = createViewModel()
 
                 viewModel.intent(DeleteCardsIntent.Initialize)
                 advanceUntilIdle()
@@ -147,11 +154,7 @@ class DeleteCardsViewModelTest : FunSpec() {
 
         test("선택된 카드가 없으면 ClickDeleteSelected 는 다이얼로그를 열지 않는다") {
             runTest(dispatcher) {
-                val cardRepository =
-                    mock<CardRepository> {
-                        everySuspend { getCards(any()) } returns cards
-                    }
-                val viewModel = createViewModel(cardRepository)
+                val viewModel = createViewModel()
 
                 viewModel.intent(DeleteCardsIntent.Initialize)
                 advanceUntilIdle()
@@ -164,11 +167,7 @@ class DeleteCardsViewModelTest : FunSpec() {
 
         test("선택된 카드가 있으면 ClickDeleteSelected 는 삭제 확인 다이얼로그를 연다") {
             runTest(dispatcher) {
-                val cardRepository =
-                    mock<CardRepository> {
-                        everySuspend { getCards(any()) } returns cards
-                    }
-                val viewModel = createViewModel(cardRepository)
+                val viewModel = createViewModel()
 
                 viewModel.intent(DeleteCardsIntent.Initialize)
                 viewModel.intent(DeleteCardsIntent.ClickCard(cardId = 1L))
@@ -185,7 +184,6 @@ class DeleteCardsViewModelTest : FunSpec() {
             runTest(dispatcher) {
                 val cardRepository =
                     mock<CardRepository> {
-                        everySuspend { getCards(any()) } returns cards
                         everySuspend { deleteCards(any()) } returns Unit
                     }
                 val viewModel = createViewModel(cardRepository)
@@ -212,7 +210,6 @@ class DeleteCardsViewModelTest : FunSpec() {
             runTest(dispatcher) {
                 val cardRepository =
                     mock<CardRepository> {
-                        everySuspend { getCards(any()) } returns cards
                         everySuspend { deleteCards(any()) } throws RuntimeException("network")
                     }
                 val viewModel = createViewModel(cardRepository)
@@ -235,8 +232,7 @@ class DeleteCardsViewModelTest : FunSpec() {
 
         test("ClickCancel 과 ClickBack 은 NavigateBack 을 emit 한다") {
             runTest(dispatcher) {
-                val cardRepository = mock<CardRepository>()
-                val viewModel = createViewModel(cardRepository)
+                val viewModel = createViewModel()
 
                 viewModel.sideEffect.test {
                     viewModel.intent(DeleteCardsIntent.ClickCancel)

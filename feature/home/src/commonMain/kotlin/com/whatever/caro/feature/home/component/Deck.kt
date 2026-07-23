@@ -21,6 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -53,6 +54,7 @@ internal fun Deck(
     todayLearningPercentage: Int,
     state: DeckState,
     onDeckClick: () -> Unit,
+    onStartLearningClick: () -> Unit,
 ) {
     val progressSpace =
         when (state) {
@@ -68,8 +70,11 @@ internal fun Deck(
                 .clip(shape = CaroTheme.shape.xl)
                 .noRippleClickable(onClick = onDeckClick)
                 .background(color = CaroTheme.color.surface.primary)
-                .border(width = 1.dp, color = CaroTheme.color.border.secondary)
-                .padding(vertical = CaroTheme.spacing.xl, horizontal = CaroTheme.spacing.xl2),
+                .border(
+                    width = 1.dp,
+                    color = CaroTheme.color.border.secondary,
+                    shape = CaroTheme.shape.xl,
+                ).padding(vertical = CaroTheme.spacing.xl, horizontal = CaroTheme.spacing.xl2),
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -131,7 +136,7 @@ internal fun Deck(
             }
             CtaButton(
                 state = state,
-                onClick = onDeckClick,
+                onClick = onStartLearningClick,
             )
         }
     }
@@ -151,9 +156,11 @@ private fun ProgressContent(
                         .height(height = 8.dp)
                         .clip(shape = CaroTheme.shape.xs),
                 drawStopIndicator = {},
+                gapSize = 0.dp,
                 progress = { todayLearningPercentage.coerceIn(0, 100).toFloat() / 100f },
                 color = CaroTheme.color.surface.brand,
                 trackColor = CaroTheme.color.surface.tertiary,
+                strokeCap = StrokeCap.Butt,
             )
         }
 
@@ -302,6 +309,7 @@ private fun NotStartedDeckItemPreview() {
             todayLearningPercentage = 0,
             state = DeckState.NOT_STARTED,
             onDeckClick = {},
+            onStartLearningClick = {},
         )
     }
 }
@@ -317,6 +325,7 @@ private fun LearningDeckItemPreview() {
             todayLearningPercentage = 70,
             state = DeckState.LEARNING,
             onDeckClick = {},
+            onStartLearningClick = {},
         )
     }
 }
@@ -332,6 +341,7 @@ private fun CompleteDeckItemPreview() {
             todayLearningPercentage = 100,
             state = DeckState.COMPLETE,
             onDeckClick = {},
+            onStartLearningClick = {},
         )
     }
 }
@@ -347,6 +357,7 @@ private fun RestDeckItemPreview() {
             todayLearningPercentage = 0,
             state = DeckState.REST_DAY,
             onDeckClick = {},
+            onStartLearningClick = {},
         )
     }
 }

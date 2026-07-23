@@ -22,7 +22,7 @@ private fun com.whatever.caro.feature.home.component.CtaButton(state: com.whatev
     - modifier: STABLE (marked @Stable or @Immutable)
 
 @Composable
-internal fun com.whatever.caro.feature.home.component.Deck(modifier: androidx.compose.ui.Modifier, title: kotlin.String, description: kotlin.String, cardTotalCount: kotlin.Int, todayLearningPercentage: kotlin.Int, state: com.whatever.caro.core.model.deck.DeckState, onDeckClick: kotlin.Function0<kotlin.Unit>): kotlin.Unit
+internal fun com.whatever.caro.feature.home.component.Deck(modifier: androidx.compose.ui.Modifier, title: kotlin.String, description: kotlin.String, cardTotalCount: kotlin.Int, todayLearningPercentage: kotlin.Int, state: com.whatever.caro.core.model.deck.DeckState, onDeckClick: kotlin.Function0<kotlin.Unit>, onStartLearningClick: kotlin.Function0<kotlin.Unit>): kotlin.Unit
   skippable: true
   restartable: true
   params:
@@ -33,6 +33,7 @@ internal fun com.whatever.caro.feature.home.component.Deck(modifier: androidx.co
     - todayLearningPercentage: STABLE (primitive type)
     - state: STABLE (class with no mutable properties)
     - onDeckClick: STABLE (function type)
+    - onStartLearningClick: STABLE (function type)
 
 @Composable
 private fun com.whatever.caro.feature.home.component.DeckStateBadge(modifier: androidx.compose.ui.Modifier, state: com.whatever.caro.core.model.deck.DeckState): kotlin.Unit

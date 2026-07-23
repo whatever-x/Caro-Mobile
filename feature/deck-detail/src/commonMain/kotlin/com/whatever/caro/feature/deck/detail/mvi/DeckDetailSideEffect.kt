@@ -1,5 +1,6 @@
 package com.whatever.caro.feature.deck.detail.mvi
 
+import com.whatever.caro.core.model.learning.LearningMode
 import com.whatever.caro.core.viewmodel.contract.UiSideEffect
 
 sealed interface DeckDetailSideEffect : UiSideEffect {
@@ -9,12 +10,9 @@ sealed interface DeckDetailSideEffect : UiSideEffect {
         val deckId: Long,
     ) : DeckDetailSideEffect
 
-    data class NavigateToAllStudy(
+    data class NavigateToLearning(
         val deckId: Long,
-    ) : DeckDetailSideEffect
-
-    data class NavigateToDailyStudy(
-        val deckId: Long,
+        val mode: LearningMode,
     ) : DeckDetailSideEffect
 
     data class NavigateToEditCardList(

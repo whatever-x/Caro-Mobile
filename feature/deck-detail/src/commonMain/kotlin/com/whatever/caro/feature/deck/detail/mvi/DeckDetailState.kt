@@ -1,23 +1,13 @@
 package com.whatever.caro.feature.deck.detail.mvi
 
 import com.whatever.caro.core.model.deck.Deck
-import com.whatever.caro.core.model.deck.DeckState
 import com.whatever.caro.core.viewmodel.contract.UiState
 import com.whatever.caro.feature.deck.detail.model.CardItem
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 
 data class DeckDetailState(
-    val deck: Deck =
-        Deck(
-            id = 1L,
-            title = "Preview Title",
-            description = "Preview Description for Deck Detail",
-            cardTotalCount = 0,
-            todayLearningCount = 0,
-            todayCompleteCount = 0,
-            state = DeckState.NOT_STARTED,
-        ),
+    val deck: Deck,
     val deckCardList: ImmutableList<CardItem> = persistentListOf(),
     val isCardListLoading: Boolean = false,
     val isSortBottomSheetVisible: Boolean = false,

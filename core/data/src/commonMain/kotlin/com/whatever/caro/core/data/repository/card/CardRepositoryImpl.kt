@@ -1,13 +1,12 @@
 package com.whatever.caro.core.data.repository.card
 
 import com.whatever.caro.core.data.mapper.toFields
-import com.whatever.caro.core.data.mapper.toModel
-import com.whatever.caro.core.model.card.Card
 import com.whatever.caro.core.model.card.CardContent
 import com.whatever.caro.core.remote.datasource.card.CardDataSource
 import com.whatever.caro.core.remote.dto.cardController.request.CreateCardItemDto
 import com.whatever.caro.core.remote.dto.cardController.request.CreateCardItemDto.CardTypeDto
 import com.whatever.caro.core.remote.dto.cardController.request.CreateCardsRequest
+import com.whatever.caro.core.remote.dto.cardController.request.DeleteCardsRequest
 import com.whatever.caro.core.remote.dto.cardController.request.UpdateCardRequest
 
 internal class CardRepositoryImpl(
@@ -30,11 +29,6 @@ internal class CardRepositoryImpl(
         cardDataSource.createCards(deckId = deckId, request = request)
     }
 
-    override suspend fun getCards(deckId: Long): List<Card> =
-        cardDataSource
-            .getCards(deckId = deckId)
-            .mapNotNull { response -> response.toModel() }
-
     override suspend fun updateCard(
         cardId: Long,
         content: CardContent,
@@ -47,8 +41,7 @@ internal class CardRepositoryImpl(
     }
 
     override suspend fun deleteCards(cardIds: List<Long>) {
-        cardIds.forEach { cardId ->
-            cardDataSource.deleteCard(cardId = cardId)
-        }
+        val request = DeleteCardsRequest(cardIds = cardIds.toSet())
+        cardDataSource.deleteCards(request = request)
     }
 }

@@ -5,6 +5,7 @@ import com.whatever.caro.core.model.card.CardContent
 import com.whatever.caro.core.model.card.DeckCard
 import com.whatever.caro.core.model.deck.Deck
 import com.whatever.caro.core.model.deck.DeckState
+import com.whatever.caro.core.model.learning.LearningMode
 import com.whatever.caro.core.viewmodel.ExceptionFilter
 import com.whatever.caro.feature.deck.detail.DeckDetailViewModel
 import com.whatever.caro.feature.deck.detail.model.CardItem
@@ -161,7 +162,11 @@ class DeckDetailViewModelTest :
                 viewModel.sideEffect.test {
                     viewModel.intent(DeckDetailIntent.ClickAllStudy)
 
-                    awaitItem() shouldBe DeckDetailSideEffect.NavigateToAllStudy(deckId = deck.id)
+                    awaitItem() shouldBe
+                        DeckDetailSideEffect.NavigateToLearning(
+                            deckId = deck.id,
+                            mode = LearningMode.ALL,
+                        )
                 }
             }
         }
@@ -174,7 +179,11 @@ class DeckDetailViewModelTest :
                 viewModel.sideEffect.test {
                     viewModel.intent(DeckDetailIntent.ClickDailyStudy)
 
-                    awaitItem() shouldBe DeckDetailSideEffect.NavigateToDailyStudy(deckId = deck.id)
+                    awaitItem() shouldBe
+                        DeckDetailSideEffect.NavigateToLearning(
+                            deckId = deck.id,
+                            mode = LearningMode.DAILY,
+                        )
                 }
             }
         }

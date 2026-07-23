@@ -1,6 +1,7 @@
 package com.whatever.caro.feature.deck.detail.model
 
 import androidx.compose.runtime.Stable
+import com.whatever.caro.core.model.card.Card
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlin.random.Random
@@ -14,6 +15,13 @@ data class CardItem(
     val reviewState: CardReviewState = CardReviewState.NEW,
 ) {
     companion object {
+        fun toUiModel(card: Card): CardItem =
+            CardItem(
+                id = card.id,
+                front = card.content.front,
+                back = card.content.back,
+            )
+
         fun fakeList(): ImmutableList<CardItem> =
             (0L..20L)
                 .map { id ->
