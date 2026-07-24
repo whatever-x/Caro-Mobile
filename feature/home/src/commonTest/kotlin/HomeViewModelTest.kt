@@ -11,18 +11,22 @@ import com.whatever.caro.feature.home.HomeViewModel
 import com.whatever.caro.feature.home.mvi.HomeIntent
 import com.whatever.caro.feature.home.mvi.HomeSideEffect
 import com.whatever.caro.feature.home.mvi.HomeStreakState
+import dev.mokkery.answering.calls
 import dev.mokkery.answering.returns
 import dev.mokkery.answering.throws
 import dev.mokkery.everySuspend
 import dev.mokkery.mock
 import dev.mokkery.verifySuspend
 import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.shouldBe
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 
@@ -41,11 +45,12 @@ class HomeViewModelTest : FunSpec() {
                 },
             profileRepository: ProfileRepository =
                 mock { everySuspend { getMyNickname() } returns "캐로" },
+            exceptionFilter: ExceptionFilter = ExceptionFilter.None,
         ) = HomeViewModel(
             deckRepository,
             streakRepository,
             profileRepository,
-            ExceptionFilter.None,
+            exceptionFilter,
         )
 
         beforeTest {
@@ -319,6 +324,95 @@ class HomeViewModelTest : FunSpec() {
                 viewModel.state.value.decks
                     .toList() shouldBe decks
                 viewModel.state.value.streakState shouldBe HomeStreakState.Active(days = 5)
+            }
+        }
+
+        test("연속 Initialize 에서는 느린 이전 요청이 최신 상태를 덮어쓰지 않는다") {
+            runTest(testDispatcher) {
+                val firstDecks = CompletableDeferred<List<Deck>>()
+                var deckRequestCount = 0
+                var nicknameRequestCount = 0
+                val deckRepository =
+                    mock<DeckRepository> {
+                        everySuspend { getDecks() } calls {
+                            deckRequestCount++
+                            if (deckRequestCount == 1) {
+                                firstDecks.await()
+                            } else {
+                                emptyList()
+                            }
+                        }
+                    }
+                val profileRepository =
+                    mock<ProfileRepository> {
+                        everySuspend { getMyNickname() } calls {
+                            nicknameRequestCount++
+                            if (nicknameRequestCount == 1) "이전 닉네임" else "최신 닉네임"
+                        }
+                    }
+                val viewModel =
+                    viewModelWith(
+                        deckRepository = deckRepository,
+                        profileRepository = profileRepository,
+                    )
+
+                viewModel.intent(HomeIntent.Initialize)
+                runCurrent()
+                viewModel.intent(HomeIntent.Initialize)
+                runCurrent()
+
+                viewModel.state.value.nickname shouldBe "최신 닉네임"
+
+                firstDecks.complete(emptyList())
+                advanceUntilIdle()
+
+                viewModel.state.value.nickname shouldBe "최신 닉네임"
+                viewModel.state.value.isLoading shouldBe false
+            }
+        }
+
+        test("동시 조회 실패는 decks 예외를 대표로 두고 나머지 원인을 suppressed 로 보존한다") {
+            runTest(testDispatcher) {
+                val decksError = IllegalStateException("decks error")
+                val streakError = IllegalArgumentException("streak error")
+                val nicknameError = RuntimeException("nickname error")
+                val capturedErrors = mutableListOf<Throwable>()
+                val deckRepository =
+                    mock<DeckRepository> {
+                        everySuspend { getDecks() } throws decksError
+                    }
+                val streakRepository =
+                    mock<StreakRepository> {
+                        everySuspend { getStreak() } throws streakError
+                    }
+                val profileRepository =
+                    mock<ProfileRepository> {
+                        everySuspend { getMyNickname() } throws nicknameError
+                    }
+                val viewModel =
+                    viewModelWith(
+                        deckRepository = deckRepository,
+                        streakRepository = streakRepository,
+                        profileRepository = profileRepository,
+                        exceptionFilter =
+                            ExceptionFilter { throwable ->
+                                capturedErrors += throwable
+                                true
+                            },
+                    )
+
+                viewModel.intent(HomeIntent.Initialize)
+                advanceUntilIdle()
+
+                capturedErrors.size shouldBe 1
+                val primaryError = capturedErrors.single().cause ?: capturedErrors.single()
+                (primaryError === decksError) shouldBe true
+                verifySuspend { deckRepository.getDecks() }
+                verifySuspend { streakRepository.getStreak() }
+                verifySuspend { profileRepository.getMyNickname() }
+                primaryError.suppressedExceptions
+                    .toList()
+                    .shouldContainExactly(streakError, nicknameError)
             }
         }
     }

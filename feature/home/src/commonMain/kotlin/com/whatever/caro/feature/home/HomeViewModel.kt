@@ -25,6 +25,8 @@ class HomeViewModel(
         initialState = HomeState(),
         exceptionFilter = exceptionFilter,
     ) {
+    private var initializationGeneration = 0L
+
     override fun handleClientException(throwable: Throwable) {
         reduce { copy(isLoading = false) }
     }
@@ -69,6 +71,7 @@ class HomeViewModel(
 
     private suspend fun initialize() =
         coroutineScope {
+            val generation = ++initializationGeneration
             reduce { copy(isLoading = true) }
 
             val decksDeferred =
@@ -97,6 +100,8 @@ class HomeViewModel(
             val loadedStreak = streakResult.getOrNull()
             val loadedNickname = nicknameResult.getOrNull()
 
+            if (generation != initializationGeneration) return@coroutineScope
+
             reduce {
                 copy(
                     isLoading = false,
@@ -106,9 +111,16 @@ class HomeViewModel(
                 )
             }
 
-            decksResult.exceptionOrNull()?.let { throw it }
-            streakResult.exceptionOrNull()?.let { throw it }
-            nicknameResult.exceptionOrNull()?.let { throw it }
+            val exceptions =
+                listOfNotNull(
+                    decksResult.exceptionOrNull(),
+                    streakResult.exceptionOrNull(),
+                    nicknameResult.exceptionOrNull(),
+                )
+            exceptions.firstOrNull()?.let { primary ->
+                primary.addSuppressedExceptions(exceptions.drop(1))
+                throw primary
+            }
         }
 
     private fun Streak.toHomeStreakState(): HomeStreakState =
@@ -117,4 +129,8 @@ class HomeViewModel(
             StreakStatus.ACTIVE -> HomeStreakState.Active(days = currentDays)
             StreakStatus.BROKEN -> HomeStreakState.Broken
         }
+}
+
+private fun Throwable.addSuppressedExceptions(exceptions: Iterable<Throwable>) {
+    exceptions.forEach(::addSuppressed)
 }
