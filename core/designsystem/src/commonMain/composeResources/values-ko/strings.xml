@@ -106,7 +106,12 @@
     <string name="card_delete_error">카드 삭제에 실패했어요. 다시 시도해 주세요.</string>
     <!-- home -->
     <string name="home_banner_title">%1$s님, 안녕하세요!</string>
-    <string name="home_learning_days">%1$d일 연속 학습중</string>
+    <string name="home_streak_not_started_description">새 덱을 만들고\n학습을 시작해볼까요?</string>
+    <string name="home_streak_not_started_label">첫 연속 학습에 도전해 보세요</string>
+    <string name="home_streak_active_description">%1$d일 째 학습 중이에요.\n오늘은 복습 카드와 새 덱 하나를 끝내봐요.</string>
+    <string name="home_streak_active_label">%1$d일째 연속 학습 중</string>
+    <string name="home_streak_broken_description">잠시 쉬고 계셨네요.\n다시 이어서 준비해볼까요?</string>
+    <string name="home_streak_broken_label">연속 학습 기록이 초기화되었어요</string>
     <string name="home_deck_badge_not_started">학습 전</string>
     <string name="home_deck_badge_learning">학습 중</string>
     <string name="home_deck_badge_complete">완료</string>
