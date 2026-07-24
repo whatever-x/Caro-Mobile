@@ -1,8 +1,8 @@
 package com.whatever.caro.core.data.repository.card
 
 import com.whatever.caro.core.remote.datasource.card.CardDataSource
-import com.whatever.caro.core.remote.dto.cardController.request.DeleteCardsRequest
-import com.whatever.caro.core.remote.dto.cardController.response.DeleteCardResponse
+import com.whatever.caro.core.remote.dto.card.request.DeleteCardsRequest
+import com.whatever.caro.core.remote.dto.card.response.DeleteCardResponse
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any

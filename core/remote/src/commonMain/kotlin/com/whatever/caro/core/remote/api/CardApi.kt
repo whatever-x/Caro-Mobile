@@ -1,12 +1,12 @@
 package com.whatever.caro.core.remote.api
 
-import com.whatever.caro.core.remote.dto.cardController.request.CreateCardsRequest
-import com.whatever.caro.core.remote.dto.cardController.request.DeleteCardsRequest
-import com.whatever.caro.core.remote.dto.cardController.request.UpdateCardRequest
-import com.whatever.caro.core.remote.dto.cardController.response.CardResponse
-import com.whatever.caro.core.remote.dto.cardController.response.CreateCardsResponse
-import com.whatever.caro.core.remote.dto.cardController.response.DeleteCardResponse
-import com.whatever.caro.core.remote.dto.cardController.response.UpdateCardResponse
+import com.whatever.caro.core.remote.dto.card.request.CreateCardsRequest
+import com.whatever.caro.core.remote.dto.card.request.DeleteCardsRequest
+import com.whatever.caro.core.remote.dto.card.request.UpdateCardRequest
+import com.whatever.caro.core.remote.dto.card.response.CardResponse
+import com.whatever.caro.core.remote.dto.card.response.CreateCardsResponse
+import com.whatever.caro.core.remote.dto.card.response.DeleteCardResponse
+import com.whatever.caro.core.remote.dto.card.response.UpdateCardResponse
 import de.jensklingenberg.ktorfit.http.Body
 import de.jensklingenberg.ktorfit.http.DELETE
 import de.jensklingenberg.ktorfit.http.GET
@@ -14,7 +14,7 @@ import de.jensklingenberg.ktorfit.http.PATCH
 import de.jensklingenberg.ktorfit.http.POST
 import de.jensklingenberg.ktorfit.http.Path
 
-internal interface CardControllerApi {
+internal interface CardApi {
     @POST("v1/decks/{deckId}/cards")
     suspend fun requestCreateCards(
         @Path("deckId") deckId: Long,

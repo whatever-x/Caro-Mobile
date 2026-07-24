@@ -1,4 +1,4 @@
-package com.whatever.caro.core.remote.dto.cardController.response
+package com.whatever.caro.core.remote.dto.card.response
 
 import kotlinx.serialization.Serializable
 

@@ -2,12 +2,12 @@ package com.whatever.caro.core.data.repository.card
 
 import com.whatever.caro.core.model.card.CardContent
 import com.whatever.caro.core.remote.datasource.card.CardDataSource
-import com.whatever.caro.core.remote.dto.cardController.request.CreateCardItemDto
-import com.whatever.caro.core.remote.dto.cardController.request.CreateCardItemDto.CardTypeDto
-import com.whatever.caro.core.remote.dto.cardController.request.CreateCardsRequest
-import com.whatever.caro.core.remote.dto.cardController.request.UpdateCardRequest
-import com.whatever.caro.core.remote.dto.cardController.response.CreateCardsResponse
-import com.whatever.caro.core.remote.dto.cardController.response.UpdateCardResponse
+import com.whatever.caro.core.remote.dto.card.request.CreateCardItemDto
+import com.whatever.caro.core.remote.dto.card.request.CreateCardItemDto.CardTypeDto
+import com.whatever.caro.core.remote.dto.card.request.CreateCardsRequest
+import com.whatever.caro.core.remote.dto.card.request.UpdateCardRequest
+import com.whatever.caro.core.remote.dto.card.response.CreateCardsResponse
+import com.whatever.caro.core.remote.dto.card.response.UpdateCardResponse
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any

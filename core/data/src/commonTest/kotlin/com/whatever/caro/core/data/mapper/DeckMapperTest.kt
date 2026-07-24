@@ -1,7 +1,7 @@
 package com.whatever.caro.core.data.mapper
 
 import com.whatever.caro.core.model.deck.DeckState
-import com.whatever.caro.core.remote.dto.deckCardInformation.response.DeckListResponse
+import com.whatever.caro.core.remote.dto.deck.response.DeckListResponse
 import com.whatever.caro.core.remote.dto.studySession.response.StudySessionProgressResponseDto
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe

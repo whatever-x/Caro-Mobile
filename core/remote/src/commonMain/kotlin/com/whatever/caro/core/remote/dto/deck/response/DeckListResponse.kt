@@ -1,4 +1,4 @@
-package com.whatever.caro.core.remote.dto.deckCardInformation.response
+package com.whatever.caro.core.remote.dto.deck.response
 
 import com.whatever.caro.core.remote.dto.studySession.response.StudySessionProgressResponseDto
 import kotlinx.serialization.Serializable

@@ -13,4 +13,8 @@ internal class RemoteAuthDataSourceImpl(
     override suspend fun logout() {
         authApi.requestLogout()
     }
+
+    override suspend fun withdraw() {
+        authApi.requestWithdraw()
+    }
 }
