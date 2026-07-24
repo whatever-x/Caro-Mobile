@@ -1,7 +1,7 @@
 package com.whatever.caro.core.data.mapper
 
 import com.whatever.caro.core.model.card.CardContent
-import com.whatever.caro.core.remote.dto.cardController.response.CardResponse
+import com.whatever.caro.core.remote.dto.card.response.CardResponse
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 
