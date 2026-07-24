@@ -2,7 +2,7 @@ package com.whatever.caro.core.data.mapper
 
 import com.whatever.caro.core.model.card.Card
 import com.whatever.caro.core.model.card.CardContent
-import com.whatever.caro.core.remote.dto.cardController.response.CardResponse
+import com.whatever.caro.core.remote.dto.card.response.CardResponse
 
 private const val FIELD_FRONT = "front"
 private const val FIELD_BACK = "back"
