@@ -78,6 +78,7 @@ internal fun EditProfileScreen(
         ProfileCtaButton(
             text = stringResource(Res.string.profile_button_done),
             enabled = state.isConfirmEnabled,
+            isLoading = state.isLoading,
             onClick = { onIntent(EditProfileIntent.ClickConfirm) },
             modifier =
                 Modifier

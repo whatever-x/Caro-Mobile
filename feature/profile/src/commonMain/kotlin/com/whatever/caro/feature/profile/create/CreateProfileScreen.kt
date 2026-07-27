@@ -81,6 +81,7 @@ internal fun CreateProfileScreen(
         ProfileCtaButton(
             text = stringResource(Res.string.profile_button_create),
             enabled = state.isConfirmEnabled,
+            isLoading = state.isLoading,
             onClick = { onIntent(CreateProfileIntent.ClickConfirm) },
             modifier =
                 Modifier
