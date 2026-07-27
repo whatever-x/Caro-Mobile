@@ -65,12 +65,7 @@ fun LoginRoute(
         viewModel.sideEffect.collect { sideEffect ->
             when (sideEffect) {
                 is LoginSideEffect.NavigateHome -> {
-                    navDispatcher.emit(
-                        command =
-                            To(
-                                key = HomeEntry,
-                            ),
-                    )
+                    navDispatcher.emit(command = To(key = HomeEntry))
                 }
 
                 is LoginSideEffect.ShowErrorSnackbar -> {

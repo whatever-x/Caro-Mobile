@@ -43,8 +43,8 @@ class CreateDeckViewModel(
                     name = currentState.name,
                     description = currentState.description,
                 )
-            }.onSuccess {
-                postSideEffect(CreateDeckSideEffect.NavigateBack)
+            }.onSuccess { deck ->
+                postSideEffect(CreateDeckSideEffect.Created(deck))
             }.onFailure { throwable ->
                 Napier.e(throwable = throwable) { "createDeck failed" }
                 reduce { copy(isLoading = false) }

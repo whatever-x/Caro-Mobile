@@ -69,7 +69,7 @@ fun LearningScreen(
             LearningMessage(
                 stringResource(Res.string.learning_rest),
                 stringResource(Res.string.learning_close),
-            ) { onIntent(LearningIntent.Close) }
+            ) { onIntent(LearningIntent.ClickBackButton) }
         }
 
         state.isCompleted -> {
@@ -79,7 +79,7 @@ fun LearningScreen(
                 easy = ratingCounts?.easy ?: state.evaluations.count { it.rating == StudyRating.EASY },
                 fair = ratingCounts?.fair ?: state.evaluations.count { it.rating == StudyRating.FAIR },
                 again = ratingCounts?.again ?: state.evaluations.count { it.rating == StudyRating.AGAIN },
-                onClose = { onIntent(LearningIntent.Close) },
+                onClickBackToHome = { onIntent(LearningIntent.ClickNavigateToHome) },
             )
         }
 

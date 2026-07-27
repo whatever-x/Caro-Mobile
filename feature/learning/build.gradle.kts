@@ -14,5 +14,6 @@ kotlin {
     sourceSets.commonMain.dependencies {
         implementation(projects.core.model)
         implementation(libs.jetbrains.androidx.navigation3.event)
+        implementation(libs.compottie.lite)
     }
 }

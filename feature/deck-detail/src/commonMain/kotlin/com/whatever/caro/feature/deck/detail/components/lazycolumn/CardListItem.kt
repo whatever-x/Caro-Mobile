@@ -96,7 +96,7 @@ internal fun DeckCardItem(
             Text(
                 text = card.back,
                 color = CaroTheme.color.text.secondary,
-                style = CaroTheme.typography.label2,
+                style = CaroTheme.typography.label2.regular,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )

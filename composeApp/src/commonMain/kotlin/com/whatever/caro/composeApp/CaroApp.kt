@@ -9,6 +9,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.savedstate.serialization.SavedStateConfiguration
@@ -40,6 +42,11 @@ import io.github.aakira.napier.Napier
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
 import org.koin.compose.koinInject
+
+private val HomeSnackbarBottomPadding = 88.dp
+
+internal fun snackbarHostBottomPadding(currentDestination: NavKey?): Dp =
+    if (currentDestination is HomeEntry) HomeSnackbarBottomPadding else 0.dp
 
 @Composable
 fun CaroApp(
@@ -117,6 +124,7 @@ fun CaroApp(
     }
     CaroTheme {
         val snackBarHostState = remember { SnackbarHostState() }
+        val snackbarBottomPadding = snackbarHostBottomPadding(backStack.lastOrNull())
 
         LaunchedEffect(snackbarController, snackBarHostState) {
             snackbarController.messages.collect { snackbar ->
@@ -126,6 +134,8 @@ fun CaroApp(
                     message = snackbar.message,
                     style = snackbar.style,
                     duration = snackbar.duration,
+                    actionLabel = snackbar.actionLabel,
+                    onAction = snackbar.onAction,
                 )
             }
         }
@@ -134,7 +144,7 @@ fun CaroApp(
             modifier = Modifier.fillMaxSize(),
             snackbarHost = {
                 CaroSnackBarHost(
-                    modifier = Modifier,
+                    modifier = Modifier.padding(bottom = snackbarBottomPadding),
                     hostState = snackBarHostState,
                     snackbar = { snackbarData ->
                         CaroSnackbar(

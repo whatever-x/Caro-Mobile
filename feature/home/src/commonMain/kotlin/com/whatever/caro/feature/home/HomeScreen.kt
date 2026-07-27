@@ -109,12 +109,7 @@ internal fun HomeScreen(
                 },
             )
 
-            LazyColumn(
-                modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 72.dp),
-            ) {
+            LazyColumn(modifier = Modifier.fillMaxWidth()) {
                 item {
                     HomeStreakBanner(state = state)
                 }
@@ -147,7 +142,7 @@ internal fun HomeScreen(
                         },
                     )
                     if (index == state.decks.lastIndex) {
-                        Spacer(modifier = Modifier.size(size = CaroTheme.spacing.l))
+                        Spacer(modifier = Modifier.size(size = 72.dp + CaroTheme.spacing.l))
                     }
                 }
             }

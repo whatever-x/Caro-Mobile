@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <resources>
+	<!-- splash -->
+	<string name="splash_content">Build your daily study habit\nwith just one card</string>
 	<!-- login -->
 	<string name="login_snackbar_cancel">Cancelled.</string>
 	<string name="login_snackbar_error">An error occurred.</string>
@@ -35,6 +37,8 @@
 	<string name="deck_tip_max_cards">You can add up to 200 cards per deck.</string>
 	<string name="deck_button_create">Create</string>
 	<string name="deck_snackbar_create_error">Failed to create the deck. Please try again.</string>
+	<string name="deck_snackbar_create_success">Deck created successfully.</string>
+	<string name="deck_snackbar_action_open">View deck</string>
 	<!-- deck detail -->
 	<string name="deck_detail_screen_name">Deck Detail</string>
 	<string name="deck_detail_label_screen_name">Deck Detail</string>
@@ -172,6 +176,7 @@
 	<string name="learning_dialog_title">Notice</string>
 	<string name="learning_dialog_submit_error">An unknown error occurred.</string>
 	<string name="learning_dialog_confirm">OK</string>
+	<string name="learning_complete_description">Let’s review again tomorrow</string>
 	<!-- card detail -->
 	<string name="card_detail_back">Go back</string>
 	<string name="card_detail_edit">Edit card</string>

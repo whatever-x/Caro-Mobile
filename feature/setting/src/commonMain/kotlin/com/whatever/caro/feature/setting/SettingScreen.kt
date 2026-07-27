@@ -151,7 +151,7 @@ internal fun SettingScreen(
                         Res.string.setting_description_app_version,
                         AppConfig.appVersion,
                     ),
-                style = CaroTheme.typography.caption2.regular,
+                style = CaroTheme.typography.caption1.medium,
                 color = CaroTheme.color.text.tertiary,
             )
         }
@@ -201,7 +201,7 @@ private fun UserInfo(
             )
             Text(
                 text = emailAddress,
-                style = CaroTheme.typography.body4.regular,
+                style = CaroTheme.typography.body2.medium,
                 color = CaroTheme.color.text.secondary,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,

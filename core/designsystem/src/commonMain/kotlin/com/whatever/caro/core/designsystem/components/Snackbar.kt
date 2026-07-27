@@ -1,17 +1,21 @@
 package com.whatever.caro.core.designsystem.components
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.SnackbarData
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.SnackbarVisuals
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextAlign
 import com.whatever.caro.core.designsystem.animation.SlideInSlideOutSnackbarHost
 import com.whatever.caro.core.designsystem.themes.CaroTheme
@@ -37,9 +41,16 @@ class CaroSnackbarVisuals(
     override val message: String,
     val style: CaroSnackbarStyle = CaroSnackbarStyle.Normal,
     override val duration: SnackbarDuration = SnackbarDuration.Short,
+    override val actionLabel: String? = null,
 ) : SnackbarVisuals {
-    override val actionLabel: String? = null
     override val withDismissAction: Boolean = false
+
+    internal var dismissImmediately: Boolean = false
+        private set
+
+    internal fun markForImmediateDismissal() {
+        dismissImmediately = true
+    }
 }
 
 /**
@@ -73,6 +84,7 @@ fun CaroSnackBarHost(
     SlideInSlideOutSnackbarHost(
         current = hostState.currentSnackbarData,
         modifier = modifier,
+        dismissImmediately = ::shouldDismissSnackbarImmediately,
         content = snackbar,
     )
 }
@@ -102,26 +114,48 @@ fun CaroSnackbar(
             CaroSnackbarStyle.Error -> CaroTheme.color.text.error
         }
 
-    Box(
+    Row(
         modifier =
             modifier
                 .background(
                     color = backgroundColor,
                     shape = CaroTheme.shape.s,
                 ).padding(
-                    horizontal = CaroTheme.spacing.m,
-                    vertical = CaroTheme.spacing.l,
+                    horizontal = CaroTheme.spacing.l,
+                    vertical = CaroTheme.spacing.m,
                 ),
-        contentAlignment = Alignment.Center,
+        horizontalArrangement = Arrangement.spacedBy(CaroTheme.spacing.s),
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
-            style = CaroTheme.typography.body3,
+            style = CaroTheme.typography.body2.medium,
             text = snackbarData.visuals.message,
             textAlign = TextAlign.Center,
             color = textColor,
         )
+
+        snackbarData.visuals.actionLabel?.let { actionLabel ->
+            Text(
+                modifier =
+                    Modifier.clickable(
+                        role = Role.Button,
+                        onClick = { performCaroSnackbarAction(snackbarData) },
+                    ),
+                text = actionLabel,
+                style = CaroTheme.typography.label2.regular,
+                color = CaroTheme.color.text.brand,
+            )
+        }
     }
 }
+
+internal fun performCaroSnackbarAction(snackbarData: SnackbarData) {
+    (snackbarData.visuals as? CaroSnackbarVisuals)?.markForImmediateDismissal()
+    snackbarData.performAction()
+}
+
+internal fun shouldDismissSnackbarImmediately(snackbarData: SnackbarData): Boolean =
+    (snackbarData.visuals as? CaroSnackbarVisuals)?.dismissImmediately == true
 
 fun showSnackbarMessage(
     coroutineScope: CoroutineScope,
@@ -129,15 +163,22 @@ fun showSnackbarMessage(
     message: String,
     style: CaroSnackbarStyle = CaroSnackbarStyle.Normal,
     duration: SnackbarDuration = SnackbarDuration.Short,
+    actionLabel: String? = null,
+    onAction: (suspend () -> Unit)? = null,
 ) {
     coroutineScope.launch {
         snackbarHostState.currentSnackbarData?.dismiss()
-        snackbarHostState.showSnackbar(
-            CaroSnackbarVisuals(
-                message = message,
-                style = style,
-                duration = duration,
-            ),
-        )
+        val result =
+            snackbarHostState.showSnackbar(
+                CaroSnackbarVisuals(
+                    message = message,
+                    style = style,
+                    duration = duration,
+                    actionLabel = actionLabel,
+                ),
+            )
+        if (result == SnackbarResult.ActionPerformed) {
+            onAction?.invoke()
+        }
     }
 }
