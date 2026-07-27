@@ -108,7 +108,12 @@
 	<string name="card_delete_error">Failed to delete cards. Please try again.</string>
 	<!-- home -->
 	<string name="home_banner_title">Hello, %1$s!</string>
-	<string name="home_learning_days">Learning Streak: %1$d Days</string>
+	<string name="home_streak_not_started_description">Create a new deck\nto start learning.</string>
+	<string name="home_streak_not_started_label">Start your first learning streak</string>
+	<string name="home_streak_active_description">You’re on day %1$d.\nFinish today’s reviews and one new deck.</string>
+	<string name="home_streak_active_label">%1$d-day learning streak</string>
+	<string name="home_streak_broken_description">You’ve taken a short break.\nReady to start again?</string>
+	<string name="home_streak_broken_label">Your learning streak was reset</string>
 	<string name="home_deck_badge_not_started">Not Started</string>
 	<string name="home_deck_badge_learning">In Progress</string>
 	<string name="home_deck_badge_complete">Completed</string>

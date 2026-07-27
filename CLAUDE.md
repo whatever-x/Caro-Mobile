@@ -180,6 +180,11 @@ plugins {
 - `.editorconfig` exempts `@Composable` functions from ktlint's function naming rule.
 - Always run `./gradlew spotlessApply` before committing to avoid CI failures.
 
+## Git Ignore Policy
+
+- `.gitignore` is authoritative. Never bypass it with `git add -f` or otherwise force-add an ignored file unless the user explicitly requests that exact path.
+- `docs/` contains local design, specification, and implementation-plan artifacts. Keep these files local; never commit or push them.
+
 ## Testing Stack
 
 - **Kotest** — FunSpec style with `init { }` block, JUnit5 runner on Android

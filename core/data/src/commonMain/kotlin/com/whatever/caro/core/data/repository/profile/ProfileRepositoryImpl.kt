@@ -11,6 +11,8 @@ internal class ProfileRepositoryImpl(
         return response.nickname
     }
 
+    override suspend fun getMyNickname(): String = profileDataSource.getMyNickname().nickname.orEmpty()
+
     override suspend fun isNicknameAvailable(nickname: String): Boolean {
         val response = profileDataSource.checkNicknameAvailability(nickname)
         return response.available
