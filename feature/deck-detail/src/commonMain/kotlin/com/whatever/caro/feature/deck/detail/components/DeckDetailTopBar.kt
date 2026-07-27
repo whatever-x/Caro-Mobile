@@ -3,6 +3,7 @@ package com.whatever.caro.feature.deck.detail.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -25,6 +26,7 @@ import org.jetbrains.compose.resources.painterResource
 @Composable
 internal fun DeckDetailTopBar(
     title: String,
+    isLoading: Boolean,
     onBack: () -> Unit,
     onEditDeck: () -> Unit,
     modifier: Modifier = Modifier,
@@ -54,14 +56,26 @@ internal fun DeckDetailTopBar(
                 tint = CaroTheme.color.icon.inverse,
             )
 
-            Text(
-                text = title,
-                modifier = Modifier.weight(1f),
-                color = CaroTheme.color.text.inverse,
-                style = CaroTheme.typography.heading2,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
+            if (isLoading) {
+                Box(
+                    modifier =
+                        Modifier
+                            .size(width = 100.dp, height = 21.dp)
+                            .background(
+                                color = CaroTheme.color.skeleton.inverse,
+                                shape = CaroTheme.shape.xs,
+                            ),
+                )
+            } else {
+                Text(
+                    text = title,
+                    modifier = Modifier.weight(1f),
+                    color = CaroTheme.color.text.inverse,
+                    style = CaroTheme.typography.heading2,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
         }
 
         Icon(

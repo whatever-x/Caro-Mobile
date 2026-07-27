@@ -64,6 +64,7 @@ import com.whatever.caro.core.designsystem.components.CaroTextArea
 import com.whatever.caro.core.designsystem.components.CaroTopBar
 import com.whatever.caro.core.designsystem.themes.CaroTheme
 import com.whatever.caro.core.model.card.CardContent
+import com.whatever.caro.core.ui.loading.CaroLoadingOverlay
 import com.whatever.caro.feature.card.mvi.CreateCardIntent
 import com.whatever.caro.feature.card.mvi.CreateCardState
 import com.whatever.caro.feature.card.mvi.StagedCard
@@ -90,83 +91,88 @@ internal fun CreateCardScreen(
     state: CreateCardState,
     onIntent: (CreateCardIntent) -> Unit,
 ) {
-    Column(
-        modifier =
-            Modifier
-                .fillMaxSize()
-                .background(CaroTheme.color.background.primary),
-    ) {
-        CaroTopBar(
-            modifier = Modifier.padding(horizontal = CaroTheme.spacing.xl),
-            leadingContent = {
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(CaroTheme.spacing.s),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Icon(
-                        modifier =
-                            Modifier
-                                .size(TopBarIconSize)
-                                .clickable { onIntent(CreateCardIntent.ClickBack) },
-                        painter = painterResource(Res.drawable.ic_chevron_left_24),
-                        contentDescription = stringResource(Res.string.card_content_description_back),
-                        tint = CaroTheme.color.icon.brand,
-                    )
-                    Text(
-                        text = stringResource(Res.string.card_title_create),
-                        style = CaroTheme.typography.heading2,
-                        color = CaroTheme.color.text.primary,
-                    )
-                }
-            },
-        )
-
+    Box(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier =
                 Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
-                    .verticalScroll(rememberScrollState())
-                    .padding(
-                        horizontal = CaroTheme.spacing.xl,
-                        vertical = CaroTheme.spacing.m,
-                    ),
-            verticalArrangement = Arrangement.spacedBy(CaroTheme.spacing.l),
+                    .fillMaxSize()
+                    .background(CaroTheme.color.background.primary),
         ) {
-            CaroTextArea(
-                value = state.front,
-                onValueChange = { onIntent(CreateCardIntent.UpdateFront(it)) },
-                placeholder = stringResource(Res.string.card_field_placeholder_front),
-                header = { RequiredFieldHeader(label = stringResource(Res.string.card_field_label_front)) },
-                footer = { FieldCounter(count = state.frontCount) },
+            CaroTopBar(
+                modifier = Modifier.padding(horizontal = CaroTheme.spacing.xl),
+                leadingContent = {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(CaroTheme.spacing.s),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Icon(
+                            modifier =
+                                Modifier
+                                    .size(TopBarIconSize)
+                                    .clickable { onIntent(CreateCardIntent.ClickBack) },
+                            painter = painterResource(Res.drawable.ic_chevron_left_24),
+                            contentDescription = stringResource(Res.string.card_content_description_back),
+                            tint = CaroTheme.color.icon.brand,
+                        )
+                        Text(
+                            text = stringResource(Res.string.card_title_create),
+                            style = CaroTheme.typography.heading2,
+                            color = CaroTheme.color.text.primary,
+                        )
+                    }
+                },
             )
 
-            SwapButton(onClick = { onIntent(CreateCardIntent.ClickSwap) })
+            Column(
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
+                        .verticalScroll(rememberScrollState())
+                        .padding(
+                            horizontal = CaroTheme.spacing.xl,
+                            vertical = CaroTheme.spacing.m,
+                        ),
+                verticalArrangement = Arrangement.spacedBy(CaroTheme.spacing.l),
+            ) {
+                CaroTextArea(
+                    value = state.front,
+                    onValueChange = { onIntent(CreateCardIntent.UpdateFront(it)) },
+                    placeholder = stringResource(Res.string.card_field_placeholder_front),
+                    header = { RequiredFieldHeader(label = stringResource(Res.string.card_field_label_front)) },
+                    footer = { FieldCounter(count = state.frontCount) },
+                )
 
-            CaroTextArea(
-                value = state.back,
-                onValueChange = { onIntent(CreateCardIntent.UpdateBack(it)) },
-                placeholder = stringResource(Res.string.card_field_placeholder_back),
-                header = { RequiredFieldHeader(label = stringResource(Res.string.card_field_label_back)) },
-                footer = { FieldCounter(count = state.backCount) },
-            )
+                SwapButton(onClick = { onIntent(CreateCardIntent.ClickSwap) })
 
-            TipSection()
+                CaroTextArea(
+                    value = state.back,
+                    onValueChange = { onIntent(CreateCardIntent.UpdateBack(it)) },
+                    placeholder = stringResource(Res.string.card_field_placeholder_back),
+                    header = { RequiredFieldHeader(label = stringResource(Res.string.card_field_label_back)) },
+                    footer = { FieldCounter(count = state.backCount) },
+                )
 
-            AddedCardsSection(
-                addedCount = state.addedCount,
-                addedCards = state.addedCards,
-                onRemove = { id -> onIntent(CreateCardIntent.ClickRemoveCard(id)) },
+                TipSection()
+
+                AddedCardsSection(
+                    addedCount = state.addedCount,
+                    addedCards = state.addedCards,
+                    onRemove = { id -> onIntent(CreateCardIntent.ClickRemoveCard(id)) },
+                )
+            }
+
+            BottomBar(
+                isAddEnabled = state.isAddEnabled,
+                isSaveEnabled = state.isSaveEnabled,
+                hasAddedCards = state.addedCards.isNotEmpty(),
+                onAdd = { onIntent(CreateCardIntent.ClickAddCard) },
+                onSave = { onIntent(CreateCardIntent.ClickSave) },
             )
         }
-
-        BottomBar(
-            isAddEnabled = state.isAddEnabled,
-            isSaveEnabled = state.isSaveEnabled,
-            hasAddedCards = state.addedCards.isNotEmpty(),
-            onAdd = { onIntent(CreateCardIntent.ClickAddCard) },
-            onSave = { onIntent(CreateCardIntent.ClickSave) },
-        )
+        if (state.isSaving) {
+            CaroLoadingOverlay()
+        }
     }
 }
 

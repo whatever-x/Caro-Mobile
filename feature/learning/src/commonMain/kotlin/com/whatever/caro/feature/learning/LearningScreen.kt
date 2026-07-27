@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -38,6 +37,7 @@ import com.whatever.caro.core.model.learning.LearningMode
 import com.whatever.caro.core.model.learning.StudyCard
 import com.whatever.caro.core.model.learning.StudyEvaluation
 import com.whatever.caro.core.model.learning.StudyRating
+import com.whatever.caro.core.ui.loading.CaroLoadingOverlay
 import com.whatever.caro.core.ui.modifier.swipeGesture
 import com.whatever.caro.core.ui.swipe.SwipeDirection
 import com.whatever.caro.core.ui.swipe.SwipeGestureConfig
@@ -247,9 +247,8 @@ private fun LoadingContent() {
             Modifier
                 .fillMaxSize()
                 .background(CaroTheme.color.background.primary),
-        contentAlignment = Alignment.Center,
     ) {
-        CircularProgressIndicator(color = CaroTheme.color.icon.primary)
+        CaroLoadingOverlay()
     }
 }
 

@@ -3,6 +3,7 @@ package com.whatever.caro.feature.deck.edit
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.exclude
@@ -41,6 +42,7 @@ import com.whatever.caro.core.designsystem.components.CaroTextArea
 import com.whatever.caro.core.designsystem.components.CaroTextField
 import com.whatever.caro.core.designsystem.components.CaroTopBar
 import com.whatever.caro.core.designsystem.themes.CaroTheme
+import com.whatever.caro.core.ui.loading.CaroLoadingOverlay
 import com.whatever.caro.feature.deck.component.CtaButton
 import com.whatever.caro.feature.deck.component.DeckTipSection
 import com.whatever.caro.feature.deck.component.FieldCounter
@@ -63,94 +65,99 @@ internal fun CreateDeckScreen(
         nameFocusRequester.requestFocus()
     }
 
-    Column(
-        modifier =
-            Modifier
-                .fillMaxSize()
-                .background(CaroTheme.color.background.primary),
-    ) {
-        CaroTopBar(
-            leadingContent = {
-                Icon(
-                    modifier =
-                        Modifier
-                            .size(24.dp)
-                            .clickable { onIntent(CreateDeckIntent.ClickBack) },
-                    painter = painterResource(Res.drawable.ic_chevron_left_24),
-                    contentDescription = stringResource(Res.string.deck_content_description_back),
-                    tint = CaroTheme.color.icon.brand,
-                )
-            },
-            centerContent = {
-                Text(
-                    text = stringResource(Res.string.deck_title_create),
-                    style = CaroTheme.typography.heading2,
-                    color = CaroTheme.color.text.primary,
-                )
-            },
-        )
-
+    Box(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier =
                 Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
-                    .verticalScroll(rememberScrollState())
-                    .padding(
-                        horizontal = CaroTheme.spacing.xl,
-                        vertical = CaroTheme.spacing.m,
-                    ),
-            verticalArrangement = Arrangement.spacedBy(CaroTheme.spacing.l),
+                    .fillMaxSize()
+                    .background(CaroTheme.color.background.primary),
         ) {
-            CaroTextField(
-                value = state.name,
-                onValueChange = { onIntent(CreateDeckIntent.UpdateName(it)) },
-                placeholder = stringResource(Res.string.deck_field_placeholder_name),
-                header = { RequiredFieldHeader(label = stringResource(Res.string.deck_field_label_name)) },
-                footer = { FieldCounter(count = state.nameCount) },
-                focusRequester = nameFocusRequester,
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
-                keyboardActions = KeyboardActions(onNext = { descriptionFocusRequester.requestFocus() }),
-                trailingIcon =
-                    if (state.name.isNotEmpty()) {
-                        {
-                            Icon(
-                                modifier =
-                                    Modifier
-                                        .size(24.dp)
-                                        .clickable { onIntent(CreateDeckIntent.UpdateName("")) },
-                                painter = painterResource(Res.drawable.ic_x_circle_24),
-                                contentDescription = stringResource(Res.string.deck_content_description_clear),
-                                tint = CaroTheme.color.icon.tertiary,
-                            )
-                        }
-                    } else {
-                        null
-                    },
+            CaroTopBar(
+                leadingContent = {
+                    Icon(
+                        modifier =
+                            Modifier
+                                .size(24.dp)
+                                .clickable { onIntent(CreateDeckIntent.ClickBack) },
+                        painter = painterResource(Res.drawable.ic_chevron_left_24),
+                        contentDescription = stringResource(Res.string.deck_content_description_back),
+                        tint = CaroTheme.color.icon.brand,
+                    )
+                },
+                centerContent = {
+                    Text(
+                        text = stringResource(Res.string.deck_title_create),
+                        style = CaroTheme.typography.heading2,
+                        color = CaroTheme.color.text.primary,
+                    )
+                },
             )
-            CaroTextArea(
-                value = state.description,
-                onValueChange = { onIntent(CreateDeckIntent.UpdateDescription(it)) },
-                placeholder = stringResource(Res.string.deck_field_placeholder_description),
-                header = { RequiredFieldHeader(label = stringResource(Res.string.deck_field_label_description)) },
-                footer = { FieldCounter(count = state.descriptionCount) },
-                focusRequester = descriptionFocusRequester,
-            )
-            DeckTipSection()
-        }
 
-        CtaButton(
-            enabled = state.isConfirmEnabled,
-            onClick = { onIntent(CreateDeckIntent.ClickConfirm) },
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .windowInsetsPadding(WindowInsets.ime.exclude(WindowInsets.navigationBars))
-                    .padding(
-                        horizontal = PageHorizontalPadding,
-                        vertical = CaroTheme.spacing.l,
-                    ),
-            text = stringResource(Res.string.deck_button_create),
-        )
+            Column(
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
+                        .verticalScroll(rememberScrollState())
+                        .padding(
+                            horizontal = CaroTheme.spacing.xl,
+                            vertical = CaroTheme.spacing.m,
+                        ),
+                verticalArrangement = Arrangement.spacedBy(CaroTheme.spacing.l),
+            ) {
+                CaroTextField(
+                    value = state.name,
+                    onValueChange = { onIntent(CreateDeckIntent.UpdateName(it)) },
+                    placeholder = stringResource(Res.string.deck_field_placeholder_name),
+                    header = { RequiredFieldHeader(label = stringResource(Res.string.deck_field_label_name)) },
+                    footer = { FieldCounter(count = state.nameCount) },
+                    focusRequester = nameFocusRequester,
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                    keyboardActions = KeyboardActions(onNext = { descriptionFocusRequester.requestFocus() }),
+                    trailingIcon =
+                        if (state.name.isNotEmpty()) {
+                            {
+                                Icon(
+                                    modifier =
+                                        Modifier
+                                            .size(24.dp)
+                                            .clickable { onIntent(CreateDeckIntent.UpdateName("")) },
+                                    painter = painterResource(Res.drawable.ic_x_circle_24),
+                                    contentDescription = stringResource(Res.string.deck_content_description_clear),
+                                    tint = CaroTheme.color.icon.tertiary,
+                                )
+                            }
+                        } else {
+                            null
+                        },
+                )
+                CaroTextArea(
+                    value = state.description,
+                    onValueChange = { onIntent(CreateDeckIntent.UpdateDescription(it)) },
+                    placeholder = stringResource(Res.string.deck_field_placeholder_description),
+                    header = { RequiredFieldHeader(label = stringResource(Res.string.deck_field_label_description)) },
+                    footer = { FieldCounter(count = state.descriptionCount) },
+                    focusRequester = descriptionFocusRequester,
+                )
+                DeckTipSection()
+            }
+
+            CtaButton(
+                enabled = state.isConfirmEnabled,
+                onClick = { onIntent(CreateDeckIntent.ClickConfirm) },
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .windowInsetsPadding(WindowInsets.ime.exclude(WindowInsets.navigationBars))
+                        .padding(
+                            horizontal = PageHorizontalPadding,
+                            vertical = CaroTheme.spacing.l,
+                        ),
+                text = stringResource(Res.string.deck_button_create),
+            )
+        }
+        if (state.isLoading) {
+            CaroLoadingOverlay()
+        }
     }
 }
