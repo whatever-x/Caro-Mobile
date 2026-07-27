@@ -38,6 +38,11 @@ internal class AuthRepositoryImpl(
         localAuthDataSource.clear()
     }
 
+    override suspend fun withdraw() {
+        remoteAuthDataSource.withdraw()
+        localAuthDataSource.clear()
+    }
+
     override suspend fun completeRegistration(
         nickname: String,
         termsAgreed: Boolean,

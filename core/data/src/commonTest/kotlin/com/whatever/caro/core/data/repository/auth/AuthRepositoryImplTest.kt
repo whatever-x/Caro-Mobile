@@ -91,6 +91,27 @@ class AuthRepositoryImplTest : FunSpec() {
             }
         }
 
+        test("withdraw는 원격 회원탈퇴 후 로컬 토큰을 비운다") {
+            runTest {
+                val remoteAuthDataSource =
+                    mock<AuthDataSource> { everySuspend { withdraw() } returns Unit }
+                val localAuthDataSource =
+                    mock<LocalAuthDataSource> { everySuspend { clear() } returns Unit }
+                val repository =
+                    repositoryWith(
+                        remoteAuthDataSource = remoteAuthDataSource,
+                        localAuthDataSource = localAuthDataSource,
+                    )
+
+                repository.withdraw()
+
+                verifySuspend {
+                    remoteAuthDataSource.withdraw()
+                    localAuthDataSource.clear()
+                }
+            }
+        }
+
         test("completeRegistration은 발급된 토큰을 저장하고 AuthSession을 반환한다") {
             runTest {
                 val remoteAuthDataSource =

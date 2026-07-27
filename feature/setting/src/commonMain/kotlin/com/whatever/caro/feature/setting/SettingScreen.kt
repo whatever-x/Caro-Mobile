@@ -172,7 +172,7 @@ private fun UserInfo(
         when (socialLoginType) {
             SocialLoginType.GOOGLE -> Res.drawable.ic_logo_google_small
             SocialLoginType.APPLE -> Res.drawable.ic_logo_apple_small
-            else -> return
+            SocialLoginType.NONE -> null
         }
 
     Row(
@@ -182,13 +182,15 @@ private fun UserInfo(
                 .padding(horizontal = 28.dp, vertical = CaroTheme.spacing.xl),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Image(
-            modifier =
-                Modifier.size(size = ProfileImageSize),
-            painter = painterResource(socialIcon),
-            contentDescription = null,
-        )
-        Spacer(modifier = Modifier.size(size = CaroTheme.spacing.m))
+        socialIcon?.let {
+            Image(
+                modifier =
+                    Modifier.size(size = ProfileImageSize),
+                painter = painterResource(it),
+                contentDescription = null,
+            )
+            Spacer(modifier = Modifier.size(size = CaroTheme.spacing.m))
+        }
         Column(
             modifier = Modifier.weight(weight = 1f),
         ) {

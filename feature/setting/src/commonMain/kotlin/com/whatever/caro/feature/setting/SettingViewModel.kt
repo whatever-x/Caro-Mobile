@@ -1,6 +1,7 @@
 package com.whatever.caro.feature.setting
 
 import com.whatever.caro.core.data.repository.auth.AuthRepository
+import com.whatever.caro.core.data.repository.profile.ProfileRepository
 import com.whatever.caro.core.viewmodel.BaseViewModel
 import com.whatever.caro.core.viewmodel.ExceptionFilter
 import com.whatever.caro.feature.setting.model.SnackbarType
@@ -8,9 +9,11 @@ import com.whatever.caro.feature.setting.model.WebViewType
 import com.whatever.caro.feature.setting.mvi.SettingIntent
 import com.whatever.caro.feature.setting.mvi.SettingSideEffect
 import com.whatever.caro.feature.setting.mvi.SettingState
+import kotlinx.coroutines.CancellationException
 
 class SettingViewModel(
     private val authRepository: AuthRepository,
+    private val profileRepository: ProfileRepository,
     exceptionFilter: ExceptionFilter,
 ) : BaseViewModel<SettingState, SettingIntent, SettingSideEffect>(
         initialState = SettingState(),
@@ -71,22 +74,54 @@ class SettingViewModel(
     }
 
     private suspend fun initialize() {
-        // TODO : 사용자 정보 조회 API 구현 필요
+        if (currentState.isLoading) return
+        reduce { copy(isLoading = true) }
+        runCatching {
+            profileRepository.getMyNickname()
+        }.onSuccess { nickname ->
+            reduce {
+                copy(
+                    isLoading = false,
+                    nickname = nickname,
+                )
+            }
+        }.onFailure { throwable ->
+            if (throwable is CancellationException) throw throwable
+            reduce { copy(isLoading = false) }
+        }
     }
 
     private fun controlAccountDeleteButton() {
         reduce { copy(accountDeleteDialogVisible = !accountDeleteDialogVisible) }
     }
 
-    // TODO: 계정 삭제 필요
-    private fun deleteAccount() {
-        reduce { copy(accountDeleteDialogVisible = false) }
-        postSideEffect(SettingSideEffect.ShowSnackbar(type = SnackbarType.DELETE_ACCOUNT))
-        postSideEffect(SettingSideEffect.NavigateToLogin)
+    private suspend fun deleteAccount() {
+        if (currentState.isLoading) return
+        reduce { copy(isLoading = true) }
+
+        runCatching {
+            authRepository.withdraw()
+        }.onSuccess {
+            reduce {
+                copy(
+                    isLoading = false,
+                    accountDeleteDialogVisible = false,
+                )
+            }
+            postSideEffect(SettingSideEffect.ShowSnackbar(type = SnackbarType.DELETE_ACCOUNT))
+            postSideEffect(SettingSideEffect.NavigateToLogin)
+        }.onFailure { throwable ->
+            if (throwable is CancellationException) throw throwable
+            reduce { copy(isLoading = false) }
+            postSideEffect(SettingSideEffect.ShowSnackbar(type = SnackbarType.DELETE_ACCOUNT_ERROR))
+        }
     }
 
     private suspend fun logout() {
+        if (currentState.isLoading) return
+        reduce { copy(isLoading = true) }
         authRepository.logout()
+        reduce { copy(isLoading = false) }
         postSideEffect(SettingSideEffect.ShowSnackbar(type = SnackbarType.LOGOUT))
         postSideEffect(SettingSideEffect.NavigateToLogin)
     }

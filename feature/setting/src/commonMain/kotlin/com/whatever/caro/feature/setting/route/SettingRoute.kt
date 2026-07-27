@@ -26,9 +26,11 @@ import caromobile.core.designsystem.generated.resources.setting_dialog_title
 import caromobile.core.designsystem.generated.resources.setting_privcay_policy_url
 import caromobile.core.designsystem.generated.resources.setting_report_bug_url
 import caromobile.core.designsystem.generated.resources.setting_snackbar_delete_account
+import caromobile.core.designsystem.generated.resources.setting_snackbar_delete_account_error
 import caromobile.core.designsystem.generated.resources.setting_snackbar_logout
 import caromobile.core.designsystem.generated.resources.setting_terms_of_service_url
 import com.whatever.caro.core.designsystem.components.CaroDialog
+import com.whatever.caro.core.designsystem.components.CaroSnackbarStyle
 import com.whatever.caro.core.designsystem.themes.CaroTheme
 import com.whatever.caro.core.navigator.contract.NavCommand
 import com.whatever.caro.core.navigator.dispatcher.NavigationDispatcher
@@ -59,6 +61,8 @@ fun SettingRoute(
     val logoutSnackbarMessage = stringResource(resource = Res.string.setting_snackbar_logout)
     val deleteAccountSnackbarMessage =
         stringResource(resource = Res.string.setting_snackbar_delete_account)
+    val deleteAccountErrorSnackbarMessage =
+        stringResource(resource = Res.string.setting_snackbar_delete_account_error)
 
     LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
         viewModel.intent(SettingIntent.Initialize)
@@ -104,8 +108,19 @@ fun SettingRoute(
                         when (sideEffect.type) {
                             SnackbarType.LOGOUT -> logoutSnackbarMessage
                             SnackbarType.DELETE_ACCOUNT -> deleteAccountSnackbarMessage
+                            SnackbarType.DELETE_ACCOUNT_ERROR -> deleteAccountErrorSnackbarMessage
                         }
-                    snackbarController.show(SnackBarMessage(message = message))
+                    snackbarController.show(
+                        SnackBarMessage(
+                            message = message,
+                            style =
+                                if (sideEffect.type == SnackbarType.DELETE_ACCOUNT_ERROR) {
+                                    CaroSnackbarStyle.Error
+                                } else {
+                                    CaroSnackbarStyle.Normal
+                                },
+                        ),
+                    )
                 }
             }
         }
@@ -117,6 +132,7 @@ fun SettingRoute(
     )
     if (state.accountDeleteDialogVisible) {
         DeleteAccountDialog(
+            isLoading = state.isLoading,
             onDeleteAccountClick = { viewModel.intent(SettingIntent.ClickDeleteAccountDialogConfirm) },
             onCancelClick = { viewModel.intent(SettingIntent.ClickDeleteAccountDialogCancel) },
         )
@@ -125,6 +141,7 @@ fun SettingRoute(
 
 @Composable
 private fun DeleteAccountDialog(
+    isLoading: Boolean,
     onDeleteAccountClick: () -> Unit,
     onCancelClick: () -> Unit,
 ) {
@@ -163,7 +180,13 @@ private fun DeleteAccountDialog(
                             ).padding(
                                 horizontal = CaroTheme.spacing.l,
                                 vertical = CaroTheme.spacing.m,
-                            ).noRippleClickable(onDeleteAccountClick),
+                            ).then(
+                                if (isLoading) {
+                                    Modifier
+                                } else {
+                                    Modifier.noRippleClickable(onDeleteAccountClick)
+                                },
+                            ),
                     text = stringResource(Res.string.setting_dialog_button_delete_account),
                     color = Color(0xFFFF7A70),
                     style = CaroTheme.typography.caption1.regular,
@@ -179,7 +202,13 @@ private fun DeleteAccountDialog(
                             ).padding(
                                 horizontal = CaroTheme.spacing.l,
                                 vertical = CaroTheme.spacing.m,
-                            ).noRippleClickable(onCancelClick),
+                            ).then(
+                                if (isLoading) {
+                                    Modifier
+                                } else {
+                                    Modifier.noRippleClickable(onCancelClick)
+                                },
+                            ),
                     text = stringResource(Res.string.setting_dialog_button_cancel),
                     color = CaroTheme.color.text.brand,
                     style = CaroTheme.typography.caption1.regular,

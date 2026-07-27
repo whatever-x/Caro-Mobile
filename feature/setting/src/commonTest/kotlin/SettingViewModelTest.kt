@@ -1,5 +1,6 @@
 import app.cash.turbine.test
 import com.whatever.caro.core.data.repository.auth.AuthRepository
+import com.whatever.caro.core.data.repository.profile.ProfileRepository
 import com.whatever.caro.core.viewmodel.ExceptionFilter
 import com.whatever.caro.feature.setting.SettingViewModel
 import com.whatever.caro.feature.setting.model.SnackbarType
@@ -7,6 +8,7 @@ import com.whatever.caro.feature.setting.model.WebViewType
 import com.whatever.caro.feature.setting.mvi.SettingIntent
 import com.whatever.caro.feature.setting.mvi.SettingSideEffect
 import dev.mokkery.answering.returns
+import dev.mokkery.answering.throws
 import dev.mokkery.everySuspend
 import dev.mokkery.mock
 import dev.mokkery.verify.VerifyMode.Companion.exactly
@@ -34,17 +36,41 @@ class SettingViewModelTest : FunSpec() {
             Dispatchers.resetMain()
         }
 
-        fun createViewModel(): Pair<SettingViewModel, AuthRepository> {
-            val authRepository =
-                mock<AuthRepository> {
+        fun createViewModel(
+            authRepository: AuthRepository =
+                mock {
                     everySuspend { logout() } returns Unit
-                }
+                    everySuspend { withdraw() } returns Unit
+                },
+            profileRepository: ProfileRepository =
+                mock {
+                    everySuspend { getMyNickname() } returns "캐로"
+                },
+        ): Pair<SettingViewModel, AuthRepository> {
             val viewModel =
                 SettingViewModel(
                     authRepository = authRepository,
+                    profileRepository = profileRepository,
                     exceptionFilter = ExceptionFilter.None,
                 )
             return viewModel to authRepository
+        }
+
+        test("Initialize 는 현재 사용자 닉네임을 불러온다") {
+            runTest {
+                val profileRepository =
+                    mock<ProfileRepository> {
+                        everySuspend { getMyNickname() } returns "승우"
+                    }
+                val (viewModel, _) = createViewModel(profileRepository = profileRepository)
+
+                viewModel.intent(SettingIntent.Initialize)
+                advanceUntilIdle()
+
+                viewModel.state.value.nickname shouldBe "승우"
+                viewModel.state.value.isLoading shouldBe false
+                verifySuspend(exactly(1)) { profileRepository.getMyNickname() }
+            }
         }
 
         test("ClickLogOut 은 logout 을 호출하고 ShowSnackbar(LOGOUT) 와 NavigateToLogin 을 순서대로 emit 한다") {
@@ -159,7 +185,7 @@ class SettingViewModelTest : FunSpec() {
 
         test("ClickDeleteAccountDialogConfirm 은 다이얼로그를 닫고 ShowSnackbar(DELETE_ACCOUNT) 와 NavigateToLogin 을 emit 한다") {
             runTest {
-                val (viewModel, _) = createViewModel()
+                val (viewModel, authRepository) = createViewModel()
 
                 viewModel.intent(SettingIntent.ClickDeleteAccount)
                 advanceUntilIdle()
@@ -172,6 +198,30 @@ class SettingViewModelTest : FunSpec() {
                     awaitItem() shouldBe SettingSideEffect.NavigateToLogin
                 }
                 viewModel.state.value.accountDeleteDialogVisible shouldBe false
+                verifySuspend(exactly(1)) { authRepository.withdraw() }
+            }
+        }
+
+        test("회원탈퇴 실패 시 다이얼로그를 유지하고 에러 스낵바를 emit 한다") {
+            runTest {
+                val authRepository =
+                    mock<AuthRepository> {
+                        everySuspend { withdraw() } throws RuntimeException("network")
+                    }
+                val (viewModel, _) = createViewModel(authRepository = authRepository)
+                viewModel.intent(SettingIntent.ClickDeleteAccount)
+                advanceUntilIdle()
+
+                viewModel.sideEffect.test {
+                    viewModel.intent(SettingIntent.ClickDeleteAccountDialogConfirm)
+                    advanceUntilIdle()
+
+                    awaitItem() shouldBe
+                        SettingSideEffect.ShowSnackbar(type = SnackbarType.DELETE_ACCOUNT_ERROR)
+                }
+
+                viewModel.state.value.accountDeleteDialogVisible shouldBe true
+                viewModel.state.value.isLoading shouldBe false
             }
         }
     }
