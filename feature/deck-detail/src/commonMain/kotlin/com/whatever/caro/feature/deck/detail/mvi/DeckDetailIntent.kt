@@ -33,5 +33,9 @@ sealed interface DeckDetailIntent : UiIntent {
         val cardId: Long,
     ) : DeckDetailIntent
 
+    data class ClickEditCard(
+        val cardId: Long,
+    ) : DeckDetailIntent
+
     data object RefreshCards : DeckDetailIntent
 }

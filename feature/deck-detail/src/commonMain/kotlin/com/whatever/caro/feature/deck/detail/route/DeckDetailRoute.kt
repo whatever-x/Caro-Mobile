@@ -14,6 +14,7 @@ import caromobile.core.designsystem.generated.resources.card_list_error
 import com.whatever.caro.core.designsystem.components.CaroSnackbarStyle
 import com.whatever.caro.core.navigator.contract.NavCommand
 import com.whatever.caro.core.navigator.dispatcher.NavigationDispatcher
+import com.whatever.caro.core.navigator.entries.CardDetailEntry
 import com.whatever.caro.core.navigator.entries.CreateCardEntry
 import com.whatever.caro.core.navigator.entries.DeleteCardsEntry
 import com.whatever.caro.core.navigator.entries.EditCardEntry
@@ -92,6 +93,18 @@ fun DeckDetailRoute(
                                     deckId = state.deck.id,
                                     deckName = state.deck.title,
                                     deckDescription = state.deck.description,
+                                ),
+                        ),
+                    )
+                }
+
+                is DeckDetailSideEffect.NavigateToCardDetail -> {
+                    navDispatcher.emit(
+                        NavCommand.To(
+                            key =
+                                CardDetailEntry(
+                                    deckId = sideEffect.deckId,
+                                    cardId = sideEffect.cardId,
                                 ),
                         ),
                     )

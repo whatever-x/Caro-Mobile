@@ -162,4 +162,18 @@
     <string name="learning_dialog_title">알림</string>
     <string name="learning_dialog_submit_error">알 수 없는 오류가 발생했습니다.</string>
     <string name="learning_dialog_confirm">확인</string>
+    <!-- card detail -->
+    <string name="card_detail_back">뒤로 가기</string>
+    <string name="card_detail_edit">카드 수정</string>
+    <string name="card_detail_delete">카드 삭제</string>
+    <string name="card_detail_previous">이전</string>
+    <string name="card_detail_next">다음</string>
+    <string name="card_detail_flip_hint">탭하여 뒤집기</string>
+    <string name="card_detail_more">더보기</string>
+    <string name="card_detail_delete_title">해당 카드를 삭제할까요?</string>
+    <string name="card_detail_delete_body">삭제 후에는 복구할 수 없어요</string>
+    <string name="card_detail_delete_confirm">삭제</string>
+    <string name="card_detail_delete_cancel">취소</string>
+    <string name="card_detail_load_error">카드를 불러오지 못했어요. 잠시 후 다시 시도해주세요.</string>
+    <string name="card_detail_delete_error">카드를 삭제하지 못했어요. 잠시 후 다시 시도해주세요.</string>
 </resources>

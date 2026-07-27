@@ -113,7 +113,18 @@ class DeckDetailViewModel(
             }
 
             is DeckDetailIntent.ClickCard -> {
-                handleClickCard(cardId = intent.cardId)
+                if (currentState.deckCardList.any { it.id == intent.cardId }) {
+                    postSideEffect(
+                        DeckDetailSideEffect.NavigateToCardDetail(
+                            deckId = currentState.deck.id,
+                            cardId = intent.cardId,
+                        ),
+                    )
+                }
+            }
+
+            is DeckDetailIntent.ClickEditCard -> {
+                handleClickEditCard(cardId = intent.cardId)
             }
 
             DeckDetailIntent.RefreshCards -> {
@@ -122,7 +133,7 @@ class DeckDetailViewModel(
         }
     }
 
-    private fun handleClickCard(cardId: Long) {
+    private fun handleClickEditCard(cardId: Long) {
         val card = currentState.deckCardList.firstOrNull { it.id == cardId } ?: return
         postSideEffect(
             DeckDetailSideEffect.NavigateToEditCard(
@@ -145,6 +156,7 @@ class DeckDetailViewModel(
             }.onSuccess { cards ->
                 reduce {
                     copy(
+                        deck = deck.copy(cardTotalCount = cards.size),
                         deckCardList =
                             cards
                                 .map { card ->
