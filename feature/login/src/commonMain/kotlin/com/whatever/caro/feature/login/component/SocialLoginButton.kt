@@ -15,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import caromobile.core.designsystem.generated.resources.Res
@@ -33,6 +34,7 @@ internal fun SocialLoginButton(
     iconRes: DrawableResource,
     contentRes: StringResource,
     textColor: Color,
+    enabled: Boolean = true,
     onClick: () -> Unit,
 ) {
     Box(
@@ -40,7 +42,8 @@ internal fun SocialLoginButton(
             modifier
                 .heightIn(min = 52.dp)
                 .padding(vertical = CaroTheme.spacing.xs)
-                .noRippleClickable(onClick = onClick),
+                .graphicsLayer { alpha = if (enabled) 1f else 0.6f }
+                .then(if (enabled) Modifier.noRippleClickable(onClick = onClick) else Modifier),
         contentAlignment = Alignment.Center,
     ) {
         Row(

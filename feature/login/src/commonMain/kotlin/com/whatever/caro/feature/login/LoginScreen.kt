@@ -34,7 +34,6 @@ import org.jetbrains.compose.resources.stringResource
 internal fun LoginScreen(
     state: LoginState,
     onIntent: (LoginIntent) -> Unit,
-    onLaunch: (SocialLoginType) -> Unit,
 ) {
     Column(
         modifier =
@@ -73,7 +72,10 @@ internal fun LoginScreen(
                 iconRes = Res.drawable.ic_logo_google,
                 contentRes = Res.string.login_button_google,
                 textColor = CaroTheme.color.text.primary,
-                onClick = { onLaunch(SocialLoginType.GOOGLE) },
+                enabled = state.isLoading.not(),
+                onClick = {
+                    onIntent(LoginIntent.ClickSocialLoginButton(SocialLoginType.GOOGLE))
+                },
             )
 
             SocialLoginButton(
@@ -85,7 +87,10 @@ internal fun LoginScreen(
                 iconRes = Res.drawable.ic_logo_apple,
                 contentRes = Res.string.login_button_apple,
                 textColor = CaroTheme.color.text.inverse,
-                onClick = { onLaunch(SocialLoginType.APPLE) },
+                enabled = state.isLoading.not(),
+                onClick = {
+                    onIntent(LoginIntent.ClickSocialLoginButton(SocialLoginType.APPLE))
+                },
             )
 
             Text(
@@ -105,7 +110,6 @@ private fun LoginScreenPreview() {
         LoginScreen(
             state = LoginState(),
             onIntent = {},
-            onLaunch = {},
         )
     }
 }
