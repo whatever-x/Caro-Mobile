@@ -91,6 +91,7 @@
     <string name="card_button_save">저장하기</string>
     <string name="card_button_update">수정하기</string>
     <string name="card_save_error">카드 저장에 실패했어요. 다시 시도해 주세요.</string>
+    <string name="card_max_cards_reached">한 덱에는 카드 200장까지 추가할 수 있어요.</string>
     <string name="card_update_error">카드 수정에 실패했어요. 다시 시도해 주세요.</string>
     <string name="card_list_error">카드를 불러오지 못했어요. 다시 시도해 주세요.</string>
     <string name="deck_delete_dialog_title">덱을 삭제할까요?</string>

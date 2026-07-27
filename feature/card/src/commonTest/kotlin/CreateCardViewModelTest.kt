@@ -105,6 +105,33 @@ class CreateCardViewModelTest : FunSpec() {
             }
         }
 
+        test("200장을 채운 뒤 추가를 시도하면 안내를 emit 하고 입력을 보존한다") {
+            runTest(dispatcher) {
+                val viewModel = createViewModel()
+
+                repeat(CardInputLimits.MAX_CARDS) { index ->
+                    viewModel.intent(CreateCardIntent.UpdateFront("front-$index"))
+                    viewModel.intent(CreateCardIntent.UpdateBack("back-$index"))
+                    viewModel.intent(CreateCardIntent.ClickAddCard)
+                    advanceUntilIdle()
+                }
+                viewModel.intent(CreateCardIntent.UpdateFront("overflow-front"))
+                viewModel.intent(CreateCardIntent.UpdateBack("overflow-back"))
+                advanceUntilIdle()
+
+                viewModel.sideEffect.test {
+                    viewModel.intent(CreateCardIntent.ClickAddCard)
+                    advanceUntilIdle()
+
+                    awaitItem() shouldBe CreateCardSideEffect.ShowMaxCardsReached
+                }
+
+                viewModel.state.value.addedCards.size shouldBe CardInputLimits.MAX_CARDS
+                viewModel.state.value.front shouldBe "overflow-front"
+                viewModel.state.value.back shouldBe "overflow-back"
+            }
+        }
+
         test("ClickRemoveCard 는 해당 id 의 카드를 제거한다") {
             runTest(dispatcher) {
                 val viewModel = createViewModel()
