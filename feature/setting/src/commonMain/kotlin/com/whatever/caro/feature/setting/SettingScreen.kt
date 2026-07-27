@@ -2,14 +2,17 @@ package com.whatever.caro.feature.setting
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -39,6 +42,7 @@ import caromobile.core.designsystem.generated.resources.setting_userinfo_nicknam
 import com.whatever.caro.core.designsystem.components.CaroTopBar
 import com.whatever.caro.core.designsystem.themes.CaroTheme
 import com.whatever.caro.core.model.auth.SocialLoginType
+import com.whatever.caro.core.ui.loading.CaroLoadingOverlay
 import com.whatever.caro.core.ui.modifier.noRippleClickable
 import com.whatever.caro.feature.setting.component.MenuSection
 import com.whatever.caro.feature.setting.model.AppConfig
@@ -92,68 +96,74 @@ internal fun SettingScreen(
     state: SettingState,
     onIntent: (SettingIntent) -> Unit,
 ) {
-    Column(
-        modifier =
-            Modifier
-                .fillMaxSize()
-                .background(color = CaroTheme.color.background.primary)
-                .padding(bottom = CaroTheme.spacing.xl2),
-    ) {
-        CaroTopBar(
+    Box(modifier = Modifier.fillMaxSize()) {
+        Column(
             modifier =
                 Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = CaroTheme.spacing.xl2),
-            leadingContent = {
-                Row(modifier = Modifier.noRippleClickable { onIntent(SettingIntent.ClickBack) }) {
-                    Icon(
-                        imageVector = vectorResource(Res.drawable.ic_arrow_left_24),
-                        tint = CaroTheme.color.icon.primary,
-                        contentDescription = null,
-                    )
-                    Spacer(modifier = Modifier.size(size = CaroTheme.spacing.s))
-                    Text(
-                        text = stringResource(Res.string.setting_title),
-                        style = CaroTheme.typography.heading2,
-                        color = CaroTheme.color.text.primary,
-                    )
-                }
-            },
-        )
-        UserInfo(
-            modifier =
-                Modifier
-                    .background(CaroTheme.color.surface.primary),
-            nickname = state.nickname,
-            emailAddress = state.emailAddress,
-            socialLoginType = state.socialLoginType,
-            onNicknameChangeClick = { onIntent(SettingIntent.ClickNicknameChange) },
-        )
-        Spacer(modifier = Modifier.size(size = CaroTheme.spacing.s))
-        MenuSection(
-            modifier = Modifier.fillMaxWidth(),
-            items = firstMenu,
-            onClickMenu = onIntent,
-        )
-        Spacer(modifier = Modifier.size(size = CaroTheme.spacing.s))
-        MenuSection(
-            modifier = Modifier.fillMaxWidth(),
-            items = secondMenu,
-            onClickMenu = onIntent,
-        )
-        Spacer(modifier = Modifier.weight(1f))
-        // FIXME: 임시 디자인 적용
-        Box(modifier = Modifier.fillMaxWidth()) {
-            Text(
-                modifier = Modifier.align(Alignment.Center),
-                text =
-                    stringResource(
-                        Res.string.setting_description_app_version,
-                        AppConfig.appVersion,
-                    ),
-                style = CaroTheme.typography.caption2.regular,
-                color = CaroTheme.color.text.tertiary,
+                    .fillMaxSize()
+                    .background(color = CaroTheme.color.background.primary)
+                    .padding(bottom = CaroTheme.spacing.xl2),
+        ) {
+            CaroTopBar(
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = CaroTheme.spacing.xl2),
+                leadingContent = {
+                    Row(modifier = Modifier.noRippleClickable { onIntent(SettingIntent.ClickBack) }) {
+                        Icon(
+                            imageVector = vectorResource(Res.drawable.ic_arrow_left_24),
+                            tint = CaroTheme.color.icon.primary,
+                            contentDescription = null,
+                        )
+                        Spacer(modifier = Modifier.size(size = CaroTheme.spacing.s))
+                        Text(
+                            text = stringResource(Res.string.setting_title),
+                            style = CaroTheme.typography.heading2,
+                            color = CaroTheme.color.text.primary,
+                        )
+                    }
+                },
             )
+            UserInfo(
+                modifier =
+                    Modifier
+                        .background(CaroTheme.color.surface.primary),
+                nickname = state.nickname,
+                emailAddress = state.emailAddress,
+                socialLoginType = state.socialLoginType,
+                isLoading = state.isLoading,
+                onNicknameChangeClick = { onIntent(SettingIntent.ClickNicknameChange) },
+            )
+            Spacer(modifier = Modifier.size(size = CaroTheme.spacing.s))
+            MenuSection(
+                modifier = Modifier.fillMaxWidth(),
+                items = firstMenu,
+                onClickMenu = onIntent,
+            )
+            Spacer(modifier = Modifier.size(size = CaroTheme.spacing.s))
+            MenuSection(
+                modifier = Modifier.fillMaxWidth(),
+                items = secondMenu,
+                onClickMenu = onIntent,
+            )
+            Spacer(modifier = Modifier.weight(1f))
+            // FIXME: 임시 디자인 적용
+            Box(modifier = Modifier.fillMaxWidth()) {
+                Text(
+                    modifier = Modifier.align(Alignment.Center),
+                    text =
+                        stringResource(
+                            Res.string.setting_description_app_version,
+                            AppConfig.appVersion,
+                        ),
+                    style = CaroTheme.typography.caption2.regular,
+                    color = CaroTheme.color.text.tertiary,
+                )
+            }
+        }
+        if (state.isLoading) {
+            CaroLoadingOverlay()
         }
     }
 }
@@ -166,46 +176,86 @@ private fun UserInfo(
     nickname: String,
     emailAddress: String,
     socialLoginType: SocialLoginType,
+    isLoading: Boolean,
     onNicknameChangeClick: () -> Unit,
 ) {
     val socialIcon =
         when (socialLoginType) {
             SocialLoginType.GOOGLE -> Res.drawable.ic_logo_google_small
             SocialLoginType.APPLE -> Res.drawable.ic_logo_apple_small
-            else -> return
+            SocialLoginType.NONE -> null
         }
 
     Row(
         modifier =
             modifier
                 .fillMaxWidth()
-                .padding(horizontal = 28.dp, vertical = CaroTheme.spacing.xl),
+                .padding(horizontal = CaroTheme.spacing.xl, vertical = CaroTheme.spacing.xl),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Image(
+        Box(
             modifier =
-                Modifier.size(size = ProfileImageSize),
-            painter = painterResource(socialIcon),
-            contentDescription = null,
-        )
+                Modifier
+                    .size(ProfileImageSize)
+                    .background(
+                        color = CaroTheme.color.surface.primary,
+                        shape = CaroTheme.shape.xxl,
+                    ).border(
+                        width = 1.dp,
+                        color = CaroTheme.color.border.tertiary,
+                        shape = CaroTheme.shape.xxl,
+                    ),
+            contentAlignment = Alignment.Center,
+        ) {
+            socialIcon?.let {
+                Image(
+                    painter = painterResource(it),
+                    contentDescription = null,
+                )
+            }
+        }
         Spacer(modifier = Modifier.size(size = CaroTheme.spacing.m))
         Column(
             modifier = Modifier.weight(weight = 1f),
         ) {
-            Text(
-                text = nickname,
-                style = CaroTheme.typography.heading2,
-                color = CaroTheme.color.text.primary,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
-            Text(
-                text = emailAddress,
-                style = CaroTheme.typography.body4.regular,
-                color = CaroTheme.color.text.secondary,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
+            if (isLoading) {
+                Box(
+                    modifier =
+                        Modifier
+                            .width(223.dp)
+                            .height(21.dp)
+                            .background(
+                                color = CaroTheme.color.skeleton.primary,
+                                shape = CaroTheme.shape.xs,
+                            ),
+                )
+                Spacer(modifier = Modifier.height(2.dp))
+                Box(
+                    modifier =
+                        Modifier
+                            .width(150.dp)
+                            .height(17.dp)
+                            .background(
+                                color = CaroTheme.color.skeleton.secondary,
+                                shape = CaroTheme.shape.xs,
+                            ),
+                )
+            } else {
+                Text(
+                    text = nickname,
+                    style = CaroTheme.typography.heading2,
+                    color = CaroTheme.color.text.primary,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+                Text(
+                    text = emailAddress,
+                    style = CaroTheme.typography.body4.regular,
+                    color = CaroTheme.color.text.secondary,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
         }
         Spacer(modifier = Modifier.size(size = CaroTheme.spacing.s))
         Box(
@@ -255,6 +305,7 @@ private fun UserInfoPreview() {
             nickname = "승우",
             emailAddress = "rsw1452@gmail.com",
             socialLoginType = SocialLoginType.GOOGLE,
+            isLoading = false,
             onNicknameChangeClick = {},
         )
     }
