@@ -67,12 +67,14 @@ private val CloseAnimationSpec =
  * "수정" 배경은 아이템 전체를 채우고 카드와 동일한 [CaroTheme.shape] 로 라운드 처리하므로,
  * 스와이프 시 위에 있는 흰 카드의 라운드 모서리가 파란 배경을 덮으며 밀려난다.
  * 스와이프 오프셋은 순수 UI 상호작용 상태이므로 이 컴포넌트 안에서만 관리한다.
+ * - 카드 상세 진입: 닫힌 카드 본문 탭 -> [onClick]
  * - 수정 진입: 드러난 버튼 탭 -> [onEdit]
  * - 열린 상태에서 카드 본문 탭 -> 닫기 (수정으로 이동하지 않음)
  */
 @Composable
 internal fun SwipeToRevealCardItem(
     card: CardItem,
+    onClick: () -> Unit,
     onEdit: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -124,6 +126,8 @@ internal fun SwipeToRevealCardItem(
             onClick = {
                 if (offsetX.value != 0f) {
                     scope.launch { offsetX.animateTo(0f, animationSpec = CloseAnimationSpec) }
+                } else {
+                    onClick()
                 }
             },
             modifier =
@@ -181,6 +185,7 @@ private fun SwipeToRevealCardItemPreview() {
                         reviewState = CardReviewState.NEW,
                     ),
                 onEdit = { },
+                onClick = { },
             )
         }
     }

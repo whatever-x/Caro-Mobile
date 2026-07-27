@@ -89,7 +89,7 @@ internal fun createDeckCreatedSnackbar(
                     NavCommand.To(
                         key =
                             DeckDetailEntry(
-                                payload = DeckDetailEntry.Payload(deck = deck),
+                                deck = deck,
                             ),
                     ),
             )

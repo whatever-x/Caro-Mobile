@@ -14,6 +14,7 @@ import caromobile.core.designsystem.generated.resources.card_list_error
 import com.whatever.caro.core.designsystem.components.CaroSnackbarStyle
 import com.whatever.caro.core.navigator.contract.NavCommand
 import com.whatever.caro.core.navigator.dispatcher.NavigationDispatcher
+import com.whatever.caro.core.navigator.entries.CardDetailEntry
 import com.whatever.caro.core.navigator.entries.CreateCardEntry
 import com.whatever.caro.core.navigator.entries.DeleteCardsEntry
 import com.whatever.caro.core.navigator.entries.EditCardEntry
@@ -56,9 +57,7 @@ fun DeckDetailRoute(
                     navDispatcher.emit(
                         NavCommand.To(
                             CreateCardEntry(
-                                CreateCardEntry.Payload(
-                                    sideEffect.deckId,
-                                ),
+                                deckId = sideEffect.deckId,
                             ),
                         ),
                     )
@@ -68,11 +67,8 @@ fun DeckDetailRoute(
                     navDispatcher.emit(
                         NavCommand.To(
                             LearningEntry(
-                                payload =
-                                    LearningEntry.Payload(
-                                        deckId = sideEffect.deckId,
-                                        mode = sideEffect.mode,
-                                    ),
+                                deckId = sideEffect.deckId,
+                                mode = sideEffect.mode,
                             ),
                         ),
                     )
@@ -83,10 +79,7 @@ fun DeckDetailRoute(
                         NavCommand.To(
                             key =
                                 DeleteCardsEntry(
-                                    payload =
-                                        DeleteCardsEntry.Payload(
-                                            deckId = sideEffect.deckId,
-                                        ),
+                                    deckId = sideEffect.deckId,
                                 ),
                         ),
                     )
@@ -105,17 +98,26 @@ fun DeckDetailRoute(
                     )
                 }
 
+                is DeckDetailSideEffect.NavigateToCardDetail -> {
+                    navDispatcher.emit(
+                        NavCommand.To(
+                            key =
+                                CardDetailEntry(
+                                    deckId = sideEffect.deckId,
+                                    cardId = sideEffect.cardId,
+                                ),
+                        ),
+                    )
+                }
+
                 is DeckDetailSideEffect.NavigateToEditCard -> {
                     navDispatcher.emit(
                         NavCommand.To(
                             key =
                                 EditCardEntry(
-                                    payload =
-                                        EditCardEntry.Payload(
-                                            cardId = sideEffect.cardId,
-                                            front = sideEffect.front,
-                                            back = sideEffect.back,
-                                        ),
+                                    cardId = sideEffect.cardId,
+                                    front = sideEffect.front,
+                                    back = sideEffect.back,
                                 ),
                         ),
                     )

@@ -8,10 +8,10 @@ import com.whatever.caro.core.remote.datasource.deck.DeckDataSource
 import com.whatever.caro.core.remote.dto.deck.request.CreateDeckRequest
 import com.whatever.caro.core.remote.dto.deck.request.UpdateDeckRequest
 import com.whatever.caro.core.remote.dto.deck.response.CreateDeckResponse
+import com.whatever.caro.core.remote.dto.deck.response.DeckCardResponse
+import com.whatever.caro.core.remote.dto.deck.response.DeckListResponse
 import com.whatever.caro.core.remote.dto.deck.response.DeleteDeckResponse
 import com.whatever.caro.core.remote.dto.deck.response.UpdateDeckResponse
-import com.whatever.caro.core.remote.dto.deckCardInformation.response.DeckCardResponse
-import com.whatever.caro.core.remote.dto.deckCardInformation.response.DeckListResponse
 import com.whatever.caro.core.remote.dto.studySession.response.StudySessionProgressResponseDto
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend

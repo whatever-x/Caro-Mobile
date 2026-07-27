@@ -1,5 +1,6 @@
 package com.whatever.caro.composeApp.di
 
+import com.whatever.caro.core.navigator.entries.CardDetailEntry
 import com.whatever.caro.core.navigator.entries.CreateCardEntry
 import com.whatever.caro.core.navigator.entries.CreateDeckEntry
 import com.whatever.caro.core.navigator.entries.CreateProfileEntry
@@ -17,6 +18,8 @@ import com.whatever.caro.feature.card.CreateCardViewModel
 import com.whatever.caro.feature.card.EditCardViewModel
 import com.whatever.caro.feature.card.delete.DeleteCardsViewModel
 import com.whatever.caro.feature.card.delete.route.DeleteCardsRoute
+import com.whatever.caro.feature.card.detail.CardDetailViewModel
+import com.whatever.caro.feature.card.detail.route.CardDetailRoute
 import com.whatever.caro.feature.card.route.CreateCardRoute
 import com.whatever.caro.feature.card.route.EditCardRoute
 import com.whatever.caro.feature.deck.create.CreateDeckRoute
@@ -24,7 +27,6 @@ import com.whatever.caro.feature.deck.detail.DeckDetailViewModel
 import com.whatever.caro.feature.deck.detail.route.DeckDetailRoute
 import com.whatever.caro.feature.deck.edit.EditDeckRoute
 import com.whatever.caro.feature.deck.edit.EditDeckViewModel
-import com.whatever.caro.feature.home.HomeViewModel
 import com.whatever.caro.feature.home.route.HomeRoute
 import com.whatever.caro.feature.learning.LearningViewModel
 import com.whatever.caro.feature.learning.route.LearningRoute
@@ -101,7 +103,7 @@ val navEntryModule: Module =
                 viewModel =
                     koinViewModel<DeckDetailViewModel> {
                         parametersOf(
-                            navKey.payload.deck,
+                            navKey.deck,
                         )
                     },
                 navDispatcher = get(),
@@ -118,7 +120,21 @@ val navEntryModule: Module =
 
         navigation<CreateCardEntry> { navKey ->
             CreateCardRoute(
-                viewModel = koinViewModel<CreateCardViewModel> { parametersOf(navKey.payload.deckId) },
+                viewModel = koinViewModel<CreateCardViewModel> { parametersOf(navKey.deckId) },
+                navDispatcher = get(),
+                snackbarController = get(),
+            )
+        }
+
+        navigation<CardDetailEntry> { navKey ->
+            CardDetailRoute(
+                viewModel =
+                    koinViewModel<CardDetailViewModel> {
+                        parametersOf(
+                            navKey.deckId,
+                            navKey.cardId,
+                        )
+                    },
                 navDispatcher = get(),
                 snackbarController = get(),
             )
@@ -129,9 +145,9 @@ val navEntryModule: Module =
                 viewModel =
                     koinViewModel<EditCardViewModel> {
                         parametersOf(
-                            navKey.payload.cardId,
-                            navKey.payload.front,
-                            navKey.payload.back,
+                            navKey.cardId,
+                            navKey.front,
+                            navKey.back,
                         )
                     },
                 navDispatcher = get(),
@@ -141,7 +157,7 @@ val navEntryModule: Module =
 
         navigation<DeleteCardsEntry> { navKey ->
             DeleteCardsRoute(
-                viewModel = koinViewModel<DeleteCardsViewModel> { parametersOf(navKey.payload.deckId) },
+                viewModel = koinViewModel<DeleteCardsViewModel> { parametersOf(navKey.deckId) },
                 navDispatcher = get(),
                 snackbarController = get(),
             )
@@ -160,8 +176,8 @@ val navEntryModule: Module =
                 viewModel =
                     koinViewModel<LearningViewModel> {
                         parametersOf(
-                            navKey.payload.deckId,
-                            navKey.payload.mode,
+                            navKey.deckId,
+                            navKey.mode,
                         )
                     },
                 navDispatcher = get(),

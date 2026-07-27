@@ -112,7 +112,12 @@
 	<string name="card_delete_error">Failed to delete cards. Please try again.</string>
 	<!-- home -->
 	<string name="home_banner_title">Hello, %1$s!</string>
-	<string name="home_learning_days">Learning Streak: %1$d Days</string>
+	<string name="home_streak_not_started_description">Create a new deck\nto start learning.</string>
+	<string name="home_streak_not_started_label">Start your first learning streak</string>
+	<string name="home_streak_active_description">You’re on day %1$d.\nFinish today’s reviews and one new deck.</string>
+	<string name="home_streak_active_label">%1$d-day learning streak</string>
+	<string name="home_streak_broken_description">You’ve taken a short break.\nReady to start again?</string>
+	<string name="home_streak_broken_label">Your learning streak was reset</string>
 	<string name="home_deck_badge_not_started">Not Started</string>
 	<string name="home_deck_badge_learning">In Progress</string>
 	<string name="home_deck_badge_complete">Completed</string>
@@ -172,4 +177,18 @@
 	<string name="learning_dialog_submit_error">An unknown error occurred.</string>
 	<string name="learning_dialog_confirm">OK</string>
 	<string name="learning_complete_description">Let’s review again tomorrow</string>
+	<!-- card detail -->
+	<string name="card_detail_back">Go back</string>
+	<string name="card_detail_edit">Edit card</string>
+	<string name="card_detail_delete">Delete card</string>
+	<string name="card_detail_previous">Previous</string>
+	<string name="card_detail_next">Next</string>
+	<string name="card_detail_flip_hint">Tap to flip</string>
+	<string name="card_detail_more">More</string>
+	<string name="card_detail_delete_title">Delete this card?</string>
+	<string name="card_detail_delete_body">You can’t recover it after deletion</string>
+	<string name="card_detail_delete_confirm">Delete</string>
+	<string name="card_detail_delete_cancel">Cancel</string>
+	<string name="card_detail_load_error">Failed to load the cards. Please try again.</string>
+	<string name="card_detail_delete_error">Failed to delete the card. Please try again.</string>
 </resources>

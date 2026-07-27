@@ -39,7 +39,7 @@ class CreateDeckRouteTest : FunSpec() {
                 listOf(
                     NavCommand.To(
                         DeckDetailEntry(
-                            payload = DeckDetailEntry.Payload(deck = deck),
+                            deck = deck,
                         ),
                     ),
                 )

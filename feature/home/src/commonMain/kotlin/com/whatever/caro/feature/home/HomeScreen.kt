@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -21,6 +22,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -28,12 +30,20 @@ import caromobile.core.designsystem.generated.resources.Res
 import caromobile.core.designsystem.generated.resources.home_banner_title
 import caromobile.core.designsystem.generated.resources.home_deck_field_empty
 import caromobile.core.designsystem.generated.resources.home_floating_button
-import caromobile.core.designsystem.generated.resources.home_learning_days
+import caromobile.core.designsystem.generated.resources.home_streak_active_description
+import caromobile.core.designsystem.generated.resources.home_streak_active_label
+import caromobile.core.designsystem.generated.resources.home_streak_broken_description
+import caromobile.core.designsystem.generated.resources.home_streak_broken_label
+import caromobile.core.designsystem.generated.resources.home_streak_not_started_description
+import caromobile.core.designsystem.generated.resources.home_streak_not_started_label
 import caromobile.core.designsystem.generated.resources.ic_add_24
 import caromobile.core.designsystem.generated.resources.ic_logo_small
 import caromobile.core.designsystem.generated.resources.ic_setting_24
 import caromobile.core.designsystem.generated.resources.img_fire
-import caromobile.core.designsystem.generated.resources.img_home_banner
+import caromobile.core.designsystem.generated.resources.img_home_streak_active
+import caromobile.core.designsystem.generated.resources.img_home_streak_broken
+import caromobile.core.designsystem.generated.resources.img_home_streak_not_started
+import caromobile.core.designsystem.generated.resources.img_streak_broken
 import com.whatever.caro.core.designsystem.components.CaroTopBar
 import com.whatever.caro.core.designsystem.themes.CaroTheme
 import com.whatever.caro.core.model.deck.Deck
@@ -42,6 +52,7 @@ import com.whatever.caro.core.ui.modifier.noRippleClickable
 import com.whatever.caro.feature.home.component.Deck
 import com.whatever.caro.feature.home.mvi.HomeIntent
 import com.whatever.caro.feature.home.mvi.HomeState
+import com.whatever.caro.feature.home.mvi.HomeStreakState
 import io.github.alexzhirkevich.compottie.Compottie
 import io.github.alexzhirkevich.compottie.ExperimentalCompottieApi
 import io.github.alexzhirkevich.compottie.Lottie
@@ -51,6 +62,7 @@ import io.github.alexzhirkevich.compottie.Resource
 import io.github.alexzhirkevich.compottie.rememberLottieComposition
 import io.github.alexzhirkevich.compottie.rememberLottiePainter
 import kotlinx.collections.immutable.persistentListOf
+import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
@@ -99,61 +111,7 @@ internal fun HomeScreen(
 
             LazyColumn(modifier = Modifier.fillMaxWidth()) {
                 item {
-                    Row(
-                        modifier =
-                            Modifier
-                                .fillMaxWidth()
-                                .background(color = CaroTheme.color.background.brand)
-                                .padding(horizontal = CaroTheme.spacing.xl2)
-                                .padding(bottom = CaroTheme.spacing.xl2),
-                    ) {
-                        Column(
-                            modifier = Modifier.weight(1f),
-                        ) {
-                            Text(
-                                text = stringResource(Res.string.home_banner_title, state.nickname),
-                                style = CaroTheme.typography.display,
-                                color = CaroTheme.color.text.inverse,
-                            )
-                            Spacer(modifier = Modifier.size(size = CaroTheme.spacing.s))
-                            Text(
-                                text = state.additionalDescription,
-                                style = CaroTheme.typography.body3,
-                            )
-                            Spacer(modifier = Modifier.size(size = CaroTheme.spacing.l))
-                            Row(
-                                modifier =
-                                    Modifier
-                                        .clip(
-                                            shape = RoundedCornerShape(size = 50.dp),
-                                        ).background(color = CaroTheme.color.overlay.light)
-                                        .padding(
-                                            horizontal = CaroTheme.spacing.m,
-                                            vertical = CaroTheme.spacing.s,
-                                        ),
-                                horizontalArrangement = Arrangement.spacedBy(space = CaroTheme.spacing.xs),
-                            ) {
-                                Image(
-                                    modifier = Modifier.size(size = 18.dp),
-                                    painter = painterResource(resource = Res.drawable.img_fire),
-                                    contentDescription = null,
-                                )
-                                Text(
-                                    text =
-                                        stringResource(
-                                            Res.string.home_learning_days,
-                                            state.learningDays,
-                                        ),
-                                    style = CaroTheme.typography.body2.semiBold,
-                                    color = CaroTheme.color.text.warning,
-                                )
-                            }
-                        }
-                        Image(
-                            painter = painterResource(resource = Res.drawable.img_home_banner),
-                            contentDescription = null,
-                        )
-                    }
+                    HomeStreakBanner(state = state)
                 }
 
                 itemsIndexed(
@@ -252,9 +210,118 @@ internal fun HomeScreen(
     }
 }
 
+@Composable
+private fun HomeStreakBanner(state: HomeState) {
+    val content = state.streakState.toBannerContent()
+
+    Row(
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .background(color = CaroTheme.color.background.brand)
+                .padding(horizontal = CaroTheme.spacing.xl2)
+                .padding(bottom = CaroTheme.spacing.xl2)
+                .heightIn(min = 109.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = stringResource(Res.string.home_banner_title, state.nickname),
+                style = CaroTheme.typography.display,
+                color = CaroTheme.color.text.inverse,
+            )
+            content?.let {
+                Spacer(modifier = Modifier.size(CaroTheme.spacing.s))
+                Text(
+                    text = it.description,
+                    style = CaroTheme.typography.body3,
+                    color = CaroTheme.color.text.tertiary,
+                )
+                Spacer(modifier = Modifier.size(CaroTheme.spacing.m))
+                Row(
+                    modifier =
+                        Modifier
+                            .clip(RoundedCornerShape(50.dp))
+                            .background(CaroTheme.color.overlay.light)
+                            .padding(
+                                horizontal = CaroTheme.spacing.m,
+                                vertical = CaroTheme.spacing.xs,
+                            ),
+                    horizontalArrangement = Arrangement.spacedBy(CaroTheme.spacing.xs),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Image(
+                        modifier = Modifier.size(18.dp),
+                        painter = painterResource(it.icon),
+                        contentDescription = null,
+                    )
+                    Text(
+                        text = it.label,
+                        style = CaroTheme.typography.body2.semiBold,
+                        color = it.labelColor,
+                    )
+                }
+            }
+        }
+        content?.let {
+            Image(
+                modifier = Modifier.size(88.dp),
+                painter = painterResource(it.character),
+                contentDescription = null,
+            )
+        }
+    }
+}
+
+private data class HomeStreakBannerContent(
+    val description: String,
+    val label: String,
+    val icon: DrawableResource,
+    val character: DrawableResource,
+    val labelColor: Color,
+)
+
+@Composable
+private fun HomeStreakState.toBannerContent(): HomeStreakBannerContent? =
+    when (this) {
+        HomeStreakState.Loading -> {
+            null
+        }
+
+        HomeStreakState.NotStarted -> {
+            HomeStreakBannerContent(
+                description = stringResource(Res.string.home_streak_not_started_description),
+                label = stringResource(Res.string.home_streak_not_started_label),
+                icon = Res.drawable.img_fire,
+                character = Res.drawable.img_home_streak_not_started,
+                labelColor = CaroTheme.color.text.warning,
+            )
+        }
+
+        is HomeStreakState.Active -> {
+            HomeStreakBannerContent(
+                description = stringResource(Res.string.home_streak_active_description, days),
+                label = stringResource(Res.string.home_streak_active_label, days),
+                icon = Res.drawable.img_fire,
+                character = Res.drawable.img_home_streak_active,
+                labelColor = CaroTheme.color.text.warning,
+            )
+        }
+
+        HomeStreakState.Broken -> {
+            HomeStreakBannerContent(
+                description = stringResource(Res.string.home_streak_broken_description),
+                label = stringResource(Res.string.home_streak_broken_label),
+                icon = Res.drawable.img_streak_broken,
+                character = Res.drawable.img_home_streak_broken,
+                labelColor = CaroTheme.color.text.tertiary,
+            )
+        }
+    }
+
 @Preview
 @Composable
-private fun HomeScreenPreview() {
+private fun HomeScreenActivePreview() {
     val notStarted =
         Deck(
             id = 1,
@@ -293,8 +360,7 @@ private fun HomeScreenPreview() {
             state =
                 HomeState(
                     nickname = "승우",
-                    additionalDescription = "화이또~",
-                    learningDays = 10,
+                    streakState = HomeStreakState.Active(days = 10),
                     decks =
                         persistentListOf(
                             notStarted,
@@ -309,14 +375,67 @@ private fun HomeScreenPreview() {
 
 @Preview
 @Composable
-private fun HomeScreenEmptyDeckPreview() {
+private fun HomeScreenNotStartedWithoutDeckPreview() {
     CaroTheme {
         HomeScreen(
             state =
                 HomeState(
                     nickname = "승우",
-                    additionalDescription = "화이또~",
-                    learningDays = 10,
+                    streakState = HomeStreakState.NotStarted,
+                ),
+            onIntent = {},
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun HomeScreenNotStartedWithFirstDeckPreview() {
+    CaroTheme {
+        HomeScreen(
+            state =
+                HomeState(
+                    nickname = "승우",
+                    streakState = HomeStreakState.NotStarted,
+                    decks =
+                        persistentListOf(
+                            Deck(
+                                id = 1,
+                                title = "Android",
+                                description = "기초 학습",
+                                cardTotalCount = 100,
+                                todayLearningCount = 10,
+                                todayCompleteCount = 0,
+                                state = DeckState.NOT_STARTED,
+                            ),
+                        ),
+                ),
+            onIntent = {},
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun HomeScreenBrokenPreview() {
+    CaroTheme {
+        HomeScreen(
+            state =
+                HomeState(
+                    nickname = "승우",
+                    streakState = HomeStreakState.Broken,
+                    decks =
+                        persistentListOf(
+                            Deck(
+                                id = 1,
+                                title = "Android",
+                                description = "기초 학습",
+                                cardTotalCount = 100,
+                                todayLearningCount = 10,
+                                todayCompleteCount = 0,
+                                state = DeckState.NOT_STARTED,
+                            ),
+                        ),
                 ),
             onIntent = {},
         )

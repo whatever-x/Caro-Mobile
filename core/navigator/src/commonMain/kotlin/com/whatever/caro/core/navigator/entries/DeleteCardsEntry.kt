@@ -5,10 +5,5 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class DeleteCardsEntry(
-    val payload: Payload,
-) : NavKey {
-    @Serializable
-    data class Payload(
-        val deckId: Long,
-    )
-}
+    val deckId: Long,
+) : NavKey

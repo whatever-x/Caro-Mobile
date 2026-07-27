@@ -5,12 +5,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class EditCardEntry(
-    val payload: Payload,
-) : NavKey {
-    @Serializable
-    data class Payload(
-        val cardId: Long,
-        val front: String,
-        val back: String,
-    )
-}
+    val cardId: Long,
+    val front: String,
+    val back: String,
+) : NavKey

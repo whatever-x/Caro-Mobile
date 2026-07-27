@@ -103,7 +103,18 @@ Navigation keys are `@Serializable` data objects/classes extending `NavKey` in `
 3. Add a `navigation<Key> { }` entry in `composeApp/di/NavigationModule.kt`
 4. Create the feature module with Route/Screen/ViewModel/MVI classes
 
-**Passing parameters:** Use a `@Serializable data class` with a `Payload` (see `HomeEntry` pattern). The ViewModel declares the NavKey as a constructor parameter; in `NavigationModule.kt` the route lambda forwards it via `koinViewModel<HomeViewModel> { parametersOf(navKey) }`, and Koin's compiler plugin auto-routes that parameter through `parametersOf` when resolving `viewModel<HomeViewModel>()`.
+**Passing parameters:** Declare the values directly as constructor properties on the NavKey `@Serializable data class` — do NOT wrap them in a nested or top-level `Payload` object (see `EditDeckEntry`, `EditProfileEntry`):
+
+```kotlin
+@Serializable
+data class EditDeckEntry(
+    val deckName: String,
+    val deckDescription: String,
+    val deckId: Long,
+) : NavKey
+```
+
+In `NavigationModule.kt` the route lambda forwards each value individually via `parametersOf(navKey.deckId, navKey.deckName, navKey.deckDescription)`, and the ViewModel receives them as individual constructor parameters (`EditDeckViewModel(deckName, deckDescription, deckId, ...)`) — Koin's compiler plugin auto-routes those through `parametersOf` when resolving `viewModel<EditDeckViewModel>()`. Keep NavKey payloads flat: a NavKey should not forward its whole self (`parametersOf(navKey)`) unless the ViewModel actually declares the NavKey as a parameter.
 
 ### Dependency Injection (Koin)
 
@@ -168,6 +179,11 @@ plugins {
 - **Spotless** with **ktlint 1.8.0** enforces formatting on all `*.kt` and `*.gradle.kts` files.
 - `.editorconfig` exempts `@Composable` functions from ktlint's function naming rule.
 - Always run `./gradlew spotlessApply` before committing to avoid CI failures.
+
+## Git Ignore Policy
+
+- `.gitignore` is authoritative. Never bypass it with `git add -f` or otherwise force-add an ignored file unless the user explicitly requests that exact path.
+- `docs/` contains local design, specification, and implementation-plan artifacts. Keep these files local; never commit or push them.
 
 ## Testing Stack
 
@@ -236,3 +252,5 @@ Remote data source implementation classes should carry a `Remote` prefix when th
 상수 위치는 사용 범위로 결정한다. 한 화면(Screen)에서만 쓰는 UI 값은 그 Screen 파일의 `private const val`/`private val` 로 둔다. ViewModel·State·Test 등 feature 내부 여러 곳에서 공유하는 입력 제한·정책 값은 feature 패키지의 `internal object XxxLimits`(예: `DeckInputLimits`)로 분리한다. 서버 정책이나 도메인 규칙에 가까운 값은 domain/model 또는 repository 계층에서 관리한다.
 
 Screen 전용의 작은 `private` Composable 은 같은 Screen 파일에 둔다. 파일이 커지거나 다른 화면에서 재사용할 여지가 있는 UI 조각만 feature 내부 `components/` 패키지로 분리한다. 현재 feature(profile, deck 등)는 한 파일 유지가 기준선이며, `components/` 도입 시 기존 화면도 함께 정리해 구조를 일관되게 맞춘다.
+
+DTO ↔ 도메인 모델 매핑은 `:core:data` 의 `mapper` 패키지(`com.whatever.caro.core.data.mapper`)에 모은다. RepositoryImpl 내부에 `private fun XxxResponse.toModel()` 같은 인라인/`private` 확장함수로 매핑을 두지 않는다. 컨벤션: 파일명 `{Domain}Mapper.kt`, DTO(`XxxResponse`/`XxxResponseDto`)에 대한 `to{Model}` 확장함수(`internal`), enum·필드 헬퍼는 `private`, 매핑에만 쓰이는 상수(`FIELD_FRONT` 등)도 mapper 파일 top-level `private const val` 로 둔다(`AuthMapper.kt`·`DeckMapper.kt` 참고). `remote`/DataSource 레이어는 매핑하지 않고 DTO 를 그대로 반환하며, DTO→모델 변환은 항상 data(repository) 레이어의 mapper 에서 일어난다. mapper 는 `commonTest` 에 별도 단위 테스트(`{Domain}MapperTest.kt`)를 갖는다.

@@ -7,8 +7,8 @@ import com.whatever.caro.core.model.deck.Deck
 import com.whatever.caro.core.model.deck.DeckState
 import com.whatever.caro.core.model.exception.CaroInvalidResponseException
 import com.whatever.caro.core.remote.dto.deck.response.CreateDeckResponse
-import com.whatever.caro.core.remote.dto.deckCardInformation.response.DeckCardResponse
-import com.whatever.caro.core.remote.dto.deckCardInformation.response.DeckListResponse
+import com.whatever.caro.core.remote.dto.deck.response.DeckCardResponse
+import com.whatever.caro.core.remote.dto.deck.response.DeckListResponse
 import com.whatever.caro.core.remote.dto.studySession.response.StudySessionProgressResponseDto
 
 private const val FIELD_FRONT = "front"

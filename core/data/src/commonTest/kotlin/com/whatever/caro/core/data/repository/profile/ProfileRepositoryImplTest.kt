@@ -3,6 +3,7 @@ package com.whatever.caro.core.data.repository.profile
 import com.whatever.caro.core.remote.datasource.profile.ProfileDataSource
 import com.whatever.caro.core.remote.dto.nickname.response.NicknameResponse
 import com.whatever.caro.core.remote.dto.user.request.UpdateNicknameRequest
+import com.whatever.caro.core.remote.dto.user.response.MyNicknameResponse
 import com.whatever.caro.core.remote.dto.user.response.NicknameCheckResponse
 import com.whatever.caro.core.remote.dto.user.response.UpdateNicknameResponse
 import dev.mokkery.answering.returns
@@ -25,6 +26,31 @@ class ProfileRepositoryImplTest : FunSpec() {
                 val repository = ProfileRepositoryImpl(profileDataSource)
 
                 repository.getRandomNickname() shouldBe "캐로"
+            }
+        }
+
+        test("getMyNickname은 현재 사용자 닉네임을 반환한다") {
+            runTest {
+                val profileDataSource =
+                    mock<ProfileDataSource> {
+                        everySuspend { getMyNickname() } returns MyNicknameResponse(nickname = "캐로")
+                    }
+                val repository = ProfileRepositoryImpl(profileDataSource)
+
+                repository.getMyNickname() shouldBe "캐로"
+                verifySuspend { profileDataSource.getMyNickname() }
+            }
+        }
+
+        test("getMyNickname은 nullable 닉네임을 빈 문자열로 정규화한다") {
+            runTest {
+                val profileDataSource =
+                    mock<ProfileDataSource> {
+                        everySuspend { getMyNickname() } returns MyNicknameResponse(nickname = null)
+                    }
+                val repository = ProfileRepositoryImpl(profileDataSource)
+
+                repository.getMyNickname() shouldBe ""
             }
         }
 

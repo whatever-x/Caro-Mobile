@@ -7,8 +7,7 @@ import kotlinx.collections.immutable.persistentListOf
 
 data class HomeState(
     val nickname: String = "",
-    val additionalDescription: String = "",
-    val learningDays: Int = 0,
+    val streakState: HomeStreakState = HomeStreakState.Loading,
     val decks: ImmutableList<Deck> = persistentListOf(),
     val isLoading: Boolean = false,
 ) : UiState {

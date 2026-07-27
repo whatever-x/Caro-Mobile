@@ -6,11 +6,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class LearningEntry(
-    val payload: Payload,
-) : NavKey {
-    @Serializable
-    data class Payload(
-        val deckId: Long,
-        val mode: LearningMode,
-    )
-}
+    val deckId: Long,
+    val mode: LearningMode,
+) : NavKey
