@@ -113,6 +113,8 @@
 	<string name="card_delete_error">Failed to delete cards. Please try again.</string>
 	<!-- home -->
 	<string name="home_banner_title">Hello, %1$s!</string>
+	<string name="home_load_error">Some data could not be loaded.</string>
+	<string name="home_retry">Retry</string>
 	<string name="home_streak_not_started_description">Create a new deck\nto start learning.</string>
 	<string name="home_streak_not_started_label">Start your first learning streak</string>
 	<string name="home_streak_active_description">You’re on day %1$d.\nFinish today’s reviews and one new deck.</string>

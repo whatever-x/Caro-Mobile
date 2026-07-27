@@ -82,7 +82,7 @@ class HomeViewModelTest : FunSpec() {
                     viewModel.intent(HomeIntent.ClickProfile)
                     advanceUntilIdle()
 
-                    awaitItem() shouldBe HomeSideEffect.NavigateToProfile
+                    awaitItem() shouldBe HomeSideEffect.NavigateToProfile(nickname = "")
                 }
             }
         }
@@ -324,6 +324,35 @@ class HomeViewModelTest : FunSpec() {
                 viewModel.state.value.decks
                     .toList() shouldBe decks
                 viewModel.state.value.streakState shouldBe HomeStreakState.Active(days = 5)
+                viewModel.state.value.hasLoadError shouldBe true
+            }
+        }
+
+        test("ClickRetry 는 실패한 홈 데이터를 다시 불러오고 에러 상태를 해제한다") {
+            runTest(testDispatcher) {
+                var requestCount = 0
+                val deckRepository =
+                    mock<DeckRepository> {
+                        everySuspend { getDecks() } calls {
+                            requestCount++
+                            if (requestCount == 1) {
+                                throw RuntimeException("offline")
+                            }
+                            emptyList()
+                        }
+                    }
+                val viewModel = viewModelWith(deckRepository = deckRepository)
+
+                viewModel.intent(HomeIntent.Initialize)
+                advanceUntilIdle()
+                viewModel.state.value.hasLoadError shouldBe true
+
+                viewModel.intent(HomeIntent.ClickRetry)
+                advanceUntilIdle()
+
+                viewModel.state.value.hasLoadError shouldBe false
+                viewModel.state.value.isLoading shouldBe false
+                requestCount shouldBe 2
             }
         }
 

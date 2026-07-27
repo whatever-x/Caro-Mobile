@@ -37,6 +37,10 @@ class HomeViewModel(
                 initialize()
             }
 
+            HomeIntent.ClickRetry -> {
+                initialize()
+            }
+
             is HomeIntent.ClickStartLearning -> {
                 postSideEffect(HomeSideEffect.NavigateToDailyLearning(deckId = intent.deckId))
             }
@@ -60,7 +64,7 @@ class HomeViewModel(
             }
 
             HomeIntent.ClickProfile -> {
-                postSideEffect(HomeSideEffect.NavigateToProfile)
+                postSideEffect(HomeSideEffect.NavigateToProfile(nickname = currentState.nickname))
             }
 
             HomeIntent.ClickCreateDeck -> {
@@ -72,7 +76,12 @@ class HomeViewModel(
     private suspend fun initialize() =
         coroutineScope {
             val generation = ++initializationGeneration
-            reduce { copy(isLoading = true) }
+            reduce {
+                copy(
+                    isLoading = true,
+                    hasLoadError = false,
+                )
+            }
 
             val decksDeferred =
                 async {
@@ -99,6 +108,12 @@ class HomeViewModel(
             val loadedDecks = decksResult.getOrNull()
             val loadedStreak = streakResult.getOrNull()
             val loadedNickname = nicknameResult.getOrNull()
+            val exceptions =
+                listOfNotNull(
+                    decksResult.exceptionOrNull(),
+                    streakResult.exceptionOrNull(),
+                    nicknameResult.exceptionOrNull(),
+                )
 
             if (generation != initializationGeneration) return@coroutineScope
 
@@ -108,15 +123,10 @@ class HomeViewModel(
                     nickname = loadedNickname ?: nickname,
                     decks = loadedDecks ?: decks,
                     streakState = loadedStreak ?: streakState,
+                    hasLoadError = exceptions.isNotEmpty(),
                 )
             }
 
-            val exceptions =
-                listOfNotNull(
-                    decksResult.exceptionOrNull(),
-                    streakResult.exceptionOrNull(),
-                    nicknameResult.exceptionOrNull(),
-                )
             exceptions.firstOrNull()?.let { primary ->
                 primary.addSuppressedExceptions(exceptions.drop(1))
                 throw primary
