@@ -93,6 +93,11 @@
     <string name="card_save_error">카드 저장에 실패했어요. 다시 시도해 주세요.</string>
     <string name="card_update_error">카드 수정에 실패했어요. 다시 시도해 주세요.</string>
     <string name="card_list_error">카드를 불러오지 못했어요. 다시 시도해 주세요.</string>
+    <string name="deck_delete_dialog_title">덱을 삭제할까요?</string>
+    <string name="deck_delete_dialog_content">덱에 포함된 모든 카드도 함께 삭제됩니다.</string>
+    <string name="deck_delete_dialog_button_delete">덱 삭제</string>
+    <string name="deck_delete_dialog_button_cancel">취소</string>
+    <string name="deck_delete_error">덱을 삭제하지 못했어요. 다시 시도해 주세요.</string>
     <string name="card_title_edit">카드 편집</string>
     <string name="card_button_delete_selected">선택삭제</string>
     <string name="card_button_cancel">취소</string>

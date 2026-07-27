@@ -2,18 +2,31 @@ package com.whatever.caro.feature.deck.detail
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import caromobile.core.designsystem.generated.resources.Res
+import caromobile.core.designsystem.generated.resources.deck_delete_dialog_button_cancel
+import caromobile.core.designsystem.generated.resources.deck_delete_dialog_button_delete
+import caromobile.core.designsystem.generated.resources.deck_delete_dialog_content
+import caromobile.core.designsystem.generated.resources.deck_delete_dialog_title
+import com.whatever.caro.core.designsystem.components.CaroDialog
 import com.whatever.caro.core.designsystem.themes.CaroTheme
 import com.whatever.caro.core.model.deck.Deck
 import com.whatever.caro.core.model.deck.DeckState
+import com.whatever.caro.core.ui.modifier.noRippleClickable
 import com.whatever.caro.feature.deck.detail.components.DeckDetailGuid
 import com.whatever.caro.feature.deck.detail.components.DeckDetailTopBar
 import com.whatever.caro.feature.deck.detail.components.DeckEditBottomSheet
@@ -24,6 +37,7 @@ import com.whatever.caro.feature.deck.detail.components.lazycolumn.FilterAndSort
 import com.whatever.caro.feature.deck.detail.components.lazycolumn.SwipeToRevealCardItem
 import com.whatever.caro.feature.deck.detail.mvi.DeckDetailIntent
 import com.whatever.caro.feature.deck.detail.mvi.DeckDetailState
+import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -124,6 +138,86 @@ internal fun DeckDetailScreen(
             onDismissRequest = { onIntent(DeckDetailIntent.DismissDeckEditBottomSheet) },
         )
     }
+
+    if (state.isDeckDeleteDialogVisible) {
+        DeckDeleteDialog(
+            isDeleting = state.isDeckDeleting,
+            onDelete = { onIntent(DeckDetailIntent.ClickDeckDeleteDialogConfirm) },
+            onCancel = { onIntent(DeckDetailIntent.ClickDeckDeleteDialogCancel) },
+        )
+    }
+}
+
+@Composable
+private fun DeckDeleteDialog(
+    isDeleting: Boolean,
+    onDelete: () -> Unit,
+    onCancel: () -> Unit,
+) {
+    CaroDialog(
+        onDismissRequest = { if (isDeleting.not()) onCancel() },
+        title = {
+            Text(
+                modifier = Modifier.fillMaxWidth(),
+                text = stringResource(Res.string.deck_delete_dialog_title),
+                color = CaroTheme.color.text.primary,
+                style = CaroTheme.typography.heading2,
+            )
+        },
+        content = {
+            Spacer(modifier = Modifier.size(CaroTheme.spacing.s))
+            Text(
+                modifier = Modifier.fillMaxWidth(),
+                text = stringResource(Res.string.deck_delete_dialog_content),
+                color = CaroTheme.color.text.secondary,
+                style = CaroTheme.typography.body3,
+            )
+            Spacer(modifier = Modifier.size(CaroTheme.spacing.m))
+        },
+        buttons = {
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(CaroTheme.spacing.s),
+            ) {
+                Text(
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .background(
+                                color = CaroTheme.color.surface.error,
+                                shape = CaroTheme.shape.xxl,
+                            ).padding(
+                                horizontal = CaroTheme.spacing.l,
+                                vertical = CaroTheme.spacing.m,
+                            ).then(
+                                if (isDeleting) Modifier else Modifier.noRippleClickable(onDelete),
+                            ),
+                    text = stringResource(Res.string.deck_delete_dialog_button_delete),
+                    color = CaroTheme.color.text.error,
+                    style = CaroTheme.typography.caption1.regular,
+                    textAlign = TextAlign.Center,
+                )
+                Text(
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .background(
+                                color = CaroTheme.color.surface.tertiary,
+                                shape = CaroTheme.shape.xxl,
+                            ).padding(
+                                horizontal = CaroTheme.spacing.l,
+                                vertical = CaroTheme.spacing.m,
+                            ).then(
+                                if (isDeleting) Modifier else Modifier.noRippleClickable(onCancel),
+                            ),
+                    text = stringResource(Res.string.deck_delete_dialog_button_cancel),
+                    color = CaroTheme.color.text.brand,
+                    style = CaroTheme.typography.caption1.regular,
+                    textAlign = TextAlign.Center,
+                )
+            }
+        },
+    )
 }
 
 @Preview(locale = "en")

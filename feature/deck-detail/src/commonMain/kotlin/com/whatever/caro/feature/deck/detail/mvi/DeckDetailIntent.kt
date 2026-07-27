@@ -29,6 +29,10 @@ sealed interface DeckDetailIntent : UiIntent {
 
     data object ClickDeckEditBottomSheetDelete : DeckDetailIntent
 
+    data object ClickDeckDeleteDialogCancel : DeckDetailIntent
+
+    data object ClickDeckDeleteDialogConfirm : DeckDetailIntent
+
     data class ClickCard(
         val cardId: Long,
     ) : DeckDetailIntent

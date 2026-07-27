@@ -35,4 +35,6 @@ sealed interface DeckDetailSideEffect : UiSideEffect {
     ) : DeckDetailSideEffect
 
     data object ShowCardLoadError : DeckDetailSideEffect
+
+    data object ShowDeckDeleteError : DeckDetailSideEffect
 }

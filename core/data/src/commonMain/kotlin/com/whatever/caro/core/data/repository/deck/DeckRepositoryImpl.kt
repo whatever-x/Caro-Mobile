@@ -4,6 +4,7 @@ import com.whatever.caro.core.data.mapper.toDeckCardModel
 import com.whatever.caro.core.data.mapper.toDeckModel
 import com.whatever.caro.core.model.card.DeckCard
 import com.whatever.caro.core.model.deck.Deck
+import com.whatever.caro.core.model.deck.DeckCardSortType
 import com.whatever.caro.core.remote.datasource.deck.DeckDataSource
 import com.whatever.caro.core.remote.dto.deck.request.CreateDeckRequest
 import com.whatever.caro.core.remote.dto.deck.request.UpdateDeckRequest
@@ -19,6 +20,14 @@ internal class DeckRepositoryImpl(
     override suspend fun getDeckCards(deckId: Long): List<DeckCard> =
         deckDataSource
             .getDeckCards(deckId = deckId)
+            .mapNotNull { it.toDeckCardModel() }
+
+    override suspend fun getDeckCards(
+        deckId: Long,
+        sortType: DeckCardSortType,
+    ): List<DeckCard> =
+        deckDataSource
+            .getDeckCards(deckId = deckId, sortType = sortType.name)
             .mapNotNull { it.toDeckCardModel() }
 
     override suspend fun createDeck(

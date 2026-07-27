@@ -4,6 +4,7 @@ import com.whatever.caro.core.model.card.CardBadge
 import com.whatever.caro.core.model.card.CardContent
 import com.whatever.caro.core.model.card.DeckCard
 import com.whatever.caro.core.model.deck.Deck
+import com.whatever.caro.core.model.deck.DeckCardSortType
 import com.whatever.caro.core.model.deck.DeckState
 import com.whatever.caro.core.model.learning.LearningMode
 import com.whatever.caro.core.viewmodel.ExceptionFilter
@@ -13,19 +14,23 @@ import com.whatever.caro.feature.deck.detail.model.CardReviewState
 import com.whatever.caro.feature.deck.detail.mvi.DeckDetailIntent
 import com.whatever.caro.feature.deck.detail.mvi.DeckDetailSideEffect
 import com.whatever.caro.feature.deck.detail.mvi.DeckDetailSortOption
+import dev.mokkery.answering.calls
 import dev.mokkery.answering.returns
 import dev.mokkery.answering.throws
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
 import dev.mokkery.mock
+import dev.mokkery.verifySuspend
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 
@@ -125,6 +130,63 @@ class DeckDetailViewModelTest : FunSpec() {
             }
         }
 
+        test("정렬 옵션을 선택하면 해당 타입으로 카드 목록을 다시 로드한다") {
+            runTest(dispatcher) {
+                val deckRepository =
+                    mock<DeckRepository> {
+                        everySuspend { getDeckCards(any()) } returns createDeckCards()
+                        everySuspend { getDeckCards(any(), any()) } returns createDeckCards().reversed()
+                    }
+                val viewModel = createViewModel(deck = createDeck(), deckRepository = deckRepository)
+                advanceUntilIdle()
+
+                viewModel.intent(
+                    DeckDetailIntent.ClickSortOption(DeckDetailSortOption.LAST_REVIEWED),
+                )
+                advanceUntilIdle()
+
+                viewModel.state.value.selectedSortOption shouldBe DeckDetailSortOption.LAST_REVIEWED
+                viewModel.state.value.deckCardList
+                    .first()
+                    .id shouldBe 2L
+                verifySuspend {
+                    deckRepository.getDeckCards(
+                        deckId = 1L,
+                        sortType = DeckCardSortType.LAST_REVIEWED,
+                    )
+                }
+            }
+        }
+
+        test("초기 로딩 중 정렬을 바꿔도 최신 정렬 응답만 화면에 반영한다") {
+            runTest(dispatcher) {
+                val initialCards = CompletableDeferred<List<DeckCard>>()
+                val deckRepository =
+                    mock<DeckRepository> {
+                        everySuspend { getDeckCards(any()) } calls { initialCards.await() }
+                        everySuspend { getDeckCards(any(), any()) } returns createDeckCards().reversed()
+                    }
+                val viewModel = createViewModel(deck = createDeck(), deckRepository = deckRepository)
+                runCurrent()
+
+                viewModel.intent(
+                    DeckDetailIntent.ClickSortOption(DeckDetailSortOption.FREQUENCY),
+                )
+                runCurrent()
+                viewModel.state.value.deckCardList
+                    .first()
+                    .id shouldBe 2L
+
+                initialCards.complete(createDeckCards())
+                advanceUntilIdle()
+
+                viewModel.state.value.selectedSortOption shouldBe DeckDetailSortOption.FREQUENCY
+                viewModel.state.value.deckCardList
+                    .first()
+                    .id shouldBe 2L
+            }
+        }
+
         test("카드 목록 로드 실패 시 ShowCardLoadError 를 방출한다") {
             runTest(dispatcher) {
                 val deckRepository =
@@ -219,6 +281,55 @@ class DeckDetailViewModelTest : FunSpec() {
                 }
 
                 viewModel.state.value.isDeckEditBottomSheetVisible shouldBe false
+            }
+        }
+
+        test("덱 삭제 확인 시 실제 삭제 후 뒤로 이동한다") {
+            runTest(dispatcher) {
+                val deckRepository =
+                    mock<DeckRepository> {
+                        everySuspend { getDeckCards(any()) } returns createDeckCards()
+                        everySuspend { deleteDeck(any()) } returns Unit
+                    }
+                val viewModel = createViewModel(deck = createDeck(), deckRepository = deckRepository)
+                advanceUntilIdle()
+                viewModel.intent(DeckDetailIntent.ClickDeckEditBottomSheetDelete)
+                advanceUntilIdle()
+                viewModel.state.value.isDeckDeleteDialogVisible shouldBe true
+
+                viewModel.sideEffect.test {
+                    viewModel.intent(DeckDetailIntent.ClickDeckDeleteDialogConfirm)
+                    advanceUntilIdle()
+
+                    awaitItem() shouldBe DeckDetailSideEffect.NavigateBack
+                }
+
+                viewModel.state.value.isDeckDeleteDialogVisible shouldBe false
+                verifySuspend { deckRepository.deleteDeck(deckId = 1L) }
+            }
+        }
+
+        test("덱 삭제 실패 시 다이얼로그를 유지하고 에러를 방출한다") {
+            runTest(dispatcher) {
+                val deckRepository =
+                    mock<DeckRepository> {
+                        everySuspend { getDeckCards(any()) } returns createDeckCards()
+                        everySuspend { deleteDeck(any()) } throws RuntimeException("network")
+                    }
+                val viewModel = createViewModel(deck = createDeck(), deckRepository = deckRepository)
+                advanceUntilIdle()
+                viewModel.intent(DeckDetailIntent.ClickDeckEditBottomSheetDelete)
+                advanceUntilIdle()
+
+                viewModel.sideEffect.test {
+                    viewModel.intent(DeckDetailIntent.ClickDeckDeleteDialogConfirm)
+                    advanceUntilIdle()
+
+                    awaitItem() shouldBe DeckDetailSideEffect.ShowDeckDeleteError
+                }
+
+                viewModel.state.value.isDeckDeleteDialogVisible shouldBe true
+                viewModel.state.value.isDeckDeleting shouldBe false
             }
         }
 
