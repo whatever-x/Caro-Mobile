@@ -21,6 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import caromobile.core.designsystem.generated.resources.Res
 import com.whatever.caro.core.designsystem.themes.CaroTheme
@@ -32,6 +33,7 @@ import io.github.alexzhirkevich.compottie.rememberLottiePainter
 private val CtaButtonHeight = 56.dp
 private val ButtonLoadingWidth = 57.dp
 private val ButtonLoadingHeight = 17.dp
+internal val ProfileButtonLoadingContentScale = ContentScale.Crop
 private const val LOTTIE_BUTTON_LOADING_PATH = "files/lottie_button_loading.json"
 private const val CONTENT_TRANSITION_DURATION_MILLIS = 180
 private const val CONTENT_TRANSITION_SCALE = 0.92f
@@ -115,6 +117,7 @@ private fun ProfileButtonLoading() {
                 composition = composition,
                 iterations = Compottie.IterateForever,
             ),
+        contentScale = ProfileButtonLoadingContentScale,
         contentDescription = null,
     )
 }
