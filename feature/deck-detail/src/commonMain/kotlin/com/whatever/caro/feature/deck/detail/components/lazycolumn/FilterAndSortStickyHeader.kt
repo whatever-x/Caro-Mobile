@@ -72,7 +72,7 @@ internal fun FilterAndSortSection(
                             deckCardTotal,
                         ),
                     color = CaroTheme.color.text.primary,
-                    style = CaroTheme.typography.label1.bold,
+                    style = CaroTheme.typography.label1,
                 )
 
                 Row(

@@ -71,13 +71,13 @@ private fun SocialLoginButtonPreview() {
                     .fillMaxWidth()
                     .border(
                         width = 1.dp,
-                        color = Color(0xFF000000),
+                        color = CaroTheme.color.text.primary,
                         shape = CaroTheme.shape.xxl,
                     ).clip(CaroTheme.shape.xxl)
-                    .background(color = Color(0xFFFFFFFF)),
+                    .background(color = CaroTheme.color.surface.primary),
             iconRes = Res.drawable.ic_logo_google,
             contentRes = Res.string.login_button_google,
-            textColor = Color(0xFF000000),
+            textColor = CaroTheme.color.text.primary,
             onClick = {},
         )
     }

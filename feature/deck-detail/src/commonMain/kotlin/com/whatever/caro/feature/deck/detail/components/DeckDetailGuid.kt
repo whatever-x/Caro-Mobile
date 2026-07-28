@@ -88,7 +88,7 @@ internal fun DeckDetailGuid(
                     stringResource(
                         resource = Res.string.deck_detail_sub_title_empty_guid,
                     ),
-                style = CaroTheme.typography.body2.reading,
+                style = CaroTheme.typography.body2.medium,
                 color = CaroTheme.color.text.secondary,
                 textAlign = TextAlign.Center,
             )

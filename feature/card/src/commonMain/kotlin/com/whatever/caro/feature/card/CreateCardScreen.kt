@@ -82,7 +82,6 @@ private val PreviewCardWidth = 110.dp
 private val PreviewCardHeight = 133.dp
 private val TipDotSize = 4.dp
 private val HairlineThickness = 1.dp
-private const val DISABLED_ALPHA = 0.4f
 private const val PREVIEW_TEXT_MAX_LINES = 3
 
 @Composable
@@ -184,7 +183,7 @@ private fun RequiredFieldHeader(label: String) {
         Text(
             text = stringResource(Res.string.card_field_required),
             style = CaroTheme.typography.body2.semiBold,
-            color = CaroTheme.color.text.accent,
+            color = CaroTheme.color.text.dangerous,
         )
     }
 }
@@ -355,7 +354,7 @@ private fun CardPreview(
                     Modifier
                         .fillMaxWidth()
                         .height(HairlineThickness)
-                        .background(CaroTheme.color.border.info),
+                        .background(CaroTheme.color.divider.secondary),
             )
             Text(
                 modifier = Modifier.fillMaxWidth().weight(1f),
@@ -428,8 +427,19 @@ private fun AddCardButton(
         if (enabled) {
             CaroTheme.color.surface.brand
         } else {
-            CaroTheme.color.surface.brand
-                .copy(alpha = DISABLED_ALPHA)
+            CaroTheme.color.surface.disabled
+        }
+    val textColor =
+        if (enabled) {
+            CaroTheme.color.text.inverse
+        } else {
+            CaroTheme.color.text.disabled
+        }
+    val iconColor =
+        if (enabled) {
+            CaroTheme.color.icon.inverse
+        } else {
+            CaroTheme.color.icon.disabled
         }
     val label =
         if (hasAddedCards) {
@@ -457,12 +467,12 @@ private fun AddCardButton(
             modifier = Modifier.size(SmallIconSize),
             painter = painterResource(Res.drawable.ic_add_16),
             contentDescription = null,
-            tint = CaroTheme.color.icon.inverse,
+            tint = iconColor,
         )
         Text(
             text = label,
             style = CaroTheme.typography.caption1.regular,
-            color = CaroTheme.color.text.inverse,
+            color = textColor,
         )
     }
 }
@@ -476,7 +486,7 @@ private fun SaveButton(
         if (enabled) {
             CaroTheme.color.text.primary
         } else {
-            CaroTheme.color.text.tertiary
+            CaroTheme.color.text.disabled
         }
 
     Box(

@@ -101,7 +101,7 @@ internal fun LearningTopBar(
         ) {
             Text(
                 text = "$current / $total",
-                style = CaroTheme.typography.label2.regular,
+                style = CaroTheme.typography.label2,
                 color = CaroTheme.color.text.secondary,
             )
         }
@@ -145,7 +145,7 @@ internal fun LearningCard(
                     Text(
                         text = frontText,
                         style = CaroTheme.typography.body2.semiBold,
-                        color = CaroTheme.color.text.disable,
+                        color = CaroTheme.color.text.disabled,
                         textAlign = TextAlign.Center,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
@@ -208,7 +208,7 @@ internal fun LearningEvaluationControls(
         EvaluationButton(
             label = Res.string.learning_easy,
             icon = DesignRes.drawable.ic_arrow_left_24,
-            color = if (selectedIndex == 0) CaroTheme.color.button.pressed.easy else CaroTheme.color.surface.brand,
+            color = if (selectedIndex == 0) CaroTheme.color.surface.review else CaroTheme.color.surface.brand,
             selected = selectedIndex == 0,
             enabled = enabled,
             onClick = onEasy,
@@ -217,7 +217,7 @@ internal fun LearningEvaluationControls(
         EvaluationButton(
             label = Res.string.learning_fair,
             icon = DesignRes.drawable.ic_arrow_up_24,
-            color = if (selectedIndex == 1) CaroTheme.color.button.pressed.fair else CaroTheme.color.surface.inverse,
+            color = if (selectedIndex == 1) CaroTheme.color.surface.new else CaroTheme.color.surface.inverse,
             selected = selectedIndex == 1,
             enabled = enabled,
             onClick = onFair,
@@ -226,7 +226,7 @@ internal fun LearningEvaluationControls(
         EvaluationButton(
             label = Res.string.learning_again,
             icon = DesignRes.drawable.ic_arrow_right_24,
-            color = if (selectedIndex == 2) CaroTheme.color.button.pressed.hard else CaroTheme.color.surface.accent,
+            color = if (selectedIndex == 2) CaroTheme.color.surface.dangerous else CaroTheme.color.surface.accent,
             selected = selectedIndex == 2,
             enabled = enabled,
             onClick = onAgain,
@@ -258,14 +258,14 @@ private fun EvaluationButton(
         Icon(
             painter = painterResource(icon),
             contentDescription = null,
-            tint = if (selected) CaroTheme.color.icon.disable else CaroTheme.color.icon.inverse,
+            tint = if (selected) CaroTheme.color.icon.disabled else CaroTheme.color.icon.inverse,
             modifier = Modifier.size(LearningIconSize),
         )
         Spacer(Modifier.height(CaroTheme.spacing.xs))
         Text(
             text = stringResource(label),
             style = CaroTheme.typography.body2.semiBold,
-            color = if (selected) CaroTheme.color.text.disable else CaroTheme.color.text.inverse,
+            color = if (selected) CaroTheme.color.text.disabled else CaroTheme.color.text.inverse,
         )
     }
 }
@@ -289,7 +289,7 @@ internal fun LearningStopDialog(
                 Spacer(Modifier.height(CaroTheme.spacing.s))
                 Text(
                     text = stringResource(Res.string.learning_stop_body),
-                    style = CaroTheme.typography.body3,
+                    style = CaroTheme.typography.body2.medium,
                     color = CaroTheme.color.text.secondary,
                 )
                 if (evaluatedCount != null) {
@@ -362,7 +362,7 @@ internal fun LearningErrorDialog(
                 Spacer(Modifier.height(CaroTheme.spacing.s))
                 Text(
                     text = message,
-                    style = CaroTheme.typography.body3,
+                    style = CaroTheme.typography.body2.medium,
                     color = CaroTheme.color.text.secondary,
                 )
                 Spacer(Modifier.height(CaroTheme.spacing.m))
@@ -551,7 +551,7 @@ internal fun LearningCompletion(
             ) {
                 Text(
                     text = stringResource(Res.string.learning_home),
-                    style = CaroTheme.typography.label1.regular,
+                    style = CaroTheme.typography.label1,
                     color = CaroTheme.color.text.inverse,
                 )
             }
@@ -637,7 +637,7 @@ private fun LearningCardBackPreview() {
                 backText = "사과",
                 isFlipped = true,
                 swipeColorArgb =
-                    CaroTheme.color.button.surface.fair
+                    CaroTheme.color.surface.new
                         .toArgb(),
                 swipeProgress = 1f,
                 onFlip = {},

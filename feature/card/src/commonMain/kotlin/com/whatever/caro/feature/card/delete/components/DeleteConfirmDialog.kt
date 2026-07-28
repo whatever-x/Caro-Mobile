@@ -50,7 +50,7 @@ internal fun DeleteConfirmDialog(
                 modifier = Modifier.fillMaxWidth(),
                 text = stringResource(Res.string.card_delete_dialog_body),
                 color = CaroTheme.color.text.secondary,
-                style = CaroTheme.typography.body3,
+                style = CaroTheme.typography.body2.medium,
             )
             Spacer(modifier = Modifier.size(CaroTheme.spacing.l))
         },
@@ -62,8 +62,8 @@ internal fun DeleteConfirmDialog(
                 DialogButton(
                     modifier = Modifier.weight(1f),
                     text = stringResource(Res.string.card_delete_dialog_button_delete),
-                    backgroundColor = CaroTheme.color.surface.error,
-                    textColor = CaroTheme.color.text.accent,
+                    backgroundColor = CaroTheme.color.surface.dangerous,
+                    textColor = CaroTheme.color.text.dangerous,
                     onClick = onDelete,
                 )
                 DialogButton(

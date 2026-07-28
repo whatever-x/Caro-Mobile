@@ -127,7 +127,7 @@ internal fun SortBottomSheetItem(
                 } else {
                     CaroTheme.color.text.secondary
                 },
-            style = CaroTheme.typography.label1.bold,
+            style = CaroTheme.typography.label1,
         )
 
         if (isSelected) {

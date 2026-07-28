@@ -39,7 +39,7 @@ internal fun AddCardButtonItem(
                     .fillMaxWidth()
                     .height(50.dp)
                     .background(
-                        color = CaroTheme.color.surface.brand,
+                        color = CaroTheme.color.background.brand,
                         shape = CaroTheme.shape.m,
                     ).clip(shape = CaroTheme.shape.m)
                     .clickable(onClick = onAddCard)

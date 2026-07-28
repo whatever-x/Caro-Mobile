@@ -125,7 +125,7 @@ private fun DeckEditBottomSheetItem(
         Text(
             text = text,
             color = contentColor,
-            style = CaroTheme.typography.body1.regular,
+            style = CaroTheme.typography.heading3,
         )
     }
 }

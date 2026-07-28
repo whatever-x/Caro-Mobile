@@ -182,7 +182,7 @@ internal fun HomeScreen(
                     Modifier
                         .background(
                             shape = CaroTheme.shape.xxl,
-                            color = CaroTheme.color.button.surface.floating,
+                            color = CaroTheme.color.surface.brand,
                         ).padding(horizontal = CaroTheme.spacing.l, vertical = CaroTheme.spacing.m)
                         .noRippleClickable {
                             onIntent(HomeIntent.ClickCreateDeckButton)
@@ -234,7 +234,7 @@ private fun HomeStreakBanner(state: HomeState) {
                 Spacer(modifier = Modifier.size(CaroTheme.spacing.s))
                 Text(
                     text = it.description,
-                    style = CaroTheme.typography.body3,
+                    style = CaroTheme.typography.body2.medium,
                     color = CaroTheme.color.text.tertiary,
                 )
                 Spacer(modifier = Modifier.size(CaroTheme.spacing.m))

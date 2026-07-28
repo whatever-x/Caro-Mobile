@@ -29,8 +29,6 @@ import org.jetbrains.compose.resources.stringResource
 private val BottomBarVerticalPadding = 16.dp
 private val DeleteButtonHeight = 52.dp
 private val CancelButtonWidth = 70.dp
-private const val DISABLED_BUTTON_ALPHA = 0.08f
-private const val DISABLED_TEXT_ALPHA = 0.35f
 
 @Composable
 internal fun DeleteBottomBar(
@@ -74,15 +72,13 @@ internal fun DeleteSelectedButton(
         if (enabled) {
             CaroTheme.color.surface.brand
         } else {
-            CaroTheme.color.surface.brand
-                .copy(alpha = DISABLED_BUTTON_ALPHA)
+            CaroTheme.color.surface.disabled
         }
     val textColor =
         if (enabled) {
             CaroTheme.color.text.inverse
         } else {
-            CaroTheme.color.text.inverse
-                .copy(alpha = DISABLED_TEXT_ALPHA)
+            CaroTheme.color.text.disabled
         }
 
     Box(
