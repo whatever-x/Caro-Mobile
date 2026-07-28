@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -37,7 +38,6 @@ import com.whatever.caro.core.model.learning.LearningMode
 import com.whatever.caro.core.model.learning.StudyCard
 import com.whatever.caro.core.model.learning.StudyEvaluation
 import com.whatever.caro.core.model.learning.StudyRating
-import com.whatever.caro.core.ui.loading.CaroLoadingOverlay
 import com.whatever.caro.core.ui.modifier.swipeGesture
 import com.whatever.caro.core.ui.swipe.SwipeDirection
 import com.whatever.caro.core.ui.swipe.SwipeGestureConfig
@@ -61,10 +61,8 @@ fun LearningScreen(
     onIntent: (LearningIntent) -> Unit,
 ) {
     when {
-        state.isLoadedContentVisible.not() -> {
-            LoadingContent(
-                onBack = { onIntent(LearningIntent.Close) },
-            )
+        state.isLoading -> {
+            LoadingContent()
         }
 
         state.isRestDay -> {
@@ -243,20 +241,15 @@ private val SwipeDirection.exitOffset: Offset
 private const val EVALUATION_ANIMATION_TIMEOUT_MILLIS = 500L
 
 @Composable
-private fun LoadingContent(onBack: () -> Unit) {
+private fun LoadingContent() {
     Box(
         modifier =
             Modifier
                 .fillMaxSize()
                 .background(CaroTheme.color.background.primary),
+        contentAlignment = Alignment.Center,
     ) {
-        LearningTopBar(
-            current = 0,
-            total = 0,
-            isLoading = true,
-            onBack = onBack,
-        )
-        CaroLoadingOverlay()
+        CircularProgressIndicator(color = CaroTheme.color.icon.primary)
     }
 }
 

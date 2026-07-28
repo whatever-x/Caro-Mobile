@@ -24,7 +24,6 @@ data class LearningState(
     val errorMessage: String? = null,
     val isShowErrorDialog: Boolean = false,
 ) : UiState {
-    val isLoadedContentVisible: Boolean get() = isLoading.not()
     val currentCard: StudyCard? get() = cards.getOrNull(index)
     val progress: Int get() = studiedBefore + index + if (isCompleted) 1 else 0
 }
