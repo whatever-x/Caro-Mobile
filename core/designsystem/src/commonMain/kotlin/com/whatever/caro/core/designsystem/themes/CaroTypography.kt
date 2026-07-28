@@ -7,6 +7,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 
+private val basePretendardStyle = TextStyle(letterSpacing = 0.em)
+
 @Immutable
 data class CaroTypography(
     val display: TextStyle,
@@ -45,103 +47,90 @@ data class CaroTypography(
             roboto: FontFamily,
         ) = CaroTypography(
             display =
-                TextStyle(
+                basePretendardStyle.copy(
                     fontFamily = pretendard,
                     fontWeight = FontWeight.W700,
                     fontSize = 24.sp,
-                    letterSpacing = 0.em,
                 ),
             heading1 =
-                TextStyle(
+                basePretendardStyle.copy(
                     fontFamily = pretendard,
                     fontWeight = FontWeight.W700,
                     fontSize = 20.sp,
-                    letterSpacing = 0.em,
                 ),
             heading2 =
-                TextStyle(
+                basePretendardStyle.copy(
                     fontFamily = pretendard,
                     fontWeight = FontWeight.W600,
                     fontSize = 18.sp,
-                    letterSpacing = 0.em,
                 ),
             heading3 =
-                TextStyle(
+                basePretendardStyle.copy(
                     fontFamily = pretendard,
                     fontWeight = FontWeight.W500,
                     fontSize = 16.sp,
-                    letterSpacing = 0.em,
                 ),
             body1 =
-                TextStyle(
+                basePretendardStyle.copy(
                     fontFamily = pretendard,
                     fontWeight = FontWeight.W600,
                     fontSize = 16.sp,
-                    letterSpacing = 0.em,
                 ),
             body2 =
                 Body2Style(
                     semiBold =
-                        TextStyle(
+                        basePretendardStyle.copy(
                             fontFamily = pretendard,
                             fontWeight = FontWeight.W600,
                             fontSize = 14.sp,
-                            letterSpacing = 0.em,
                         ),
                     medium =
-                        TextStyle(
+                        basePretendardStyle.copy(
                             fontFamily = pretendard,
                             fontWeight = FontWeight.W500,
                             fontSize = 14.sp,
-                            letterSpacing = 0.em,
                         ),
                 ),
             label1 =
-                TextStyle(
+                basePretendardStyle.copy(
                     fontFamily = pretendard,
                     fontWeight = FontWeight.W500,
                     fontSize = 14.sp,
-                    letterSpacing = 0.em,
                 ),
             label2 =
-                TextStyle(
+                basePretendardStyle.copy(
                     fontFamily = pretendard,
                     fontWeight = FontWeight.W400,
                     fontSize = 12.sp,
-                    letterSpacing = 0.em,
                 ),
             caption1 =
                 Caption1Style(
                     regular =
-                        TextStyle(
+                        basePretendardStyle.copy(
                             fontFamily = pretendard,
                             fontWeight = FontWeight.W400,
                             fontSize = 12.sp,
-                            letterSpacing = 0.em,
                         ),
                     medium =
-                        TextStyle(
+                        basePretendardStyle.copy(
                             fontFamily = pretendard,
                             fontWeight = FontWeight.W500,
                             fontSize = 12.sp,
-                            letterSpacing = 0.em,
                         ),
                 ),
             caption2 =
                 Caption2Style(
                     regular =
-                        TextStyle(
+                        basePretendardStyle.copy(
                             fontFamily = pretendard,
                             fontWeight = FontWeight.W400,
                             fontSize = 10.sp,
-                            letterSpacing = 0.em,
                         ),
                     medium =
-                        TextStyle(
+                        basePretendardStyle.copy(
                             fontFamily = pretendard,
                             fontWeight = FontWeight.W500,
                             fontSize = 10.sp,
-                            letterSpacing = 0.em,
                         ),
                 ),
             robotoLabel1 =

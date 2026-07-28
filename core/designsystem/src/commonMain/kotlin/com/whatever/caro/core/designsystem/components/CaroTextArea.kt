@@ -111,10 +111,10 @@ private fun TextAreaBox(
             CaroTheme.color.surface.secondary
         }
     val borderColor =
-        when {
-            !enabled -> CaroTheme.color.border.secondary
-            isFocused -> CaroTheme.color.border.brand
-            else -> CaroTheme.color.border.secondary
+        if (isFocused) {
+            CaroTheme.color.border.brand
+        } else {
+            CaroTheme.color.border.secondary
         }
     val mergedTextStyle =
         CaroTheme.typography.body1
