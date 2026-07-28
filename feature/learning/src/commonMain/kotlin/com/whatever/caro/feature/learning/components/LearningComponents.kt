@@ -67,6 +67,7 @@ import caromobile.core.designsystem.generated.resources.Res as DesignRes
 internal fun LearningTopBar(
     current: Int,
     total: Int,
+    isLoading: Boolean = false,
     onBack: () -> Unit,
 ) {
     Box(
@@ -84,17 +85,26 @@ internal fun LearningTopBar(
                     .size(LearningIconSize)
                     .clickable(onClick = onBack),
         )
-        Box(
-            modifier =
-                Modifier
-                    .background(CaroTheme.color.surface.tertiary, CaroTheme.shape.xxl)
-                    .padding(horizontal = CaroTheme.spacing.l, vertical = LearningProgressPillVerticalPadding),
-        ) {
-            Text(
-                text = "$current / $total",
-                style = CaroTheme.typography.caption1.regular,
-                color = CaroTheme.color.text.secondary,
+        if (isLoading) {
+            Box(
+                modifier =
+                    Modifier
+                        .size(width = LearningProgressSkeletonWidth, height = LearningProgressSkeletonHeight)
+                        .background(CaroTheme.color.skeleton.primary, CaroTheme.shape.xxl),
             )
+        } else {
+            Box(
+                modifier =
+                    Modifier
+                        .background(CaroTheme.color.surface.tertiary, CaroTheme.shape.xxl)
+                        .padding(horizontal = CaroTheme.spacing.l, vertical = LearningProgressPillVerticalPadding),
+            ) {
+                Text(
+                    text = "$current / $total",
+                    style = CaroTheme.typography.caption1.regular,
+                    color = CaroTheme.color.text.secondary,
+                )
+            }
         }
     }
 }
@@ -568,6 +578,8 @@ private fun CompletionStat(
 private val LearningTopBarHeight = 56.dp
 private val LearningIconSize = 24.dp
 private val LearningProgressPillVerticalPadding = 6.dp
+private val LearningProgressSkeletonWidth = 64.dp
+private val LearningProgressSkeletonHeight = 24.dp
 private const val LEARNING_SWIPE_FEEDBACK_MAX_ALPHA = 0.12f
 private val LearningCardBorderWidth = 1.dp
 private val LearningCardDividerWidth = 80.dp

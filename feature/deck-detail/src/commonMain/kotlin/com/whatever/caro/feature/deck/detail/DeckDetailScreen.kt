@@ -47,70 +47,72 @@ internal fun DeckDetailScreen(
                 onEditDeck = { onIntent(DeckDetailIntent.ClickEditDeck) },
             )
 
-            if (state.isEmptyDeckCard) {
-                DeckDetailGuid(
-                    onAddFirstCard = { onIntent(DeckDetailIntent.ClickAddCard) },
-                )
-            } else {
-                LazyColumn(
-                    modifier =
-                        Modifier
-                            .fillMaxSize(),
-                    overscrollEffect = null,
-                ) {
-                    item {
-                        DeckDetailHeader(
-                            description = state.deck.description,
-                            learningCardTotal = state.deck.todayLearningCount,
-                            learningProgress = state.deck.todayProgress,
-                            currentLearningStatus = state.deck.state,
-                            onAllStudy = { onIntent(DeckDetailIntent.ClickAllStudy) },
-                            onDailyStudy = { onIntent(DeckDetailIntent.ClickDailyStudy) },
-                        )
-                    }
+            if (state.isLoadedContentVisible) {
+                if (state.isEmptyDeckCard) {
+                    DeckDetailGuid(
+                        onAddFirstCard = { onIntent(DeckDetailIntent.ClickAddCard) },
+                    )
+                } else {
+                    LazyColumn(
+                        modifier =
+                            Modifier
+                                .fillMaxSize(),
+                        overscrollEffect = null,
+                    ) {
+                        item {
+                            DeckDetailHeader(
+                                description = state.deck.description,
+                                learningCardTotal = state.deck.todayLearningCount,
+                                learningProgress = state.deck.todayProgress,
+                                currentLearningStatus = state.deck.state,
+                                onAllStudy = { onIntent(DeckDetailIntent.ClickAllStudy) },
+                                onDailyStudy = { onIntent(DeckDetailIntent.ClickDailyStudy) },
+                            )
+                        }
 
-                    stickyHeader {
-                        FilterAndSortSection(
-                            deckCardTotal = state.deck.cardTotalCount,
-                            selectedSortOption = state.selectedSortOption,
-                            onSortCardList = { onIntent(DeckDetailIntent.ClickSortCardList) },
-                            onEditCardList = { onIntent(DeckDetailIntent.ClickEditCardList) },
-                        )
-                    }
+                        stickyHeader {
+                            FilterAndSortSection(
+                                deckCardTotal = state.deck.cardTotalCount,
+                                selectedSortOption = state.selectedSortOption,
+                                onSortCardList = { onIntent(DeckDetailIntent.ClickSortCardList) },
+                                onEditCardList = { onIntent(DeckDetailIntent.ClickEditCardList) },
+                            )
+                        }
 
-                    item {
-                        AddCardButtonItem(
-                            onAddCard = { onIntent(DeckDetailIntent.ClickAddCard) },
-                        )
-                    }
+                        item {
+                            AddCardButtonItem(
+                                onAddCard = { onIntent(DeckDetailIntent.ClickAddCard) },
+                            )
+                        }
 
-                    itemsIndexed(
-                        items = state.deckCardList,
-                        key = { _, card -> card.id },
-                    ) { index, card ->
-                        SwipeToRevealCardItem(
-                            card = card,
-                            onEdit = { onIntent(DeckDetailIntent.ClickCard(card.id)) },
-                            modifier =
-                                Modifier
-                                    .padding(
-                                        start = CaroTheme.spacing.xl,
-                                        top = CaroTheme.spacing.m,
-                                        end = CaroTheme.spacing.xl,
-                                        bottom =
-                                            if (index == state.deckCardList.lastIndex) {
-                                                CaroTheme.spacing.m
-                                            } else {
-                                                0.dp
-                                            },
-                                    ),
-                        )
+                        itemsIndexed(
+                            items = state.deckCardList,
+                            key = { _, card -> card.id },
+                        ) { index, card ->
+                            SwipeToRevealCardItem(
+                                card = card,
+                                onEdit = { onIntent(DeckDetailIntent.ClickCard(card.id)) },
+                                modifier =
+                                    Modifier
+                                        .padding(
+                                            start = CaroTheme.spacing.xl,
+                                            top = CaroTheme.spacing.m,
+                                            end = CaroTheme.spacing.xl,
+                                            bottom =
+                                                if (index == state.deckCardList.lastIndex) {
+                                                    CaroTheme.spacing.m
+                                                } else {
+                                                    0.dp
+                                                },
+                                        ),
+                            )
+                        }
                     }
                 }
             }
         }
 
-        if (state.isSortBottomSheetVisible) {
+        if (state.isLoadedContentVisible && state.isSortBottomSheetVisible) {
             SortBottomSheet(
                 selectedSortOption = state.selectedSortOption,
                 onSortOptionClick = { sortOption ->
@@ -120,7 +122,7 @@ internal fun DeckDetailScreen(
             )
         }
 
-        if (state.isDeckEditBottomSheetVisible) {
+        if (state.isLoadedContentVisible && state.isDeckEditBottomSheetVisible) {
             DeckEditBottomSheet(
                 onEditDeck = { onIntent(DeckDetailIntent.ClickDeckEditBottomSheetEdit) },
                 onDeleteDeck = { onIntent(DeckDetailIntent.ClickDeckEditBottomSheetDelete) },

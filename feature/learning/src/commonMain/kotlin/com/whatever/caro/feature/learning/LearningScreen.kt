@@ -61,8 +61,10 @@ fun LearningScreen(
     onIntent: (LearningIntent) -> Unit,
 ) {
     when {
-        state.isLoading -> {
-            LoadingContent()
+        state.isLoadedContentVisible.not() -> {
+            LoadingContent(
+                onBack = { onIntent(LearningIntent.Close) },
+            )
         }
 
         state.isRestDay -> {
@@ -241,13 +243,19 @@ private val SwipeDirection.exitOffset: Offset
 private const val EVALUATION_ANIMATION_TIMEOUT_MILLIS = 500L
 
 @Composable
-private fun LoadingContent() {
+private fun LoadingContent(onBack: () -> Unit) {
     Box(
         modifier =
             Modifier
                 .fillMaxSize()
                 .background(CaroTheme.color.background.primary),
     ) {
+        LearningTopBar(
+            current = 0,
+            total = 0,
+            isLoading = true,
+            onBack = onBack,
+        )
         CaroLoadingOverlay()
     }
 }

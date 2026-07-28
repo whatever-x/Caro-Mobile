@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -57,6 +58,7 @@ import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
 private const val ARROW_BOUNCE_LOOP_END_PROGRESS = 35f / 60f
+private val HomeLoadingBannerHeight = 128.dp
 
 @OptIn(ExperimentalResourceApi::class, ExperimentalCompottieApi::class)
 @Composable
@@ -98,104 +100,114 @@ internal fun HomeScreen(
                 },
             )
 
-            LazyColumn(
-                modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 72.dp),
-            ) {
-                item {
-                    Row(
-                        modifier =
-                            Modifier
-                                .fillMaxWidth()
-                                .background(color = CaroTheme.color.background.brand)
-                                .padding(horizontal = CaroTheme.spacing.xl2)
-                                .padding(bottom = CaroTheme.spacing.xl2),
-                    ) {
-                        Column(
-                            modifier = Modifier.weight(1f),
+            if (state.isLoadedContentVisible) {
+                LazyColumn(
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 72.dp),
+                ) {
+                    item {
+                        Row(
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .background(color = CaroTheme.color.background.brand)
+                                    .padding(horizontal = CaroTheme.spacing.xl2)
+                                    .padding(bottom = CaroTheme.spacing.xl2),
                         ) {
-                            Text(
-                                text = stringResource(Res.string.home_banner_title, state.nickname),
-                                style = CaroTheme.typography.display,
-                                color = CaroTheme.color.text.inverse,
-                            )
-                            Spacer(modifier = Modifier.size(size = CaroTheme.spacing.s))
-                            Text(
-                                text = state.additionalDescription,
-                                style = CaroTheme.typography.body3,
-                            )
-                            Spacer(modifier = Modifier.size(size = CaroTheme.spacing.l))
-                            Row(
-                                modifier =
-                                    Modifier
-                                        .clip(
-                                            shape = RoundedCornerShape(size = 50.dp),
-                                        ).background(color = CaroTheme.color.overlay.light)
-                                        .padding(
-                                            horizontal = CaroTheme.spacing.m,
-                                            vertical = CaroTheme.spacing.s,
-                                        ),
-                                horizontalArrangement = Arrangement.spacedBy(space = CaroTheme.spacing.xs),
+                            Column(
+                                modifier = Modifier.weight(1f),
                             ) {
-                                Image(
-                                    modifier = Modifier.size(size = 18.dp),
-                                    painter = painterResource(resource = Res.drawable.img_fire),
-                                    contentDescription = null,
-                                )
                                 Text(
-                                    text =
-                                        stringResource(
-                                            Res.string.home_learning_days,
-                                            state.learningDays,
-                                        ),
-                                    style = CaroTheme.typography.body2.semiBold,
-                                    color = CaroTheme.color.text.warning,
+                                    text = stringResource(Res.string.home_banner_title, state.nickname),
+                                    style = CaroTheme.typography.display,
+                                    color = CaroTheme.color.text.inverse,
                                 )
+                                Spacer(modifier = Modifier.size(size = CaroTheme.spacing.s))
+                                Text(
+                                    text = state.additionalDescription,
+                                    style = CaroTheme.typography.body3,
+                                )
+                                Spacer(modifier = Modifier.size(size = CaroTheme.spacing.l))
+                                Row(
+                                    modifier =
+                                        Modifier
+                                            .clip(
+                                                shape = RoundedCornerShape(size = 50.dp),
+                                            ).background(color = CaroTheme.color.overlay.light)
+                                            .padding(
+                                                horizontal = CaroTheme.spacing.m,
+                                                vertical = CaroTheme.spacing.s,
+                                            ),
+                                    horizontalArrangement = Arrangement.spacedBy(space = CaroTheme.spacing.xs),
+                                ) {
+                                    Image(
+                                        modifier = Modifier.size(size = 18.dp),
+                                        painter = painterResource(resource = Res.drawable.img_fire),
+                                        contentDescription = null,
+                                    )
+                                    Text(
+                                        text =
+                                            stringResource(
+                                                Res.string.home_learning_days,
+                                                state.learningDays,
+                                            ),
+                                        style = CaroTheme.typography.body2.semiBold,
+                                        color = CaroTheme.color.text.warning,
+                                    )
+                                }
                             }
+                            Image(
+                                painter = painterResource(resource = Res.drawable.img_home_banner),
+                                contentDescription = null,
+                            )
                         }
-                        Image(
-                            painter = painterResource(resource = Res.drawable.img_home_banner),
-                            contentDescription = null,
-                        )
                     }
-                }
 
-                itemsIndexed(
-                    items = state.decks,
-                    key = { _, deck -> deck.id },
-                ) { index, deck ->
-                    Spacer(modifier = Modifier.size(size = CaroTheme.spacing.m))
-                    Deck(
-                        modifier = Modifier.padding(horizontal = CaroTheme.spacing.xl2),
-                        title = deck.title,
-                        description = deck.description,
-                        cardTotalCount = deck.cardTotalCount,
-                        todayLearningPercentage = deck.todayProgress,
-                        state = deck.state,
-                        onDeckClick = {
-                            onIntent(
-                                HomeIntent.ClickDeckButton(
-                                    deck = deck,
-                                ),
-                            )
-                        },
-                        onStartLearningClick = {
-                            onIntent(
-                                HomeIntent.ClickStartLearning(
-                                    deckId = deck.id,
-                                ),
-                            )
-                        },
-                    )
-                    if (index == state.decks.lastIndex) {
-                        Spacer(modifier = Modifier.size(size = CaroTheme.spacing.l))
+                    itemsIndexed(
+                        items = state.decks,
+                        key = { _, deck -> deck.id },
+                    ) { index, deck ->
+                        Spacer(modifier = Modifier.size(size = CaroTheme.spacing.m))
+                        Deck(
+                            modifier = Modifier.padding(horizontal = CaroTheme.spacing.xl2),
+                            title = deck.title,
+                            description = deck.description,
+                            cardTotalCount = deck.cardTotalCount,
+                            todayLearningPercentage = deck.todayProgress,
+                            state = deck.state,
+                            onDeckClick = {
+                                onIntent(
+                                    HomeIntent.ClickDeckButton(
+                                        deck = deck,
+                                    ),
+                                )
+                            },
+                            onStartLearningClick = {
+                                onIntent(
+                                    HomeIntent.ClickStartLearning(
+                                        deckId = deck.id,
+                                    ),
+                                )
+                            },
+                        )
+                        if (index == state.decks.lastIndex) {
+                            Spacer(modifier = Modifier.size(size = CaroTheme.spacing.l))
+                        }
                     }
                 }
+            } else {
+                Spacer(
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .height(HomeLoadingBannerHeight)
+                            .background(color = CaroTheme.color.background.brand),
+                )
             }
         }
-        if (state.isDeckEmpty) {
+        if (state.isLoadedContentVisible && state.isDeckEmpty) {
             Text(
                 modifier =
                     Modifier
@@ -207,52 +219,54 @@ internal fun HomeScreen(
                 textAlign = TextAlign.Center,
             )
         }
-        Column(
-            modifier =
-                Modifier
-                    .align(alignment = Alignment.BottomCenter)
-                    .padding(bottom = 24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            if (state.isDeckEmpty) {
-                Lottie(
-                    painter =
-                        rememberLottiePainter(
-                            composition = lottieComposition,
-                            iterations = Compottie.IterateForever,
-                            clipSpec = LottieClipSpec.Progress(0f, ARROW_BOUNCE_LOOP_END_PROGRESS),
-                        ),
-                    contentDescription = null,
-                )
-            }
-            Row(
+        if (state.isLoadedContentVisible) {
+            Column(
                 modifier =
                     Modifier
-                        .background(
-                            shape = CaroTheme.shape.xxl,
-                            color = CaroTheme.color.button.surface.floating,
-                        ).padding(horizontal = CaroTheme.spacing.l, vertical = CaroTheme.spacing.m)
-                        .noRippleClickable {
-                            onIntent(HomeIntent.ClickCreateDeckButton)
-                        },
-                horizontalArrangement =
-                    Arrangement.spacedBy(
-                        space = CaroTheme.spacing.s,
-                        alignment = Alignment.CenterHorizontally,
-                    ),
-                verticalAlignment = Alignment.CenterVertically,
+                        .align(alignment = Alignment.BottomCenter)
+                        .padding(bottom = 24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                Icon(
-                    painter = painterResource(resource = Res.drawable.ic_add_24),
-                    tint = CaroTheme.color.icon.inverse,
-                    contentDescription = null,
-                )
+                if (state.isDeckEmpty) {
+                    Lottie(
+                        painter =
+                            rememberLottiePainter(
+                                composition = lottieComposition,
+                                iterations = Compottie.IterateForever,
+                                clipSpec = LottieClipSpec.Progress(0f, ARROW_BOUNCE_LOOP_END_PROGRESS),
+                            ),
+                        contentDescription = null,
+                    )
+                }
+                Row(
+                    modifier =
+                        Modifier
+                            .background(
+                                shape = CaroTheme.shape.xxl,
+                                color = CaroTheme.color.button.surface.floating,
+                            ).padding(horizontal = CaroTheme.spacing.l, vertical = CaroTheme.spacing.m)
+                            .noRippleClickable {
+                                onIntent(HomeIntent.ClickCreateDeckButton)
+                            },
+                    horizontalArrangement =
+                        Arrangement.spacedBy(
+                            space = CaroTheme.spacing.s,
+                            alignment = Alignment.CenterHorizontally,
+                        ),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Icon(
+                        painter = painterResource(resource = Res.drawable.ic_add_24),
+                        tint = CaroTheme.color.icon.inverse,
+                        contentDescription = null,
+                    )
 
-                Text(
-                    text = stringResource(resource = Res.string.home_floating_button),
-                    style = CaroTheme.typography.body2.semiBold,
-                    color = CaroTheme.color.text.inverse,
-                )
+                    Text(
+                        text = stringResource(resource = Res.string.home_floating_button),
+                        style = CaroTheme.typography.body2.semiBold,
+                        color = CaroTheme.color.text.inverse,
+                    )
+                }
             }
         }
         if (state.isLoading) {
