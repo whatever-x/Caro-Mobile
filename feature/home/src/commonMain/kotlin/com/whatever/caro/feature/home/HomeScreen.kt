@@ -83,7 +83,7 @@ internal fun HomeScreen(
     )
 
     CaroLoadingOverlayBox(
-        isLoading = state.isLoading,
+        isLoading = !state.isLoadedContentVisible,
         modifier =
             Modifier
                 .fillMaxSize()
