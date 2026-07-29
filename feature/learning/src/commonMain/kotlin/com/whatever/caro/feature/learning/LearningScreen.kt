@@ -124,13 +124,22 @@ private fun LearningContent(
         )
         key(card.id) {
             val swipeState = rememberSwipeGestureState()
-            var pendingRating by remember { mutableStateOf<StudyRating?>(null) }
+            var pendingEvaluation by remember { mutableStateOf(PendingEvaluationState()) }
+            val pendingRating = pendingEvaluation.rating
             val selectedDirection = pendingRating?.toSwipeDirection() ?: swipeState.currentDirection
             val interactionAvailability =
                 learningInteractionAvailability(
                     isSubmitting = state.isSubmitting,
-                    hasPendingRating = pendingRating != null,
+                    hasPendingRating = pendingEvaluation.hasPendingRating,
                 )
+
+            LaunchedEffect(state.isSubmitting, state.isShowErrorDialog) {
+                pendingEvaluation =
+                    pendingEvaluation.onSubmissionStateChanged(
+                        isSubmitting = state.isSubmitting,
+                        hasSubmissionError = state.isShowErrorDialog,
+                    )
+            }
 
             LaunchedEffect(pendingRating) {
                 val rating = pendingRating ?: return@LaunchedEffect
@@ -169,9 +178,9 @@ private fun LearningContent(
             }
             LearningEvaluationControls(
                 enabled = interactionAvailability.evaluationEnabled,
-                onEasy = { pendingRating = StudyRating.EASY },
-                onFair = { pendingRating = StudyRating.FAIR },
-                onAgain = { pendingRating = StudyRating.AGAIN },
+                onEasy = { pendingEvaluation = pendingEvaluation.select(StudyRating.EASY) },
+                onFair = { pendingEvaluation = pendingEvaluation.select(StudyRating.FAIR) },
+                onAgain = { pendingEvaluation = pendingEvaluation.select(StudyRating.AGAIN) },
             )
         }
         Text(
