@@ -61,7 +61,7 @@ internal fun ProfileCtaButton(
                 .heightIn(min = CtaButtonHeight)
                 .clip(CaroTheme.shape.xxl)
                 .background(backgroundColor)
-                .clickable(enabled = enabled, onClick = onClick)
+                .clickable(enabled = enabled && !isLoading, onClick = onClick)
                 .padding(
                     horizontal = CaroTheme.spacing.xl,
                     vertical = CaroTheme.spacing.l,
