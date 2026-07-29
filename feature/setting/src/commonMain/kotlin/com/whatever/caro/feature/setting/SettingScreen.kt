@@ -40,7 +40,6 @@ import caromobile.core.designsystem.generated.resources.setting_userinfo_nicknam
 import com.whatever.caro.core.designsystem.components.CaroTopBar
 import com.whatever.caro.core.designsystem.themes.CaroTheme
 import com.whatever.caro.core.model.auth.SocialLoginType
-import com.whatever.caro.core.ui.loading.CaroLoadingOverlayBox
 import com.whatever.caro.core.ui.modifier.noRippleClickable
 import com.whatever.caro.feature.setting.component.MenuSection
 import com.whatever.caro.feature.setting.model.AppConfig
@@ -94,76 +93,85 @@ internal fun SettingScreen(
     state: SettingState,
     onIntent: (SettingIntent) -> Unit,
 ) {
-    CaroLoadingOverlayBox(isLoading = state.isLoading) {
-        Column(
+    val onEnabledIntent: (SettingIntent) -> Unit = { intent ->
+        if (!state.isLoading) onIntent(intent)
+    }
+
+    Column(
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .background(color = CaroTheme.color.background.primary)
+                .padding(bottom = CaroTheme.spacing.xl2),
+    ) {
+        CaroTopBar(
             modifier =
                 Modifier
-                    .fillMaxSize()
-                    .background(color = CaroTheme.color.background.primary)
-                    .padding(bottom = CaroTheme.spacing.xl2),
-        ) {
-            CaroTopBar(
-                modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = CaroTheme.spacing.xl2),
-                leadingContent = {
-                    Row(modifier = Modifier.noRippleClickable { onIntent(SettingIntent.ClickBack) }) {
-                        Icon(
-                            imageVector = vectorResource(Res.drawable.ic_arrow_left_24),
-                            tint = CaroTheme.color.icon.primary,
-                            contentDescription = null,
-                        )
-                        Spacer(modifier = Modifier.size(size = CaroTheme.spacing.s))
-                        Text(
-                            text = stringResource(Res.string.setting_title),
-                            style = CaroTheme.typography.heading2,
-                            color = CaroTheme.color.text.primary,
-                        )
-                    }
-                },
-            )
+                    .fillMaxWidth()
+                    .padding(horizontal = CaroTheme.spacing.xl2),
+            leadingContent = {
+                Row(modifier = Modifier.noRippleClickable { onEnabledIntent(SettingIntent.ClickBack) }) {
+                    Icon(
+                        imageVector = vectorResource(Res.drawable.ic_arrow_left_24),
+                        tint = CaroTheme.color.icon.primary,
+                        contentDescription = null,
+                    )
+                    Spacer(modifier = Modifier.size(size = CaroTheme.spacing.s))
+                    Text(
+                        text = stringResource(Res.string.setting_title),
+                        style = CaroTheme.typography.heading2,
+                        color = CaroTheme.color.text.primary,
+                    )
+                }
+            },
+        )
+        if (state.isUserInfoVisible) {
             UserInfo(
-                modifier =
-                    Modifier
-                        .background(CaroTheme.color.surface.primary),
+                modifier = Modifier.background(CaroTheme.color.surface.primary),
                 nickname = state.nickname,
                 emailAddress = state.emailAddress,
                 socialLoginType = state.socialLoginType,
                 isLoading = state.isLoading,
-                onNicknameChangeClick = { onIntent(SettingIntent.ClickNicknameChange) },
+                onNicknameChangeClick = {
+                    onEnabledIntent(SettingIntent.ClickNicknameChange)
+                },
             )
-            Spacer(modifier = Modifier.size(size = CaroTheme.spacing.s))
-            MenuSection(
-                modifier = Modifier.fillMaxWidth(),
-                items = firstMenu,
-                onClickMenu = onIntent,
+        }
+        Spacer(modifier = Modifier.size(size = CaroTheme.spacing.s))
+        MenuSection(
+            modifier = Modifier.fillMaxWidth(),
+            items = firstMenu,
+            onClickMenu = onEnabledIntent,
+        )
+        Spacer(modifier = Modifier.size(size = CaroTheme.spacing.s))
+        MenuSection(
+            modifier = Modifier.fillMaxWidth(),
+            items = secondMenu,
+            onClickMenu = onEnabledIntent,
+        )
+        Spacer(modifier = Modifier.weight(1f))
+        // FIXME: 임시 디자인 적용
+        Box(modifier = Modifier.fillMaxWidth()) {
+            Text(
+                modifier = Modifier.align(Alignment.Center),
+                text =
+                    stringResource(
+                        Res.string.setting_description_app_version,
+                        AppConfig.appVersion,
+                    ),
+                style = CaroTheme.typography.caption1.medium,
+                color = CaroTheme.color.text.tertiary,
             )
-            Spacer(modifier = Modifier.size(size = CaroTheme.spacing.s))
-            MenuSection(
-                modifier = Modifier.fillMaxWidth(),
-                items = secondMenu,
-                onClickMenu = onIntent,
-            )
-            Spacer(modifier = Modifier.weight(1f))
-            // FIXME: 임시 디자인 적용
-            Box(modifier = Modifier.fillMaxWidth()) {
-                Text(
-                    modifier = Modifier.align(Alignment.Center),
-                    text =
-                        stringResource(
-                            Res.string.setting_description_app_version,
-                            AppConfig.appVersion,
-                        ),
-                    style = CaroTheme.typography.caption1.medium,
-                    color = CaroTheme.color.text.tertiary,
-                )
-            }
         }
     }
 }
 
 private val ProfileImageSize = 32.dp
+private val NicknameSkeletonWidth = 223.dp
+private val NicknameSkeletonHeight = 21.dp
+private val EmailSkeletonWidth = 150.dp
+private val EmailSkeletonHeight = 17.dp
+private val SkeletonSpacing = 2.dp
 
 @Composable
 private fun UserInfo(
@@ -180,8 +188,6 @@ private fun UserInfo(
             SocialLoginType.APPLE -> Res.drawable.ic_logo_apple_small
             SocialLoginType.NONE -> null
         }
-
-    if (socialIcon == null && !isLoading) return
 
     Row(
         modifier =
@@ -210,19 +216,19 @@ private fun UserInfo(
                 Box(
                     modifier =
                         Modifier
-                            .width(223.dp)
-                            .height(21.dp)
+                            .width(NicknameSkeletonWidth)
+                            .height(NicknameSkeletonHeight)
                             .background(
                                 color = CaroTheme.color.border.complete,
                                 shape = CaroTheme.shape.xs,
                             ),
                 )
-                Spacer(modifier = Modifier.height(2.dp))
+                Spacer(modifier = Modifier.height(SkeletonSpacing))
                 Box(
                     modifier =
                         Modifier
-                            .width(150.dp)
-                            .height(17.dp)
+                            .width(EmailSkeletonWidth)
+                            .height(EmailSkeletonHeight)
                             .background(
                                 color = CaroTheme.color.surface.complete,
                                 shape = CaroTheme.shape.xs,
