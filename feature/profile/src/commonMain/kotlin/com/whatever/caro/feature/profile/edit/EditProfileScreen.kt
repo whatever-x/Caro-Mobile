@@ -47,10 +47,17 @@ internal fun EditProfileScreen(
                     modifier =
                         Modifier
                             .size(24.dp)
-                            .clickable { onIntent(EditProfileIntent.ClickBack) },
+                            .clickable(enabled = state.isLoading.not()) {
+                                onIntent(EditProfileIntent.ClickBack)
+                            },
                     painter = painterResource(Res.drawable.ic_arrow_left_24),
                     contentDescription = stringResource(Res.string.profile_content_description_back),
-                    tint = CaroTheme.color.icon.secondary,
+                    tint =
+                        if (state.isLoading) {
+                            CaroTheme.color.icon.disabled
+                        } else {
+                            CaroTheme.color.icon.secondary
+                        },
                 )
             },
             centerContent = {
@@ -67,6 +74,7 @@ internal fun EditProfileScreen(
             onValueChange = { onIntent(EditProfileIntent.UpdateNickname(it)) },
             onRefreshClick = { onIntent(EditProfileIntent.ClickRefresh) },
             characterCount = state.characterCount,
+            enabled = state.isLoading.not(),
             modifier =
                 Modifier
                     .fillMaxWidth()
