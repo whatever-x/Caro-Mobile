@@ -38,10 +38,11 @@ class ProfileRepositoryImplTest : FunSpec() {
                 val repository = ProfileRepositoryImpl(profileDataSource)
 
                 repository.getMyNickname() shouldBe "캐로"
+                verifySuspend { profileDataSource.getMyNickname() }
             }
         }
 
-        test("getMyNickname은 null 닉네임을 빈 문자열로 정규화한다") {
+        test("getMyNickname은 nullable 닉네임을 빈 문자열로 정규화한다") {
             runTest {
                 val profileDataSource =
                     mock<ProfileDataSource> {

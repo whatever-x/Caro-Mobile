@@ -102,7 +102,7 @@ internal fun com.whatever.caro.feature.learning.components.LearningCardPrimaryTe
     - modifier: STABLE (marked @Stable or @Immutable)
 
 @Composable
-internal fun com.whatever.caro.feature.learning.components.LearningCompletion(total: kotlin.Int, easy: kotlin.Int, fair: kotlin.Int, again: kotlin.Int, onClose: kotlin.Function0<kotlin.Unit>): kotlin.Unit
+internal fun com.whatever.caro.feature.learning.components.LearningCompletion(total: kotlin.Int, easy: kotlin.Int, fair: kotlin.Int, again: kotlin.Int, onClickBackToHome: kotlin.Function0<kotlin.Unit>): kotlin.Unit
   skippable: true
   restartable: true
   params:
@@ -110,7 +110,7 @@ internal fun com.whatever.caro.feature.learning.components.LearningCompletion(to
     - easy: STABLE (primitive type)
     - fair: STABLE (primitive type)
     - again: STABLE (primitive type)
-    - onClose: STABLE (function type)
+    - onClickBackToHome: STABLE (function type)
 
 @Composable
 internal fun com.whatever.caro.feature.learning.components.LearningErrorDialog(message: kotlin.String, onConfirm: kotlin.Function0<kotlin.Unit>): kotlin.Unit

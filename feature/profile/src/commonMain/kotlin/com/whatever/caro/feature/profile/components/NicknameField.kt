@@ -89,13 +89,13 @@ private fun NicknameHeader(onRefreshClick: () -> Unit) {
         ) {
             Text(
                 text = stringResource(Res.string.profile_field_label_nickname),
-                style = CaroTheme.typography.heading3,
+                style = CaroTheme.typography.body1,
                 color = CaroTheme.color.text.primary,
             )
             Text(
                 text = stringResource(Res.string.profile_field_required),
-                style = CaroTheme.typography.label1.bold,
-                color = CaroTheme.color.text.accent,
+                style = CaroTheme.typography.label2,
+                color = CaroTheme.color.text.dangerous,
             )
         }
 

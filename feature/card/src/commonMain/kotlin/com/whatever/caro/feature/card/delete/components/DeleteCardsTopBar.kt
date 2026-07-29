@@ -49,7 +49,7 @@ internal fun SelectAllTextButton(onClick: () -> Unit) {
     Text(
         modifier = Modifier.noRippleClickable(onClick = onClick),
         text = stringResource(Res.string.card_text_select_all),
-        style = CaroTheme.typography.body1.semiBold,
+        style = CaroTheme.typography.body1,
         color = CaroTheme.color.text.brand,
     )
 }

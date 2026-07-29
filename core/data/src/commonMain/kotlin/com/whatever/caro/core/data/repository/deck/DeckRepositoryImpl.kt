@@ -24,13 +24,18 @@ internal class DeckRepositoryImpl(
     override suspend fun createDeck(
         name: String,
         description: String,
-    ) {
+    ): Deck {
         val request =
             CreateDeckRequest(
                 name = name,
                 description = description,
             )
-        deckDataSource.createDeck(request = request)
+        return deckDataSource
+            .createDeck(request = request)
+            .toDeckModel(
+                fallbackName = name,
+                fallbackDescription = description,
+            )
     }
 
     override suspend fun updateDeck(

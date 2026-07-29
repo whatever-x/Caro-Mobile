@@ -2,7 +2,6 @@ package com.whatever.caro.feature.setting
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -18,7 +17,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -157,7 +155,7 @@ internal fun SettingScreen(
                             Res.string.setting_description_app_version,
                             AppConfig.appVersion,
                         ),
-                    style = CaroTheme.typography.caption2.regular,
+                    style = CaroTheme.typography.caption1.medium,
                     color = CaroTheme.color.text.tertiary,
                 )
             }
@@ -186,29 +184,22 @@ private fun UserInfo(
             SocialLoginType.NONE -> null
         }
 
+    if (socialIcon == null && !isLoading) return
+
     Row(
         modifier =
             modifier
                 .fillMaxWidth()
-                .padding(horizontal = CaroTheme.spacing.xl, vertical = CaroTheme.spacing.xl),
+                .padding(horizontal = 28.dp, vertical = CaroTheme.spacing.xl),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Box(
-            modifier =
-                Modifier
-                    .size(ProfileImageSize)
-                    .background(
-                        color = CaroTheme.color.surface.primary,
-                        shape = CaroTheme.shape.xxl,
-                    ).border(
-                        width = 1.dp,
-                        color = CaroTheme.color.border.tertiary,
-                        shape = CaroTheme.shape.xxl,
-                    ),
+            modifier = Modifier.size(ProfileImageSize),
             contentAlignment = Alignment.Center,
         ) {
             socialIcon?.let {
                 Image(
+                    modifier = Modifier.size(ProfileImageSize),
                     painter = painterResource(it),
                     contentDescription = null,
                 )
@@ -225,7 +216,7 @@ private fun UserInfo(
                             .width(223.dp)
                             .height(21.dp)
                             .background(
-                                color = CaroTheme.color.skeleton.primary,
+                                color = CaroTheme.color.border.complete,
                                 shape = CaroTheme.shape.xs,
                             ),
                 )
@@ -236,7 +227,7 @@ private fun UserInfo(
                             .width(150.dp)
                             .height(17.dp)
                             .background(
-                                color = CaroTheme.color.skeleton.secondary,
+                                color = CaroTheme.color.surface.complete,
                                 shape = CaroTheme.shape.xs,
                             ),
                 )
@@ -250,7 +241,7 @@ private fun UserInfo(
                 )
                 Text(
                     text = emailAddress,
-                    style = CaroTheme.typography.body4.regular,
+                    style = CaroTheme.typography.body2.medium,
                     color = CaroTheme.color.text.secondary,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
@@ -301,7 +292,7 @@ private fun UserInfoPreview() {
             modifier =
                 Modifier
                     .fillMaxWidth()
-                    .background(color = Color(0xFFFFFFFF)),
+                    .background(color = CaroTheme.color.surface.primary),
             nickname = "승우",
             emailAddress = "rsw1452@gmail.com",
             socialLoginType = SocialLoginType.GOOGLE,

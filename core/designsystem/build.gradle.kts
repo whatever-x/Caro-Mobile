@@ -3,6 +3,7 @@ plugins {
     id("caro.kmp.android")
     id("caro.kmp.ios")
     id("caro.cmp")
+    id("caro.kmp.test")
 }
 
 kotlin {

@@ -5,6 +5,8 @@ import com.whatever.caro.core.model.card.CardContent
 import com.whatever.caro.core.model.card.DeckCard
 import com.whatever.caro.core.model.deck.Deck
 import com.whatever.caro.core.model.deck.DeckState
+import com.whatever.caro.core.model.exception.CaroInvalidResponseException
+import com.whatever.caro.core.remote.dto.deck.response.CreateDeckResponse
 import com.whatever.caro.core.remote.dto.deck.response.DeckCardResponse
 import com.whatever.caro.core.remote.dto.deck.response.DeckListResponse
 import com.whatever.caro.core.remote.dto.studySession.response.StudySessionProgressResponseDto
@@ -43,6 +45,20 @@ internal fun DeckListResponse.toDeckModel() =
         todayLearningCount = this.progress?.totalCardCount ?: 0,
         todayCompleteCount = this.progress?.studiedCardCount ?: 0,
         state = this.progress?.state.toDeckState(),
+    )
+
+internal fun CreateDeckResponse.toDeckModel(
+    fallbackName: String,
+    fallbackDescription: String,
+): Deck =
+    Deck(
+        id = id ?: throw CaroInvalidResponseException(debugMessage = "CreateDeckResponse.id is null"),
+        title = deckName ?: fallbackName,
+        description = deckDescription ?: fallbackDescription,
+        cardTotalCount = 0,
+        todayLearningCount = 0,
+        todayCompleteCount = 0,
+        state = DeckState.NOT_STARTED,
     )
 
 internal fun StudySessionProgressResponseDto.StateDto?.toDeckState() =

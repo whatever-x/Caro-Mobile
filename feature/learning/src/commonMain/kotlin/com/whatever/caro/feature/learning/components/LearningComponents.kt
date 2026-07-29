@@ -1,5 +1,6 @@
 package com.whatever.caro.feature.learning.components
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -29,6 +30,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -41,6 +43,7 @@ import caromobile.core.designsystem.generated.resources.ic_arrow_up_24
 import caromobile.core.designsystem.generated.resources.ic_check_24
 import caromobile.core.designsystem.generated.resources.learning_again
 import caromobile.core.designsystem.generated.resources.learning_back
+import caromobile.core.designsystem.generated.resources.learning_complete_description
 import caromobile.core.designsystem.generated.resources.learning_complete_title
 import caromobile.core.designsystem.generated.resources.learning_continue
 import caromobile.core.designsystem.generated.resources.learning_dialog_confirm
@@ -57,6 +60,9 @@ import caromobile.core.designsystem.generated.resources.learning_stop_title
 import caromobile.core.designsystem.generated.resources.learning_total
 import com.whatever.caro.core.designsystem.components.CaroDialog
 import com.whatever.caro.core.designsystem.themes.CaroTheme
+import io.github.alexzhirkevich.compottie.LottieCompositionSpec
+import io.github.alexzhirkevich.compottie.rememberLottieComposition
+import io.github.alexzhirkevich.compottie.rememberLottiePainter
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.painterResource
@@ -88,11 +94,14 @@ internal fun LearningTopBar(
             modifier =
                 Modifier
                     .background(CaroTheme.color.surface.tertiary, CaroTheme.shape.xxl)
-                    .padding(horizontal = CaroTheme.spacing.l, vertical = LearningProgressPillVerticalPadding),
+                    .padding(
+                        horizontal = CaroTheme.spacing.l,
+                        vertical = LearningProgressPillVerticalPadding,
+                    ),
         ) {
             Text(
                 text = "$current / $total",
-                style = CaroTheme.typography.caption1.regular,
+                style = CaroTheme.typography.label2,
                 color = CaroTheme.color.text.secondary,
             )
         }
@@ -136,7 +145,7 @@ internal fun LearningCard(
                     Text(
                         text = frontText,
                         style = CaroTheme.typography.body2.semiBold,
-                        color = CaroTheme.color.text.disable,
+                        color = CaroTheme.color.text.disabled,
                         textAlign = TextAlign.Center,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
@@ -199,7 +208,7 @@ internal fun LearningEvaluationControls(
         EvaluationButton(
             label = Res.string.learning_easy,
             icon = DesignRes.drawable.ic_arrow_left_24,
-            color = if (selectedIndex == 0) CaroTheme.color.button.pressed.easy else CaroTheme.color.surface.brand,
+            color = if (selectedIndex == 0) CaroTheme.color.surface.review else CaroTheme.color.surface.brand,
             selected = selectedIndex == 0,
             enabled = enabled,
             onClick = onEasy,
@@ -208,7 +217,7 @@ internal fun LearningEvaluationControls(
         EvaluationButton(
             label = Res.string.learning_fair,
             icon = DesignRes.drawable.ic_arrow_up_24,
-            color = if (selectedIndex == 1) CaroTheme.color.button.pressed.fair else CaroTheme.color.surface.inverse,
+            color = if (selectedIndex == 1) CaroTheme.color.surface.new else CaroTheme.color.surface.inverse,
             selected = selectedIndex == 1,
             enabled = enabled,
             onClick = onFair,
@@ -217,7 +226,7 @@ internal fun LearningEvaluationControls(
         EvaluationButton(
             label = Res.string.learning_again,
             icon = DesignRes.drawable.ic_arrow_right_24,
-            color = if (selectedIndex == 2) CaroTheme.color.button.pressed.hard else CaroTheme.color.surface.accent,
+            color = if (selectedIndex == 2) CaroTheme.color.surface.dangerous else CaroTheme.color.surface.accent,
             selected = selectedIndex == 2,
             enabled = enabled,
             onClick = onAgain,
@@ -249,14 +258,14 @@ private fun EvaluationButton(
         Icon(
             painter = painterResource(icon),
             contentDescription = null,
-            tint = if (selected) CaroTheme.color.icon.disable else CaroTheme.color.icon.inverse,
+            tint = if (selected) CaroTheme.color.icon.disabled else CaroTheme.color.icon.inverse,
             modifier = Modifier.size(LearningIconSize),
         )
         Spacer(Modifier.height(CaroTheme.spacing.xs))
         Text(
             text = stringResource(label),
             style = CaroTheme.typography.body2.semiBold,
-            color = if (selected) CaroTheme.color.text.disable else CaroTheme.color.text.inverse,
+            color = if (selected) CaroTheme.color.text.disabled else CaroTheme.color.text.inverse,
         )
     }
 }
@@ -280,7 +289,7 @@ internal fun LearningStopDialog(
                 Spacer(Modifier.height(CaroTheme.spacing.s))
                 Text(
                     text = stringResource(Res.string.learning_stop_body),
-                    style = CaroTheme.typography.body3,
+                    style = CaroTheme.typography.body2.medium,
                     color = CaroTheme.color.text.secondary,
                 )
                 if (evaluatedCount != null) {
@@ -353,7 +362,7 @@ internal fun LearningErrorDialog(
                 Spacer(Modifier.height(CaroTheme.spacing.s))
                 Text(
                     text = message,
-                    style = CaroTheme.typography.body3,
+                    style = CaroTheme.typography.body2.medium,
                     color = CaroTheme.color.text.secondary,
                 )
                 Spacer(Modifier.height(CaroTheme.spacing.m))
@@ -400,16 +409,28 @@ private fun DialogAction(
     }
 }
 
+private const val LOTTIE_CHECK_POP_PATH = "files/lottie_check_pop.json"
+internal const val LEARNING_COMPLETION_ANIMATION_ITERATIONS = 1
+
 @Composable
 internal fun LearningCompletion(
     total: Int,
     easy: Int,
     fair: Int,
     again: Int,
-    onClose: () -> Unit,
+    onClickBackToHome: () -> Unit,
 ) {
+    val composition by rememberLottieComposition {
+        LottieCompositionSpec.JsonString(
+            Res.readBytes(path = LOTTIE_CHECK_POP_PATH).decodeToString(),
+        )
+    }
+
     Column(
-        modifier = Modifier.fillMaxSize().background(CaroTheme.color.background.primary),
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .background(CaroTheme.color.background.primary),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Column(
@@ -421,25 +442,33 @@ internal fun LearningCompletion(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
         ) {
-            Box(
+            Image(
                 modifier =
                     Modifier
                         .size(LearningCompletionAssetSize)
-                        .background(CaroTheme.color.surface.info, CircleShape),
-                contentAlignment = Alignment.Center,
-            ) {
-                Icon(
-                    painter = painterResource(DesignRes.drawable.ic_check_24),
-                    contentDescription = null,
-                    tint = CaroTheme.color.icon.primary,
-                    modifier = Modifier.size(LearningCompletionCheckIconSize),
-                )
-            }
+                        .background(color = CaroTheme.color.background.primary),
+                painter =
+                    rememberLottiePainter(
+                        composition = composition,
+                        iterations = LEARNING_COMPLETION_ANIMATION_ITERATIONS,
+                    ),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+            )
             Spacer(Modifier.height(CaroTheme.spacing.xl3))
             Text(
+                modifier = Modifier.fillMaxWidth(),
                 text = stringResource(Res.string.learning_complete_title),
                 style = CaroTheme.typography.heading1,
                 color = CaroTheme.color.text.primary,
+                textAlign = TextAlign.Center,
+            )
+            Spacer(Modifier.height(CaroTheme.spacing.s))
+            Text(
+                modifier = Modifier.fillMaxWidth(),
+                text = stringResource(Res.string.learning_complete_description),
+                style = CaroTheme.typography.heading3,
+                color = CaroTheme.color.text.tertiary,
                 textAlign = TextAlign.Center,
             )
             Spacer(Modifier.height(CaroTheme.spacing.xl3))
@@ -513,7 +542,7 @@ internal fun LearningCompletion(
                         .fillMaxWidth()
                         .clip(CaroTheme.shape.xxl)
                         .background(CaroTheme.color.surface.brand)
-                        .clickable(onClick = onClose)
+                        .clickable(onClick = onClickBackToHome)
                         .padding(
                             horizontal = CaroTheme.spacing.xl,
                             vertical = CaroTheme.spacing.l,
@@ -522,7 +551,7 @@ internal fun LearningCompletion(
             ) {
                 Text(
                     text = stringResource(Res.string.learning_home),
-                    style = CaroTheme.typography.label1.regular,
+                    style = CaroTheme.typography.label1,
                     color = CaroTheme.color.text.inverse,
                 )
             }
@@ -576,7 +605,6 @@ private val LearningEvaluationButtonHeight = 68.dp
 private val LearningDialogActionHeight = 38.dp
 private val LearningDialogBorderWidth = 1.dp
 private val LearningCompletionAssetSize = 70.dp
-private val LearningCompletionCheckIconSize = 36.dp
 private val LearningCompletionStatsHeight = 100.dp
 private val LearningCompletionStatHeight = 69.dp
 private val LearningCompletionBorderWidth = 1.dp
@@ -609,7 +637,7 @@ private fun LearningCardBackPreview() {
                 backText = "사과",
                 isFlipped = true,
                 swipeColorArgb =
-                    CaroTheme.color.button.surface.fair
+                    CaroTheme.color.surface.new
                         .toArgb(),
                 swipeProgress = 1f,
                 onFlip = {},
@@ -663,6 +691,6 @@ private fun AllLearningStopDialogPreview() {
 @Composable
 private fun LearningCompletionPreview() {
     CaroTheme {
-        LearningCompletion(total = 40, easy = 23, fair = 12, again = 5, onClose = {})
+        LearningCompletion(total = 40, easy = 23, fair = 12, again = 5, onClickBackToHome = {})
     }
 }

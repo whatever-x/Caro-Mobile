@@ -92,7 +92,7 @@ internal fun Deck(
         Spacer(modifier = Modifier.size(size = CaroTheme.spacing.s))
         Text(
             text = description,
-            style = CaroTheme.typography.body3,
+            style = CaroTheme.typography.body2.medium,
             color = CaroTheme.color.text.secondary,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
@@ -118,7 +118,7 @@ internal fun Deck(
                             Res.string.home_deck_card_total_count,
                             cardTotalCount.formatWithComma(),
                         ),
-                    style = CaroTheme.typography.body3,
+                    style = CaroTheme.typography.body2.medium,
                     color = CaroTheme.color.text.tertiary,
                 )
                 if (state != DeckState.REST_DAY) {
@@ -188,7 +188,7 @@ private fun ProgressContent(
                     Text(
                         text = stringResource(Res.string.home_deck_rest_title),
                         color = CaroTheme.color.text.rest,
-                        style = CaroTheme.typography.caption2.bold,
+                        style = CaroTheme.typography.caption2.medium,
                     )
                     Text(
                         text = stringResource(Res.string.home_deck_rest_description1),
@@ -233,7 +233,7 @@ private fun CtaButton(
     ) {
         Text(
             text = stringResource(resource = stringRes),
-            style = CaroTheme.typography.body1.regular,
+            style = CaroTheme.typography.body1,
             color = CaroTheme.color.text.brand,
         )
     }
@@ -258,8 +258,8 @@ private fun DeckStateBadge(
         }
     val textColor =
         when (state) {
-            DeckState.NOT_STARTED, DeckState.LEARNING -> CaroTheme.color.text.ready
-            DeckState.COMPLETE -> CaroTheme.color.text.complete
+            DeckState.NOT_STARTED, DeckState.LEARNING -> CaroTheme.color.text.brand
+            DeckState.COMPLETE -> CaroTheme.color.text.secondary
             DeckState.REST_DAY -> CaroTheme.color.text.rest
         }
     val stringRes =

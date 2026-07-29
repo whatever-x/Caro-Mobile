@@ -22,7 +22,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -69,7 +68,7 @@ fun LearningScreen(
             LearningMessage(
                 stringResource(Res.string.learning_rest),
                 stringResource(Res.string.learning_close),
-            ) { onIntent(LearningIntent.Close) }
+            ) { onIntent(LearningIntent.ClickBackButton) }
         }
 
         state.isCompleted -> {
@@ -79,7 +78,7 @@ fun LearningScreen(
                 easy = ratingCounts?.easy ?: state.evaluations.count { it.rating == StudyRating.EASY },
                 fair = ratingCounts?.fair ?: state.evaluations.count { it.rating == StudyRating.FAIR },
                 again = ratingCounts?.again ?: state.evaluations.count { it.rating == StudyRating.AGAIN },
-                onClose = { onIntent(LearningIntent.Close) },
+                onClickBackToHome = { onIntent(LearningIntent.ClickNavigateToHome) },
             )
         }
 
@@ -120,8 +119,8 @@ private fun LearningContent(
         LinearProgressIndicator(
             progress = { ((state.progress + 1).toFloat() / state.totalCount.coerceAtLeast(1)).coerceIn(0f, 1f) },
             modifier = Modifier.fillMaxWidth().height(LearningProgressHeight),
-            color = LearningProgressFillColor,
-            trackColor = LearningProgressTrackColor,
+            color = CaroTheme.color.border.progress,
+            trackColor = CaroTheme.color.surface.progress,
         )
         key(card.id) {
             val swipeState = rememberSwipeGestureState()
@@ -182,7 +181,7 @@ private fun LearningContent(
                     .fillMaxWidth()
                     .height(LearningInstructionHeight)
                     .padding(top = CaroTheme.spacing.m),
-            style = CaroTheme.typography.body3,
+            style = CaroTheme.typography.body2.medium,
             color = CaroTheme.color.text.primary,
             textAlign = TextAlign.Center,
         )
@@ -203,17 +202,17 @@ internal suspend fun runEvaluationTransition(
 private fun SwipeDirection?.feedbackColorArgb(): Int =
     when (this) {
         SwipeDirection.LEFT -> {
-            CaroTheme.color.button.surface.easy
+            CaroTheme.color.surface.review
                 .toArgb()
         }
 
         SwipeDirection.UP -> {
-            CaroTheme.color.button.surface.fair
+            CaroTheme.color.surface.new
                 .toArgb()
         }
 
         SwipeDirection.RIGHT -> {
-            CaroTheme.color.button.surface.hard
+            CaroTheme.color.surface.dangerous
                 .toArgb()
         }
 
@@ -290,8 +289,6 @@ private fun LearningMessage(
 }
 
 private val LearningProgressHeight = 5.dp
-private val LearningProgressFillColor = Color(0xFF7DB4FF)
-private val LearningProgressTrackColor = Color(0xFFEFF4F8)
 private val LearningInstructionHeight = 44.dp
 private val LearningMessageActionHeight = 52.dp
 

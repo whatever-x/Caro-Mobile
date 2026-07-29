@@ -34,9 +34,7 @@ fun SplashRoute(
 
                 SplashSideEffect.NavigateHome -> {
                     navDispatcher.emit(
-                        NavCommand.To(
-                            HomeEntry,
-                        ),
+                        NavCommand.To(HomeEntry),
                     )
                 }
             }

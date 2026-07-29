@@ -9,6 +9,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.savedstate.serialization.SavedStateConfiguration
@@ -20,6 +22,7 @@ import com.whatever.caro.core.model.auth.AuthSessionEvent
 import com.whatever.caro.core.model.auth.AuthSessionEventBus
 import com.whatever.caro.core.navigator.contract.NavCommand
 import com.whatever.caro.core.navigator.dispatcher.NavigationDispatcher
+import com.whatever.caro.core.navigator.entries.CardDetailEntry
 import com.whatever.caro.core.navigator.entries.CreateCardEntry
 import com.whatever.caro.core.navigator.entries.CreateDeckEntry
 import com.whatever.caro.core.navigator.entries.CreateProfileEntry
@@ -39,6 +42,11 @@ import io.github.aakira.napier.Napier
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
 import org.koin.compose.koinInject
+
+private val HomeSnackbarBottomPadding = 88.dp
+
+internal fun snackbarHostBottomPadding(currentDestination: NavKey?): Dp =
+    if (currentDestination is HomeEntry) HomeSnackbarBottomPadding else 0.dp
 
 @Composable
 fun CaroApp(
@@ -61,6 +69,7 @@ fun CaroApp(
                             subclass(CreateDeckEntry::class, CreateDeckEntry.serializer())
                             subclass(DeckDetailEntry::class, DeckDetailEntry.serializer())
                             subclass(CreateCardEntry::class, CreateCardEntry.serializer())
+                            subclass(CardDetailEntry::class, CardDetailEntry.serializer())
                             subclass(EditCardEntry::class, EditCardEntry.serializer())
                             subclass(DeleteCardsEntry::class, DeleteCardsEntry.serializer())
                             subclass(HomeEntry::class, HomeEntry.serializer())
@@ -115,6 +124,7 @@ fun CaroApp(
     }
     CaroTheme {
         val snackBarHostState = remember { SnackbarHostState() }
+        val snackbarBottomPadding = snackbarHostBottomPadding(backStack.lastOrNull())
 
         LaunchedEffect(snackbarController, snackBarHostState) {
             snackbarController.messages.collect { snackbar ->
@@ -124,6 +134,8 @@ fun CaroApp(
                     message = snackbar.message,
                     style = snackbar.style,
                     duration = snackbar.duration,
+                    actionLabel = snackbar.actionLabel,
+                    onAction = snackbar.onAction,
                 )
             }
         }
@@ -132,7 +144,7 @@ fun CaroApp(
             modifier = Modifier.fillMaxSize(),
             snackbarHost = {
                 CaroSnackBarHost(
-                    modifier = Modifier,
+                    modifier = Modifier.padding(bottom = snackbarBottomPadding),
                     hostState = snackBarHostState,
                     snackbar = { snackbarData ->
                         CaroSnackbar(

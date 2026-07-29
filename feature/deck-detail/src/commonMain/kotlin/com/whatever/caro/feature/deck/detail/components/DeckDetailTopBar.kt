@@ -62,7 +62,9 @@ internal fun DeckDetailTopBar(
                         Modifier
                             .size(width = 100.dp, height = 21.dp)
                             .background(
-                                color = CaroTheme.color.skeleton.inverse,
+                                color =
+                                    CaroTheme.color.surface.primary
+                                        .copy(alpha = 0.2f),
                                 shape = CaroTheme.shape.xs,
                             ),
                 )

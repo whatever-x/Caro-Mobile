@@ -6,6 +6,7 @@ import com.whatever.caro.core.model.card.CardBadge
 import com.whatever.caro.core.model.card.CardContent
 import com.whatever.caro.core.model.card.DeckCard
 import com.whatever.caro.core.model.deck.Deck
+import com.whatever.caro.core.model.deck.DeckState
 import com.whatever.caro.core.model.exception.CaroServerException
 import com.whatever.caro.core.model.learning.LearningMode
 import com.whatever.caro.core.model.learning.StudyCard
@@ -114,6 +115,32 @@ class LearningViewModelTest :
             }
         }
 
+        test("ClickBackButton은 PopBackStack을 방출한다") {
+            runTest(dispatcher) {
+                val viewModel = createViewModel(emptyList())
+
+                viewModel.sideEffect.test {
+                    viewModel.intent(LearningIntent.ClickBackButton)
+
+                    awaitItem() shouldBe LearningSideEffect.PopBackStack
+                    cancelAndIgnoreRemainingEvents()
+                }
+            }
+        }
+
+        test("ClickNavigateToHome은 NavigateToHome을 방출한다") {
+            runTest(dispatcher) {
+                val viewModel = createViewModel(emptyList())
+
+                viewModel.sideEffect.test {
+                    viewModel.intent(LearningIntent.ClickNavigateToHome)
+
+                    awaitItem() shouldBe LearningSideEffect.NavigateToHome
+                    cancelAndIgnoreRemainingEvents()
+                }
+            }
+        }
+
         test("일일 학습 중단 시 이전까지 평가한 카드를 제출한 뒤 화면을 닫는다") {
             runTest(dispatcher) {
                 val study =
@@ -143,7 +170,7 @@ class LearningViewModelTest :
                     runCurrent()
                     expectNoEvents()
                     study.submitGate?.complete(Unit)
-                    awaitItem() shouldBe LearningSideEffect.NavigateBack
+                    awaitItem() shouldBe LearningSideEffect.PopBackStack
                     study.submittedSessionId shouldBe 42L
                     study.submittedEvaluations shouldBe viewModel.state.value.evaluations
                     study.submittedIdempotencyKey?.isNotBlank() shouldBe true
@@ -178,7 +205,7 @@ class LearningViewModelTest :
                     viewModel.intent(LearningIntent.ConfirmStop)
                     advanceUntilIdle()
 
-                    awaitItem() shouldBe LearningSideEffect.NavigateBack
+                    awaitItem() shouldBe LearningSideEffect.PopBackStack
                     expectNoEvents()
                     study.submitCount shouldBe 1
                     cancelAndIgnoreRemainingEvents()
@@ -221,7 +248,7 @@ class LearningViewModelTest :
                     viewModel.state.value.showStopDialog shouldBe false
 
                     viewModel.intent(LearningIntent.ConfirmError)
-                    awaitItem() shouldBe LearningSideEffect.NavigateBack
+                    awaitItem() shouldBe LearningSideEffect.PopBackStack
                     study.submitCount shouldBe 1
                     cancelAndIgnoreRemainingEvents()
                 }
@@ -299,7 +326,7 @@ class LearningViewModelTest :
 
                 viewModel.sideEffect.test {
                     viewModel.intent(LearningIntent.ConfirmStop)
-                    awaitItem() shouldBe LearningSideEffect.NavigateBack
+                    awaitItem() shouldBe LearningSideEffect.PopBackStack
                     study.submitCount shouldBe 0
                     cancelAndIgnoreRemainingEvents()
                 }
@@ -318,7 +345,7 @@ class LearningViewModelTest :
 
                 viewModel.sideEffect.test {
                     viewModel.intent(LearningIntent.ConfirmStop)
-                    awaitItem() shouldBe LearningSideEffect.NavigateBack
+                    awaitItem() shouldBe LearningSideEffect.PopBackStack
                     study.submitCount shouldBe 0
                     cancelAndIgnoreRemainingEvents()
                 }
@@ -339,7 +366,7 @@ class LearningViewModelTest :
 
                 viewModel.sideEffect.test {
                     viewModel.intent(LearningIntent.RequestStop)
-                    awaitItem() shouldBe LearningSideEffect.NavigateBack
+                    awaitItem() shouldBe LearningSideEffect.PopBackStack
                     viewModel.state.value.showStopDialog shouldBe false
                     cancelAndIgnoreRemainingEvents()
                 }
@@ -392,7 +419,16 @@ private class FakeDeckRepository(
     override suspend fun createDeck(
         name: String,
         description: String,
-    ) = Unit
+    ): Deck =
+        Deck(
+            id = 1L,
+            title = name,
+            description = description,
+            cardTotalCount = 0,
+            todayLearningCount = 0,
+            todayCompleteCount = 0,
+            state = DeckState.NOT_STARTED,
+        )
 
     override suspend fun updateDeck(
         deckId: Long,

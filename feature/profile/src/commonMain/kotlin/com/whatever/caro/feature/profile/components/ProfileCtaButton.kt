@@ -20,7 +20,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import caromobile.core.designsystem.generated.resources.Res
@@ -53,7 +52,7 @@ internal fun ProfileCtaButton(
         if (enabled || isLoading) {
             CaroTheme.color.surface.brand to CaroTheme.color.text.inverse
         } else {
-            CaroTheme.color.surface.info to Color(0xFFA4B5FB)
+            CaroTheme.color.surface.disabled to CaroTheme.color.text.disabled
         }
 
     Box(
@@ -94,7 +93,7 @@ internal fun ProfileCtaButton(
             } else {
                 Text(
                     text = text,
-                    style = CaroTheme.typography.label1.bold,
+                    style = CaroTheme.typography.label1,
                     color = textColor,
                 )
             }
