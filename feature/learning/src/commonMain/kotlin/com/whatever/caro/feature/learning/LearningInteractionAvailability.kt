@@ -32,6 +32,6 @@ internal fun learningInteractionAvailability(
     hasPendingRating: Boolean,
 ): LearningInteractionAvailability =
     LearningInteractionAvailability(
-        swipeEnabled = !isSubmitting,
+        swipeEnabled = !isSubmitting && !hasPendingRating,
         evaluationEnabled = !isSubmitting && !hasPendingRating,
     )

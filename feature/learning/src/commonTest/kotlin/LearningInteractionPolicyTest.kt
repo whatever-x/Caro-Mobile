@@ -17,13 +17,13 @@ class LearningInteractionPolicyTest : FunSpec() {
                 )
         }
 
-        test("버튼 평가 애니메이션 중에는 버튼 중복 입력만 막는다") {
+        test("버튼 평가 애니메이션 중에는 모든 추가 평가 입력을 막는다") {
             learningInteractionAvailability(
                 isSubmitting = false,
                 hasPendingRating = true,
             ) shouldBe
                 LearningInteractionAvailability(
-                    swipeEnabled = true,
+                    swipeEnabled = false,
                     evaluationEnabled = false,
                 )
         }
