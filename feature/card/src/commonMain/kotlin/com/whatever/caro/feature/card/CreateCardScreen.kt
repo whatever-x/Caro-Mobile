@@ -64,7 +64,7 @@ import com.whatever.caro.core.designsystem.components.CaroTextArea
 import com.whatever.caro.core.designsystem.components.CaroTopBar
 import com.whatever.caro.core.designsystem.themes.CaroTheme
 import com.whatever.caro.core.model.card.CardContent
-import com.whatever.caro.core.ui.loading.CaroLoadingOverlay
+import com.whatever.caro.core.ui.loading.CaroLoadingOverlayBox
 import com.whatever.caro.feature.card.mvi.CreateCardIntent
 import com.whatever.caro.feature.card.mvi.CreateCardState
 import com.whatever.caro.feature.card.mvi.StagedCard
@@ -90,7 +90,7 @@ internal fun CreateCardScreen(
     state: CreateCardState,
     onIntent: (CreateCardIntent) -> Unit,
 ) {
-    Box(modifier = Modifier.fillMaxSize()) {
+    CaroLoadingOverlayBox(isLoading = state.isSaving) {
         Column(
             modifier =
                 Modifier
@@ -168,9 +168,6 @@ internal fun CreateCardScreen(
                 onAdd = { onIntent(CreateCardIntent.ClickAddCard) },
                 onSave = { onIntent(CreateCardIntent.ClickSave) },
             )
-        }
-        if (state.isSaving) {
-            CaroLoadingOverlay()
         }
     }
 }

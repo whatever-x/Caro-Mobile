@@ -42,7 +42,7 @@ import com.whatever.caro.core.designsystem.components.CaroTextArea
 import com.whatever.caro.core.designsystem.components.CaroTextField
 import com.whatever.caro.core.designsystem.components.CaroTopBar
 import com.whatever.caro.core.designsystem.themes.CaroTheme
-import com.whatever.caro.core.ui.loading.CaroLoadingOverlay
+import com.whatever.caro.core.ui.loading.CaroLoadingOverlayBox
 import com.whatever.caro.feature.deck.component.CtaButton
 import com.whatever.caro.feature.deck.component.DeckTipSection
 import com.whatever.caro.feature.deck.component.FieldCounter
@@ -65,7 +65,7 @@ internal fun CreateDeckScreen(
         nameFocusRequester.requestFocus()
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    CaroLoadingOverlayBox(isLoading = state.isLoading) {
         Column(
             modifier =
                 Modifier
@@ -155,9 +155,6 @@ internal fun CreateDeckScreen(
                         ),
                 text = stringResource(Res.string.deck_button_create),
             )
-        }
-        if (state.isLoading) {
-            CaroLoadingOverlay()
         }
     }
 }

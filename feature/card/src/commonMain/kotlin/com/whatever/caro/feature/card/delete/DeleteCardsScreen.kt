@@ -14,7 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.whatever.caro.core.designsystem.components.CaroTopBar
 import com.whatever.caro.core.designsystem.themes.CaroTheme
-import com.whatever.caro.core.ui.loading.CaroLoadingOverlay
+import com.whatever.caro.core.ui.loading.CaroLoadingOverlayBox
 import com.whatever.caro.feature.card.delete.components.DeleteBottomBar
 import com.whatever.caro.feature.card.delete.components.DeleteCardListItem
 import com.whatever.caro.feature.card.delete.components.DeleteCardsTopBarTitle
@@ -28,7 +28,7 @@ internal fun DeleteCardsScreen(
     state: DeleteCardsState,
     onIntent: (DeleteCardsIntent) -> Unit,
 ) {
-    Box(modifier = Modifier.fillMaxSize()) {
+    CaroLoadingOverlayBox(isLoading = state.isLoading || state.isDeleting) {
         Column(
             modifier =
                 Modifier
@@ -84,10 +84,6 @@ internal fun DeleteCardsScreen(
                 onDelete = { onIntent(DeleteCardsIntent.ClickDeleteConfirm) },
                 onCancel = { onIntent(DeleteCardsIntent.ClickDeleteCancel) },
             )
-        }
-
-        if (state.isLoading || state.isDeleting) {
-            CaroLoadingOverlay()
         }
     }
 }

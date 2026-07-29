@@ -40,7 +40,7 @@ import caromobile.core.designsystem.generated.resources.setting_userinfo_nicknam
 import com.whatever.caro.core.designsystem.components.CaroTopBar
 import com.whatever.caro.core.designsystem.themes.CaroTheme
 import com.whatever.caro.core.model.auth.SocialLoginType
-import com.whatever.caro.core.ui.loading.CaroLoadingOverlay
+import com.whatever.caro.core.ui.loading.CaroLoadingOverlayBox
 import com.whatever.caro.core.ui.modifier.noRippleClickable
 import com.whatever.caro.feature.setting.component.MenuSection
 import com.whatever.caro.feature.setting.model.AppConfig
@@ -94,7 +94,7 @@ internal fun SettingScreen(
     state: SettingState,
     onIntent: (SettingIntent) -> Unit,
 ) {
-    Box(modifier = Modifier.fillMaxSize()) {
+    CaroLoadingOverlayBox(isLoading = state.isLoading) {
         Column(
             modifier =
                 Modifier
@@ -159,9 +159,6 @@ internal fun SettingScreen(
                     color = CaroTheme.color.text.tertiary,
                 )
             }
-        }
-        if (state.isLoading) {
-            CaroLoadingOverlay()
         }
     }
 }

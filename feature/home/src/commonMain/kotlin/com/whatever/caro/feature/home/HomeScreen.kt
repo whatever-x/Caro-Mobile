@@ -49,7 +49,7 @@ import com.whatever.caro.core.designsystem.components.CaroTopBar
 import com.whatever.caro.core.designsystem.themes.CaroTheme
 import com.whatever.caro.core.model.deck.Deck
 import com.whatever.caro.core.model.deck.DeckState
-import com.whatever.caro.core.ui.loading.CaroLoadingOverlay
+import com.whatever.caro.core.ui.loading.CaroLoadingOverlayBox
 import com.whatever.caro.core.ui.modifier.noRippleClickable
 import com.whatever.caro.feature.home.component.Deck
 import com.whatever.caro.feature.home.mvi.HomeIntent
@@ -82,7 +82,8 @@ internal fun HomeScreen(
         LottieCompositionSpec.Resource(Res.getUri("files/arrow_down_bounce.json")),
     )
 
-    Box(
+    CaroLoadingOverlayBox(
+        isLoading = state.isLoading,
         modifier =
             Modifier
                 .fillMaxSize()
@@ -221,9 +222,6 @@ internal fun HomeScreen(
                     )
                 }
             }
-        }
-        if (state.isLoading) {
-            CaroLoadingOverlay()
         }
     }
 }

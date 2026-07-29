@@ -15,7 +15,7 @@ import androidx.compose.ui.unit.dp
 import com.whatever.caro.core.designsystem.themes.CaroTheme
 import com.whatever.caro.core.model.deck.Deck
 import com.whatever.caro.core.model.deck.DeckState
-import com.whatever.caro.core.ui.loading.CaroLoadingOverlay
+import com.whatever.caro.core.ui.loading.CaroLoadingOverlayBox
 import com.whatever.caro.feature.deck.detail.components.DeckDetailGuid
 import com.whatever.caro.feature.deck.detail.components.DeckDetailTopBar
 import com.whatever.caro.feature.deck.detail.components.DeckEditBottomSheet
@@ -33,7 +33,7 @@ internal fun DeckDetailScreen(
     state: DeckDetailState,
     onIntent: (DeckDetailIntent) -> Unit,
 ) {
-    Box(modifier = Modifier.fillMaxSize()) {
+    CaroLoadingOverlayBox(isLoading = state.isCardListLoading) {
         Column(
             modifier =
                 Modifier
@@ -129,10 +129,6 @@ internal fun DeckDetailScreen(
                 onDeleteDeck = { onIntent(DeckDetailIntent.ClickDeckEditBottomSheetDelete) },
                 onDismissRequest = { onIntent(DeckDetailIntent.DismissDeckEditBottomSheet) },
             )
-        }
-
-        if (state.isCardListLoading) {
-            CaroLoadingOverlay()
         }
     }
 }

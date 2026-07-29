@@ -48,7 +48,7 @@ import caromobile.core.designsystem.generated.resources.ic_switch_16
 import com.whatever.caro.core.designsystem.components.CaroTextArea
 import com.whatever.caro.core.designsystem.components.CaroTopBar
 import com.whatever.caro.core.designsystem.themes.CaroTheme
-import com.whatever.caro.core.ui.loading.CaroLoadingOverlay
+import com.whatever.caro.core.ui.loading.CaroLoadingOverlayBox
 import com.whatever.caro.feature.card.mvi.EditCardIntent
 import com.whatever.caro.feature.card.mvi.EditCardState
 import org.jetbrains.compose.resources.painterResource
@@ -66,7 +66,7 @@ internal fun EditCardScreen(
     state: EditCardState,
     onIntent: (EditCardIntent) -> Unit,
 ) {
-    Box(modifier = Modifier.fillMaxSize()) {
+    CaroLoadingOverlayBox(isLoading = state.isSaving) {
         Column(
             modifier =
                 Modifier
@@ -133,9 +133,6 @@ internal fun EditCardScreen(
                 enabled = state.isSaveEnabled,
                 onClick = { onIntent(EditCardIntent.ClickSave) },
             )
-        }
-        if (state.isSaving) {
-            CaroLoadingOverlay()
         }
     }
 }
