@@ -126,7 +126,11 @@ private fun LearningContent(
             val swipeState = rememberSwipeGestureState()
             var pendingRating by remember { mutableStateOf<StudyRating?>(null) }
             val selectedDirection = pendingRating?.toSwipeDirection() ?: swipeState.currentDirection
-            val selectedIndex = selectedDirection.toEvaluationIndex()
+            val interactionAvailability =
+                learningInteractionAvailability(
+                    isSubmitting = state.isSubmitting,
+                    hasPendingRating = pendingRating != null,
+                )
 
             LaunchedEffect(pendingRating) {
                 val rating = pendingRating ?: return@LaunchedEffect
@@ -158,14 +162,13 @@ private fun LearningContent(
                             .fillMaxSize()
                             .swipeGesture(
                                 state = swipeState,
-                                enabled = state.isFlipped && !state.isSubmitting,
+                                enabled = interactionAvailability.swipeEnabled,
                                 onSwiped = { direction -> onIntent(LearningIntent.Evaluate(direction.toRating())) },
                             ),
                 )
             }
             LearningEvaluationControls(
-                enabled = state.isFlipped && !state.isSubmitting && pendingRating == null,
-                selectedIndex = selectedIndex,
+                enabled = interactionAvailability.evaluationEnabled,
                 onEasy = { pendingRating = StudyRating.EASY },
                 onFair = { pendingRating = StudyRating.FAIR },
                 onAgain = { pendingRating = StudyRating.AGAIN },
@@ -219,14 +222,6 @@ private fun SwipeDirection?.feedbackColorArgb(): Int =
         null -> {
             0x00000000
         }
-    }
-
-private fun SwipeDirection?.toEvaluationIndex(): Int? =
-    when (this) {
-        SwipeDirection.LEFT -> 0
-        SwipeDirection.UP -> 1
-        SwipeDirection.RIGHT -> 2
-        null -> null
     }
 
 private val SwipeDirection.exitOffset: Offset
