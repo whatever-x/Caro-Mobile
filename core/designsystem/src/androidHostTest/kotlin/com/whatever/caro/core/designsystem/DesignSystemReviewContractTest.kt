@@ -2,6 +2,7 @@ package com.whatever.caro.core.designsystem
 
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.ints.shouldBeExactly
+import io.kotest.matchers.string.shouldContain
 import io.kotest.matchers.string.shouldNotContain
 import java.io.File
 
@@ -13,8 +14,13 @@ class DesignSystemReviewContractTest :
                     "core/designsystem/src/commonMain/kotlin/com/whatever/caro/core/designsystem/" +
                         "components/CaroTextArea.kt",
                 ).readText()
+            val borderColorBranch =
+                source
+                    .substringAfter("val borderColor =")
+                    .substringBefore("val mergedTextStyle =")
 
-            source shouldNotContain "!enabled -> CaroTheme.color.border.secondary"
+            borderColorBranch shouldContain "isFocused"
+            borderColorBranch shouldNotContain "enabled"
         }
 
         test("Pretendard 타이포그래피는 zero letter spacing 기본값을 공유한다") {
