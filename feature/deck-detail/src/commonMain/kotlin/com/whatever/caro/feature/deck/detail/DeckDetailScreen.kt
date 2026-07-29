@@ -113,7 +113,7 @@ internal fun DeckDetailScreen(
             }
         }
 
-        if (state.isLoadedContentVisible && state.isSortBottomSheetVisible) {
+        if (state.isSortBottomSheetVisible) {
             SortBottomSheet(
                 selectedSortOption = state.selectedSortOption,
                 onSortOptionClick = { sortOption ->
@@ -123,7 +123,7 @@ internal fun DeckDetailScreen(
             )
         }
 
-        if (state.isLoadedContentVisible && state.isDeckEditBottomSheetVisible) {
+        if (state.isDeckEditBottomSheetVisible) {
             DeckEditBottomSheet(
                 onEditDeck = { onIntent(DeckDetailIntent.ClickDeckEditBottomSheetEdit) },
                 onDeleteDeck = { onIntent(DeckDetailIntent.ClickDeckEditBottomSheetDelete) },
