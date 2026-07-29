@@ -37,6 +37,11 @@ private const val LOTTIE_BUTTON_LOADING_PATH = "files/lottie_button_loading.json
 private const val CONTENT_TRANSITION_DURATION_MILLIS = 180
 private const val CONTENT_TRANSITION_SCALE = 0.92f
 
+internal fun isProfileCtaButtonClickEnabled(
+    enabled: Boolean,
+    isLoading: Boolean,
+): Boolean = enabled && !isLoading
+
 /**
  * create/edit 화면이 공유하는 하단 CTA 버튼. 라벨 텍스트만 호출부에서 주입한다.
  */
@@ -61,8 +66,10 @@ internal fun ProfileCtaButton(
                 .heightIn(min = CtaButtonHeight)
                 .clip(CaroTheme.shape.xxl)
                 .background(backgroundColor)
-                .clickable(enabled = enabled && !isLoading, onClick = onClick)
-                .padding(
+                .clickable(
+                    enabled = isProfileCtaButtonClickEnabled(enabled, isLoading),
+                    onClick = onClick,
+                ).padding(
                     horizontal = CaroTheme.spacing.xl,
                     vertical = CaroTheme.spacing.l,
                 ),
