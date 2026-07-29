@@ -408,7 +408,7 @@ private fun CardDetailDeleteDialog(
             Text(
                 text = stringResource(Res.string.card_detail_delete_body),
                 modifier = Modifier.fillMaxWidth(),
-                style = CaroTheme.typography.body3,
+                style = CaroTheme.typography.body2.medium,
                 color = CaroTheme.color.text.secondary,
             )
             Spacer(Modifier.height(CaroTheme.spacing.l))
@@ -420,8 +420,8 @@ private fun CardDetailDeleteDialog(
             ) {
                 CardDetailDialogButton(
                     text = stringResource(Res.string.card_detail_delete_confirm),
-                    backgroundColor = CaroTheme.color.surface.error,
-                    textColor = CaroTheme.color.text.accent,
+                    backgroundColor = CaroTheme.color.surface.dangerous,
+                    textColor = CaroTheme.color.text.dangerous,
                     enabled = !isDeleting,
                     onClick = onDelete,
                     modifier = Modifier.weight(1f),

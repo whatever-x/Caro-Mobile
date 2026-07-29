@@ -25,12 +25,11 @@ import kotlinx.coroutines.launch
 
 /**
  * 토스트 시각 변형. 디자인 시스템의 surface/text 시맨틱 토큰에 매핑된다.
- * 팔레트에 success(녹색) 토큰이 없어 Normal/Info/Warning/Error 만 제공한다.
+ * 팔레트에 success(녹색)·warning surface 토큰이 없어 Normal/Info/Error 만 제공한다.
  */
 enum class CaroSnackbarStyle {
     Normal,
     Info,
-    Warning,
     Error,
 }
 
@@ -102,7 +101,6 @@ fun CaroSnackbar(
         when (style) {
             CaroSnackbarStyle.Normal -> CaroTheme.color.surface.inverse
             CaroSnackbarStyle.Info -> CaroTheme.color.surface.info
-            CaroSnackbarStyle.Warning -> CaroTheme.color.surface.warning
             CaroSnackbarStyle.Error -> CaroTheme.color.surface.error
         }
 
@@ -110,7 +108,6 @@ fun CaroSnackbar(
         when (style) {
             CaroSnackbarStyle.Normal -> CaroTheme.color.text.inverse
             CaroSnackbarStyle.Info -> CaroTheme.color.text.info
-            CaroSnackbarStyle.Warning -> CaroTheme.color.text.warning
             CaroSnackbarStyle.Error -> CaroTheme.color.text.error
         }
 
@@ -142,7 +139,7 @@ fun CaroSnackbar(
                         onClick = { performCaroSnackbarAction(snackbarData) },
                     ),
                 text = actionLabel,
-                style = CaroTheme.typography.label2.regular,
+                style = CaroTheme.typography.label2,
                 color = CaroTheme.color.text.brand,
             )
         }

@@ -21,7 +21,6 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.style.TextOverflow
@@ -67,7 +66,7 @@ internal fun DeckDetailHeader(
         Text(
             text = description,
             color = CaroTheme.color.text.secondary,
-            style = CaroTheme.typography.label2.regular,
+            style = CaroTheme.typography.label2,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
         )
@@ -135,8 +134,8 @@ private fun DeckStateBadge(
 
     val textColor =
         when (currentLearningStatus) {
-            DeckState.NOT_STARTED, DeckState.LEARNING -> CaroTheme.color.text.ready
-            DeckState.COMPLETE -> CaroTheme.color.text.complete
+            DeckState.NOT_STARTED, DeckState.LEARNING -> CaroTheme.color.text.brand
+            DeckState.COMPLETE -> CaroTheme.color.text.secondary
             DeckState.REST_DAY -> CaroTheme.color.text.rest
         }
 
@@ -221,7 +220,7 @@ private fun DailyLearningProgress(
                         learningCardTotal,
                     ),
                 color = CaroTheme.color.text.tertiary,
-                style = CaroTheme.typography.label2.regular,
+                style = CaroTheme.typography.label2,
             )
 
             Box(
@@ -241,7 +240,7 @@ private fun DailyLearningProgress(
                         learningProgress,
                     ),
                 color = CaroTheme.color.text.brand,
-                style = CaroTheme.typography.label2.regular,
+                style = CaroTheme.typography.label2,
             )
         }
     }
@@ -254,7 +253,7 @@ private fun UnavailableLearningMessage(modifier: Modifier = Modifier) {
             modifier
                 .fillMaxWidth()
                 .background(
-                    color = CaroTheme.color.surface.warning,
+                    color = CaroTheme.color.surface.rest,
                     shape = CaroTheme.shape.m,
                 ).padding(CaroTheme.spacing.s),
         horizontalArrangement = Arrangement.spacedBy(CaroTheme.spacing.s),
@@ -268,18 +267,18 @@ private fun UnavailableLearningMessage(modifier: Modifier = Modifier) {
         ) {
             Text(
                 text = stringResource(Res.string.deck_detail_caption_daily_learning_unavailable_title),
-                color = CaroTheme.color.text.error,
-                style = CaroTheme.typography.label1.bold,
+                color = CaroTheme.color.text.rest,
+                style = CaroTheme.typography.label1,
             )
             Text(
                 text = stringResource(Res.string.deck_detail_caption_daily_learning_unavailable_body_1),
                 color = CaroTheme.color.text.primary,
-                style = CaroTheme.typography.label2.regular,
+                style = CaroTheme.typography.label2,
             )
             Text(
                 text = stringResource(Res.string.deck_detail_caption_daily_learning_unavailable_body_2),
                 color = CaroTheme.color.text.primary,
-                style = CaroTheme.typography.label2.regular,
+                style = CaroTheme.typography.label2,
             )
         }
     }
@@ -288,7 +287,8 @@ private fun UnavailableLearningMessage(modifier: Modifier = Modifier) {
 @Composable
 private fun RestCardIcon(modifier: Modifier = Modifier) {
     val starColor = CaroTheme.color.surface.brand
-    val cardBorderColor = CaroTheme.color.border.warning
+    val cardSurfaceColor = CaroTheme.color.surface.primary
+    val cardBorderColor = CaroTheme.color.border.rest
 
     Canvas(
         modifier =
@@ -304,7 +304,7 @@ private fun RestCardIcon(modifier: Modifier = Modifier) {
             )
 
         drawRoundRect(
-            color = Color.White,
+            color = cardSurfaceColor,
             topLeft = cardOffset,
             size = cardSize,
             cornerRadius = CornerRadius(4.dp.toPx()),

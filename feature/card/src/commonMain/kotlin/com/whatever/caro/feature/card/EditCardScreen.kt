@@ -59,7 +59,6 @@ private val TopBarIconSize = 24.dp
 private val SwapButtonSize = 32.dp
 private val SmallIconSize = 16.dp
 private val HairlineThickness = 1.dp
-private const val DISABLED_ALPHA = 0.4f
 
 @Composable
 internal fun EditCardScreen(
@@ -149,7 +148,7 @@ private fun RequiredFieldHeader(label: String) {
         Text(
             text = stringResource(Res.string.card_field_required),
             style = CaroTheme.typography.body2.semiBold,
-            color = CaroTheme.color.text.accent,
+            color = CaroTheme.color.text.dangerous,
         )
     }
 }
@@ -208,8 +207,13 @@ private fun EditBottomBar(
         if (enabled) {
             CaroTheme.color.surface.brand
         } else {
-            CaroTheme.color.surface.brand
-                .copy(alpha = DISABLED_ALPHA)
+            CaroTheme.color.surface.disabled
+        }
+    val textColor =
+        if (enabled) {
+            CaroTheme.color.text.inverse
+        } else {
+            CaroTheme.color.text.disabled
         }
 
     Box(
@@ -233,8 +237,8 @@ private fun EditBottomBar(
     ) {
         Text(
             text = stringResource(Res.string.card_button_update),
-            style = CaroTheme.typography.label1.bold,
-            color = CaroTheme.color.text.inverse,
+            style = CaroTheme.typography.label1,
+            color = textColor,
         )
     }
 }

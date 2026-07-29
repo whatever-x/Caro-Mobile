@@ -136,8 +136,8 @@ private fun FlashCardFace(
                 Text(
                     text = frontText,
                     modifier = Modifier.fillMaxWidth(),
-                    style = CaroTheme.typography.body1.regular,
-                    color = CaroTheme.color.text.disable,
+                    style = CaroTheme.typography.body1,
+                    color = CaroTheme.color.text.disabled,
                     textAlign = TextAlign.Center,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
@@ -302,7 +302,7 @@ private fun FlashCardFullTextDialog(
                                 horizontal = CaroTheme.spacing.s,
                                 vertical = CaroTheme.spacing.xl4,
                             ).verticalScroll(rememberScrollState()),
-                    style = CaroTheme.typography.body1.semiBold,
+                    style = CaroTheme.typography.body1,
                     color = CaroTheme.color.text.primary,
                 )
             }

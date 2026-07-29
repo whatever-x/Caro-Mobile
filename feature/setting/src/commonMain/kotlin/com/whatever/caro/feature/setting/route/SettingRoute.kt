@@ -12,7 +12,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.style.TextAlign
 import androidx.lifecycle.Lifecycle
@@ -144,7 +143,7 @@ private fun DeleteAccountDialog(
                 modifier = Modifier.fillMaxWidth(),
                 text = stringResource(Res.string.setting_dialog_content),
                 color = CaroTheme.color.text.secondary,
-                style = CaroTheme.typography.body3,
+                style = CaroTheme.typography.body2.medium,
             )
             Spacer(modifier = Modifier.size(size = CaroTheme.spacing.m))
         },
@@ -158,14 +157,14 @@ private fun DeleteAccountDialog(
                         Modifier
                             .fillMaxWidth()
                             .background(
-                                color = CaroTheme.color.surface.error,
+                                color = CaroTheme.color.surface.dangerous,
                                 shape = CaroTheme.shape.xxl,
                             ).padding(
                                 horizontal = CaroTheme.spacing.l,
                                 vertical = CaroTheme.spacing.m,
                             ).noRippleClickable(onDeleteAccountClick),
                     text = stringResource(Res.string.setting_dialog_button_delete_account),
-                    color = Color(0xFFFF7A70),
+                    color = CaroTheme.color.text.dangerous,
                     style = CaroTheme.typography.caption1.regular,
                     textAlign = TextAlign.Center,
                 )
