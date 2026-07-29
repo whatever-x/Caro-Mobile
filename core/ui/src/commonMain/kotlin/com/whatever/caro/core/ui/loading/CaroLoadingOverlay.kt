@@ -16,6 +16,9 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.unit.dp
+import androidx.navigationevent.NavigationEventInfo
+import androidx.navigationevent.compose.NavigationBackHandler
+import androidx.navigationevent.compose.rememberNavigationEventState
 import caromobile.core.designsystem.generated.resources.Res
 import com.whatever.caro.core.designsystem.themes.CaroTheme
 import io.github.alexzhirkevich.compottie.Compottie
@@ -38,6 +41,14 @@ fun CaroLoadingOverlayBox(
         if (isLoading) {
             focusManager.clearFocus(force = true)
         }
+    }
+
+    if (isLoading) {
+        val backState = rememberNavigationEventState(currentInfo = NavigationEventInfo.None)
+        NavigationBackHandler(
+            state = backState,
+            onBackCompleted = {},
+        )
     }
 
     Box(
