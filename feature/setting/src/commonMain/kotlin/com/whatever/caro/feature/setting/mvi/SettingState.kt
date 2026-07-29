@@ -4,7 +4,7 @@ import com.whatever.caro.core.model.auth.SocialLoginType
 import com.whatever.caro.core.viewmodel.contract.UiState
 
 data class SettingState(
-    val isLoading: Boolean = false,
+    val isLoading: Boolean = true,
     val nickname: String = "",
     val emailAddress: String = "",
     val socialLoginType: SocialLoginType = SocialLoginType.NONE,

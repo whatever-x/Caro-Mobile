@@ -7,8 +7,8 @@ import io.kotest.matchers.booleans.shouldBeTrue
 
 class HomeStateTest : FunSpec() {
     init {
-        test("초기 로딩 중에는 홈 본문을 노출하지 않는다") {
-            HomeState(isLoading = true).isLoadedContentVisible.shouldBeFalse()
+        test("첫 렌더부터 홈 본문을 노출하지 않는다") {
+            HomeState().isLoadedContentVisible.shouldBeFalse()
         }
 
         test("초기 로딩이 끝나면 홈 본문을 노출한다") {

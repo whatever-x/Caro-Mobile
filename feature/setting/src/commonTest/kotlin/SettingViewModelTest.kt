@@ -62,11 +62,10 @@ class SettingViewModelTest : FunSpec() {
                 val (viewModel, _) = createViewModel()
 
                 viewModel.state.test {
-                    awaitItem().isLoading shouldBe false
+                    awaitItem().isLoading shouldBe true
 
                     viewModel.intent(SettingIntent.Initialize)
 
-                    awaitItem().isLoading shouldBe true
                     awaitItem() shouldBe
                         SettingState(
                             isLoading = false,

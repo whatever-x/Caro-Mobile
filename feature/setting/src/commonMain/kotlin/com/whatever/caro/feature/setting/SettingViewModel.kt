@@ -18,6 +18,8 @@ class SettingViewModel(
         initialState = SettingState(),
         exceptionFilter = exceptionFilter,
     ) {
+    private var isInitializing = false
+
     override fun handleClientException(throwable: Throwable) {
         reduce { copy(isLoading = false) }
     }
@@ -77,7 +79,8 @@ class SettingViewModel(
     }
 
     private suspend fun initialize() {
-        if (currentState.isLoading) return
+        if (isInitializing) return
+        isInitializing = true
         reduce { copy(isLoading = true) }
         try {
             val nickname = profileRepository.getMyNickname()
@@ -85,6 +88,8 @@ class SettingViewModel(
         } catch (throwable: Throwable) {
             reduce { copy(isLoading = false) }
             throw throwable
+        } finally {
+            isInitializing = false
         }
     }
 
