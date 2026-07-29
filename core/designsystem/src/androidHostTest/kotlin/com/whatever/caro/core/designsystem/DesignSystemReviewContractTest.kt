@@ -18,9 +18,14 @@ class DesignSystemReviewContractTest :
                 source
                     .substringAfter("val borderColor =")
                     .substringBefore("val mergedTextStyle =")
+            val borderArguments =
+                source
+                    .substringAfter(".border(")
+                    .substringBefore(").padding(")
 
             borderColorBranch shouldContain "isFocused"
             borderColorBranch shouldNotContain "enabled"
+            borderArguments shouldContain "color = borderColor"
         }
 
         test("Pretendard 타이포그래피는 zero letter spacing 기본값을 공유한다") {

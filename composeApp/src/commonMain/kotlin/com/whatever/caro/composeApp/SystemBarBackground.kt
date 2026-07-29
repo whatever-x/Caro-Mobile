@@ -5,9 +5,12 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.windowInsetsBottomHeight
 import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.navigation3.runtime.NavKey
@@ -58,18 +61,21 @@ internal fun CaroSystemBarBackground(
     val statusBarColor = roles.statusBar.color()
     val navigationBarColor = roles.navigationBar.color()
 
-    Box(
-        modifier =
-            Modifier
-                .fillMaxSize()
-                .background(navigationBarColor),
-    ) {
+    Box(modifier = Modifier.fillMaxSize()) {
         Box(
             modifier =
                 Modifier
                     .fillMaxWidth()
                     .windowInsetsTopHeight(WindowInsets.statusBars)
                     .background(statusBarColor),
+        )
+        Box(
+            modifier =
+                Modifier
+                    .align(Alignment.BottomCenter)
+                    .fillMaxWidth()
+                    .windowInsetsBottomHeight(WindowInsets.navigationBars)
+                    .background(navigationBarColor),
         )
         content()
     }
