@@ -7,8 +7,8 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.booleans.shouldBeFalse
 import io.kotest.matchers.booleans.shouldBeTrue
 
-class DeckDetailStateTest :
-    FunSpec({
+class DeckDetailStateTest : FunSpec() {
+    init {
         val deck =
             Deck(
                 id = 1L,
@@ -27,4 +27,5 @@ class DeckDetailStateTest :
         test("카드 목록 초기 로딩이 끝나면 덱 상세 본문을 노출한다") {
             DeckDetailState(deck = deck, isCardListLoading = false).isLoadedContentVisible.shouldBeTrue()
         }
-    })
+    }
+}
