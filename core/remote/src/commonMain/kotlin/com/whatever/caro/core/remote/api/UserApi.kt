@@ -1,7 +1,7 @@
 package com.whatever.caro.core.remote.api
 
 import com.whatever.caro.core.remote.dto.user.request.UpdateNicknameRequest
-import com.whatever.caro.core.remote.dto.user.response.MyNicknameResponse
+import com.whatever.caro.core.remote.dto.user.response.MyInfoResponse
 import com.whatever.caro.core.remote.dto.user.response.NicknameCheckResponse
 import com.whatever.caro.core.remote.dto.user.response.UpdateNicknameResponse
 import de.jensklingenberg.ktorfit.http.Body
@@ -10,8 +10,8 @@ import de.jensklingenberg.ktorfit.http.PATCH
 import de.jensklingenberg.ktorfit.http.Path
 
 internal interface UserApi {
-    @GET("v1/users/me/nickname")
-    suspend fun requestMyNickname(): MyNicknameResponse
+    @GET("v1/users/me/info")
+    suspend fun requestMyInfo(): MyInfoResponse
 
     @GET("v1/users/nicknames/{nickname}/availability")
     suspend fun requestCheckNicknameAvailability(
