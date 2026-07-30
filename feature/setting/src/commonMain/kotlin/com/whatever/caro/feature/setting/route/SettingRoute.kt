@@ -116,6 +116,7 @@ fun SettingRoute(
     )
     if (state.accountDeleteDialogVisible) {
         DeleteAccountDialog(
+            enabled = !state.isDeletingAccount,
             onDeleteAccountClick = { viewModel.intent(SettingIntent.ClickDeleteAccountDialogConfirm) },
             onCancelClick = { viewModel.intent(SettingIntent.ClickDeleteAccountDialogCancel) },
         )
@@ -124,6 +125,7 @@ fun SettingRoute(
 
 @Composable
 private fun DeleteAccountDialog(
+    enabled: Boolean,
     onDeleteAccountClick: () -> Unit,
     onCancelClick: () -> Unit,
 ) {
@@ -162,7 +164,13 @@ private fun DeleteAccountDialog(
                             ).padding(
                                 horizontal = CaroTheme.spacing.l,
                                 vertical = CaroTheme.spacing.m,
-                            ).noRippleClickable(onDeleteAccountClick),
+                            ).then(
+                                if (enabled) {
+                                    Modifier.noRippleClickable(onDeleteAccountClick)
+                                } else {
+                                    Modifier
+                                },
+                            ),
                     text = stringResource(Res.string.setting_dialog_button_delete_account),
                     color = CaroTheme.color.text.dangerous,
                     style = CaroTheme.typography.caption1.regular,
@@ -178,7 +186,13 @@ private fun DeleteAccountDialog(
                             ).padding(
                                 horizontal = CaroTheme.spacing.l,
                                 vertical = CaroTheme.spacing.m,
-                            ).noRippleClickable(onCancelClick),
+                            ).then(
+                                if (enabled) {
+                                    Modifier.noRippleClickable(onCancelClick)
+                                } else {
+                                    Modifier
+                                },
+                            ),
                     text = stringResource(Res.string.setting_dialog_button_cancel),
                     color = CaroTheme.color.text.brand,
                     style = CaroTheme.typography.caption1.regular,

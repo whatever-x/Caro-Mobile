@@ -12,9 +12,11 @@ import com.whatever.caro.core.remote.dto.auth.request.SocialLoginRequest
 import com.whatever.caro.core.remote.dto.auth.response.SocialLoginResponse
 import com.whatever.caro.core.remote.dto.auth.response.TokenResponse
 import dev.mokkery.answering.returns
+import dev.mokkery.answering.throws
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
 import dev.mokkery.mock
+import dev.mokkery.verify.VerifyMode.Companion.exactly
 import dev.mokkery.verifySuspend
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
@@ -88,6 +90,44 @@ class AuthRepositoryImplTest : FunSpec() {
                     remoteAuthDataSource.logout()
                     localAuthDataSource.clear()
                 }
+            }
+        }
+
+        test("withdraw는 원격 회원탈퇴 후 로컬 토큰을 비운다") {
+            runTest {
+                val remoteAuthDataSource =
+                    mock<AuthDataSource> { everySuspend { withdraw() } returns Unit }
+                val localAuthDataSource =
+                    mock<LocalAuthDataSource> { everySuspend { clear() } returns Unit }
+                val repository =
+                    repositoryWith(
+                        remoteAuthDataSource = remoteAuthDataSource,
+                        localAuthDataSource = localAuthDataSource,
+                    )
+
+                repository.withdraw()
+
+                verifySuspend {
+                    remoteAuthDataSource.withdraw()
+                    localAuthDataSource.clear()
+                }
+            }
+        }
+
+        test("withdraw는 원격 회원탈퇴 실패 시 로컬 토큰을 유지한다") {
+            runTest {
+                val failure = RuntimeException("withdraw failed")
+                val remoteAuthDataSource =
+                    mock<AuthDataSource> { everySuspend { withdraw() } throws failure }
+                val localAuthDataSource = mock<LocalAuthDataSource>()
+                val repository =
+                    repositoryWith(
+                        remoteAuthDataSource = remoteAuthDataSource,
+                        localAuthDataSource = localAuthDataSource,
+                    )
+
+                shouldThrow<RuntimeException> { repository.withdraw() } shouldBe failure
+                verifySuspend(exactly(0)) { localAuthDataSource.clear() }
             }
         }
 

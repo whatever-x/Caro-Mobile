@@ -1,5 +1,7 @@
 package com.whatever.caro.core.data.repository.profile
 
+import com.whatever.caro.core.model.auth.SocialLoginType
+import com.whatever.caro.core.model.profile.MyInfo
 import com.whatever.caro.core.remote.datasource.profile.ProfileDataSource
 import com.whatever.caro.core.remote.dto.nickname.response.NicknameResponse
 import com.whatever.caro.core.remote.dto.user.request.UpdateNicknameRequest
@@ -10,6 +12,7 @@ import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
 import dev.mokkery.mock
+import dev.mokkery.verify.VerifyMode.Companion.exactly
 import dev.mokkery.verifySuspend
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
@@ -17,6 +20,29 @@ import kotlinx.coroutines.test.runTest
 
 class ProfileRepositoryImplTest : FunSpec() {
     init {
+        test("getMyInfo는 현재 사용자 전체 정보를 반환한다") {
+            runTest {
+                val profileDataSource =
+                    mock<ProfileDataSource> {
+                        everySuspend { getMyInfo() } returns
+                            MyInfoResponse(
+                                nickname = "캐로",
+                                email = "caro@example.com",
+                                loginPlatform = SocialLoginType.APPLE,
+                            )
+                    }
+                val repository = ProfileRepositoryImpl(profileDataSource)
+
+                repository.getMyInfo() shouldBe
+                    MyInfo(
+                        nickname = "캐로",
+                        email = "caro@example.com",
+                        socialLoginType = SocialLoginType.APPLE,
+                    )
+                verifySuspend(exactly(1)) { profileDataSource.getMyInfo() }
+            }
+        }
+
         test("getRandomNickname은 응답의 nickname을 반환한다") {
             runTest {
                 val profileDataSource =

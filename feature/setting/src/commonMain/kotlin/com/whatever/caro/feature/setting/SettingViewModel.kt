@@ -1,6 +1,7 @@
 package com.whatever.caro.feature.setting
 
 import com.whatever.caro.core.data.repository.auth.AuthRepository
+import com.whatever.caro.core.data.repository.profile.ProfileRepository
 import com.whatever.caro.core.viewmodel.BaseViewModel
 import com.whatever.caro.core.viewmodel.ExceptionFilter
 import com.whatever.caro.feature.setting.model.SnackbarType
@@ -11,11 +12,14 @@ import com.whatever.caro.feature.setting.mvi.SettingState
 
 class SettingViewModel(
     private val authRepository: AuthRepository,
+    private val profileRepository: ProfileRepository,
     exceptionFilter: ExceptionFilter,
 ) : BaseViewModel<SettingState, SettingIntent, SettingSideEffect>(
         initialState = SettingState(),
         exceptionFilter = exceptionFilter,
     ) {
+    private var initializeGeneration = 0L
+
     override suspend fun handleIntent(intent: SettingIntent) {
         when (intent) {
             SettingIntent.ClickLogOut -> {
@@ -71,18 +75,40 @@ class SettingViewModel(
     }
 
     private suspend fun initialize() {
-        // TODO : 사용자 정보 조회 API 구현 필요
+        val generation = ++initializeGeneration
+        reduce { copy(isLoading = true) }
+        try {
+            val myInfo = profileRepository.getMyInfo()
+            if (generation != initializeGeneration) return
+            reduce {
+                copy(
+                    nickname = myInfo.nickname,
+                    emailAddress = myInfo.email,
+                    socialLoginType = myInfo.socialLoginType,
+                )
+            }
+        } finally {
+            if (generation == initializeGeneration) {
+                reduce { copy(isLoading = false) }
+            }
+        }
     }
 
     private fun controlAccountDeleteButton() {
         reduce { copy(accountDeleteDialogVisible = !accountDeleteDialogVisible) }
     }
 
-    // TODO: 계정 삭제 필요
-    private fun deleteAccount() {
-        reduce { copy(accountDeleteDialogVisible = false) }
-        postSideEffect(SettingSideEffect.ShowSnackbar(type = SnackbarType.DELETE_ACCOUNT))
-        postSideEffect(SettingSideEffect.NavigateToLogin)
+    private suspend fun deleteAccount() {
+        if (currentState.isDeletingAccount) return
+        reduce { copy(isDeletingAccount = true) }
+        try {
+            authRepository.withdraw()
+            reduce { copy(accountDeleteDialogVisible = false) }
+            postSideEffect(SettingSideEffect.ShowSnackbar(type = SnackbarType.DELETE_ACCOUNT))
+            postSideEffect(SettingSideEffect.NavigateToLogin)
+        } finally {
+            reduce { copy(isDeletingAccount = false) }
+        }
     }
 
     private suspend fun logout() {
