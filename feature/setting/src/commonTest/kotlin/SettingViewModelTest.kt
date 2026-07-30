@@ -1,12 +1,15 @@
 import app.cash.turbine.test
 import com.whatever.caro.core.data.repository.auth.AuthRepository
+import com.whatever.caro.core.data.repository.profile.ProfileRepository
 import com.whatever.caro.core.viewmodel.ExceptionFilter
 import com.whatever.caro.feature.setting.SettingViewModel
 import com.whatever.caro.feature.setting.model.SnackbarType
 import com.whatever.caro.feature.setting.model.WebViewType
 import com.whatever.caro.feature.setting.mvi.SettingIntent
 import com.whatever.caro.feature.setting.mvi.SettingSideEffect
+import com.whatever.caro.feature.setting.mvi.SettingState
 import dev.mokkery.answering.returns
+import dev.mokkery.answering.throws
 import dev.mokkery.everySuspend
 import dev.mokkery.mock
 import dev.mokkery.verify.VerifyMode.Companion.exactly
@@ -34,7 +37,13 @@ class SettingViewModelTest : FunSpec() {
             Dispatchers.resetMain()
         }
 
-        fun createViewModel(): Pair<SettingViewModel, AuthRepository> {
+        fun createViewModel(
+            profileRepository: ProfileRepository =
+                mock {
+                    everySuspend { getMyNickname() } returns "캐로"
+                },
+            exceptionFilter: ExceptionFilter = ExceptionFilter.None,
+        ): Pair<SettingViewModel, AuthRepository> {
             val authRepository =
                 mock<AuthRepository> {
                     everySuspend { logout() } returns Unit
@@ -42,9 +51,63 @@ class SettingViewModelTest : FunSpec() {
             val viewModel =
                 SettingViewModel(
                     authRepository = authRepository,
-                    exceptionFilter = ExceptionFilter.None,
+                    profileRepository = profileRepository,
+                    exceptionFilter = exceptionFilter,
                 )
             return viewModel to authRepository
+        }
+
+        test("Initialize는 사용자 닉네임 조회 중 로딩을 표시하고 성공 후 닉네임을 반영한다") {
+            runTest {
+                val (viewModel, _) = createViewModel()
+
+                viewModel.state.test {
+                    awaitItem().isLoading shouldBe true
+
+                    viewModel.intent(SettingIntent.Initialize)
+
+                    awaitItem() shouldBe
+                        SettingState(
+                            isLoading = false,
+                            nickname = "캐로",
+                        )
+                }
+            }
+        }
+
+        test("Initialize의 사용자 닉네임 조회가 실패하면 로딩을 해제한다") {
+            runTest {
+                val profileRepository =
+                    mock<ProfileRepository> {
+                        everySuspend { getMyNickname() } throws IllegalStateException("network")
+                    }
+                val (viewModel, _) = createViewModel(profileRepository)
+
+                viewModel.intent(SettingIntent.Initialize)
+                advanceUntilIdle()
+
+                viewModel.state.value.isLoading shouldBe false
+            }
+        }
+
+        test("Initialize의 사용자 닉네임 조회 예외가 전역 필터에서 억제되어도 로딩을 해제한다") {
+            runTest {
+                val suppressedException = IllegalStateException("suppressed")
+                val profileRepository =
+                    mock<ProfileRepository> {
+                        everySuspend { getMyNickname() } throws suppressedException
+                    }
+                val (viewModel, _) =
+                    createViewModel(
+                        profileRepository = profileRepository,
+                        exceptionFilter = ExceptionFilter { it === suppressedException },
+                    )
+
+                viewModel.intent(SettingIntent.Initialize)
+                advanceUntilIdle()
+
+                viewModel.state.value.isLoading shouldBe false
+            }
         }
 
         test("ClickLogOut 은 logout 을 호출하고 ShowSnackbar(LOGOUT) 와 NavigateToLogin 을 순서대로 emit 한다") {

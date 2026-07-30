@@ -17,6 +17,8 @@ kotlin {
             implementation(libs.coil.compose)
             implementation(libs.coil.network.ktor3)
             implementation(libs.coil.mp)
+            implementation(libs.compottie.lite)
+            implementation(libs.jetbrains.androidx.navigation3.event)
         }
     }
 }

@@ -23,8 +23,11 @@ class EditProfileViewModel(
         exceptionFilter = exceptionFilter,
     ) {
     private var nicknameValidationJob: Job? = null
+    private var randomNicknameJob: Job? = null
 
     override suspend fun handleIntent(intent: EditProfileIntent) {
+        if (currentState.isLoading) return
+
         when (intent) {
             is EditProfileIntent.UpdateNickname -> handleUpdateNickname(intent.nickname)
             is EditProfileIntent.ClickRefresh -> fetchRandomNickname()
@@ -34,16 +37,29 @@ class EditProfileViewModel(
     }
 
     private fun handleUpdateNickname(nickname: String) {
+        randomNicknameJob?.cancel()
         val filtered = nicknameValidator.filterInput(nickname)
         val validation = nicknameValidator.validate(filtered)
 
         if (validation.isValid.not()) {
             nicknameValidationJob?.cancel()
-            reduce { copy(nickname = filtered, validationResult = validation) }
+            reduce {
+                copy(
+                    nickname = filtered,
+                    validationResult = validation,
+                    isRandomNicknameLoading = false,
+                )
+            }
             return
         }
 
-        reduce { copy(nickname = filtered, validationResult = NicknameValidationResult.Checking) }
+        reduce {
+            copy(
+                nickname = filtered,
+                validationResult = NicknameValidationResult.Checking,
+                isRandomNicknameLoading = false,
+            )
+        }
 
         nicknameValidationJob?.cancel()
         nicknameValidationJob =
@@ -67,29 +83,34 @@ class EditProfileViewModel(
 
     private fun fetchRandomNickname() {
         nicknameValidationJob?.cancel()
+        randomNicknameJob?.cancel()
         reduce { copy(isRandomNicknameLoading = true) }
-        launch {
-            suspendRunCatching { profileRepository.getRandomNickname() }
-                .onSuccess { nickname ->
-                    reduce {
-                        copy(
-                            nickname = nickname,
-                            validationResult = NicknameValidationResult.Valid,
-                        )
+        randomNicknameJob =
+            launch {
+                suspendRunCatching { profileRepository.getRandomNickname() }
+                    .onSuccess { nickname ->
+                        reduce {
+                            copy(
+                                nickname = nickname,
+                                validationResult = NicknameValidationResult.Valid,
+                            )
+                        }
+                    }.onFailure { throwable ->
+                        Napier.e(throwable = throwable) { "getRandomNickname failed" }
                     }
-                }.onFailure { throwable ->
-                    Napier.e(throwable = throwable) { "getRandomNickname failed" }
-                }
-            reduce { copy(isRandomNicknameLoading = false) }
-        }
+                reduce { copy(isRandomNicknameLoading = false) }
+            }
     }
 
     private fun handleConfirm() {
         if (currentState.isConfirmEnabled.not()) return
-        reduce { copy(isLoading = true) }
+        val nickname = currentState.nickname
+        nicknameValidationJob?.cancel()
+        randomNicknameJob?.cancel()
+        reduce { copy(isLoading = true, isRandomNicknameLoading = false) }
         launch {
             suspendRunCatching {
-                profileRepository.updateNickname(nickname = currentState.nickname)
+                profileRepository.updateNickname(nickname = nickname)
             }.onSuccess {
                 postSideEffect(EditProfileSideEffect.NavigateBack)
             }.onFailure { throwable ->

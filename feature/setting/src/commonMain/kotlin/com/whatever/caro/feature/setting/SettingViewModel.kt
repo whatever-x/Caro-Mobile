@@ -1,6 +1,7 @@
 package com.whatever.caro.feature.setting
 
 import com.whatever.caro.core.data.repository.auth.AuthRepository
+import com.whatever.caro.core.data.repository.profile.ProfileRepository
 import com.whatever.caro.core.viewmodel.BaseViewModel
 import com.whatever.caro.core.viewmodel.ExceptionFilter
 import com.whatever.caro.feature.setting.model.SnackbarType
@@ -11,11 +12,18 @@ import com.whatever.caro.feature.setting.mvi.SettingState
 
 class SettingViewModel(
     private val authRepository: AuthRepository,
+    private val profileRepository: ProfileRepository,
     exceptionFilter: ExceptionFilter,
 ) : BaseViewModel<SettingState, SettingIntent, SettingSideEffect>(
         initialState = SettingState(),
         exceptionFilter = exceptionFilter,
     ) {
+    private var isInitializing = false
+
+    override fun handleClientException(throwable: Throwable) {
+        reduce { copy(isLoading = false) }
+    }
+
     override suspend fun handleIntent(intent: SettingIntent) {
         when (intent) {
             SettingIntent.ClickLogOut -> {
@@ -71,7 +79,18 @@ class SettingViewModel(
     }
 
     private suspend fun initialize() {
-        // TODO : 사용자 정보 조회 API 구현 필요
+        if (isInitializing) return
+        isInitializing = true
+        reduce { copy(isLoading = true) }
+        try {
+            val nickname = profileRepository.getMyNickname()
+            reduce { copy(isLoading = false, nickname = nickname) }
+        } catch (throwable: Throwable) {
+            reduce { copy(isLoading = false) }
+            throw throwable
+        } finally {
+            isInitializing = false
+        }
     }
 
     private fun controlAccountDeleteButton() {

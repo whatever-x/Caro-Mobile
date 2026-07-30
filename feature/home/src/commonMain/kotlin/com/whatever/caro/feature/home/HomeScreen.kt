@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -48,6 +49,7 @@ import com.whatever.caro.core.designsystem.components.CaroTopBar
 import com.whatever.caro.core.designsystem.themes.CaroTheme
 import com.whatever.caro.core.model.deck.Deck
 import com.whatever.caro.core.model.deck.DeckState
+import com.whatever.caro.core.ui.loading.CaroLoadingOverlayBox
 import com.whatever.caro.core.ui.modifier.noRippleClickable
 import com.whatever.caro.feature.home.component.Deck
 import com.whatever.caro.feature.home.mvi.HomeIntent
@@ -68,6 +70,7 @@ import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
 private const val ARROW_BOUNCE_LOOP_END_PROGRESS = 35f / 60f
+private val HomeLoadingBannerHeight = 128.dp
 
 @OptIn(ExperimentalResourceApi::class, ExperimentalCompottieApi::class)
 @Composable
@@ -79,7 +82,8 @@ internal fun HomeScreen(
         LottieCompositionSpec.Resource(Res.getUri("files/arrow_down_bounce.json")),
     )
 
-    Box(
+    CaroLoadingOverlayBox(
+        isLoading = !state.isLoadedContentVisible,
         modifier =
             Modifier
                 .fillMaxSize()
@@ -109,45 +113,55 @@ internal fun HomeScreen(
                 },
             )
 
-            LazyColumn(modifier = Modifier.fillMaxWidth()) {
-                item {
-                    HomeStreakBanner(state = state)
-                }
+            if (state.isLoadedContentVisible) {
+                LazyColumn(modifier = Modifier.fillMaxWidth()) {
+                    item {
+                        HomeStreakBanner(state = state)
+                    }
 
-                itemsIndexed(
-                    items = state.decks,
-                    key = { _, deck -> deck.id },
-                ) { index, deck ->
-                    Spacer(modifier = Modifier.size(size = CaroTheme.spacing.m))
-                    Deck(
-                        modifier = Modifier.padding(horizontal = CaroTheme.spacing.xl2),
-                        title = deck.title,
-                        description = deck.description,
-                        cardTotalCount = deck.cardTotalCount,
-                        todayLearningPercentage = deck.todayProgress,
-                        state = deck.state,
-                        onDeckClick = {
-                            onIntent(
-                                HomeIntent.ClickDeckButton(
-                                    deck = deck,
-                                ),
-                            )
-                        },
-                        onStartLearningClick = {
-                            onIntent(
-                                HomeIntent.ClickStartLearning(
-                                    deckId = deck.id,
-                                ),
-                            )
-                        },
-                    )
-                    if (index == state.decks.lastIndex) {
-                        Spacer(modifier = Modifier.size(size = 72.dp + CaroTheme.spacing.l))
+                    itemsIndexed(
+                        items = state.decks,
+                        key = { _, deck -> deck.id },
+                    ) { index, deck ->
+                        Spacer(modifier = Modifier.size(size = CaroTheme.spacing.m))
+                        Deck(
+                            modifier = Modifier.padding(horizontal = CaroTheme.spacing.xl2),
+                            title = deck.title,
+                            description = deck.description,
+                            cardTotalCount = deck.cardTotalCount,
+                            todayLearningPercentage = deck.todayProgress,
+                            state = deck.state,
+                            onDeckClick = {
+                                onIntent(
+                                    HomeIntent.ClickDeckButton(
+                                        deck = deck,
+                                    ),
+                                )
+                            },
+                            onStartLearningClick = {
+                                onIntent(
+                                    HomeIntent.ClickStartLearning(
+                                        deckId = deck.id,
+                                    ),
+                                )
+                            },
+                        )
+                        if (index == state.decks.lastIndex) {
+                            Spacer(modifier = Modifier.size(size = 72.dp + CaroTheme.spacing.l))
+                        }
                     }
                 }
+            } else {
+                Spacer(
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .height(HomeLoadingBannerHeight)
+                            .background(color = CaroTheme.color.background.brand),
+                )
             }
         }
-        if (state.isDeckEmpty) {
+        if (state.isLoadedContentVisible && state.isDeckEmpty) {
             Text(
                 modifier =
                     Modifier
@@ -159,52 +173,54 @@ internal fun HomeScreen(
                 textAlign = TextAlign.Center,
             )
         }
-        Column(
-            modifier =
-                Modifier
-                    .align(alignment = Alignment.BottomCenter)
-                    .padding(bottom = 24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            if (state.isDeckEmpty) {
-                Lottie(
-                    painter =
-                        rememberLottiePainter(
-                            composition = lottieComposition,
-                            iterations = Compottie.IterateForever,
-                            clipSpec = LottieClipSpec.Progress(0f, ARROW_BOUNCE_LOOP_END_PROGRESS),
-                        ),
-                    contentDescription = null,
-                )
-            }
-            Row(
+        if (state.isLoadedContentVisible) {
+            Column(
                 modifier =
                     Modifier
-                        .background(
-                            shape = CaroTheme.shape.xxl,
-                            color = CaroTheme.color.surface.brand,
-                        ).padding(horizontal = CaroTheme.spacing.l, vertical = CaroTheme.spacing.m)
-                        .noRippleClickable {
-                            onIntent(HomeIntent.ClickCreateDeckButton)
-                        },
-                horizontalArrangement =
-                    Arrangement.spacedBy(
-                        space = CaroTheme.spacing.s,
-                        alignment = Alignment.CenterHorizontally,
-                    ),
-                verticalAlignment = Alignment.CenterVertically,
+                        .align(alignment = Alignment.BottomCenter)
+                        .padding(bottom = 24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                Icon(
-                    painter = painterResource(resource = Res.drawable.ic_add_24),
-                    tint = CaroTheme.color.icon.inverse,
-                    contentDescription = null,
-                )
+                if (state.isDeckEmpty) {
+                    Lottie(
+                        painter =
+                            rememberLottiePainter(
+                                composition = lottieComposition,
+                                iterations = Compottie.IterateForever,
+                                clipSpec = LottieClipSpec.Progress(0f, ARROW_BOUNCE_LOOP_END_PROGRESS),
+                            ),
+                        contentDescription = null,
+                    )
+                }
+                Row(
+                    modifier =
+                        Modifier
+                            .background(
+                                shape = CaroTheme.shape.xxl,
+                                color = CaroTheme.color.surface.brand,
+                            ).padding(horizontal = CaroTheme.spacing.l, vertical = CaroTheme.spacing.m)
+                            .noRippleClickable {
+                                onIntent(HomeIntent.ClickCreateDeckButton)
+                            },
+                    horizontalArrangement =
+                        Arrangement.spacedBy(
+                            space = CaroTheme.spacing.s,
+                            alignment = Alignment.CenterHorizontally,
+                        ),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Icon(
+                        painter = painterResource(resource = Res.drawable.ic_add_24),
+                        tint = CaroTheme.color.icon.inverse,
+                        contentDescription = null,
+                    )
 
-                Text(
-                    text = stringResource(resource = Res.string.home_floating_button),
-                    style = CaroTheme.typography.body2.semiBold,
-                    color = CaroTheme.color.text.inverse,
-                )
+                    Text(
+                        text = stringResource(resource = Res.string.home_floating_button),
+                        style = CaroTheme.typography.body2.semiBold,
+                        color = CaroTheme.color.text.inverse,
+                    )
+                }
             }
         }
     }
