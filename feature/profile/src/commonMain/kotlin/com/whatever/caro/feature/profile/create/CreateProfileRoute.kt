@@ -32,15 +32,7 @@ fun CreateProfileRoute(
 
     LaunchedEffect(Unit) {
         viewModel.sideEffect.collect { sideEffect ->
-            when (sideEffect) {
-                is CreateProfileSideEffect.NavigateBack -> {
-                    navDispatcher.emit(command = NavCommand.Back)
-                }
-
-                is CreateProfileSideEffect.NavigateHome -> {
-                    navDispatcher.emit(command = NavCommand.To(HomeEntry))
-                }
-            }
+            navDispatcher.emit(command = createProfileNavigationCommand(sideEffect))
         }
     }
 
@@ -49,3 +41,9 @@ fun CreateProfileRoute(
         onIntent = viewModel::intent,
     )
 }
+
+internal fun createProfileNavigationCommand(sideEffect: CreateProfileSideEffect): NavCommand =
+    when (sideEffect) {
+        CreateProfileSideEffect.NavigateBack -> NavCommand.Back
+        CreateProfileSideEffect.NavigateHome -> NavCommand.ResetTo(key = HomeEntry)
+    }
