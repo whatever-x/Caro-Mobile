@@ -1,5 +1,6 @@
 package com.whatever.caro.core.data.repository.profile
 
+import com.whatever.caro.core.data.mapper.toMyNickname
 import com.whatever.caro.core.remote.datasource.profile.ProfileDataSource
 import com.whatever.caro.core.remote.dto.user.request.UpdateNicknameRequest
 
@@ -11,7 +12,7 @@ internal class ProfileRepositoryImpl(
         return response.nickname
     }
 
-    override suspend fun getMyNickname(): String = profileDataSource.getMyInfo().nickname.orEmpty()
+    override suspend fun getMyNickname(): String = profileDataSource.getMyInfo().toMyNickname()
 
     override suspend fun isNicknameAvailable(nickname: String): Boolean {
         val response = profileDataSource.checkNicknameAvailability(nickname)
