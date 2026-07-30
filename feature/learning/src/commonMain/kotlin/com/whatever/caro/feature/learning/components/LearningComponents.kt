@@ -193,7 +193,6 @@ internal fun LearningCard(
 @Composable
 internal fun LearningEvaluationControls(
     enabled: Boolean,
-    selectedIndex: Int?,
     onEasy: () -> Unit,
     onFair: () -> Unit,
     onAgain: () -> Unit,
@@ -208,8 +207,7 @@ internal fun LearningEvaluationControls(
         EvaluationButton(
             label = Res.string.learning_easy,
             icon = DesignRes.drawable.ic_arrow_left_24,
-            color = if (selectedIndex == 0) CaroTheme.color.surface.review else CaroTheme.color.surface.brand,
-            selected = selectedIndex == 0,
+            color = CaroTheme.color.surface.brand,
             enabled = enabled,
             onClick = onEasy,
             modifier = Modifier.weight(1f),
@@ -217,8 +215,7 @@ internal fun LearningEvaluationControls(
         EvaluationButton(
             label = Res.string.learning_fair,
             icon = DesignRes.drawable.ic_arrow_up_24,
-            color = if (selectedIndex == 1) CaroTheme.color.surface.new else CaroTheme.color.surface.inverse,
-            selected = selectedIndex == 1,
+            color = CaroTheme.color.surface.inverse,
             enabled = enabled,
             onClick = onFair,
             modifier = Modifier.weight(1f),
@@ -226,8 +223,7 @@ internal fun LearningEvaluationControls(
         EvaluationButton(
             label = Res.string.learning_again,
             icon = DesignRes.drawable.ic_arrow_right_24,
-            color = if (selectedIndex == 2) CaroTheme.color.surface.dangerous else CaroTheme.color.surface.accent,
-            selected = selectedIndex == 2,
+            color = CaroTheme.color.surface.accent,
             enabled = enabled,
             onClick = onAgain,
             modifier = Modifier.weight(1f),
@@ -240,7 +236,6 @@ private fun EvaluationButton(
     label: StringResource,
     icon: DrawableResource,
     color: Color,
-    selected: Boolean,
     enabled: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -258,14 +253,14 @@ private fun EvaluationButton(
         Icon(
             painter = painterResource(icon),
             contentDescription = null,
-            tint = if (selected) CaroTheme.color.icon.disabled else CaroTheme.color.icon.inverse,
+            tint = CaroTheme.color.icon.inverse,
             modifier = Modifier.size(LearningIconSize),
         )
         Spacer(Modifier.height(CaroTheme.spacing.xs))
         Text(
             text = stringResource(label),
             style = CaroTheme.typography.body2.semiBold,
-            color = if (selected) CaroTheme.color.text.disabled else CaroTheme.color.text.inverse,
+            color = CaroTheme.color.text.inverse,
         )
     }
 }
@@ -653,7 +648,6 @@ private fun LearningEvaluationPreview() {
     CaroTheme {
         LearningEvaluationControls(
             enabled = true,
-            selectedIndex = 0,
             onEasy = {},
             onFair = {},
             onAgain = {},
