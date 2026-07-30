@@ -121,7 +121,7 @@ class CreateProfileViewModel(
                     termsAgreed = true,
                 )
             }.onSuccess {
-                postSideEffect(CreateProfileSideEffect.NavigateBack)
+                postSideEffect(CreateProfileSideEffect.NavigateHome)
             }.onFailure { throwable ->
                 Napier.e(throwable = throwable) { "completeRegistration failed" }
                 reduce { copy(isLoading = false) }

@@ -108,7 +108,7 @@ class CreateProfileViewModelTest : FunSpec() {
             }
         }
 
-        test("확인 가능 상태에서 ClickConfirm 은 가입 완료 후 NavigateBack 을 emit 한다") {
+        test("확인 가능 상태에서 ClickConfirm 은 가입 완료 후 NavigateHome 을 emit 한다") {
             runTest {
                 val (viewModel, authRepository, _) =
                     createViewModel(randomNickname = "랜덤닉네임")
@@ -121,7 +121,7 @@ class CreateProfileViewModelTest : FunSpec() {
                     viewModel.intent(CreateProfileIntent.ClickConfirm)
                     advanceUntilIdle()
 
-                    awaitItem() shouldBe CreateProfileSideEffect.NavigateBack
+                    awaitItem() shouldBe CreateProfileSideEffect.NavigateHome
                 }
                 verifySuspend(exactly(1)) {
                     authRepository.completeRegistration(
@@ -182,7 +182,7 @@ class CreateProfileViewModelTest : FunSpec() {
                     }
 
                     saveGate.complete(Unit)
-                    awaitItem() shouldBe CreateProfileSideEffect.NavigateBack
+                    awaitItem() shouldBe CreateProfileSideEffect.NavigateHome
                 }
             }
         }

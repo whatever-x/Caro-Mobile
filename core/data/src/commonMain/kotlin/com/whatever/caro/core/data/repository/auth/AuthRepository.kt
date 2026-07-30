@@ -7,7 +7,7 @@ interface AuthRepository {
     suspend fun loginWithSocial(
         provider: SocialLoginType,
         idToken: String,
-    ): AuthSession
+    ): Boolean
 
     suspend fun logout()
 

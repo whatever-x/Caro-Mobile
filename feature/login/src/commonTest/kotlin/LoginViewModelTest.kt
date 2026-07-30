@@ -1,6 +1,5 @@
 import app.cash.turbine.test
 import com.whatever.caro.core.data.repository.auth.AuthRepository
-import com.whatever.caro.core.model.auth.AuthSession
 import com.whatever.caro.core.model.auth.SocialLoginType
 import com.whatever.caro.core.viewmodel.ExceptionFilter
 import com.whatever.caro.feature.login.LoginViewModel
@@ -34,8 +33,7 @@ class LoginViewModelTest : FunSpec() {
         fun viewModelWith(
             authRepository: AuthRepository =
                 mock {
-                    everySuspend { loginWithSocial(any(), any()) } returns
-                        AuthSession(accessToken = "access", refreshToken = "refresh")
+                    everySuspend { loginWithSocial(any(), any()) } returns true
                 },
         ) = LoginViewModel(authRepository, ExceptionFilter.None)
 
@@ -47,12 +45,11 @@ class LoginViewModelTest : FunSpec() {
             Dispatchers.resetMain()
         }
 
-        test("구글 로그인 성공 시 GOOGLE 토큰으로 로그인하고 NavigateHome을 방출한다") {
+        test("구글 로그인 성공 시 가입이 완료된 사용자면 NavigateHome을 방출한다") {
             runTest(testDispatcher) {
                 val authRepository =
                     mock<AuthRepository> {
-                        everySuspend { loginWithSocial(any(), any()) } returns
-                            AuthSession(accessToken = "access", refreshToken = "refresh")
+                        everySuspend { loginWithSocial(any(), any()) } returns true
                     }
                 val viewModel = viewModelWith(authRepository)
 
@@ -75,12 +72,11 @@ class LoginViewModelTest : FunSpec() {
             }
         }
 
-        test("애플 로그인 성공 시 APPLE 토큰으로 로그인하고 NavigateHome을 방출한다") {
+        test("애플 로그인 성공 시 가입이 완료된 사용자면 NavigateHome을 방출한다") {
             runTest(testDispatcher) {
                 val authRepository =
                     mock<AuthRepository> {
-                        everySuspend { loginWithSocial(any(), any()) } returns
-                            AuthSession(accessToken = "access", refreshToken = "refresh")
+                        everySuspend { loginWithSocial(any(), any()) } returns true
                     }
                 val viewModel = viewModelWith(authRepository)
 
@@ -97,6 +93,33 @@ class LoginViewModelTest : FunSpec() {
                     authRepository.loginWithSocial(
                         provider = SocialLoginType.APPLE,
                         idToken = "apple-token",
+                    )
+                }
+            }
+        }
+
+        test("로그인 성공 시 가입이 완료되지 않은 사용자면 NavigateCreateProfile을 방출한다") {
+            runTest(testDispatcher) {
+                val authRepository =
+                    mock<AuthRepository> {
+                        everySuspend { loginWithSocial(any(), any()) } returns false
+                    }
+                val viewModel = viewModelWith(authRepository)
+
+                viewModel.sideEffect.test {
+                    viewModel.intent(
+                        LoginIntent.ClickGoogleLoginButton(
+                            SocialLoginResult.Success(GoogleUser(idToken = "google-token")),
+                        ),
+                    )
+                    awaitItem() shouldBe LoginSideEffect.NavigateCreateProfile
+                }
+
+                viewModel.state.value.isLoading shouldBe false
+                verifySuspend {
+                    authRepository.loginWithSocial(
+                        provider = SocialLoginType.GOOGLE,
+                        idToken = "google-token",
                     )
                 }
             }

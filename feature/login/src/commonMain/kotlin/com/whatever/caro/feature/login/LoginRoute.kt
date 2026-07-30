@@ -13,6 +13,7 @@ import com.whatever.caro.core.designsystem.components.CaroSnackbarStyle
 import com.whatever.caro.core.model.auth.SocialLoginType
 import com.whatever.caro.core.navigator.contract.NavCommand.To
 import com.whatever.caro.core.navigator.dispatcher.NavigationDispatcher
+import com.whatever.caro.core.navigator.entries.CreateProfileEntry
 import com.whatever.caro.core.navigator.entries.HomeEntry
 import com.whatever.caro.core.ui.snackbar.SnackBarMessage
 import com.whatever.caro.core.ui.snackbar.SnackbarController
@@ -80,6 +81,10 @@ fun LoginRoute(
                             style = CaroSnackbarStyle.Error,
                         ),
                     )
+                }
+
+                LoginSideEffect.NavigateCreateProfile -> {
+                    navDispatcher.emit(command = To(key = CreateProfileEntry))
                 }
             }
         }
