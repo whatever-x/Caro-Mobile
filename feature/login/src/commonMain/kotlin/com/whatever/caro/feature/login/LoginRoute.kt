@@ -11,8 +11,9 @@ import caromobile.core.designsystem.generated.resources.login_snackbar_cancel
 import caromobile.core.designsystem.generated.resources.login_snackbar_error
 import com.whatever.caro.core.designsystem.components.CaroSnackbarStyle
 import com.whatever.caro.core.model.auth.SocialLoginType
-import com.whatever.caro.core.navigator.contract.NavCommand.To
+import com.whatever.caro.core.navigator.contract.NavCommand
 import com.whatever.caro.core.navigator.dispatcher.NavigationDispatcher
+import com.whatever.caro.core.navigator.entries.CreateProfileEntry
 import com.whatever.caro.core.navigator.entries.HomeEntry
 import com.whatever.caro.core.ui.snackbar.SnackBarMessage
 import com.whatever.caro.core.ui.snackbar.SnackbarController
@@ -63,9 +64,12 @@ fun LoginRoute(
 
     LaunchedEffect(Unit) {
         viewModel.sideEffect.collect { sideEffect ->
+            loginNavigationCommand(sideEffect)?.let { command ->
+                navDispatcher.emit(command = command)
+            }
             when (sideEffect) {
                 is LoginSideEffect.NavigateHome -> {
-                    navDispatcher.emit(command = To(key = HomeEntry))
+                    Unit
                 }
 
                 is LoginSideEffect.ShowErrorSnackbar -> {
@@ -81,6 +85,10 @@ fun LoginRoute(
                         ),
                     )
                 }
+
+                LoginSideEffect.NavigateCreateProfile -> {
+                    Unit
+                }
             }
         }
     }
@@ -91,3 +99,10 @@ fun LoginRoute(
         onLaunch = { socialLoginType -> socialLoginAuth(socialLoginType) },
     )
 }
+
+internal fun loginNavigationCommand(sideEffect: LoginSideEffect): NavCommand? =
+    when (sideEffect) {
+        LoginSideEffect.NavigateHome -> NavCommand.ResetTo(key = HomeEntry)
+        LoginSideEffect.NavigateCreateProfile -> NavCommand.To(key = CreateProfileEntry)
+        is LoginSideEffect.ShowErrorSnackbar -> null
+    }

@@ -59,10 +59,6 @@ class HomeViewModel(
                 postSideEffect(HomeSideEffect.NavigateToSetting)
             }
 
-            HomeIntent.ClickProfile -> {
-                postSideEffect(HomeSideEffect.NavigateToProfile)
-            }
-
             HomeIntent.ClickCreateDeck -> {
                 postSideEffect(HomeSideEffect.NavigateToCreateDeck)
             }

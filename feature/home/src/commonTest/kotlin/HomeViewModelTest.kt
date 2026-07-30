@@ -74,19 +74,6 @@ class HomeViewModelTest : FunSpec() {
             }
         }
 
-        test("ClickProfile 은 NavigateToProfile 을 방출한다") {
-            runTest(testDispatcher) {
-                val viewModel = viewModelWith()
-
-                viewModel.sideEffect.test {
-                    viewModel.intent(HomeIntent.ClickProfile)
-                    advanceUntilIdle()
-
-                    awaitItem() shouldBe HomeSideEffect.NavigateToProfile
-                }
-            }
-        }
-
         test("ClickCreateDeck 은 NavigateToCreateDeck 을 방출한다") {
             runTest(testDispatcher) {
                 val viewModel = viewModelWith()
