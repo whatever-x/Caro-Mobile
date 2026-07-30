@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.navigation3.runtime.NavKey
@@ -124,7 +125,9 @@ fun CaroApp(
     }
     CaroTheme {
         val snackBarHostState = remember { SnackbarHostState() }
-        val snackbarBottomPadding = snackbarHostBottomPadding(backStack.lastOrNull())
+        val currentDestination = backStack.lastOrNull()
+        val systemBarBackgroundRoles = systemBarBackgroundRoles(currentDestination)
+        val snackbarBottomPadding = snackbarHostBottomPadding(currentDestination)
 
         LaunchedEffect(snackbarController, snackBarHostState) {
             snackbarController.messages.collect { snackbar ->
@@ -140,29 +143,32 @@ fun CaroApp(
             }
         }
 
-        Scaffold(
-            modifier = Modifier.fillMaxSize(),
-            snackbarHost = {
-                CaroSnackBarHost(
-                    modifier = Modifier.padding(bottom = snackbarBottomPadding),
-                    hostState = snackBarHostState,
-                    snackbar = { snackbarData ->
-                        CaroSnackbar(
-                            snackbarData = snackbarData,
-                        )
-                    },
-                )
-            },
-        ) { innerPadding ->
-            Box(
-                modifier =
-                    Modifier
-                        .fillMaxSize()
-                        .padding(paddingValues = innerPadding),
-            ) {
-                CaroNavHost(
-                    backStack = backStack,
-                )
+        CaroSystemBarBackground(roles = systemBarBackgroundRoles) {
+            Scaffold(
+                modifier = Modifier.fillMaxSize(),
+                containerColor = Color.Transparent,
+                snackbarHost = {
+                    CaroSnackBarHost(
+                        modifier = Modifier.padding(bottom = snackbarBottomPadding),
+                        hostState = snackBarHostState,
+                        snackbar = { snackbarData ->
+                            CaroSnackbar(
+                                snackbarData = snackbarData,
+                            )
+                        },
+                    )
+                },
+            ) { innerPadding ->
+                Box(
+                    modifier =
+                        Modifier
+                            .fillMaxSize()
+                            .padding(paddingValues = innerPadding),
+                ) {
+                    CaroNavHost(
+                        backStack = backStack,
+                    )
+                }
             }
         }
     }

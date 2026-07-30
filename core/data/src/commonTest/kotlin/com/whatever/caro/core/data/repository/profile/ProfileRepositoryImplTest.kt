@@ -3,7 +3,7 @@ package com.whatever.caro.core.data.repository.profile
 import com.whatever.caro.core.remote.datasource.profile.ProfileDataSource
 import com.whatever.caro.core.remote.dto.nickname.response.NicknameResponse
 import com.whatever.caro.core.remote.dto.user.request.UpdateNicknameRequest
-import com.whatever.caro.core.remote.dto.user.response.MyNicknameResponse
+import com.whatever.caro.core.remote.dto.user.response.MyInfoResponse
 import com.whatever.caro.core.remote.dto.user.response.NicknameCheckResponse
 import com.whatever.caro.core.remote.dto.user.response.UpdateNicknameResponse
 import dev.mokkery.answering.returns
@@ -33,12 +33,17 @@ class ProfileRepositoryImplTest : FunSpec() {
             runTest {
                 val profileDataSource =
                     mock<ProfileDataSource> {
-                        everySuspend { getMyNickname() } returns MyNicknameResponse(nickname = "캐로")
+                        everySuspend { getMyInfo() } returns
+                            MyInfoResponse(
+                                nickname = "캐로",
+                                email = "caro@example.com",
+                                loginPlatform = null,
+                            )
                     }
                 val repository = ProfileRepositoryImpl(profileDataSource)
 
                 repository.getMyNickname() shouldBe "캐로"
-                verifySuspend { profileDataSource.getMyNickname() }
+                verifySuspend { profileDataSource.getMyInfo() }
             }
         }
 
@@ -46,7 +51,12 @@ class ProfileRepositoryImplTest : FunSpec() {
             runTest {
                 val profileDataSource =
                     mock<ProfileDataSource> {
-                        everySuspend { getMyNickname() } returns MyNicknameResponse(nickname = null)
+                        everySuspend { getMyInfo() } returns
+                            MyInfoResponse(
+                                nickname = null,
+                                email = null,
+                                loginPlatform = null,
+                            )
                     }
                 val repository = ProfileRepositoryImpl(profileDataSource)
 
