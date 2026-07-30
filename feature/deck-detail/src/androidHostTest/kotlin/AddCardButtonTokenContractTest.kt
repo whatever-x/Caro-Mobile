@@ -8,8 +8,8 @@ class AddCardButtonTokenContractTest :
         test("카드 추가 버튼은 brand surface 토큰을 사용한다") {
             val source = findAddCardButtonItem().readText()
 
-            source shouldContain "color = CaroTheme.color.surface.brand"
-            source shouldNotContain "color = CaroTheme.color.background.brand"
+            source shouldContain "CaroTheme.color.surface.brand"
+            source shouldNotContain "CaroTheme.color.background.brand"
         }
     })
 
