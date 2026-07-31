@@ -2,6 +2,7 @@ package com.whatever.caro.feature.setting
 
 import com.whatever.caro.core.data.repository.auth.AuthRepository
 import com.whatever.caro.core.data.repository.profile.ProfileRepository
+import com.whatever.caro.core.data.util.suspendRunCatching
 import com.whatever.caro.core.viewmodel.BaseViewModel
 import com.whatever.caro.core.viewmodel.ExceptionFilter
 import com.whatever.caro.feature.setting.model.SnackbarType
@@ -77,20 +78,22 @@ class SettingViewModel(
     private suspend fun initialize() {
         val generation = ++initializeGeneration
         reduce { copy(isLoading = true) }
-        try {
-            val myInfo = profileRepository.getMyInfo()
+        suspendRunCatching {
+            profileRepository.getMyInfo()
+        }.onSuccess { myInfo ->
             if (generation != initializeGeneration) return
             reduce {
                 copy(
+                    isLoading = false,
                     nickname = myInfo.nickname,
                     emailAddress = myInfo.email,
                     socialLoginType = myInfo.socialLoginType,
                 )
             }
-        } finally {
-            if (generation == initializeGeneration) {
-                reduce { copy(isLoading = false) }
-            }
+        }.onFailure {
+            if (generation != initializeGeneration) return
+            reduce { copy(isLoading = false) }
+            postSideEffect(SettingSideEffect.ShowSnackbar(type = SnackbarType.USER_INFO_LOAD_ERROR))
         }
     }
 

@@ -18,6 +18,7 @@ import dev.mokkery.matcher.any
 import dev.mokkery.mock
 import dev.mokkery.verify.VerifyMode.Companion.exactly
 import dev.mokkery.verifySuspend
+import io.kotest.assertions.throwables.shouldNotThrowAny
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
@@ -143,6 +144,52 @@ class AuthRepositoryImplTest : FunSpec() {
 
                 verifySuspend {
                     remoteAuthDataSource.withdraw()
+                    localAuthDataSource.clear()
+                }
+            }
+        }
+
+        test("withdraw는 로컬 토큰 삭제가 실패해도 예외를 전파하지 않는다") {
+            runTest {
+                val remoteAuthDataSource =
+                    mock<AuthDataSource> { everySuspend { withdraw() } returns Unit }
+                val localAuthDataSource =
+                    mock<LocalAuthDataSource> {
+                        everySuspend { clear() } throws RuntimeException("clear failed")
+                    }
+                val repository =
+                    repositoryWith(
+                        remoteAuthDataSource = remoteAuthDataSource,
+                        localAuthDataSource = localAuthDataSource,
+                    )
+
+                shouldNotThrowAny { repository.withdraw() }
+
+                verifySuspend {
+                    remoteAuthDataSource.withdraw()
+                    localAuthDataSource.clear()
+                }
+            }
+        }
+
+        test("logout은 로컬 토큰 삭제가 실패해도 예외를 전파하지 않는다") {
+            runTest {
+                val remoteAuthDataSource =
+                    mock<AuthDataSource> { everySuspend { logout() } returns Unit }
+                val localAuthDataSource =
+                    mock<LocalAuthDataSource> {
+                        everySuspend { clear() } throws RuntimeException("clear failed")
+                    }
+                val repository =
+                    repositoryWith(
+                        remoteAuthDataSource = remoteAuthDataSource,
+                        localAuthDataSource = localAuthDataSource,
+                    )
+
+                shouldNotThrowAny { repository.logout() }
+
+                verifySuspend {
+                    remoteAuthDataSource.logout()
                     localAuthDataSource.clear()
                 }
             }

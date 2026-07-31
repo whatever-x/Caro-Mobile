@@ -217,22 +217,21 @@ class SettingViewModelTest : FunSpec() {
             }
         }
 
-        test("Initialize의 사용자 정보 조회 예외가 전역 필터에서 억제되어도 로딩을 해제한다") {
+        test("Initialize의 사용자 정보 조회가 실패하면 로딩을 해제하고 에러 스낵바를 emit 한다") {
             runTest {
-                val suppressedException = IllegalStateException("suppressed")
                 val profileRepository =
                     mock<ProfileRepository> {
-                        everySuspend { getMyInfo() } throws suppressedException
+                        everySuspend { getMyInfo() } throws IllegalStateException("my info failed")
                     }
-                val (viewModel, _) =
-                    createViewModel(
-                        profileRepository = profileRepository,
-                        exceptionFilter = ExceptionFilter { it === suppressedException },
-                    )
+                val (viewModel, _) = createViewModel(profileRepository = profileRepository)
 
-                viewModel.intent(SettingIntent.Initialize)
-                advanceUntilIdle()
+                viewModel.sideEffect.test {
+                    viewModel.intent(SettingIntent.Initialize)
+                    advanceUntilIdle()
 
+                    awaitItem() shouldBe
+                        SettingSideEffect.ShowSnackbar(type = SnackbarType.USER_INFO_LOAD_ERROR)
+                }
                 viewModel.state.value.isLoading shouldBe false
             }
         }

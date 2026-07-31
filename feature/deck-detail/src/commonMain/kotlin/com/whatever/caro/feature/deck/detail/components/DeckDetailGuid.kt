@@ -107,7 +107,7 @@ internal fun DeckDetailGuid(
                         ).padding(
                             horizontal = CaroTheme.spacing.l,
                             vertical = CaroTheme.spacing.m,
-                        ).noRippleClickable(onAddFirstCard),
+                        ).noRippleClickable(onClick = onAddFirstCard),
                 horizontalArrangement =
                     Arrangement.spacedBy(
                         space = CaroTheme.spacing.xs,

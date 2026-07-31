@@ -1,6 +1,7 @@
 package com.whatever.caro.core.data.repository.auth
 
 import com.whatever.caro.core.data.mapper.toAuthSession
+import com.whatever.caro.core.data.util.suspendRunCatching
 import com.whatever.caro.core.datastore.datasource.LocalAuthDataSource
 import com.whatever.caro.core.model.auth.AuthSession
 import com.whatever.caro.core.model.auth.SocialLoginType
@@ -10,6 +11,7 @@ import com.whatever.caro.core.remote.datasource.auth.NonAuthDataSource
 import com.whatever.caro.core.remote.dto.auth.request.CompleteRegistrationRequest
 import com.whatever.caro.core.remote.dto.auth.request.RefreshTokenRequest
 import com.whatever.caro.core.remote.dto.auth.request.SocialLoginRequest
+import io.github.aakira.napier.Napier
 
 internal class AuthRepositoryImpl(
     private val remoteAuthDataSource: AuthDataSource,
@@ -35,12 +37,24 @@ internal class AuthRepositoryImpl(
 
     override suspend fun logout() {
         remoteAuthDataSource.logout()
-        localAuthDataSource.clear()
+        clearLocalSession()
     }
 
     override suspend fun withdraw() {
         remoteAuthDataSource.withdraw()
-        localAuthDataSource.clear()
+        clearLocalSession()
+    }
+
+    /**
+     * 원격 로그아웃·탈퇴는 되돌릴 수 없으므로, 로컬 토큰 삭제가 실패해도 전체 요청을 실패로 만들지 않는다.
+     * 실패로 처리하면 클라이언트가 이미 무효해진 세션으로 로그인 상태를 유지하게 된다.
+     */
+    private suspend fun clearLocalSession() {
+        suspendRunCatching {
+            localAuthDataSource.clear()
+        }.onFailure { throwable ->
+            Napier.w(throwable = throwable) { "clearLocalSession failed" }
+        }
     }
 
     override suspend fun completeRegistration(

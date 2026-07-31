@@ -144,6 +144,7 @@
 	<string name="setting_report_bug_url">https://forms.gle/tCVKgkuNc6ZHuNkp9</string>
 	<string name="setting_snackbar_logout">Successfully logged out.</string>
 	<string name="setting_snackbar_delete_account">Account deleted successfully.</string>
+	<string name="setting_snackbar_user_info_load_error">Failed to load your profile. Please try again.</string>
 	<string name="setting_dialog_title">Are you sure you want to delete your account?</string>
 	<string name="setting_dialog_content">All your saved data will be permanently removed.</string>
 	<string name="setting_dialog_button_delete_account">Delete Account</string>

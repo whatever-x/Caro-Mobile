@@ -139,6 +139,7 @@
     <string name="setting_description_app_version">현재 앱 버전 : %1$s</string>
     <string name="setting_snackbar_logout">로그아웃을 하였습니다.</string>
     <string name="setting_snackbar_delete_account">회원탈퇴를 하였습니다.</string>
+    <string name="setting_snackbar_user_info_load_error">사용자 정보를 불러오지 못했습니다. 다시 시도해 주세요.</string>
     <string name="setting_dialog_title">정말 계정을 탈퇴하시겠습니까?</string>
     <string name="setting_dialog_content">저장된 모든 기록이 소멸될 수 있습니다.</string>
     <string name="setting_dialog_button_delete_account">탈퇴하기</string>
