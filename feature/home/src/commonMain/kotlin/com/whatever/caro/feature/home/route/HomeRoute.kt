@@ -10,7 +10,6 @@ import com.whatever.caro.core.model.learning.LearningMode
 import com.whatever.caro.core.navigator.contract.NavCommand.To
 import com.whatever.caro.core.navigator.dispatcher.NavigationDispatcher
 import com.whatever.caro.core.navigator.entries.CreateDeckEntry
-import com.whatever.caro.core.navigator.entries.CreateProfileEntry
 import com.whatever.caro.core.navigator.entries.DeckDetailEntry
 import com.whatever.caro.core.navigator.entries.LearningEntry
 import com.whatever.caro.core.navigator.entries.SettingEntry
@@ -44,10 +43,6 @@ fun HomeRoute(
                                     ),
                             ),
                     )
-                }
-
-                is HomeSideEffect.NavigateToProfile -> {
-                    navDispatcher.emit(command = To(key = CreateProfileEntry))
                 }
 
                 is HomeSideEffect.NavigateToCreateDeck -> {

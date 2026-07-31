@@ -63,12 +63,13 @@ class SettingViewModelTest : FunSpec() {
                             socialLoginType = SocialLoginType.NONE,
                         )
                 },
+            exceptionFilter: ExceptionFilter = ExceptionFilter.None,
         ): SettingFixture {
             val viewModel =
                 SettingViewModel(
                     authRepository = authRepository,
                     profileRepository = profileRepository,
-                    exceptionFilter = ExceptionFilter.None,
+                    exceptionFilter = exceptionFilter,
                 )
             return SettingFixture(
                 viewModel = viewModel,
@@ -216,6 +217,26 @@ class SettingViewModelTest : FunSpec() {
             }
         }
 
+        test("Initialize의 사용자 정보 조회 예외가 전역 필터에서 억제되어도 로딩을 해제한다") {
+            runTest {
+                val suppressedException = IllegalStateException("suppressed")
+                val profileRepository =
+                    mock<ProfileRepository> {
+                        everySuspend { getMyInfo() } throws suppressedException
+                    }
+                val (viewModel, _) =
+                    createViewModel(
+                        profileRepository = profileRepository,
+                        exceptionFilter = ExceptionFilter { it === suppressedException },
+                    )
+
+                viewModel.intent(SettingIntent.Initialize)
+                advanceUntilIdle()
+
+                viewModel.state.value.isLoading shouldBe false
+            }
+        }
+
         test("ClickLogOut 은 logout 을 호출하고 ShowSnackbar(LOGOUT) 와 NavigateToLogin 을 순서대로 emit 한다") {
             runTest {
                 val (viewModel, authRepository) = createViewModel()
@@ -330,6 +351,7 @@ class SettingViewModelTest : FunSpec() {
             runTest {
                 val (viewModel, authRepository) = createViewModel()
 
+                viewModel.intent(SettingIntent.Initialize)
                 viewModel.intent(SettingIntent.ClickDeleteAccount)
                 advanceUntilIdle()
 
@@ -354,6 +376,7 @@ class SettingViewModelTest : FunSpec() {
                         everySuspend { withdraw() } calls { withdrawal.await() }
                     }
                 val (viewModel) = createViewModel(authRepository = authRepository)
+                viewModel.intent(SettingIntent.Initialize)
                 viewModel.intent(SettingIntent.ClickDeleteAccount)
                 advanceUntilIdle()
 
@@ -409,6 +432,7 @@ class SettingViewModelTest : FunSpec() {
                         everySuspend { withdraw() } throws RuntimeException("withdraw failed")
                     }
                 val (viewModel) = createViewModel(authRepository = authRepository)
+                viewModel.intent(SettingIntent.Initialize)
                 viewModel.intent(SettingIntent.ClickDeleteAccount)
                 advanceUntilIdle()
 

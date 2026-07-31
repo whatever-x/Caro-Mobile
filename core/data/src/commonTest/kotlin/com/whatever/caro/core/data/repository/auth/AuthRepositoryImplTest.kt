@@ -35,7 +35,7 @@ class AuthRepositoryImplTest : FunSpec() {
             localAuthDataSource = localAuthDataSource,
         )
 
-        test("loginWithSocial은 발급된 토큰을 저장하고 AuthSession을 반환한다") {
+        test("loginWithSocial은 발급된 토큰을 저장하고 가입 완료 여부를 반환한다") {
             runTest {
                 val remoteNonAuthDataSource =
                     mock<NonAuthDataSource> {
@@ -62,11 +62,45 @@ class AuthRepositoryImplTest : FunSpec() {
                         idToken = "idToken",
                     )
 
-                result shouldBe AuthSession(accessToken = "access", refreshToken = "refresh")
+                result shouldBe true
                 verifySuspend {
                     remoteNonAuthDataSource.socialLogin(
                         SocialLoginRequest(provider = SocialLoginType.GOOGLE, idToken = "idToken"),
                     )
+                    localAuthDataSource.saveTokens(accessToken = "access", refreshToken = "refresh")
+                }
+            }
+        }
+
+        test("loginWithSocial은 가입이 완료되지 않은 응답이면 토큰 저장 후 false를 반환한다") {
+            runTest {
+                val remoteNonAuthDataSource =
+                    mock<NonAuthDataSource> {
+                        everySuspend { socialLogin(any()) } returns
+                            SocialLoginResponse(
+                                accessToken = "access",
+                                refreshToken = "refresh",
+                                isRegistrationComplete = false,
+                            )
+                    }
+                val localAuthDataSource =
+                    mock<LocalAuthDataSource> {
+                        everySuspend { saveTokens(any(), any()) } returns Unit
+                    }
+                val repository =
+                    repositoryWith(
+                        remoteNonAuthDataSource = remoteNonAuthDataSource,
+                        localAuthDataSource = localAuthDataSource,
+                    )
+
+                val result =
+                    repository.loginWithSocial(
+                        provider = SocialLoginType.GOOGLE,
+                        idToken = "idToken",
+                    )
+
+                result shouldBe false
+                verifySuspend {
                     localAuthDataSource.saveTokens(accessToken = "access", refreshToken = "refresh")
                 }
             }

@@ -8,6 +8,7 @@ import com.whatever.caro.feature.profile.NicknameValidator
 import com.whatever.caro.feature.profile.create.CreateProfileViewModel
 import com.whatever.caro.feature.profile.create.mvi.CreateProfileIntent
 import com.whatever.caro.feature.profile.create.mvi.CreateProfileSideEffect
+import dev.mokkery.answering.calls
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
@@ -16,11 +17,13 @@ import dev.mokkery.verify.VerifyMode.Companion.exactly
 import dev.mokkery.verifySuspend
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 
@@ -105,7 +108,7 @@ class CreateProfileViewModelTest : FunSpec() {
             }
         }
 
-        test("확인 가능 상태에서 ClickConfirm 은 가입 완료 후 NavigateBack 을 emit 한다") {
+        test("확인 가능 상태에서 ClickConfirm 은 가입 완료 후 NavigateHome 을 emit 한다") {
             runTest {
                 val (viewModel, authRepository, _) =
                     createViewModel(randomNickname = "랜덤닉네임")
@@ -118,13 +121,68 @@ class CreateProfileViewModelTest : FunSpec() {
                     viewModel.intent(CreateProfileIntent.ClickConfirm)
                     advanceUntilIdle()
 
-                    awaitItem() shouldBe CreateProfileSideEffect.NavigateBack
+                    awaitItem() shouldBe CreateProfileSideEffect.NavigateHome
                 }
                 verifySuspend(exactly(1)) {
                     authRepository.completeRegistration(
                         nickname = "랜덤닉네임",
                         termsAgreed = true,
                     )
+                }
+            }
+        }
+
+        test("가입 저장 중 사용자 Intent 를 무시하고 저장 시작 시점의 닉네임을 전달한다") {
+            runTest {
+                val (viewModel, authRepository, profileRepository) =
+                    createViewModel(randomNickname = "저장할닉네임")
+                val saveGate = CompletableDeferred<Unit>()
+                everySuspend {
+                    authRepository.completeRegistration(any(), any())
+                } calls {
+                    saveGate.await()
+                    AuthSession(accessToken = "access", refreshToken = "refresh")
+                }
+                advanceUntilIdle()
+                val randomNicknameGate = CompletableDeferred<Unit>()
+                everySuspend {
+                    profileRepository.getRandomNickname()
+                } calls {
+                    randomNicknameGate.await()
+                    "뒤늦게도착한닉네임"
+                }
+
+                viewModel.sideEffect.test {
+                    viewModel.intent(CreateProfileIntent.ClickRefresh)
+                    runCurrent()
+                    viewModel.intent(CreateProfileIntent.ClickConfirm)
+                    viewModel.intent(CreateProfileIntent.UpdateNickname("변경된닉네임"))
+                    runCurrent()
+
+                    viewModel.state.value.isLoading shouldBe true
+                    viewModel.state.value.nickname shouldBe "저장할닉네임"
+
+                    viewModel.intent(CreateProfileIntent.ClickRefresh)
+                    viewModel.intent(CreateProfileIntent.ClickConfirm)
+                    viewModel.intent(CreateProfileIntent.ClickBack)
+                    runCurrent()
+                    randomNicknameGate.complete(Unit)
+                    runCurrent()
+
+                    viewModel.state.value.nickname shouldBe "저장할닉네임"
+                    expectNoEvents()
+                    verifySuspend(exactly(2)) {
+                        profileRepository.getRandomNickname()
+                    }
+                    verifySuspend(exactly(1)) {
+                        authRepository.completeRegistration(
+                            nickname = "저장할닉네임",
+                            termsAgreed = true,
+                        )
+                    }
+
+                    saveGate.complete(Unit)
+                    awaitItem() shouldBe CreateProfileSideEffect.NavigateHome
                 }
             }
         }

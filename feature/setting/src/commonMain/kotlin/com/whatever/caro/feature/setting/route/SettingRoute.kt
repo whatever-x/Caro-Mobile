@@ -17,6 +17,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigationevent.NavigationEventInfo
+import androidx.navigationevent.compose.NavigationBackHandler
+import androidx.navigationevent.compose.rememberNavigationEventState
 import caromobile.core.designsystem.generated.resources.Res
 import caromobile.core.designsystem.generated.resources.setting_dialog_button_cancel
 import caromobile.core.designsystem.generated.resources.setting_dialog_button_delete_account
@@ -51,6 +54,7 @@ fun SettingRoute(
     snackbarController: SnackbarController,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val backState = rememberNavigationEventState(currentInfo = NavigationEventInfo.None)
     val uriHandler = LocalUriHandler.current
     val privacyPolicyUrl = stringResource(resource = Res.string.setting_privcay_policy_url)
     val termsOfServiceUrl = stringResource(resource = Res.string.setting_terms_of_service_url)
@@ -58,6 +62,15 @@ fun SettingRoute(
     val logoutSnackbarMessage = stringResource(resource = Res.string.setting_snackbar_logout)
     val deleteAccountSnackbarMessage =
         stringResource(resource = Res.string.setting_snackbar_delete_account)
+
+    NavigationBackHandler(
+        state = backState,
+        onBackCompleted = {
+            if (!state.isLoading) {
+                viewModel.intent(SettingIntent.ClickBack)
+            }
+        },
+    )
 
     LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
         viewModel.intent(SettingIntent.Initialize)

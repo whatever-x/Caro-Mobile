@@ -24,12 +24,15 @@ class CreateProfileViewModel(
         exceptionFilter = exceptionFilter,
     ) {
     private var nicknameValidationJob: Job? = null
+    private var randomNicknameJob: Job? = null
 
     init {
         fetchRandomNickname()
     }
 
     override suspend fun handleIntent(intent: CreateProfileIntent) {
+        if (currentState.isLoading) return
+
         when (intent) {
             is CreateProfileIntent.UpdateNickname -> handleUpdateNickname(intent.nickname)
             is CreateProfileIntent.ClickRefresh -> fetchRandomNickname()
@@ -39,16 +42,29 @@ class CreateProfileViewModel(
     }
 
     private fun handleUpdateNickname(nickname: String) {
+        randomNicknameJob?.cancel()
         val filtered = nicknameValidator.filterInput(nickname)
         val validation = nicknameValidator.validate(filtered)
 
         if (validation.isValid.not()) {
             nicknameValidationJob?.cancel()
-            reduce { copy(nickname = filtered, validationResult = validation) }
+            reduce {
+                copy(
+                    nickname = filtered,
+                    validationResult = validation,
+                    isRandomNicknameLoading = false,
+                )
+            }
             return
         }
 
-        reduce { copy(nickname = filtered, validationResult = NicknameValidationResult.Checking) }
+        reduce {
+            copy(
+                nickname = filtered,
+                validationResult = NicknameValidationResult.Checking,
+                isRandomNicknameLoading = false,
+            )
+        }
 
         nicknameValidationJob?.cancel()
         nicknameValidationJob =
@@ -72,35 +88,40 @@ class CreateProfileViewModel(
 
     private fun fetchRandomNickname() {
         nicknameValidationJob?.cancel()
+        randomNicknameJob?.cancel()
         reduce { copy(isRandomNicknameLoading = true) }
-        launch {
-            suspendRunCatching { profileRepository.getRandomNickname() }
-                .onSuccess { nickname ->
-                    reduce {
-                        copy(
-                            nickname = nickname,
-                            validationResult = NicknameValidationResult.Valid,
-                        )
+        randomNicknameJob =
+            launch {
+                suspendRunCatching { profileRepository.getRandomNickname() }
+                    .onSuccess { nickname ->
+                        reduce {
+                            copy(
+                                nickname = nickname,
+                                validationResult = NicknameValidationResult.Valid,
+                            )
+                        }
+                    }.onFailure { throwable ->
+                        Napier.e(throwable = throwable) { "getRandomNickname failed" }
                     }
-                }.onFailure { throwable ->
-                    Napier.e(throwable = throwable) { "getRandomNickname failed" }
-                }
-            reduce { copy(isRandomNicknameLoading = false) }
-        }
+                reduce { copy(isRandomNicknameLoading = false) }
+            }
     }
 
     private fun handleConfirm() {
         if (currentState.isConfirmEnabled.not()) return
-        reduce { copy(isLoading = true) }
+        val nickname = currentState.nickname
+        nicknameValidationJob?.cancel()
+        randomNicknameJob?.cancel()
+        reduce { copy(isLoading = true, isRandomNicknameLoading = false) }
         launch {
             suspendRunCatching {
                 // TODO: 약관 동의 화면 추가 시 termsAgreed 전달 값 변경
                 authRepository.completeRegistration(
-                    nickname = currentState.nickname,
+                    nickname = nickname,
                     termsAgreed = true,
                 )
             }.onSuccess {
-                postSideEffect(CreateProfileSideEffect.NavigateBack)
+                postSideEffect(CreateProfileSideEffect.NavigateHome)
             }.onFailure { throwable ->
                 Napier.e(throwable = throwable) { "completeRegistration failed" }
                 reduce { copy(isLoading = false) }
