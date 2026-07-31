@@ -18,6 +18,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
@@ -33,6 +34,13 @@ private val CtaButtonHeight = 56.dp
 private val ButtonLoadingWidth = 57.dp
 private val ButtonLoadingHeight = 17.dp
 internal val ProfileButtonLoadingContentScale = ContentScale.Crop
+
+/**
+ * 로띠 캔버스(800x800)는 정사각이지만 점 3개는 y 350~510 밴드에만 그려진다.
+ * 캔버스 중심(400) 기준으로 크롭하면 아래쪽 여유가 10px 밖에 남지 않으므로,
+ * 밴드 중심(430)에 맞춰 크롭 창을 내린다.
+ */
+internal val ProfileButtonLoadingAlignment = BiasAlignment(horizontalBias = 0f, verticalBias = 0.075f)
 private const val LOTTIE_BUTTON_LOADING_PATH = "files/lottie_button_loading.json"
 private const val CONTENT_TRANSITION_DURATION_MILLIS = 180
 private const val CONTENT_TRANSITION_SCALE = 0.92f
@@ -123,6 +131,7 @@ private fun ProfileButtonLoading() {
                 composition = composition,
                 iterations = Compottie.IterateForever,
             ),
+        alignment = ProfileButtonLoadingAlignment,
         contentScale = ProfileButtonLoadingContentScale,
         contentDescription = null,
     )
