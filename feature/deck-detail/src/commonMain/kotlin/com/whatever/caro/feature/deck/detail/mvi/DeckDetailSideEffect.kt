@@ -34,5 +34,9 @@ sealed interface DeckDetailSideEffect : UiSideEffect {
         val back: String,
     ) : DeckDetailSideEffect
 
+    data object NavigateToHome : DeckDetailSideEffect
+
     data object ShowCardLoadError : DeckDetailSideEffect
+
+    data object ShowDeckDeleteError : DeckDetailSideEffect
 }

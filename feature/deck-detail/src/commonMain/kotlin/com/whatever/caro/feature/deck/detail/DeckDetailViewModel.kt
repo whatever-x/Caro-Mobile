@@ -1,6 +1,7 @@
 package com.whatever.caro.feature.deck.detail
 
 import com.whatever.caro.core.data.repository.deck.DeckRepository
+import com.whatever.caro.core.data.util.suspendRunCatching
 import com.whatever.caro.core.model.card.CardBadge
 import com.whatever.caro.core.model.deck.Deck
 import com.whatever.caro.core.model.learning.LearningMode
@@ -108,8 +109,21 @@ class DeckDetailViewModel(
 
             DeckDetailIntent.ClickDeckEditBottomSheetDelete -> {
                 reduce {
-                    copy(isDeckEditBottomSheetVisible = false)
+                    copy(
+                        isDeckEditBottomSheetVisible = false,
+                        isDeleteDeckDialogVisible = true,
+                    )
                 }
+            }
+
+            DeckDetailIntent.ClickDeleteDeckCancel -> {
+                reduce {
+                    copy(isDeleteDeckDialogVisible = false)
+                }
+            }
+
+            DeckDetailIntent.ClickDeleteDeckConfirm -> {
+                deleteDeck()
             }
 
             is DeckDetailIntent.ClickCard -> {
@@ -142,6 +156,29 @@ class DeckDetailViewModel(
                 back = card.back,
             ),
         )
+    }
+
+    private fun deleteDeck() {
+        if (currentState.isDeckDeleting) return
+        reduce {
+            copy(
+                isDeleteDeckDialogVisible = false,
+                isDeckDeleting = true,
+            )
+        }
+
+        launch {
+            suspendRunCatching {
+                deckRepository.deleteDeck(deckId = currentState.deck.id)
+            }.onSuccess {
+                postSideEffect(DeckDetailSideEffect.NavigateToHome)
+            }.onFailure {
+                reduce {
+                    copy(isDeckDeleting = false)
+                }
+                postSideEffect(DeckDetailSideEffect.ShowDeckDeleteError)
+            }
+        }
     }
 
     private fun loadCards() {

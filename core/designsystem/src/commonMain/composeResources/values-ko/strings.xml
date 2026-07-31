@@ -75,6 +75,11 @@
     <string name="deck_detail_button_bottom_sheet_last_frequency">출제 빈도</string>
     <string name="deck_detail_button_bottom_sheet_deck_edit">덱 편집</string>
     <string name="deck_detail_button_bottom_sheet_deck_delete">덱 삭제</string>
+    <string name="deck_delete_dialog_title">덱을 삭제할까요?</string>
+    <string name="deck_delete_dialog_body">삭제 후에는 복구할 수 없어요</string>
+    <string name="deck_delete_dialog_button_delete">삭제</string>
+    <string name="deck_delete_dialog_button_cancel">취소</string>
+    <string name="deck_delete_error">덱 삭제에 실패했어요. 다시 시도해 주세요.</string>
     <!-- card -->
     <string name="card_title_create">카드 생성</string>
     <string name="card_title_edit_content">카드 수정</string>
