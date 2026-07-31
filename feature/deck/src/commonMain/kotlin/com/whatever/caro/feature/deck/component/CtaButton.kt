@@ -23,8 +23,13 @@ internal fun CtaButton(
         if (enabled) {
             CaroTheme.color.surface.brand
         } else {
-            CaroTheme.color.surface.brand
-                .copy(alpha = DISABLED_ALPHA)
+            CaroTheme.color.surface.disabled
+        }
+    val textColor =
+        if (enabled) {
+            CaroTheme.color.text.inverse
+        } else {
+            CaroTheme.color.text.disabled
         }
 
     Box(
@@ -42,8 +47,8 @@ internal fun CtaButton(
     ) {
         Text(
             text = text,
-            style = CaroTheme.typography.label1.bold,
-            color = CaroTheme.color.text.inverse,
+            style = CaroTheme.typography.label1,
+            color = textColor,
         )
     }
 }

@@ -27,8 +27,8 @@ internal fun RequiredFieldHeader(label: String) {
         )
         Text(
             text = stringResource(Res.string.deck_field_required),
-            style = CaroTheme.typography.label1.bold,
-            color = CaroTheme.color.text.accent,
+            style = CaroTheme.typography.label1,
+            color = CaroTheme.color.text.dangerous,
         )
     }
 }

@@ -17,7 +17,7 @@ interface DeckRepository {
     suspend fun createDeck(
         name: String,
         description: String,
-    )
+    ): Deck
 
     suspend fun updateDeck(
         deckId: Long,

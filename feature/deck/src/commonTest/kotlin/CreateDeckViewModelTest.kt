@@ -1,6 +1,8 @@
 import app.cash.turbine.test
 import com.whatever.caro.core.data.repository.deck.DeckRepository
+import com.whatever.caro.core.model.deck.Deck
 import com.whatever.caro.core.model.deck.DeckInputLimits
+import com.whatever.caro.core.model.deck.DeckState
 import com.whatever.caro.core.viewmodel.ExceptionFilter
 import com.whatever.caro.feature.deck.create.CreateDeckViewModel
 import com.whatever.caro.feature.deck.create.mvi.CreateDeckIntent
@@ -25,10 +27,20 @@ import kotlinx.coroutines.test.setMain
 class CreateDeckViewModelTest : FunSpec() {
     init {
         val testDispatcher = StandardTestDispatcher()
+        val createdDeck =
+            Deck(
+                id = 7L,
+                title = "영어 단어 2000개",
+                description = "일상에서 많이 쓰는 단어",
+                cardTotalCount = 0,
+                todayLearningCount = 0,
+                todayCompleteCount = 0,
+                state = DeckState.NOT_STARTED,
+            )
 
         fun viewModelWith(
             deckRepository: DeckRepository =
-                mock { everySuspend { createDeck(any(), any()) } returns Unit },
+                mock { everySuspend { createDeck(any(), any()) } returns createdDeck },
         ) = CreateDeckViewModel(deckRepository, ExceptionFilter.None)
 
         beforeTest {
@@ -86,10 +98,10 @@ class CreateDeckViewModelTest : FunSpec() {
             }
         }
 
-        test("입력 완료 후 ClickConfirm은 덱을 생성하고 NavigateBack을 방출한다") {
+        test("입력 완료 후 ClickConfirm은 덱을 생성하고 Created를 방출한다") {
             runTest(testDispatcher) {
                 val deckRepository =
-                    mock<DeckRepository> { everySuspend { createDeck(any(), any()) } returns Unit }
+                    mock<DeckRepository> { everySuspend { createDeck(any(), any()) } returns createdDeck }
                 val viewModel = viewModelWith(deckRepository)
 
                 viewModel.intent(CreateDeckIntent.UpdateName("영어 단어 2000개"))
@@ -98,7 +110,7 @@ class CreateDeckViewModelTest : FunSpec() {
 
                 viewModel.sideEffect.test {
                     viewModel.intent(CreateDeckIntent.ClickConfirm)
-                    awaitItem() shouldBe CreateDeckSideEffect.NavigateBack
+                    awaitItem() shouldBe CreateDeckSideEffect.Created(createdDeck)
                 }
                 verifySuspend {
                     deckRepository.createDeck(

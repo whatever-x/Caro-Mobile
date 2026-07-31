@@ -9,9 +9,12 @@ data class HomeState(
     val nickname: String = "",
     val streakState: HomeStreakState = HomeStreakState.Loading,
     val decks: ImmutableList<Deck> = persistentListOf(),
-    val isLoading: Boolean = false,
+    val isLoading: Boolean = true,
     val hasLoadError: Boolean = false,
 ) : UiState {
+    val isLoadedContentVisible: Boolean
+        get() = isLoading.not()
+
     val isDeckEmpty: Boolean
         get() = decks.isEmpty() && isLoading.not() && hasLoadError.not()
 }

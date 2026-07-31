@@ -102,7 +102,7 @@ private fun TextAreaBox(
         if (enabled) {
             CaroTheme.color.text.primary
         } else {
-            CaroTheme.color.text.disable
+            CaroTheme.color.text.disabled
         }
     val surfaceColor =
         if (enabled) {
@@ -111,13 +111,13 @@ private fun TextAreaBox(
             CaroTheme.color.surface.secondary
         }
     val borderColor =
-        when {
-            !enabled -> CaroTheme.color.border.disabled
-            isFocused -> CaroTheme.color.border.brand
-            else -> CaroTheme.color.border.secondary
+        if (isFocused) {
+            CaroTheme.color.border.brand
+        } else {
+            CaroTheme.color.border.secondary
         }
     val mergedTextStyle =
-        CaroTheme.typography.body1.regular
+        CaroTheme.typography.body1
             .copy(color = textColor)
     val selectionColors =
         TextSelectionColors(
@@ -170,7 +170,7 @@ private fun TextAreaBox(
                 if (value.isEmpty() && placeholder != null) {
                     Text(
                         text = placeholder,
-                        style = CaroTheme.typography.body1.regular,
+                        style = CaroTheme.typography.body1,
                         color = CaroTheme.color.text.tertiary,
                     )
                 }
@@ -203,7 +203,7 @@ private fun CaroTextAreaWithTitlePreview() {
             header = {
                 Text(
                     text = "자기소개",
-                    style = CaroTheme.typography.label1.bold,
+                    style = CaroTheme.typography.label1,
                     color = CaroTheme.color.text.primary,
                 )
             },
@@ -226,13 +226,13 @@ private fun CaroTextAreaRequiredPreview() {
                 ) {
                     Text(
                         text = "자기소개",
-                        style = CaroTheme.typography.label1.bold,
+                        style = CaroTheme.typography.label1,
                         color = CaroTheme.color.text.primary,
                     )
                     Text(
                         text = "*",
-                        style = CaroTheme.typography.label1.bold,
-                        color = CaroTheme.color.text.accent,
+                        style = CaroTheme.typography.label1,
+                        color = CaroTheme.color.text.dangerous,
                     )
                 }
             },
@@ -251,7 +251,7 @@ private fun CaroTextAreaWithCaptionPreview() {
             header = {
                 Text(
                     text = "자기소개",
-                    style = CaroTheme.typography.label1.bold,
+                    style = CaroTheme.typography.label1,
                     color = CaroTheme.color.text.primary,
                 )
             },
@@ -279,7 +279,7 @@ private fun CaroTextAreaWithCounterPreview() {
             header = {
                 Text(
                     text = "자기소개",
-                    style = CaroTheme.typography.label1.bold,
+                    style = CaroTheme.typography.label1,
                     color = CaroTheme.color.text.primary,
                 )
             },
@@ -319,13 +319,13 @@ private fun CaroTextAreaFilledPreview() {
                 ) {
                     Text(
                         text = "자기소개",
-                        style = CaroTheme.typography.label1.bold,
+                        style = CaroTheme.typography.label1,
                         color = CaroTheme.color.text.primary,
                     )
                     Text(
                         text = "*",
-                        style = CaroTheme.typography.label1.bold,
-                        color = CaroTheme.color.text.accent,
+                        style = CaroTheme.typography.label1,
+                        color = CaroTheme.color.text.dangerous,
                     )
                 }
             },
@@ -371,7 +371,7 @@ private fun CaroTextAreaOverflowPreview() {
             header = {
                 Text(
                     text = "자기소개",
-                    style = CaroTheme.typography.label1.bold,
+                    style = CaroTheme.typography.label1,
                     color = CaroTheme.color.text.primary,
                 )
             },
@@ -404,7 +404,7 @@ private fun CaroTextAreaCustomFooterPreview() {
             header = {
                 Text(
                     text = "자기소개",
-                    style = CaroTheme.typography.label1.bold,
+                    style = CaroTheme.typography.label1,
                     color = CaroTheme.color.text.primary,
                 )
             },
@@ -412,7 +412,7 @@ private fun CaroTextAreaCustomFooterPreview() {
                 Text(
                     text = "필수 입력 항목이에요",
                     style = CaroTheme.typography.caption1.regular,
-                    color = CaroTheme.color.text.accent,
+                    color = CaroTheme.color.text.dangerous,
                 )
             },
             placeholder = "자기소개를 입력해주세요",
@@ -430,8 +430,8 @@ private fun CaroTextAreaDisabledPreview() {
             header = {
                 Text(
                     text = "자기소개",
-                    style = CaroTheme.typography.label1.bold,
-                    color = CaroTheme.color.text.disable,
+                    style = CaroTheme.typography.label1,
+                    color = CaroTheme.color.text.disabled,
                 )
             },
             placeholder = "입력 불가",

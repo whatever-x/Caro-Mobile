@@ -133,7 +133,7 @@ internal fun LearningCardFullTextDialog(
                                 horizontal = CaroTheme.spacing.s,
                                 vertical = CaroTheme.spacing.xl4,
                             ).verticalScroll(rememberScrollState()),
-                    style = CaroTheme.typography.body1.semiBold,
+                    style = CaroTheme.typography.body1,
                     color = CaroTheme.color.text.primary,
                 )
             }

@@ -30,6 +30,7 @@ import androidx.compose.ui.util.fastMapTo
 fun SlideInSlideOutSnackbarHost(
     current: SnackbarData?,
     modifier: Modifier = Modifier,
+    dismissImmediately: (SnackbarData) -> Boolean = { false },
     content: @Composable (SnackbarData) -> Unit,
 ) {
     val state = remember { FadeInFadeOutState<SnackbarData?>() }
@@ -40,13 +41,14 @@ fun SlideInSlideOutSnackbarHost(
             keys.add(current)
         }
         state.items.clear()
-        keys.fastFilterNotNull().fastMapTo(state.items) { key ->
+        val retainedKeys = retainedSnackbarKeys(keys, current, dismissImmediately)
+        retainedKeys.fastMapTo(state.items) { key ->
             FadeInFadeOutAnimationItem(key) { children ->
                 val isVisible = key == current
                 val duration = if (isVisible) SNACK_BAR_FADE_IN_MILLIS else SNACK_BAR_FADE_OUT_MILLIS
                 val delay = SNACK_BAR_FADE_OUT_MILLIS + SNACK_BAR_IN_BETWEEN_DELAY_MILLIS
                 val animationDelay =
-                    if (isVisible && keys.fastFilterNotNull().size != 1) {
+                    if (isVisible && retainedKeys.size != 1) {
                         delay
                     } else {
                         0
@@ -100,6 +102,15 @@ fun SlideInSlideOutSnackbarHost(
         state.items.fastForEach { (item, opacity) -> key(item) { opacity { content(item!!) } } }
     }
 }
+
+internal fun retainedSnackbarKeys(
+    keys: List<SnackbarData?>,
+    current: SnackbarData?,
+    dismissImmediately: (SnackbarData) -> Boolean,
+): List<SnackbarData> =
+    keys.fastFilterNotNull().filterNot { key ->
+        key != current && dismissImmediately(key)
+    }
 
 private class FadeInFadeOutState<T> {
     var current: SnackbarData? = null

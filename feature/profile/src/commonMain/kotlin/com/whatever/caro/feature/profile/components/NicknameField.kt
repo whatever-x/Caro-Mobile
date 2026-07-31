@@ -43,14 +43,19 @@ internal fun NicknameField(
     onRefreshClick: () -> Unit,
     characterCount: String,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
 ) {
     CaroTextField(
         modifier = modifier,
         value = value,
         onValueChange = onValueChange,
+        enabled = enabled,
         placeholder = stringResource(Res.string.profile_field_placeholder_random_nickname),
         header = {
-            NicknameHeader(onRefreshClick = onRefreshClick)
+            NicknameHeader(
+                enabled = enabled,
+                onRefreshClick = onRefreshClick,
+            )
         },
         footer = {
             NicknameFooter(characterCount = characterCount)
@@ -62,10 +67,15 @@ internal fun NicknameField(
                         modifier =
                             Modifier
                                 .size(24.dp)
-                                .clickable { onValueChange("") },
+                                .clickable(enabled = enabled) { onValueChange("") },
                         painter = painterResource(Res.drawable.ic_x_circle_24),
                         contentDescription = stringResource(Res.string.profile_content_description_clear),
-                        tint = CaroTheme.color.icon.tertiary,
+                        tint =
+                            if (enabled) {
+                                CaroTheme.color.icon.tertiary
+                            } else {
+                                CaroTheme.color.icon.disabled
+                            },
                     )
                 }
             } else {
@@ -75,7 +85,10 @@ internal fun NicknameField(
 }
 
 @Composable
-private fun NicknameHeader(onRefreshClick: () -> Unit) {
+private fun NicknameHeader(
+    enabled: Boolean,
+    onRefreshClick: () -> Unit,
+) {
     Box(
         modifier =
             Modifier
@@ -89,13 +102,13 @@ private fun NicknameHeader(onRefreshClick: () -> Unit) {
         ) {
             Text(
                 text = stringResource(Res.string.profile_field_label_nickname),
-                style = CaroTheme.typography.heading3,
+                style = CaroTheme.typography.body1,
                 color = CaroTheme.color.text.primary,
             )
             Text(
                 text = stringResource(Res.string.profile_field_required),
-                style = CaroTheme.typography.label1.bold,
-                color = CaroTheme.color.text.accent,
+                style = CaroTheme.typography.label2,
+                color = CaroTheme.color.text.dangerous,
             )
         }
 
@@ -104,7 +117,7 @@ private fun NicknameHeader(onRefreshClick: () -> Unit) {
                 Modifier
                     .align(Alignment.CenterEnd)
                     .clip(CaroTheme.shape.xxl)
-                    .clickable(onClick = onRefreshClick),
+                    .clickable(enabled = enabled, onClick = onRefreshClick),
             horizontalArrangement = Arrangement.spacedBy(CaroTheme.spacing.xs),
             verticalAlignment = Alignment.CenterVertically,
         ) {
@@ -112,12 +125,22 @@ private fun NicknameHeader(onRefreshClick: () -> Unit) {
                 modifier = Modifier.size(16.dp),
                 painter = painterResource(Res.drawable.ic_renew_16),
                 contentDescription = null,
-                tint = CaroTheme.color.icon.brand,
+                tint =
+                    if (enabled) {
+                        CaroTheme.color.icon.brand
+                    } else {
+                        CaroTheme.color.icon.disabled
+                    },
             )
             Text(
                 text = stringResource(Res.string.profile_button_random),
                 style = CaroTheme.typography.caption1.regular,
-                color = CaroTheme.color.text.brand,
+                color =
+                    if (enabled) {
+                        CaroTheme.color.text.brand
+                    } else {
+                        CaroTheme.color.text.disabled
+                    },
             )
         }
     }

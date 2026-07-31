@@ -1,8 +1,10 @@
 package com.whatever.caro.core.data.repository.deck
 
 import com.whatever.caro.core.model.card.CardBadge
+import com.whatever.caro.core.model.deck.Deck
 import com.whatever.caro.core.model.deck.DeckCardSortType
 import com.whatever.caro.core.model.deck.DeckState
+import com.whatever.caro.core.model.exception.CaroInvalidResponseException
 import com.whatever.caro.core.remote.datasource.deck.DeckDataSource
 import com.whatever.caro.core.remote.dto.deck.request.CreateDeckRequest
 import com.whatever.caro.core.remote.dto.deck.request.UpdateDeckRequest
@@ -17,6 +19,7 @@ import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
 import dev.mokkery.mock
 import dev.mokkery.verifySuspend
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.test.runTest
@@ -32,12 +35,62 @@ class DeckRepositoryImplTest : FunSpec() {
                     }
                 val repository = DeckRepositoryImpl(deckDataSource)
 
-                repository.createDeck(name = "영어 단어", description = "일상 단어")
+                val result = repository.createDeck(name = "영어 단어", description = "일상 단어")
+
+                result shouldBe
+                    Deck(
+                        id = 1L,
+                        title = "영어 단어",
+                        description = "일상 단어",
+                        cardTotalCount = 0,
+                        todayLearningCount = 0,
+                        todayCompleteCount = 0,
+                        state = DeckState.NOT_STARTED,
+                    )
 
                 verifySuspend {
                     deckDataSource.createDeck(
                         CreateDeckRequest(name = "영어 단어", description = "일상 단어"),
                     )
+                }
+            }
+        }
+
+        test("createDeck은 응답의 이름과 설명이 없으면 요청 값을 사용한다") {
+            runTest {
+                val deckDataSource =
+                    mock<DeckDataSource> {
+                        everySuspend { createDeck(any()) } returns
+                            CreateDeckResponse(id = 2L, deckName = null, deckDescription = null)
+                    }
+                val repository = DeckRepositoryImpl(deckDataSource)
+
+                val result = repository.createDeck(name = "요청 이름", description = "요청 설명")
+
+                result shouldBe
+                    Deck(
+                        id = 2L,
+                        title = "요청 이름",
+                        description = "요청 설명",
+                        cardTotalCount = 0,
+                        todayLearningCount = 0,
+                        todayCompleteCount = 0,
+                        state = DeckState.NOT_STARTED,
+                    )
+            }
+        }
+
+        test("createDeck은 응답 id가 없으면 유효하지 않은 응답 예외를 던진다") {
+            runTest {
+                val deckDataSource =
+                    mock<DeckDataSource> {
+                        everySuspend { createDeck(any()) } returns
+                            CreateDeckResponse(id = null, deckName = "이름", deckDescription = "설명")
+                    }
+                val repository = DeckRepositoryImpl(deckDataSource)
+
+                shouldThrow<CaroInvalidResponseException> {
+                    repository.createDeck(name = "이름", description = "설명")
                 }
             }
         }

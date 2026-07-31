@@ -12,12 +12,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.style.TextAlign
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigationevent.NavigationEventInfo
+import androidx.navigationevent.compose.NavigationBackHandler
+import androidx.navigationevent.compose.rememberNavigationEventState
 import caromobile.core.designsystem.generated.resources.Res
 import caromobile.core.designsystem.generated.resources.setting_dialog_button_cancel
 import caromobile.core.designsystem.generated.resources.setting_dialog_button_delete_account
@@ -54,6 +56,7 @@ fun SettingRoute(
     snackbarController: SnackbarController,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val backState = rememberNavigationEventState(currentInfo = NavigationEventInfo.None)
     val uriHandler = LocalUriHandler.current
     val privacyPolicyUrl = stringResource(resource = Res.string.setting_privcay_policy_url)
     val termsOfServiceUrl = stringResource(resource = Res.string.setting_terms_of_service_url)
@@ -63,6 +66,15 @@ fun SettingRoute(
         stringResource(resource = Res.string.setting_snackbar_delete_account)
     val deleteAccountErrorSnackbarMessage =
         stringResource(resource = Res.string.setting_snackbar_delete_account_error)
+
+    NavigationBackHandler(
+        state = backState,
+        onBackCompleted = {
+            if (!state.isLoading) {
+                viewModel.intent(SettingIntent.ClickBack)
+            }
+        },
+    )
 
     LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
         viewModel.intent(SettingIntent.Initialize)
@@ -161,7 +173,7 @@ private fun DeleteAccountDialog(
                 modifier = Modifier.fillMaxWidth(),
                 text = stringResource(Res.string.setting_dialog_content),
                 color = CaroTheme.color.text.secondary,
-                style = CaroTheme.typography.body3,
+                style = CaroTheme.typography.body2.medium,
             )
             Spacer(modifier = Modifier.size(size = CaroTheme.spacing.m))
         },
@@ -175,7 +187,7 @@ private fun DeleteAccountDialog(
                         Modifier
                             .fillMaxWidth()
                             .background(
-                                color = CaroTheme.color.surface.error,
+                                color = CaroTheme.color.surface.dangerous,
                                 shape = CaroTheme.shape.xxl,
                             ).padding(
                                 horizontal = CaroTheme.spacing.l,
@@ -188,7 +200,7 @@ private fun DeleteAccountDialog(
                                 },
                             ),
                     text = stringResource(Res.string.setting_dialog_button_delete_account),
-                    color = Color(0xFFFF7A70),
+                    color = CaroTheme.color.text.dangerous,
                     style = CaroTheme.typography.caption1.regular,
                     textAlign = TextAlign.Center,
                 )

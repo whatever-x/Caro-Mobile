@@ -19,7 +19,7 @@ internal class AuthRepositoryImpl(
     override suspend fun loginWithSocial(
         provider: SocialLoginType,
         idToken: String,
-    ): AuthSession {
+    ): Boolean {
         val request =
             SocialLoginRequest(
                 provider = provider,
@@ -30,7 +30,7 @@ internal class AuthRepositoryImpl(
             accessToken = response.accessToken,
             refreshToken = response.refreshToken,
         )
-        return response.toAuthSession()
+        return response.isRegistrationComplete
     }
 
     override suspend fun logout() {

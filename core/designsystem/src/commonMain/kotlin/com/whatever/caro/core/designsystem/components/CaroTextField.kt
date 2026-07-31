@@ -106,7 +106,7 @@ private fun TextFieldBox(
         if (enabled) {
             CaroTheme.color.text.primary
         } else {
-            CaroTheme.color.text.disable
+            CaroTheme.color.text.disabled
         }
     val surfaceColor =
         if (enabled) {
@@ -121,7 +121,7 @@ private fun TextFieldBox(
             else -> CaroTheme.color.border.secondary
         }
     val mergedTextStyle =
-        CaroTheme.typography.body1.regular
+        CaroTheme.typography.body1
             .copy(color = textColor)
     val selectionColors =
         TextSelectionColors(
@@ -175,7 +175,7 @@ private fun TextFieldBox(
                 if (value.isEmpty() && placeholder != null) {
                     Text(
                         text = placeholder,
-                        style = CaroTheme.typography.body1.regular,
+                        style = CaroTheme.typography.body1,
                         color = CaroTheme.color.text.tertiary,
                     )
                 }
@@ -212,7 +212,7 @@ private fun CaroTextFieldWithTitlePreview() {
             header = {
                 Text(
                     text = "닉네임",
-                    style = CaroTheme.typography.label1.bold,
+                    style = CaroTheme.typography.label1,
                     color = CaroTheme.color.text.primary,
                 )
             },
@@ -235,13 +235,13 @@ private fun CaroTextFieldRequiredPreview() {
                 ) {
                     Text(
                         text = "닉네임",
-                        style = CaroTheme.typography.label1.bold,
+                        style = CaroTheme.typography.label1,
                         color = CaroTheme.color.text.primary,
                     )
                     Text(
                         text = "*",
-                        style = CaroTheme.typography.label1.bold,
-                        color = CaroTheme.color.text.accent,
+                        style = CaroTheme.typography.label1,
+                        color = CaroTheme.color.text.dangerous,
                     )
                 }
             },
@@ -264,7 +264,7 @@ private fun CaroTextFieldWithCtaPreview() {
                 ) {
                     Text(
                         text = "닉네임",
-                        style = CaroTheme.typography.label1.bold,
+                        style = CaroTheme.typography.label1,
                         color = CaroTheme.color.text.primary,
                     )
                     Row(
@@ -304,7 +304,7 @@ private fun CaroTextFieldWithCaptionPreview() {
             header = {
                 Text(
                     text = "닉네임",
-                    style = CaroTheme.typography.label1.bold,
+                    style = CaroTheme.typography.label1,
                     color = CaroTheme.color.text.primary,
                 )
             },
@@ -332,7 +332,7 @@ private fun CaroTextFieldWithCounterPreview() {
             header = {
                 Text(
                     text = "닉네임",
-                    style = CaroTheme.typography.label1.bold,
+                    style = CaroTheme.typography.label1,
                     color = CaroTheme.color.text.primary,
                 )
             },
@@ -371,13 +371,13 @@ private fun CaroTextFieldFilledPreview() {
                 ) {
                     Text(
                         text = "닉네임",
-                        style = CaroTheme.typography.label1.bold,
+                        style = CaroTheme.typography.label1,
                         color = CaroTheme.color.text.primary,
                     )
                     Text(
                         text = "*",
-                        style = CaroTheme.typography.label1.bold,
-                        color = CaroTheme.color.text.accent,
+                        style = CaroTheme.typography.label1,
+                        color = CaroTheme.color.text.dangerous,
                     )
                 }
             },
@@ -422,7 +422,7 @@ private fun CaroTextFieldCustomFooterPreview() {
             header = {
                 Text(
                     text = "닉네임",
-                    style = CaroTheme.typography.label1.bold,
+                    style = CaroTheme.typography.label1,
                     color = CaroTheme.color.text.primary,
                 )
             },
@@ -430,7 +430,7 @@ private fun CaroTextFieldCustomFooterPreview() {
                 Text(
                     text = "이미 사용 중인 닉네임이에요",
                     style = CaroTheme.typography.caption1.regular,
-                    color = CaroTheme.color.text.accent,
+                    color = CaroTheme.color.text.dangerous,
                 )
             },
             placeholder = "닉네임을 입력해주세요",
@@ -448,8 +448,8 @@ private fun CaroTextFieldDisabledPreview() {
             header = {
                 Text(
                     text = "닉네임",
-                    style = CaroTheme.typography.label1.bold,
-                    color = CaroTheme.color.text.disable,
+                    style = CaroTheme.typography.label1,
+                    color = CaroTheme.color.text.disabled,
                 )
             },
             placeholder = "입력 불가",

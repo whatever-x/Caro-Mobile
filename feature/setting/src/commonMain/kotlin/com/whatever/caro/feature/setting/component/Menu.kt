@@ -50,7 +50,7 @@ internal fun MenuSection(
                     HorizontalDivider(
                         modifier = Modifier.fillMaxWidth(),
                         thickness = 1.dp,
-                        color = Color(0xFFEBEBEB),
+                        color = CaroTheme.color.border.secondary,
                     )
                 }
 

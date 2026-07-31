@@ -11,7 +11,6 @@ import com.whatever.caro.core.navigator.contract.NavCommand.To
 import com.whatever.caro.core.navigator.dispatcher.NavigationDispatcher
 import com.whatever.caro.core.navigator.entries.CreateDeckEntry
 import com.whatever.caro.core.navigator.entries.DeckDetailEntry
-import com.whatever.caro.core.navigator.entries.EditProfileEntry
 import com.whatever.caro.core.navigator.entries.LearningEntry
 import com.whatever.caro.core.navigator.entries.SettingEntry
 import com.whatever.caro.feature.home.HomeScreen
@@ -43,12 +42,6 @@ fun HomeRoute(
                                         mode = LearningMode.DAILY,
                                     ),
                             ),
-                    )
-                }
-
-                is HomeSideEffect.NavigateToProfile -> {
-                    navDispatcher.emit(
-                        command = To(key = EditProfileEntry(nickname = sideEffect.nickname)),
                     )
                 }
 

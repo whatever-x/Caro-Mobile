@@ -5,7 +5,7 @@
 //   ./gradlew :composeApp:stabilityDump
 
 @Composable
-public fun com.whatever.caro.composeApp.CaroApp(navDispatcher: com.whatever.caro.core.navigator.dispatcher.NavigationDispatcher?, authSessionEventBus: com.whatever.caro.core.model.auth.AuthSessionEventBus?, snackbarController: com.whatever.caro.core.ui.snackbar.SnackbarController?): kotlin.Unit
+public fun com.whatever.caro.composeApp.CaroApp(navDispatcher: com.whatever.caro.core.navigator.dispatcher.NavigationDispatcher, authSessionEventBus: com.whatever.caro.core.model.auth.AuthSessionEventBus, snackbarController: com.whatever.caro.core.ui.snackbar.SnackbarController): kotlin.Unit
   skippable: false
   restartable: true
   params:
@@ -14,7 +14,7 @@ public fun com.whatever.caro.composeApp.CaroApp(navDispatcher: com.whatever.caro
     - snackbarController: RUNTIME (requires runtime check)
 
 @Composable
-internal fun com.whatever.caro.composeApp.CaroNavHost(modifier: androidx.compose.ui.Modifier?, backStack: androidx.navigation3.runtime.NavBackStack<androidx.navigation3.runtime.NavKey>): kotlin.Unit
+internal fun com.whatever.caro.composeApp.CaroNavHost(modifier: androidx.compose.ui.Modifier, backStack: androidx.navigation3.runtime.NavBackStack<androidx.navigation3.runtime.NavKey>): kotlin.Unit
   skippable: false
   restartable: true
   params:

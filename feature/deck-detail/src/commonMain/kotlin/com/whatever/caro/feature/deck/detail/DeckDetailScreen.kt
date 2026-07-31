@@ -26,6 +26,7 @@ import com.whatever.caro.core.designsystem.components.CaroDialog
 import com.whatever.caro.core.designsystem.themes.CaroTheme
 import com.whatever.caro.core.model.deck.Deck
 import com.whatever.caro.core.model.deck.DeckState
+import com.whatever.caro.core.ui.loading.CaroLoadingOverlayBox
 import com.whatever.caro.core.ui.modifier.noRippleClickable
 import com.whatever.caro.feature.deck.detail.components.DeckDetailGuid
 import com.whatever.caro.feature.deck.detail.components.DeckDetailTopBar
@@ -45,106 +46,111 @@ internal fun DeckDetailScreen(
     state: DeckDetailState,
     onIntent: (DeckDetailIntent) -> Unit,
 ) {
-    Column(
-        modifier =
-            Modifier
-                .fillMaxSize()
-                .background(color = CaroTheme.color.background.primary),
-    ) {
-        DeckDetailTopBar(
-            title = state.deck.title,
-            onBack = { onIntent(DeckDetailIntent.ClickBack) },
-            onEditDeck = { onIntent(DeckDetailIntent.ClickEditDeck) },
-        )
-
-        if (state.isEmptyDeckCard) {
-            DeckDetailGuid(
-                onAddFirstCard = { onIntent(DeckDetailIntent.ClickAddCard) },
+    CaroLoadingOverlayBox(isLoading = state.isCardListLoading) {
+        Column(
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .background(color = CaroTheme.color.background.primary),
+        ) {
+            DeckDetailTopBar(
+                title = state.deck.title,
+                isLoading = state.isCardListLoading,
+                onBack = { onIntent(DeckDetailIntent.ClickBack) },
+                onEditDeck = { onIntent(DeckDetailIntent.ClickEditDeck) },
             )
-        } else {
-            LazyColumn(
-                modifier =
-                    Modifier
-                        .fillMaxSize(),
-                overscrollEffect = null,
-            ) {
-                item {
-                    DeckDetailHeader(
-                        description = state.deck.description,
-                        learningCardTotal = state.deck.todayLearningCount,
-                        learningProgress = state.deck.todayProgress,
-                        currentLearningStatus = state.deck.state,
-                        onAllStudy = { onIntent(DeckDetailIntent.ClickAllStudy) },
-                        onDailyStudy = { onIntent(DeckDetailIntent.ClickDailyStudy) },
-                    )
-                }
 
-                stickyHeader {
-                    FilterAndSortSection(
-                        deckCardTotal = state.deck.cardTotalCount,
-                        selectedSortOption = state.selectedSortOption,
-                        onSortCardList = { onIntent(DeckDetailIntent.ClickSortCardList) },
-                        onEditCardList = { onIntent(DeckDetailIntent.ClickEditCardList) },
+            if (state.isLoadedContentVisible) {
+                if (state.isEmptyDeckCard) {
+                    DeckDetailGuid(
+                        onAddFirstCard = { onIntent(DeckDetailIntent.ClickAddCard) },
                     )
-                }
-
-                item {
-                    AddCardButtonItem(
-                        onAddCard = { onIntent(DeckDetailIntent.ClickAddCard) },
-                    )
-                }
-
-                itemsIndexed(
-                    items = state.deckCardList,
-                    key = { _, card -> card.id },
-                ) { index, card ->
-                    SwipeToRevealCardItem(
-                        card = card,
-                        onClick = { onIntent(DeckDetailIntent.ClickCard(card.id)) },
-                        onEdit = { onIntent(DeckDetailIntent.ClickEditCard(card.id)) },
+                } else {
+                    LazyColumn(
                         modifier =
                             Modifier
-                                .padding(
-                                    start = CaroTheme.spacing.xl,
-                                    top = CaroTheme.spacing.m,
-                                    end = CaroTheme.spacing.xl,
-                                    bottom =
-                                        if (index == state.deckCardList.lastIndex) {
-                                            CaroTheme.spacing.m
-                                        } else {
-                                            0.dp
-                                        },
-                                ),
-                    )
+                                .fillMaxSize(),
+                        overscrollEffect = null,
+                    ) {
+                        item {
+                            DeckDetailHeader(
+                                description = state.deck.description,
+                                learningCardTotal = state.deck.todayLearningCount,
+                                learningProgress = state.deck.todayProgress,
+                                currentLearningStatus = state.deck.state,
+                                onAllStudy = { onIntent(DeckDetailIntent.ClickAllStudy) },
+                                onDailyStudy = { onIntent(DeckDetailIntent.ClickDailyStudy) },
+                            )
+                        }
+
+                        stickyHeader {
+                            FilterAndSortSection(
+                                deckCardTotal = state.deck.cardTotalCount,
+                                selectedSortOption = state.selectedSortOption,
+                                onSortCardList = { onIntent(DeckDetailIntent.ClickSortCardList) },
+                                onEditCardList = { onIntent(DeckDetailIntent.ClickEditCardList) },
+                            )
+                        }
+
+                        item {
+                            AddCardButtonItem(
+                                onAddCard = { onIntent(DeckDetailIntent.ClickAddCard) },
+                            )
+                        }
+
+                        itemsIndexed(
+                            items = state.deckCardList,
+                            key = { _, card -> card.id },
+                        ) { index, card ->
+                            SwipeToRevealCardItem(
+                                card = card,
+                                onClick = { onIntent(DeckDetailIntent.ClickCard(card.id)) },
+                                onEdit = { onIntent(DeckDetailIntent.ClickEditCard(card.id)) },
+                                modifier =
+                                    Modifier
+                                        .padding(
+                                            start = CaroTheme.spacing.xl,
+                                            top = CaroTheme.spacing.m,
+                                            end = CaroTheme.spacing.xl,
+                                            bottom =
+                                                if (index == state.deckCardList.lastIndex) {
+                                                    CaroTheme.spacing.m
+                                                } else {
+                                                    0.dp
+                                                },
+                                        ),
+                            )
+                        }
+                    }
                 }
             }
         }
-    }
 
-    if (state.isSortBottomSheetVisible) {
-        SortBottomSheet(
-            selectedSortOption = state.selectedSortOption,
-            onSortOptionClick = { sortOption ->
-                onIntent(DeckDetailIntent.ClickSortOption(sortOption))
-            },
-            onDismissRequest = { onIntent(DeckDetailIntent.DismissSortBottomSheet) },
-        )
-    }
+        if (state.isSortBottomSheetVisible) {
+            SortBottomSheet(
+                selectedSortOption = state.selectedSortOption,
+                onSortOptionClick = { sortOption ->
+                    onIntent(DeckDetailIntent.ClickSortOption(sortOption))
+                },
+                onDismissRequest = { onIntent(DeckDetailIntent.DismissSortBottomSheet) },
+            )
+        }
 
-    if (state.isDeckEditBottomSheetVisible) {
-        DeckEditBottomSheet(
-            onEditDeck = { onIntent(DeckDetailIntent.ClickDeckEditBottomSheetEdit) },
-            onDeleteDeck = { onIntent(DeckDetailIntent.ClickDeckEditBottomSheetDelete) },
-            onDismissRequest = { onIntent(DeckDetailIntent.DismissDeckEditBottomSheet) },
-        )
-    }
+        if (state.isDeckEditBottomSheetVisible) {
+            DeckEditBottomSheet(
+                onEditDeck = { onIntent(DeckDetailIntent.ClickDeckEditBottomSheetEdit) },
+                onDeleteDeck = { onIntent(DeckDetailIntent.ClickDeckEditBottomSheetDelete) },
+                onDismissRequest = { onIntent(DeckDetailIntent.DismissDeckEditBottomSheet) },
+            )
+        }
 
-    if (state.isDeckDeleteDialogVisible) {
-        DeckDeleteDialog(
-            isDeleting = state.isDeckDeleting,
-            onDelete = { onIntent(DeckDetailIntent.ClickDeckDeleteDialogConfirm) },
-            onCancel = { onIntent(DeckDetailIntent.ClickDeckDeleteDialogCancel) },
-        )
+        if (state.isDeckDeleteDialogVisible) {
+            DeckDeleteDialog(
+                isDeleting = state.isDeckDeleting,
+                onDelete = { onIntent(DeckDetailIntent.ClickDeckDeleteDialogConfirm) },
+                onCancel = { onIntent(DeckDetailIntent.ClickDeckDeleteDialogCancel) },
+            )
+        }
     }
 }
 
@@ -170,7 +176,7 @@ private fun DeckDeleteDialog(
                 modifier = Modifier.fillMaxWidth(),
                 text = stringResource(Res.string.deck_delete_dialog_content),
                 color = CaroTheme.color.text.secondary,
-                style = CaroTheme.typography.body3,
+                style = CaroTheme.typography.body2.medium,
             )
             Spacer(modifier = Modifier.size(CaroTheme.spacing.m))
         },

@@ -74,19 +74,6 @@ class HomeViewModelTest : FunSpec() {
             }
         }
 
-        test("ClickProfile 은 NavigateToProfile 을 방출한다") {
-            runTest(testDispatcher) {
-                val viewModel = viewModelWith()
-
-                viewModel.sideEffect.test {
-                    viewModel.intent(HomeIntent.ClickProfile)
-                    advanceUntilIdle()
-
-                    awaitItem() shouldBe HomeSideEffect.NavigateToProfile(nickname = "")
-                }
-            }
-        }
-
         test("ClickCreateDeck 은 NavigateToCreateDeck 을 방출한다") {
             runTest(testDispatcher) {
                 val viewModel = viewModelWith()
@@ -250,6 +237,7 @@ class HomeViewModelTest : FunSpec() {
 
                 viewModel.state.value.isLoading shouldBe false
                 viewModel.state.value.streakState shouldBe HomeStreakState.Active(days = 3)
+                viewModel.state.value.hasLoadError shouldBe true
             }
         }
 
@@ -284,6 +272,7 @@ class HomeViewModelTest : FunSpec() {
                 viewModel.state.value.decks
                     .toList() shouldBe decks
                 viewModel.state.value.streakState shouldBe HomeStreakState.Loading
+                viewModel.state.value.hasLoadError shouldBe true
             }
         }
 

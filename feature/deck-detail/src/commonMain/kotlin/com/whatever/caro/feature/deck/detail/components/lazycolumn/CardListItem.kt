@@ -43,22 +43,15 @@ internal fun DeckCardItem(
     val badgeTextColor =
         when (card.reviewState) {
             CardReviewState.HARD -> CaroTheme.color.text.error
-            CardReviewState.REVIEW -> CaroTheme.color.text.info
-            CardReviewState.NEW -> CaroTheme.color.text.warning
+            CardReviewState.REVIEW -> CaroTheme.color.text.review
+            CardReviewState.NEW -> CaroTheme.color.text.new
         }
 
     val badgeBackgroundColor =
         when (card.reviewState) {
             CardReviewState.HARD -> CaroTheme.color.surface.error
-            CardReviewState.REVIEW -> CaroTheme.color.surface.info
-            CardReviewState.NEW -> CaroTheme.color.surface.warning
-        }
-
-    val badgeBorderColor =
-        when (card.reviewState) {
-            CardReviewState.HARD -> CaroTheme.color.border.error
-            CardReviewState.REVIEW -> CaroTheme.color.border.info
-            CardReviewState.NEW -> CaroTheme.color.border.warning
+            CardReviewState.REVIEW -> CaroTheme.color.surface.review
+            CardReviewState.NEW -> CaroTheme.color.surface.new
         }
 
     Row(
@@ -111,10 +104,6 @@ internal fun DeckCardItem(
                     Modifier
                         .background(
                             color = badgeBackgroundColor,
-                            shape = CaroTheme.shape.l,
-                        ).border(
-                            width = 1.dp,
-                            color = badgeBorderColor,
                             shape = CaroTheme.shape.l,
                         ).padding(
                             horizontal = CaroTheme.spacing.s,

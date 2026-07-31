@@ -69,7 +69,7 @@ internal fun DeleteCardListItem(
             )
             Text(
                 text = item.card.content.back,
-                style = CaroTheme.typography.body3,
+                style = CaroTheme.typography.body2.medium,
                 color = CaroTheme.color.text.tertiary,
                 maxLines = CARD_TEXT_MAX_LINES,
                 overflow = TextOverflow.Ellipsis,

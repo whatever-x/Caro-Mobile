@@ -52,14 +52,15 @@ class LearningViewModel(
             LearningIntent.DismissStop -> reduce { copy(showStopDialog = false) }
             LearningIntent.ConfirmStop -> confirmStop()
             LearningIntent.ConfirmError -> confirmError()
-            LearningIntent.Close -> postSideEffect(LearningSideEffect.NavigateBack)
+            LearningIntent.ClickBackButton -> postSideEffect(LearningSideEffect.PopBackStack)
+            LearningIntent.ClickNavigateToHome -> postSideEffect(LearningSideEffect.NavigateToHome)
         }
     }
 
     private fun confirmError() {
         if (!currentState.isShowErrorDialog) return
         reduce { copy(isShowErrorDialog = false) }
-        postSideEffect(LearningSideEffect.NavigateBack)
+        postSideEffect(LearningSideEffect.PopBackStack)
     }
 
     private suspend fun confirmStop() {
@@ -76,7 +77,7 @@ class LearningViewModel(
                 )
                 reduce { copy(isSubmitting = false) }
             }
-            postSideEffect(LearningSideEffect.NavigateBack)
+            postSideEffect(LearningSideEffect.PopBackStack)
         } catch (throwable: Throwable) {
             isStopConfirmed = false
             throw throwable
@@ -88,7 +89,7 @@ class LearningViewModel(
         if (currentState.currentCard != null && !currentState.isCompleted) {
             reduce { copy(showStopDialog = true) }
         } else {
-            postSideEffect(LearningSideEffect.NavigateBack)
+            postSideEffect(LearningSideEffect.PopBackStack)
         }
     }
 

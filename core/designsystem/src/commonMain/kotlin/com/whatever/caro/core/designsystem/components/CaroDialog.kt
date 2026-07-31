@@ -144,7 +144,7 @@ private fun PreviewBody() {
     Spacer(modifier = Modifier.size(size = 20.dp))
     Text(
         text = "가운데 메인 내용이 들어가는 슬롯입니다.",
-        style = CaroTheme.typography.body3,
+        style = CaroTheme.typography.body2.medium,
         color = CaroTheme.color.text.secondary,
         textAlign = TextAlign.Center,
     )

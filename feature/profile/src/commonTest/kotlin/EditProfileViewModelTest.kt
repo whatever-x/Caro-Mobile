@@ -6,6 +6,7 @@ import com.whatever.caro.feature.profile.NicknameValidator
 import com.whatever.caro.feature.profile.edit.EditProfileViewModel
 import com.whatever.caro.feature.profile.edit.mvi.EditProfileIntent
 import com.whatever.caro.feature.profile.edit.mvi.EditProfileSideEffect
+import dev.mokkery.answering.calls
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
@@ -14,11 +15,13 @@ import dev.mokkery.verify.VerifyMode.Companion.exactly
 import dev.mokkery.verifySuspend
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 
@@ -130,6 +133,55 @@ class EditProfileViewModelTest : FunSpec() {
                     awaitItem() shouldBe EditProfileSideEffect.NavigateBack
                 }
                 verifySuspend(exactly(1)) { profileRepository.updateNickname(nickname = "거북이") }
+            }
+        }
+
+        test("프로필 저장 중 사용자 Intent 를 무시하고 저장 시작 시점의 닉네임을 전달한다") {
+            runTest {
+                val (viewModel, profileRepository) = createViewModel(nickname = "저장할닉네임")
+                val saveGate = CompletableDeferred<Unit>()
+                val randomNicknameGate = CompletableDeferred<Unit>()
+                everySuspend {
+                    profileRepository.updateNickname(any())
+                } calls {
+                    saveGate.await()
+                }
+                everySuspend {
+                    profileRepository.getRandomNickname()
+                } calls {
+                    randomNicknameGate.await()
+                    "뒤늦게도착한닉네임"
+                }
+
+                viewModel.sideEffect.test {
+                    viewModel.intent(EditProfileIntent.ClickRefresh)
+                    runCurrent()
+                    viewModel.intent(EditProfileIntent.ClickConfirm)
+                    viewModel.intent(EditProfileIntent.UpdateNickname("변경된닉네임"))
+                    runCurrent()
+
+                    viewModel.state.value.isLoading shouldBe true
+                    viewModel.state.value.nickname shouldBe "저장할닉네임"
+
+                    viewModel.intent(EditProfileIntent.ClickRefresh)
+                    viewModel.intent(EditProfileIntent.ClickConfirm)
+                    viewModel.intent(EditProfileIntent.ClickBack)
+                    runCurrent()
+                    randomNicknameGate.complete(Unit)
+                    runCurrent()
+
+                    viewModel.state.value.nickname shouldBe "저장할닉네임"
+                    expectNoEvents()
+                    verifySuspend(exactly(1)) {
+                        profileRepository.getRandomNickname()
+                    }
+                    verifySuspend(exactly(1)) {
+                        profileRepository.updateNickname(nickname = "저장할닉네임")
+                    }
+
+                    saveGate.complete(Unit)
+                    awaitItem() shouldBe EditProfileSideEffect.NavigateBack
+                }
             }
         }
 

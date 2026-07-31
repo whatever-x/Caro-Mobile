@@ -87,8 +87,13 @@ class LoginViewModel(
         idToken: String,
     ) {
         reduce { copy(isLoading = true) }
-        authRepository.loginWithSocial(provider = provider, idToken = idToken)
+        val registrationResult =
+            authRepository.loginWithSocial(provider = provider, idToken = idToken)
         reduce { copy(isLoading = false) }
-        postSideEffect(LoginSideEffect.NavigateHome)
+        if (registrationResult) {
+            postSideEffect(LoginSideEffect.NavigateHome)
+        } else {
+            postSideEffect(LoginSideEffect.NavigateCreateProfile)
+        }
     }
 }

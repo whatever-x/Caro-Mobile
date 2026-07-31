@@ -19,6 +19,12 @@ class SettingViewModel(
         initialState = SettingState(),
         exceptionFilter = exceptionFilter,
     ) {
+    private var isInitializing = false
+
+    override fun handleClientException(throwable: Throwable) {
+        reduce { copy(isLoading = false) }
+    }
+
     override suspend fun handleIntent(intent: SettingIntent) {
         when (intent) {
             SettingIntent.ClickLogOut -> {
@@ -74,20 +80,17 @@ class SettingViewModel(
     }
 
     private suspend fun initialize() {
-        if (currentState.isLoading) return
+        if (isInitializing) return
+        isInitializing = true
         reduce { copy(isLoading = true) }
-        runCatching {
-            profileRepository.getMyNickname()
-        }.onSuccess { nickname ->
-            reduce {
-                copy(
-                    isLoading = false,
-                    nickname = nickname,
-                )
-            }
-        }.onFailure { throwable ->
-            if (throwable is CancellationException) throw throwable
+        try {
+            val nickname = profileRepository.getMyNickname()
+            reduce { copy(isLoading = false, nickname = nickname) }
+        } catch (throwable: Throwable) {
             reduce { copy(isLoading = false) }
+            throw throwable
+        } finally {
+            isInitializing = false
         }
     }
 

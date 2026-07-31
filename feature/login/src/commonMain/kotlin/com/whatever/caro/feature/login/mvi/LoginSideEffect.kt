@@ -9,6 +9,8 @@ sealed interface LoginSideEffect : UiSideEffect {
         val type: SocialLoginType,
     ) : LoginSideEffect
 
+    data object NavigateCreateProfile : LoginSideEffect
+
     data object NavigateHome : LoginSideEffect
 
     data class ShowErrorSnackbar(

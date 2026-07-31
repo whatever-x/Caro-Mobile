@@ -20,5 +20,7 @@ sealed interface LearningIntent : UiIntent {
 
     data object ConfirmError : LearningIntent
 
-    data object Close : LearningIntent
+    data object ClickBackButton : LearningIntent
+
+    data object ClickNavigateToHome : LearningIntent
 }

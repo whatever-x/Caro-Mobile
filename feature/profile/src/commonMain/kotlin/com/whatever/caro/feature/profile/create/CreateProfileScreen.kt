@@ -47,10 +47,17 @@ internal fun CreateProfileScreen(
                     modifier =
                         Modifier
                             .size(24.dp)
-                            .clickable { onIntent(CreateProfileIntent.ClickBack) },
+                            .clickable(enabled = state.isLoading.not()) {
+                                onIntent(CreateProfileIntent.ClickBack)
+                            },
                     painter = painterResource(Res.drawable.ic_arrow_left_24),
                     contentDescription = stringResource(Res.string.profile_content_description_back),
-                    tint = CaroTheme.color.icon.secondary,
+                    tint =
+                        if (state.isLoading) {
+                            CaroTheme.color.icon.disabled
+                        } else {
+                            CaroTheme.color.icon.secondary
+                        },
                 )
             },
             centerContent = {
@@ -67,6 +74,7 @@ internal fun CreateProfileScreen(
             onValueChange = { onIntent(CreateProfileIntent.UpdateNickname(it)) },
             onRefreshClick = { onIntent(CreateProfileIntent.ClickRefresh) },
             characterCount = state.characterCount,
+            enabled = state.isLoading.not(),
             modifier =
                 Modifier
                     .fillMaxWidth()
@@ -81,6 +89,7 @@ internal fun CreateProfileScreen(
         ProfileCtaButton(
             text = stringResource(Res.string.profile_button_create),
             enabled = state.isConfirmEnabled,
+            isLoading = state.isLoading,
             onClick = { onIntent(CreateProfileIntent.ClickConfirm) },
             modifier =
                 Modifier
