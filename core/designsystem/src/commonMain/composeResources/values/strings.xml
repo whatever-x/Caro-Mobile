@@ -171,8 +171,6 @@
 	<string name="learning_total">Total</string>
 	<string name="learning_home">Back to home</string>
 	<string name="learning_retry">Retry</string>
-	<string name="learning_rest">No cards to review today</string>
-	<string name="learning_close">Go back</string>
 	<string name="learning_dialog_title">Notice</string>
 	<string name="learning_dialog_submit_error">An unknown error occurred.</string>
 	<string name="learning_dialog_confirm">OK</string>

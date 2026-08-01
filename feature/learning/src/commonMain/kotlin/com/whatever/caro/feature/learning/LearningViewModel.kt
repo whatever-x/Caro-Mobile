@@ -3,10 +3,10 @@ package com.whatever.caro.feature.learning
 import com.whatever.caro.core.data.repository.deck.DeckRepository
 import com.whatever.caro.core.data.repository.study.StudySessionRepository
 import com.whatever.caro.core.model.exception.CaroException
+import com.whatever.caro.core.model.learning.DailyStudyStartResult
 import com.whatever.caro.core.model.learning.LearningMode
 import com.whatever.caro.core.model.learning.StudyCard
 import com.whatever.caro.core.model.learning.StudyEvaluation
-import com.whatever.caro.core.model.learning.StudySession
 import com.whatever.caro.core.viewmodel.BaseViewModel
 import com.whatever.caro.core.viewmodel.ExceptionFilter
 import com.whatever.caro.feature.learning.mvi.LearningIntent
@@ -52,7 +52,6 @@ class LearningViewModel(
             LearningIntent.DismissStop -> reduce { copy(showStopDialog = false) }
             LearningIntent.ConfirmStop -> confirmStop()
             LearningIntent.ConfirmError -> confirmError()
-            LearningIntent.ClickBackButton -> postSideEffect(LearningSideEffect.PopBackStack)
             LearningIntent.ClickNavigateToHome -> postSideEffect(LearningSideEffect.NavigateToHome)
         }
     }
@@ -112,13 +111,14 @@ class LearningViewModel(
             return
         }
         when (
-            val session =
+            val result =
                 repository.startDaily(
                     deckId = deckId,
                     idempotencyKey = newUuid(),
                 )
         ) {
-            is StudySession.InProgress -> {
+            is DailyStudyStartResult.Started -> {
+                val session = result.session
                 reduce {
                     copy(
                         isLoading = false,
@@ -131,18 +131,19 @@ class LearningViewModel(
                 startCardTimer()
             }
 
-            is StudySession.Completed -> {
+            is DailyStudyStartResult.Completed -> {
                 reduce {
                     copy(
                         isLoading = false,
-                        totalCount = session.totalCardCount,
+                        totalCount = result.totalCardCount,
                         isCompleted = true,
                     )
                 }
             }
 
-            StudySession.RestDay -> {
-                reduce { copy(isLoading = false, isRestDay = true) }
+            DailyStudyStartResult.RestDay -> {
+                reduce { copy(isLoading = false) }
+                postSideEffect(LearningSideEffect.PopBackStack)
             }
         }
     }

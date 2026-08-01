@@ -1,15 +1,18 @@
 package com.whatever.caro.core.data.repository.study
 
+import com.whatever.caro.core.model.learning.ActiveDailyStudySession
+import com.whatever.caro.core.model.learning.DailyStudyStartResult
 import com.whatever.caro.core.model.learning.StudyCard
 import com.whatever.caro.core.model.learning.StudyEvaluation
 import com.whatever.caro.core.model.learning.StudyRating
 import com.whatever.caro.core.model.learning.StudyRatingCounts
-import com.whatever.caro.core.model.learning.StudySession
 import com.whatever.caro.core.remote.datasource.study.StudySessionDataSource
 import com.whatever.caro.core.remote.dto.studySession.request.EvaluatedCardRequest
+import com.whatever.caro.core.remote.dto.studySession.response.Completed
 import com.whatever.caro.core.remote.dto.studySession.response.EvaluationResponse
 import com.whatever.caro.core.remote.dto.studySession.response.InProgress
 import com.whatever.caro.core.remote.dto.studySession.response.RatingCountsDto
+import com.whatever.caro.core.remote.dto.studySession.response.RestDay
 import com.whatever.caro.core.remote.dto.studySession.response.StudyCardItemDto
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
@@ -36,17 +39,46 @@ class StudySessionRepositoryImplTest :
             val result = StudySessionRepositoryImpl(source).startDaily(3L, "key")
 
             result shouldBe
-                StudySession.InProgress(
-                    sessionId = 7L,
-                    studiedCardCount = 2,
-                    totalCardCount = 4,
-                    cards =
-                        listOf(
-                            StudyCard(11L, "Run", "달리다"),
-                        ),
+                DailyStudyStartResult.Started(
+                    ActiveDailyStudySession(
+                        sessionId = 7L,
+                        studiedCardCount = 2,
+                        totalCardCount = 4,
+                        cards =
+                            listOf(
+                                StudyCard(11L, "Run", "달리다"),
+                            ),
+                    ),
                 )
 
             verifySuspend { source.startDaily(3L, "key") }
+        }
+
+        test("completed daily response is mapped to a completed start result") {
+            val source =
+                mock<StudySessionDataSource> {
+                    everySuspend { startDaily(any(), any()) } returns
+                        Completed(
+                            sessionId = 7L,
+                            studiedCardCount = 4,
+                            totalCardCount = 4,
+                        )
+                }
+
+            StudySessionRepositoryImpl(source).startDaily(3L, "key") shouldBe
+                DailyStudyStartResult.Completed(
+                    studiedCardCount = 4,
+                    totalCardCount = 4,
+                )
+        }
+
+        test("rest day response is mapped to a non-session start result") {
+            val source =
+                mock<StudySessionDataSource> {
+                    everySuspend { startDaily(any(), any()) } returns RestDay
+                }
+
+            StudySessionRepositoryImpl(source).startDaily(3L, "key") shouldBe DailyStudyStartResult.RestDay
         }
 
         test("rating names match the API contract") {

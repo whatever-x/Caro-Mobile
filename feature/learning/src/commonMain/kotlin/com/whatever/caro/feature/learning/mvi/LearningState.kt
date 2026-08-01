@@ -20,7 +20,6 @@ data class LearningState(
     val ratingCounts: StudyRatingCounts? = null,
     val showStopDialog: Boolean = false,
     val isCompleted: Boolean = false,
-    val isRestDay: Boolean = false,
     val errorMessage: String? = null,
     val isShowErrorDialog: Boolean = false,
 ) : UiState {
