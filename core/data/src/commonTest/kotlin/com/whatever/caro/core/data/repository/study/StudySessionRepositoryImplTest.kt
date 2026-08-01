@@ -22,8 +22,8 @@ import dev.mokkery.verifySuspend
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 
-class StudySessionRepositoryImplTest :
-    FunSpec({
+class StudySessionRepositoryImplTest : FunSpec() {
+    init {
         test("daily session response is mapped to domain cards") {
             val source =
                 mock<StudySessionDataSource> {
@@ -121,7 +121,8 @@ class StudySessionRepositoryImplTest :
 
             result shouldBe StudyRatingCounts(again = 2, fair = 3, easy = 5)
         }
-    })
+    }
+}
 
 private fun evaluationResponse(ratingCounts: RatingCountsDto? = null) =
     EvaluationResponse(
