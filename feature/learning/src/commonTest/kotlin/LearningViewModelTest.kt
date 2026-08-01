@@ -36,8 +36,8 @@ import kotlin.time.TestTimeSource
 import kotlin.time.TimeSource
 
 @OptIn(ExperimentalCoroutinesApi::class, ExperimentalTime::class)
-class LearningViewModelTest :
-    FunSpec({
+class LearningViewModelTest : FunSpec() {
+    init {
         val dispatcher = StandardTestDispatcher()
         beforeTest { Dispatchers.setMain(dispatcher) }
         afterTest { Dispatchers.resetMain() }
@@ -395,7 +395,8 @@ class LearningViewModelTest :
                     .map { it.timeMs } shouldBe listOf(1_200, 350)
             }
         }
-    })
+    }
+}
 
 private fun createViewModel(
     cards: List<Card>,
