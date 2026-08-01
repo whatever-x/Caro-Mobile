@@ -2,6 +2,7 @@ package com.whatever.caro.core.data.repository.card
 
 import com.whatever.caro.core.data.mapper.toFields
 import com.whatever.caro.core.model.card.CardContent
+import com.whatever.caro.core.model.exception.CaroInvalidResponseException
 import com.whatever.caro.core.remote.datasource.card.CardDataSource
 import com.whatever.caro.core.remote.dto.card.request.CreateCardItemDto
 import com.whatever.caro.core.remote.dto.card.request.CreateCardItemDto.CardTypeDto
@@ -41,7 +42,23 @@ internal class CardRepositoryImpl(
     }
 
     override suspend fun deleteCards(cardIds: List<Long>) {
-        val request = DeleteCardsRequest(cardIds = cardIds.toSet())
-        cardDataSource.deleteCards(request = request)
+        val uniqueCardIds = cardIds.toSet()
+        val response =
+            cardDataSource.deleteCards(
+                request = DeleteCardsRequest(cardIds = uniqueCardIds),
+            )
+        val deletedCardsCount =
+            response.deletedCardsCount
+                ?: throw CaroInvalidResponseException(
+                    debugMessage = "DeleteCardResponse.deletedCardsCount is null",
+                )
+
+        if (deletedCardsCount != uniqueCardIds.size) {
+            throw CaroInvalidResponseException(
+                debugMessage =
+                    "Deleted card count does not match request: " +
+                        "requested=${uniqueCardIds.size}, deleted=$deletedCardsCount",
+            )
+        }
     }
 }
