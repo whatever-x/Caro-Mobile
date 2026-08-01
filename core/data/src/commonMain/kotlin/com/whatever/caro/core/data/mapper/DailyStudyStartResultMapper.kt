@@ -1,4 +1,4 @@
-package com.whatever.caro.core.data.repository.study
+package com.whatever.caro.core.data.mapper
 
 import com.whatever.caro.core.model.learning.ActiveDailyStudySession
 import com.whatever.caro.core.model.learning.DailyStudyStartResult
@@ -8,7 +8,10 @@ import com.whatever.caro.core.remote.dto.studySession.response.DailyStudyRespons
 import com.whatever.caro.core.remote.dto.studySession.response.InProgress
 import com.whatever.caro.core.remote.dto.studySession.response.RestDay
 
-internal fun DailyStudyResponse.toModel(): DailyStudyStartResult =
+private const val FIELD_FRONT = "front"
+private const val FIELD_BACK = "back"
+
+internal fun DailyStudyResponse.toDailyStudyStartResult(): DailyStudyStartResult =
     when (this) {
         is InProgress -> {
             DailyStudyStartResult.Started(
@@ -20,8 +23,8 @@ internal fun DailyStudyResponse.toModel(): DailyStudyStartResult =
                         cards.orEmpty().map {
                             StudyCard(
                                 requireNotNull(it.cardId),
-                                it.fields?.get("front").orEmpty(),
-                                it.fields?.get("back").orEmpty(),
+                                it.fields?.get(FIELD_FRONT).orEmpty(),
+                                it.fields?.get(FIELD_BACK).orEmpty(),
                             )
                         },
                 ),
