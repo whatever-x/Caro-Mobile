@@ -1,6 +1,7 @@
 import app.cash.turbine.test
 import com.whatever.caro.core.data.repository.auth.AuthRepository
 import com.whatever.caro.core.model.auth.SocialLoginType
+import com.whatever.caro.core.model.exception.NetworkException
 import com.whatever.caro.core.viewmodel.ExceptionFilter
 import com.whatever.caro.feature.login.LoginViewModel
 import com.whatever.caro.feature.login.model.AppleUser
@@ -204,6 +205,28 @@ class LoginViewModelTest : FunSpec() {
                         ),
                     )
                     awaitItem() shouldBe LoginSideEffect.ShowErrorSnackbar(LoginError.UNKNOWN)
+                }
+
+                viewModel.state.value.isLoading shouldBe false
+            }
+        }
+
+        test("소셜 로그인 호출이 네트워크 오류로 실패하면 NETWORK 스낵바를 방출하고 isLoading이 false로 복귀한다") {
+            runTest(testDispatcher) {
+                val authRepository =
+                    mock<AuthRepository> {
+                        everySuspend { loginWithSocial(any(), any()) } throws
+                            NetworkException.Connection(debugMessage = "unresolved address")
+                    }
+                val viewModel = viewModelWith(authRepository)
+
+                viewModel.sideEffect.test {
+                    viewModel.intent(
+                        LoginIntent.ClickGoogleLoginButton(
+                            SocialLoginResult.Success(GoogleUser(idToken = "google-token")),
+                        ),
+                    )
+                    awaitItem() shouldBe LoginSideEffect.ShowErrorSnackbar(LoginError.NETWORK)
                 }
 
                 viewModel.state.value.isLoading shouldBe false

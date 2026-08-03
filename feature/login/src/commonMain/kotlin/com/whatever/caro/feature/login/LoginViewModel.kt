@@ -2,6 +2,7 @@ package com.whatever.caro.feature.login
 
 import com.whatever.caro.core.data.repository.auth.AuthRepository
 import com.whatever.caro.core.model.auth.SocialLoginType
+import com.whatever.caro.core.model.exception.NetworkException
 import com.whatever.caro.core.viewmodel.BaseViewModel
 import com.whatever.caro.core.viewmodel.ExceptionFilter
 import com.whatever.caro.feature.login.model.AppleUser
@@ -23,7 +24,8 @@ class LoginViewModel(
     override fun handleClientException(throwable: Throwable) {
         Napier.e(throwable = throwable) { "login failed: ${throwable.message}" }
         reduce { copy(isLoading = false) }
-        postSideEffect(LoginSideEffect.ShowErrorSnackbar(error = LoginError.UNKNOWN))
+        val error = if (throwable is NetworkException) LoginError.NETWORK else LoginError.UNKNOWN
+        postSideEffect(LoginSideEffect.ShowErrorSnackbar(error = error))
     }
 
     override suspend fun handleIntent(intent: LoginIntent) {

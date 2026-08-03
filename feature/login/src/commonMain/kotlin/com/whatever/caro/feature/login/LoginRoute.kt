@@ -9,6 +9,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import caromobile.core.designsystem.generated.resources.Res
 import caromobile.core.designsystem.generated.resources.login_snackbar_cancel
 import caromobile.core.designsystem.generated.resources.login_snackbar_error
+import caromobile.core.designsystem.generated.resources.login_snackbar_network_error
 import com.whatever.caro.core.designsystem.components.CaroSnackbarStyle
 import com.whatever.caro.core.model.auth.SocialLoginType
 import com.whatever.caro.core.navigator.contract.NavCommand
@@ -41,6 +42,7 @@ fun LoginRoute(
     val coroutineScope = rememberCoroutineScope()
     val loginErrorMessage = stringResource(Res.string.login_snackbar_error)
     val loginCancelledMessage = stringResource(Res.string.login_snackbar_cancel)
+    val loginNetworkErrorMessage = stringResource(Res.string.login_snackbar_network_error)
     val socialLoginAuth: (SocialLoginType) -> Unit =
         remember {
             { type ->
@@ -77,6 +79,7 @@ fun LoginRoute(
                         when (sideEffect.error) {
                             LoginError.UNKNOWN -> loginErrorMessage
                             LoginError.USER_CANCELLED -> loginCancelledMessage
+                            LoginError.NETWORK -> loginNetworkErrorMessage
                         }
                     snackbarController.show(
                         SnackBarMessage(
