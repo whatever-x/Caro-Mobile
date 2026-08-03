@@ -11,6 +11,8 @@ interface AuthRepository {
 
     suspend fun logout()
 
+    suspend fun withdraw()
+
     suspend fun completeRegistration(
         nickname: String,
         termsAgreed: Boolean,

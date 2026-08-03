@@ -259,7 +259,7 @@ private fun UserInfo(
                         color = CaroTheme.color.surface.secondary,
                         shape = CaroTheme.shape.xxl,
                     ).padding(horizontal = 14.dp, vertical = 9.dp)
-                    .noRippleClickable(onNicknameChangeClick),
+                    .noRippleClickable(onClick = onNicknameChangeClick),
             contentAlignment = Alignment.Center,
         ) {
             Text(
