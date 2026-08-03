@@ -11,6 +11,7 @@ import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import caromobile.core.designsystem.generated.resources.Res
 import caromobile.core.designsystem.generated.resources.card_list_error
+import caromobile.core.designsystem.generated.resources.deck_delete_error
 import com.whatever.caro.core.designsystem.components.CaroSnackbarStyle
 import com.whatever.caro.core.navigator.contract.NavCommand
 import com.whatever.caro.core.navigator.dispatcher.NavigationDispatcher
@@ -19,6 +20,7 @@ import com.whatever.caro.core.navigator.entries.CreateCardEntry
 import com.whatever.caro.core.navigator.entries.DeleteCardsEntry
 import com.whatever.caro.core.navigator.entries.EditCardEntry
 import com.whatever.caro.core.navigator.entries.EditDeckEntry
+import com.whatever.caro.core.navigator.entries.HomeEntry
 import com.whatever.caro.core.navigator.entries.LearningEntry
 import com.whatever.caro.core.ui.snackbar.SnackBarMessage
 import com.whatever.caro.core.ui.snackbar.SnackbarController
@@ -36,6 +38,7 @@ fun DeckDetailRoute(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val cardLoadErrorMessage = stringResource(Res.string.card_list_error)
+    val deckDeleteErrorMessage = stringResource(Res.string.deck_delete_error)
     var hasResumed by rememberSaveable { mutableStateOf(false) }
 
     LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
@@ -123,10 +126,23 @@ fun DeckDetailRoute(
                     )
                 }
 
+                DeckDetailSideEffect.NavigateToHome -> {
+                    navDispatcher.emit(NavCommand.ResetTo(key = HomeEntry))
+                }
+
                 DeckDetailSideEffect.ShowCardLoadError -> {
                     snackbarController.show(
                         SnackBarMessage(
                             message = cardLoadErrorMessage,
+                            style = CaroSnackbarStyle.Error,
+                        ),
+                    )
+                }
+
+                DeckDetailSideEffect.ShowDeckDeleteError -> {
+                    snackbarController.show(
+                        SnackBarMessage(
+                            message = deckDeleteErrorMessage,
                             style = CaroSnackbarStyle.Error,
                         ),
                     )

@@ -12,8 +12,13 @@ data class DeckDetailState(
     val isCardListLoading: Boolean = false,
     val isSortBottomSheetVisible: Boolean = false,
     val isDeckEditBottomSheetVisible: Boolean = false,
+    val isDeleteDeckDialogVisible: Boolean = false,
+    val isDeckDeleting: Boolean = false,
     val selectedSortOption: DeckDetailSortOption = DeckDetailSortOption.CREATED,
 ) : UiState {
+    val isLoading: Boolean
+        get() = isCardListLoading || isDeckDeleting
+
     val isLoadedContentVisible: Boolean
         get() = isCardListLoading.not()
 

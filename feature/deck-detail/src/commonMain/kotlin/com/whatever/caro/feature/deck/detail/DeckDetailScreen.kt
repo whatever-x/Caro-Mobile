@@ -19,6 +19,7 @@ import com.whatever.caro.core.ui.loading.CaroLoadingOverlayBox
 import com.whatever.caro.feature.deck.detail.components.DeckDetailGuid
 import com.whatever.caro.feature.deck.detail.components.DeckDetailTopBar
 import com.whatever.caro.feature.deck.detail.components.DeckEditBottomSheet
+import com.whatever.caro.feature.deck.detail.components.DeleteDeckDialog
 import com.whatever.caro.feature.deck.detail.components.SortBottomSheet
 import com.whatever.caro.feature.deck.detail.components.lazycolumn.AddCardButtonItem
 import com.whatever.caro.feature.deck.detail.components.lazycolumn.DeckDetailHeader
@@ -33,7 +34,7 @@ internal fun DeckDetailScreen(
     state: DeckDetailState,
     onIntent: (DeckDetailIntent) -> Unit,
 ) {
-    CaroLoadingOverlayBox(isLoading = state.isCardListLoading) {
+    CaroLoadingOverlayBox(isLoading = state.isLoading) {
         Column(
             modifier =
                 Modifier
@@ -128,6 +129,13 @@ internal fun DeckDetailScreen(
                 onEditDeck = { onIntent(DeckDetailIntent.ClickDeckEditBottomSheetEdit) },
                 onDeleteDeck = { onIntent(DeckDetailIntent.ClickDeckEditBottomSheetDelete) },
                 onDismissRequest = { onIntent(DeckDetailIntent.DismissDeckEditBottomSheet) },
+            )
+        }
+
+        if (state.isDeleteDeckDialogVisible) {
+            DeleteDeckDialog(
+                onDelete = { onIntent(DeckDetailIntent.ClickDeleteDeckConfirm) },
+                onCancel = { onIntent(DeckDetailIntent.ClickDeleteDeckCancel) },
             )
         }
     }

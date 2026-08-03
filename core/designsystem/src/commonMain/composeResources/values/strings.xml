@@ -76,6 +76,11 @@
 	<string name="deck_detail_button_bottom_sheet_last_frequency">Frequency</string>
 	<string name="deck_detail_button_bottom_sheet_deck_edit">Edit deck</string>
 	<string name="deck_detail_button_bottom_sheet_deck_delete">Delete deck</string>
+	<string name="deck_delete_dialog_title">Delete this deck?</string>
+	<string name="deck_delete_dialog_body">This cannot be undone.</string>
+	<string name="deck_delete_dialog_button_delete">Delete</string>
+	<string name="deck_delete_dialog_button_cancel">Cancel</string>
+	<string name="deck_delete_error">Failed to delete the deck. Please try again.</string>
 	<!-- card -->
 	<string name="card_title_create">Create Card</string>
 	<string name="card_title_edit_content">Edit Card</string>
@@ -144,6 +149,7 @@
 	<string name="setting_report_bug_url">https://forms.gle/tCVKgkuNc6ZHuNkp9</string>
 	<string name="setting_snackbar_logout">Successfully logged out.</string>
 	<string name="setting_snackbar_delete_account">Account deleted successfully.</string>
+	<string name="setting_snackbar_user_info_load_error">Failed to load your profile. Please try again.</string>
 	<string name="setting_dialog_title">Are you sure you want to delete your account?</string>
 	<string name="setting_dialog_content">All your saved data will be permanently removed.</string>
 	<string name="setting_dialog_button_delete_account">Delete Account</string>
@@ -171,8 +177,6 @@
 	<string name="learning_total">Total</string>
 	<string name="learning_home">Back to home</string>
 	<string name="learning_retry">Retry</string>
-	<string name="learning_rest">No cards to review today</string>
-	<string name="learning_close">Go back</string>
 	<string name="learning_dialog_title">Notice</string>
 	<string name="learning_dialog_submit_error">An unknown error occurred.</string>
 	<string name="learning_dialog_confirm">OK</string>

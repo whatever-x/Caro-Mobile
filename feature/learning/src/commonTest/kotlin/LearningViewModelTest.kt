@@ -8,12 +8,13 @@ import com.whatever.caro.core.model.card.DeckCard
 import com.whatever.caro.core.model.deck.Deck
 import com.whatever.caro.core.model.deck.DeckState
 import com.whatever.caro.core.model.exception.CaroServerException
+import com.whatever.caro.core.model.learning.ActiveDailyStudySession
+import com.whatever.caro.core.model.learning.DailyStudyStartResult
 import com.whatever.caro.core.model.learning.LearningMode
 import com.whatever.caro.core.model.learning.StudyCard
 import com.whatever.caro.core.model.learning.StudyEvaluation
 import com.whatever.caro.core.model.learning.StudyRating
 import com.whatever.caro.core.model.learning.StudyRatingCounts
-import com.whatever.caro.core.model.learning.StudySession
 import com.whatever.caro.core.viewmodel.ExceptionFilter
 import com.whatever.caro.feature.learning.LearningViewModel
 import com.whatever.caro.feature.learning.mvi.LearningIntent
@@ -35,8 +36,8 @@ import kotlin.time.TestTimeSource
 import kotlin.time.TimeSource
 
 @OptIn(ExperimentalCoroutinesApi::class, ExperimentalTime::class)
-class LearningViewModelTest :
-    FunSpec({
+class LearningViewModelTest : FunSpec() {
+    init {
         val dispatcher = StandardTestDispatcher()
         beforeTest { Dispatchers.setMain(dispatcher) }
         afterTest { Dispatchers.resetMain() }
@@ -82,7 +83,7 @@ class LearningViewModelTest :
                 val study =
                     FakeStudyRepository(
                         session =
-                            StudySession.InProgress(
+                            activeDailyStudyResult(
                                 sessionId = 42L,
                                 studiedCardCount = 2,
                                 totalCardCount = 3,
@@ -102,6 +103,21 @@ class LearningViewModelTest :
             }
         }
 
+        test("일일 학습 시작 결과가 휴식일이면 화면 상태를 만들지 않고 이전 화면으로 이동한다") {
+            runTest(dispatcher) {
+                val study = FakeStudyRepository(session = DailyStudyStartResult.RestDay)
+                val viewModel = createViewModel(cards = emptyList(), study = study, mode = LearningMode.DAILY)
+
+                viewModel.sideEffect.test {
+                    viewModel.intent(LearningIntent.Load)
+
+                    awaitItem() shouldBe LearningSideEffect.PopBackStack
+                    viewModel.state.value.isLoading shouldBe false
+                    cancelAndIgnoreRemainingEvents()
+                }
+            }
+        }
+
         test("진행 중 뒤로가기는 학습 중단 다이얼로그를 표시한다") {
             runTest(dispatcher) {
                 val viewModel = createViewModel(listOf(Card(1, CardContent("앞", "뒤"))))
@@ -112,19 +128,6 @@ class LearningViewModelTest :
                 advanceUntilIdle()
 
                 viewModel.state.value.showStopDialog shouldBe true
-            }
-        }
-
-        test("ClickBackButton은 PopBackStack을 방출한다") {
-            runTest(dispatcher) {
-                val viewModel = createViewModel(emptyList())
-
-                viewModel.sideEffect.test {
-                    viewModel.intent(LearningIntent.ClickBackButton)
-
-                    awaitItem() shouldBe LearningSideEffect.PopBackStack
-                    cancelAndIgnoreRemainingEvents()
-                }
             }
         }
 
@@ -146,7 +149,7 @@ class LearningViewModelTest :
                 val study =
                     FakeStudyRepository(
                         session =
-                            StudySession.InProgress(
+                            activeDailyStudyResult(
                                 sessionId = 42L,
                                 studiedCardCount = 0,
                                 totalCardCount = 2,
@@ -183,7 +186,7 @@ class LearningViewModelTest :
             runTest(dispatcher) {
                 val study =
                     FakeStudyRepository(
-                        StudySession.InProgress(
+                        activeDailyStudyResult(
                             sessionId = 42L,
                             studiedCardCount = 0,
                             totalCardCount = 2,
@@ -217,7 +220,7 @@ class LearningViewModelTest :
             runTest(dispatcher) {
                 val study =
                     FakeStudyRepository(
-                        StudySession.InProgress(
+                        activeDailyStudyResult(
                             sessionId = 42L,
                             studiedCardCount = 0,
                             totalCardCount = 2,
@@ -259,7 +262,7 @@ class LearningViewModelTest :
             runTest(dispatcher) {
                 val study =
                     FakeStudyRepository(
-                        StudySession.InProgress(
+                        activeDailyStudyResult(
                             sessionId = 42L,
                             studiedCardCount = 0,
                             totalCardCount = 1,
@@ -283,7 +286,7 @@ class LearningViewModelTest :
             runTest(dispatcher) {
                 val study =
                     FakeStudyRepository(
-                        StudySession.InProgress(
+                        activeDailyStudyResult(
                             sessionId = 42L,
                             studiedCardCount = 0,
                             totalCardCount = 1,
@@ -313,7 +316,7 @@ class LearningViewModelTest :
             runTest(dispatcher) {
                 val study =
                     FakeStudyRepository(
-                        StudySession.InProgress(
+                        activeDailyStudyResult(
                             sessionId = 42L,
                             studiedCardCount = 0,
                             totalCardCount = 1,
@@ -392,7 +395,8 @@ class LearningViewModelTest :
                     .map { it.timeMs } shouldBe listOf(1_200, 350)
             }
         }
-    })
+    }
+}
 
 private fun createViewModel(
     cards: List<Card>,
@@ -440,7 +444,7 @@ private class FakeDeckRepository(
 }
 
 private class FakeStudyRepository(
-    private val session: StudySession? = null,
+    private val session: DailyStudyStartResult? = null,
     private val submitResult: StudyRatingCounts = StudyRatingCounts(),
 ) : StudySessionRepository {
     var submitCount = 0
@@ -454,7 +458,7 @@ private class FakeStudyRepository(
     override suspend fun startDaily(
         deckId: Long,
         idempotencyKey: String,
-    ): StudySession {
+    ): DailyStudyStartResult {
         startDailyIdempotencyKey = idempotencyKey
         return session ?: error("daily API must not be called")
     }
@@ -473,3 +477,17 @@ private class FakeStudyRepository(
         return submitResult
     }
 }
+
+private fun activeDailyStudyResult(
+    sessionId: Long,
+    studiedCardCount: Int,
+    totalCardCount: Int,
+    cards: List<StudyCard>,
+) = DailyStudyStartResult.Started(
+    ActiveDailyStudySession(
+        sessionId = sessionId,
+        studiedCardCount = studiedCardCount,
+        totalCardCount = totalCardCount,
+        cards = cards,
+    ),
+)
