@@ -8,6 +8,7 @@ import com.whatever.caro.core.viewmodel.ExceptionFilter
 import com.whatever.caro.feature.card.delete.DeleteCardsViewModel
 import com.whatever.caro.feature.card.delete.mvi.DeleteCardsIntent
 import com.whatever.caro.feature.card.delete.mvi.DeleteCardsSideEffect
+import dev.mokkery.answering.calls
 import dev.mokkery.answering.returns
 import dev.mokkery.answering.throws
 import dev.mokkery.everySuspend
@@ -227,6 +228,43 @@ class DeleteCardsViewModelTest : FunSpec() {
                 }
                 viewModel.state.value.selectedCardIds shouldBe setOf(1L)
                 viewModel.state.value.isDeleting shouldBe false
+            }
+        }
+
+        test("삭제 실패 시 카드 목록을 다시 조회해 서버 상태와 선택 상태를 동기화한다") {
+            runTest(dispatcher) {
+                var loadCount = 0
+                val cardRepository =
+                    mock<CardRepository> {
+                        everySuspend { deleteCards(any()) } throws RuntimeException("network")
+                    }
+                val deckRepository =
+                    mock<DeckRepository> {
+                        everySuspend { getDeckCards(any()) } calls {
+                            loadCount++
+                            if (loadCount == 1) cards else listOf(cards[1])
+                        }
+                    }
+                val viewModel = createViewModel(cardRepository, deckRepository)
+
+                viewModel.intent(DeleteCardsIntent.Initialize)
+                viewModel.intent(DeleteCardsIntent.ClickCard(cardId = 1L))
+                advanceUntilIdle()
+
+                viewModel.sideEffect.test {
+                    viewModel.intent(DeleteCardsIntent.ClickDeleteSelected)
+                    viewModel.intent(DeleteCardsIntent.ClickDeleteConfirm)
+                    advanceUntilIdle()
+
+                    awaitItem() shouldBe DeleteCardsSideEffect.ShowDeleteError
+                }
+                viewModel.state.value.cards
+                    .map { it.card.id } shouldBe listOf(2L)
+                viewModel.state.value.selectedCardIds shouldBe emptySet()
+                viewModel.state.value.isDeleting shouldBe false
+                verifySuspend(exactly(2)) {
+                    deckRepository.getDeckCards(deckId = testDeckId)
+                }
             }
         }
 

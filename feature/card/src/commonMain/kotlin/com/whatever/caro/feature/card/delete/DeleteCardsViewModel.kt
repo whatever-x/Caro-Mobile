@@ -128,9 +128,41 @@ class DeleteCardsViewModel(
             }.onSuccess {
                 postSideEffect(DeleteCardsSideEffect.NavigateBack)
             }.onFailure {
-                reduce { copy(isDeleting = false) }
+                synchronizeCardsAfterDeleteFailure()
                 postSideEffect(DeleteCardsSideEffect.ShowDeleteError)
             }
+        }
+    }
+
+    private suspend fun synchronizeCardsAfterDeleteFailure() {
+        val synchronizedCards =
+            suspendRunCatching {
+                deckRepository.getDeckCards(deckId = deckId)
+            }.getOrNull()
+
+        if (synchronizedCards == null) {
+            reduce { copy(isDeleting = false) }
+            return
+        }
+
+        val synchronizedCardIds = synchronizedCards.mapTo(mutableSetOf()) { card -> card.id }
+        val synchronizedSelectedIds =
+            currentState.selectedCardIds
+                .filter { cardId -> cardId in synchronizedCardIds }
+                .toPersistentSet()
+        reduce {
+            copy(
+                cards =
+                    synchronizedCards
+                        .map { card ->
+                            DeleteCardItem(
+                                card = card,
+                                isSelected = card.id in synchronizedSelectedIds,
+                            )
+                        }.toPersistentList(),
+                selectedCardIds = synchronizedSelectedIds,
+                isDeleting = false,
+            )
         }
     }
 }
