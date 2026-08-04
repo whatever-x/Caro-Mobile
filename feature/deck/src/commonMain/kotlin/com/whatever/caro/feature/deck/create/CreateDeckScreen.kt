@@ -77,6 +77,7 @@ internal fun CreateDeckScreen(
                     Icon(
                         modifier =
                             Modifier
+                                .padding(start = TopBarLeadingIconStartPadding)
                                 .size(24.dp)
                                 .clickable { onIntent(CreateDeckIntent.ClickBack) },
                         painter = painterResource(Res.drawable.ic_chevron_left_24),
@@ -158,3 +159,5 @@ internal fun CreateDeckScreen(
         }
     }
 }
+
+private val TopBarLeadingIconStartPadding = 24.dp

@@ -107,6 +107,10 @@ class HomeViewModel(
                 )
             }
 
+            if (decksResult.isFailure) {
+                postSideEffect(HomeSideEffect.ShowDeckLoadError)
+            }
+
             val exceptions =
                 listOfNotNull(
                     decksResult.exceptionOrNull(),

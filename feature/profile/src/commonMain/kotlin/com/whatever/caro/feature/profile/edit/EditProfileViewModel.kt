@@ -2,6 +2,7 @@ package com.whatever.caro.feature.profile.edit
 
 import com.whatever.caro.core.data.repository.profile.ProfileRepository
 import com.whatever.caro.core.data.util.suspendRunCatching
+import com.whatever.caro.core.model.exception.NetworkException
 import com.whatever.caro.core.viewmodel.BaseViewModel
 import com.whatever.caro.core.viewmodel.ExceptionFilter
 import com.whatever.caro.feature.profile.NicknameValidationResult
@@ -74,7 +75,11 @@ class EditProfileViewModel(
                         }
                     }.getOrElse { throwable ->
                         Napier.e(throwable = throwable) { "checkNicknameAvailability failed" }
-                        // TODO: 서버 에러 처리 UI 확정 시 폴백 제거
+                        postErrorSideEffect(
+                            throwable = throwable,
+                            fallback = EditProfileSideEffect.ShowNicknameCheckError,
+                        )
+                        // 일시적인 확인 실패로 입력을 막지 않는다. 실제 중복은 변경 요청에서 서버가 거른다.
                         NicknameValidationResult.Valid
                     }
                 reduce { copy(validationResult = result) }
@@ -97,6 +102,10 @@ class EditProfileViewModel(
                         }
                     }.onFailure { throwable ->
                         Napier.e(throwable = throwable) { "getRandomNickname failed" }
+                        postErrorSideEffect(
+                            throwable = throwable,
+                            fallback = EditProfileSideEffect.ShowRandomNicknameError,
+                        )
                     }
                 reduce { copy(isRandomNicknameLoading = false) }
             }
@@ -116,8 +125,25 @@ class EditProfileViewModel(
             }.onFailure { throwable ->
                 Napier.e(throwable = throwable) { "handleConfirm failed" }
                 reduce { copy(isLoading = false) }
+                postErrorSideEffect(
+                    throwable = throwable,
+                    fallback = EditProfileSideEffect.ShowUpdateNicknameError,
+                )
             }
         }
+    }
+
+    private fun postErrorSideEffect(
+        throwable: Throwable,
+        fallback: EditProfileSideEffect,
+    ) {
+        val sideEffect =
+            if (throwable is NetworkException) {
+                EditProfileSideEffect.ShowNetworkError
+            } else {
+                fallback
+            }
+        postSideEffect(sideEffect)
     }
 
     companion object {

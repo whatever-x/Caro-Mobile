@@ -24,6 +24,10 @@
 	<string name="profile_field_rule_nickname">2-20 characters. Korean, English, numbers, -, and _ only</string>
 	<string name="profile_button_create">Create</string>
 	<string name="profile_button_done">Done</string>
+	<string name="profile_snackbar_nickname_check_error">Failed to check nickname availability. Please try again.</string>
+	<string name="profile_snackbar_random_nickname_error">Failed to generate a nickname. Please try again.</string>
+	<string name="profile_snackbar_update_nickname_error">Failed to change your nickname. Please try again.</string>
+	<string name="profile_snackbar_network_error">No network connection. Please check your connection.</string>
 	<!-- deck create -->
 	<string name="deck_title_create">Create Deck</string>
 	<string name="deck_content_description_back">Go back</string>
@@ -135,6 +139,7 @@
 	<string name="home_deck_rest_description1">Our algorithm determined that you don't need to review today.</string>
 	<string name="home_deck_rest_description2">We'll have new questions ready for you tomorrow!</string>
 	<string name="home_deck_card_total_count">%1$s cards</string>
+	<string name="home_snackbar_deck_load_error">Failed to load decks. Please try again.</string>
 	<!-- setting -->
 	<string name="setting_title">Settings</string>
 	<string name="setting_userinfo_nickname_change">Change Nickname</string>

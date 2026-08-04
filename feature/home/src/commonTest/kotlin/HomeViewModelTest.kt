@@ -240,6 +240,24 @@ class HomeViewModelTest : FunSpec() {
             }
         }
 
+        test("덱 조회가 실패하면 ShowDeckLoadError 를 방출한다") {
+            runTest(testDispatcher) {
+                val deckRepository =
+                    mock<DeckRepository> {
+                        everySuspend { getDecks() } throws RuntimeException("deck error")
+                    }
+                val viewModel = viewModelWith(deckRepository)
+
+                viewModel.sideEffect.test {
+                    viewModel.intent(HomeIntent.Initialize)
+                    advanceUntilIdle()
+
+                    awaitItem() shouldBe HomeSideEffect.ShowDeckLoadError
+                    cancelAndIgnoreRemainingEvents()
+                }
+            }
+        }
+
         test("streak 조회가 실패해도 덱 성공 결과를 유지한다") {
             runTest(testDispatcher) {
                 val decks =

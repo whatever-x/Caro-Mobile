@@ -23,6 +23,10 @@
     <string name="profile_field_rule_nickname">2~20자, 한글/영문/숫자 및 -, _만 사용 가능해요</string>
     <string name="profile_button_create">생성하기</string>
     <string name="profile_button_done">완료</string>
+    <string name="profile_snackbar_nickname_check_error">닉네임 중복 확인에 실패했어요. 다시 시도해 주세요.</string>
+    <string name="profile_snackbar_random_nickname_error">닉네임 생성에 실패했어요. 다시 시도해 주세요.</string>
+    <string name="profile_snackbar_update_nickname_error">닉네임 변경에 실패했어요. 다시 시도해 주세요.</string>
+    <string name="profile_snackbar_network_error">네트워크 연결을 확인해 주세요.</string>
     <!-- deck -->
     <string name="deck_title_create">덱 만들기</string>
     <string name="deck_content_description_back">뒤로 가기</string>
@@ -133,6 +137,7 @@
     <string name="home_deck_rest_description1">알고리즘이 오늘은 복습이 필요 없다고 판단했어요.</string>
     <string name="home_deck_rest_description2">내일 새로운 문제를 준비할게요!</string>
     <string name="home_deck_card_total_count">%1$s개 카드</string>
+    <string name="home_snackbar_deck_load_error">덱을 불러오지 못했어요. 다시 시도해 주세요.</string>
     <!-- setting -->
     <string name="setting_title">설정</string>
     <string name="setting_userinfo_nickname_change">닉네임 변경</string>
