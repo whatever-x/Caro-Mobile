@@ -49,12 +49,16 @@ class MainActivity : ComponentActivity() {
      * 폴더블 접기/펼치기는 smallestScreenSize 설정 변경이라 Activity 가 재생성되며 여기서 다시 계산된다.
      */
     private fun applyOrientationPolicy() {
-        requestedOrientation =
+        val orientation =
             if (resources.configuration.smallestScreenWidthDp < LARGE_SCREEN_MIN_WIDTH_DP) {
                 ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
             } else {
                 ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
             }
+        // setRequestedOrientation 은 값이 같아도 재구성을 유발할 수 있어 달라질 때만 대입한다.
+        if (requestedOrientation != orientation) {
+            requestedOrientation = orientation
+        }
     }
 }
 
