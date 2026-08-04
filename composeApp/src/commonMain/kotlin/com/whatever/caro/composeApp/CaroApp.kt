@@ -159,7 +159,11 @@ fun CaroApp(
 
         if (showExitDialog) {
             AppExitDialog(
-                onExit = exitApp,
+                // iOS 의 exitApp 은 no-op 이라 먼저 닫지 않으면 다이얼로그가 남는다.
+                onExit = {
+                    showExitDialog = false
+                    exitApp()
+                },
                 onCancel = { showExitDialog = false },
             )
         }
