@@ -16,6 +16,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.disabled
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import caromobile.core.designsystem.generated.resources.Res
@@ -43,7 +47,10 @@ internal fun SocialLoginButton(
                 .heightIn(min = 52.dp)
                 .padding(vertical = CaroTheme.spacing.xs)
                 .graphicsLayer { alpha = if (enabled) 1f else 0.6f }
-                .then(if (enabled) Modifier.noRippleClickable(onClick = onClick) else Modifier),
+                .semantics {
+                    role = Role.Button
+                    if (!enabled) disabled()
+                }.noRippleClickable(enabled = enabled, onClick = onClick),
         contentAlignment = Alignment.Center,
     ) {
         Row(

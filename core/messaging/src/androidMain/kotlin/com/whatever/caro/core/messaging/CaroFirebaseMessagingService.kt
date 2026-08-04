@@ -54,6 +54,7 @@ class CaroFirebaseMessagingService : FirebaseMessagingService() {
             )
         }
 
+        val notificationId = messageValue?.hashCode() ?: System.currentTimeMillis().toInt()
         val launchIntent =
             packageManager.getLaunchIntentForPackage(packageName)?.apply {
                 putExtra(MESSAGE_VALUE_KEY, messageValue)
@@ -63,7 +64,7 @@ class CaroFirebaseMessagingService : FirebaseMessagingService() {
             launchIntent?.let {
                 PendingIntent.getActivity(
                     this,
-                    0,
+                    notificationId,
                     it,
                     PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
                 )
@@ -82,7 +83,7 @@ class CaroFirebaseMessagingService : FirebaseMessagingService() {
             .setAutoCancel(true)
             .setContentIntent(pendingIntent)
 
-        notificationManager.notify(messageValue?.hashCode() ?: System.currentTimeMillis().toInt(), builder.build())
+        notificationManager.notify(notificationId, builder.build())
     }
 
     private companion object {

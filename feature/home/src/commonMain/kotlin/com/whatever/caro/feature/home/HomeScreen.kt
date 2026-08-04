@@ -73,6 +73,7 @@ import org.jetbrains.compose.resources.stringResource
 
 private const val ARROW_BOUNCE_LOOP_END_PROGRESS = 35f / 60f
 private val HomeLoadingBannerHeight = 128.dp
+private val ArrowBounceSize = 50.dp
 
 @OptIn(ExperimentalResourceApi::class, ExperimentalCompottieApi::class)
 @Composable
@@ -216,6 +217,7 @@ internal fun HomeScreen(
             ) {
                 if (state.isDeckEmpty) {
                     Lottie(
+                        modifier = Modifier.size(size = ArrowBounceSize),
                         painter =
                             rememberLottiePainter(
                                 composition = lottieComposition,

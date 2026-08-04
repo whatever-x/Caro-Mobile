@@ -20,6 +20,7 @@ import com.whatever.caro.core.navigator.entries.CreateCardEntry
 import com.whatever.caro.core.navigator.entries.DeleteCardsEntry
 import com.whatever.caro.core.navigator.entries.EditCardEntry
 import com.whatever.caro.core.navigator.entries.EditDeckEntry
+import com.whatever.caro.core.navigator.entries.HomeEntry
 import com.whatever.caro.core.navigator.entries.LearningEntry
 import com.whatever.caro.core.ui.snackbar.SnackBarMessage
 import com.whatever.caro.core.ui.snackbar.SnackbarController
@@ -123,6 +124,10 @@ fun DeckDetailRoute(
                                 ),
                         ),
                     )
+                }
+
+                DeckDetailSideEffect.NavigateToHome -> {
+                    navDispatcher.emit(NavCommand.ResetTo(key = HomeEntry))
                 }
 
                 DeckDetailSideEffect.ShowCardLoadError -> {

@@ -1,8 +1,9 @@
 package com.whatever.caro.core.data.repository.study
 
+import com.whatever.caro.core.data.mapper.toDailyStudyStartResult
+import com.whatever.caro.core.model.learning.DailyStudyStartResult
 import com.whatever.caro.core.model.learning.StudyEvaluation
 import com.whatever.caro.core.model.learning.StudyRatingCounts
-import com.whatever.caro.core.model.learning.StudySession
 import com.whatever.caro.core.remote.datasource.study.StudySessionDataSource
 import com.whatever.caro.core.remote.dto.studySession.request.EvaluatedCardRequest
 
@@ -12,7 +13,7 @@ internal class StudySessionRepositoryImpl(
     override suspend fun startDaily(
         deckId: Long,
         idempotencyKey: String,
-    ): StudySession = source.startDaily(deckId, idempotencyKey).toModel()
+    ): DailyStudyStartResult = source.startDaily(deckId, idempotencyKey).toDailyStudyStartResult()
 
     override suspend fun submit(
         sessionId: Long,

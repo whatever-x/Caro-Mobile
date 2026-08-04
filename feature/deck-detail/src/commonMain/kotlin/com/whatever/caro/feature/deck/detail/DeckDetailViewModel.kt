@@ -1,6 +1,7 @@
 package com.whatever.caro.feature.deck.detail
 
 import com.whatever.caro.core.data.repository.deck.DeckRepository
+import com.whatever.caro.core.data.util.suspendRunCatching
 import com.whatever.caro.core.model.card.CardBadge
 import com.whatever.caro.core.model.deck.Deck
 import com.whatever.caro.core.model.deck.DeckCardSortType
@@ -115,18 +116,18 @@ class DeckDetailViewModel(
                 reduce {
                     copy(
                         isDeckEditBottomSheetVisible = false,
-                        isDeckDeleteDialogVisible = true,
+                        isDeleteDeckDialogVisible = true,
                     )
                 }
             }
 
-            DeckDetailIntent.ClickDeckDeleteDialogCancel -> {
-                if (currentState.isDeckDeleting.not()) {
-                    reduce { copy(isDeckDeleteDialogVisible = false) }
+            DeckDetailIntent.ClickDeleteDeckCancel -> {
+                reduce {
+                    copy(isDeleteDeckDialogVisible = false)
                 }
             }
 
-            DeckDetailIntent.ClickDeckDeleteDialogConfirm -> {
+            DeckDetailIntent.ClickDeleteDeckConfirm -> {
                 deleteDeck()
             }
 
@@ -160,6 +161,29 @@ class DeckDetailViewModel(
                 back = card.back,
             ),
         )
+    }
+
+    private fun deleteDeck() {
+        if (currentState.isDeckDeleting) return
+        reduce {
+            copy(
+                isDeleteDeckDialogVisible = false,
+                isDeckDeleting = true,
+            )
+        }
+
+        launch {
+            suspendRunCatching {
+                deckRepository.deleteDeck(deckId = currentState.deck.id)
+            }.onSuccess {
+                postSideEffect(DeckDetailSideEffect.NavigateToHome)
+            }.onFailure {
+                reduce {
+                    copy(isDeckDeleting = false)
+                }
+                postSideEffect(DeckDetailSideEffect.ShowDeckDeleteError)
+            }
+        }
     }
 
     private fun loadCards() {
@@ -213,27 +237,6 @@ class DeckDetailViewModel(
                 }
                 postSideEffect(DeckDetailSideEffect.ShowCardLoadError)
             }
-        }
-    }
-
-    private suspend fun deleteDeck() {
-        if (currentState.isDeckDeleting) return
-        reduce { copy(isDeckDeleting = true) }
-
-        runCatching {
-            deckRepository.deleteDeck(deckId = currentState.deck.id)
-        }.onSuccess {
-            reduce {
-                copy(
-                    isDeckDeleting = false,
-                    isDeckDeleteDialogVisible = false,
-                )
-            }
-            postSideEffect(DeckDetailSideEffect.NavigateBack)
-        }.onFailure { throwable ->
-            if (throwable is CancellationException) throw throwable
-            reduce { copy(isDeckDeleting = false) }
-            postSideEffect(DeckDetailSideEffect.ShowDeckDeleteError)
         }
     }
 

@@ -90,7 +90,7 @@ private fun MenuItem(
         modifier =
             modifier
                 .fillMaxWidth()
-                .noRippleClickable(onClickItem),
+                .noRippleClickable(onClick = onClickItem),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Icon(

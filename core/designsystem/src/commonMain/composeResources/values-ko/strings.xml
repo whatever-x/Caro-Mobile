@@ -75,6 +75,11 @@
     <string name="deck_detail_button_bottom_sheet_last_frequency">출제 빈도</string>
     <string name="deck_detail_button_bottom_sheet_deck_edit">덱 편집</string>
     <string name="deck_detail_button_bottom_sheet_deck_delete">덱 삭제</string>
+    <string name="deck_delete_dialog_title">덱을 삭제할까요?</string>
+    <string name="deck_delete_dialog_body">삭제 후에는 복구할 수 없어요</string>
+    <string name="deck_delete_dialog_button_delete">삭제</string>
+    <string name="deck_delete_dialog_button_cancel">취소</string>
+    <string name="deck_delete_error">덱 삭제에 실패했어요. 다시 시도해 주세요.</string>
     <!-- card -->
     <string name="card_title_create">카드 생성</string>
     <string name="card_title_edit_content">카드 수정</string>
@@ -98,11 +103,6 @@
     <string name="card_max_cards_reached">한 덱에는 카드 200장까지 추가할 수 있어요.</string>
     <string name="card_update_error">카드 수정에 실패했어요. 다시 시도해 주세요.</string>
     <string name="card_list_error">카드를 불러오지 못했어요. 다시 시도해 주세요.</string>
-    <string name="deck_delete_dialog_title">덱을 삭제할까요?</string>
-    <string name="deck_delete_dialog_content">덱에 포함된 모든 카드도 함께 삭제됩니다.</string>
-    <string name="deck_delete_dialog_button_delete">덱 삭제</string>
-    <string name="deck_delete_dialog_button_cancel">취소</string>
-    <string name="deck_delete_error">덱을 삭제하지 못했어요. 다시 시도해 주세요.</string>
     <string name="card_title_edit">카드 편집</string>
     <string name="card_button_delete_selected">선택삭제</string>
     <string name="card_button_cancel">취소</string>
@@ -148,6 +148,7 @@
     <string name="setting_snackbar_logout">로그아웃을 하였습니다.</string>
     <string name="setting_snackbar_delete_account">회원탈퇴를 하였습니다.</string>
     <string name="setting_snackbar_delete_account_error">회원탈퇴에 실패했어요. 다시 시도해 주세요.</string>
+    <string name="setting_snackbar_user_info_load_error">사용자 정보를 불러오지 못했습니다. 다시 시도해 주세요.</string>
     <string name="setting_dialog_title">정말 계정을 탈퇴하시겠습니까?</string>
     <string name="setting_dialog_content">저장된 모든 기록이 소멸될 수 있습니다.</string>
     <string name="setting_dialog_button_delete_account">탈퇴하기</string>
@@ -175,8 +176,6 @@
     <string name="learning_total">전체</string>
     <string name="learning_home">홈으로 돌아가기</string>
     <string name="learning_retry">다시 시도</string>
-    <string name="learning_rest">오늘은 쉬어가는 날이에요</string>
-    <string name="learning_close">돌아가기</string>
     <string name="learning_dialog_title">알림</string>
     <string name="learning_dialog_submit_error">알 수 없는 오류가 발생했습니다.</string>
     <string name="learning_dialog_confirm">확인</string>

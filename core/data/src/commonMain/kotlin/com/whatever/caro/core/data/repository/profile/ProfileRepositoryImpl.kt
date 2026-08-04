@@ -1,6 +1,8 @@
 package com.whatever.caro.core.data.repository.profile
 
+import com.whatever.caro.core.data.mapper.toMyInfo
 import com.whatever.caro.core.data.mapper.toMyNickname
+import com.whatever.caro.core.model.profile.MyInfo
 import com.whatever.caro.core.remote.datasource.profile.ProfileDataSource
 import com.whatever.caro.core.remote.dto.user.request.UpdateNicknameRequest
 
@@ -11,6 +13,8 @@ internal class ProfileRepositoryImpl(
         val response = profileDataSource.getRandomNickname()
         return response.nickname
     }
+
+    override suspend fun getMyInfo(): MyInfo = profileDataSource.getMyInfo().toMyInfo()
 
     override suspend fun getMyNickname(): String = profileDataSource.getMyInfo().toMyNickname()
 

@@ -9,9 +9,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -58,17 +58,16 @@ internal fun DeckDetailGuid(
         ) {
             Image(
                 modifier =
-                    Modifier.size(
-                        width = 47.dp,
-                        height = 62.dp,
-                    ),
+                    Modifier
+                        .fillMaxWidth()
+                        .height(height = 62.dp),
                 painter =
                     rememberLottiePainter(
                         composition = composition,
                         iterations = Compottie.IterateForever,
                     ),
                 contentDescription = null,
-                contentScale = ContentScale.Crop,
+                contentScale = ContentScale.Fit,
             )
 
             Text(
@@ -107,7 +106,7 @@ internal fun DeckDetailGuid(
                         ).padding(
                             horizontal = CaroTheme.spacing.l,
                             vertical = CaroTheme.spacing.m,
-                        ).noRippleClickable(onAddFirstCard),
+                        ).noRippleClickable(onClick = onAddFirstCard),
                 horizontalArrangement =
                     Arrangement.spacedBy(
                         space = CaroTheme.spacing.xs,

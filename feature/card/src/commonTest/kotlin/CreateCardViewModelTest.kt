@@ -132,6 +132,31 @@ class CreateCardViewModelTest : FunSpec() {
             }
         }
 
+        test("199장에서 카드 추가를 빠르게 두 번 눌러도 200장을 초과하지 않는다") {
+            runTest(dispatcher) {
+                val viewModel = createViewModel()
+
+                repeat(CardInputLimits.MAX_CARDS - 1) { index ->
+                    viewModel.intent(CreateCardIntent.UpdateFront("front-$index"))
+                    viewModel.intent(CreateCardIntent.UpdateBack("back-$index"))
+                    viewModel.intent(CreateCardIntent.ClickAddCard)
+                }
+                advanceUntilIdle()
+
+                viewModel.intent(CreateCardIntent.UpdateFront("last-front"))
+                viewModel.intent(CreateCardIntent.UpdateBack("last-back"))
+                viewModel.intent(CreateCardIntent.ClickAddCard)
+                viewModel.intent(CreateCardIntent.ClickAddCard)
+                advanceUntilIdle()
+
+                viewModel.state.value.addedCards.size shouldBe CardInputLimits.MAX_CARDS
+                viewModel.state.value.addedCards
+                    .last()
+                    .content shouldBe
+                    CardContent(front = "last-front", back = "last-back")
+            }
+        }
+
         test("ClickRemoveCard 는 해당 id 의 카드를 제거한다") {
             runTest(dispatcher) {
                 val viewModel = createViewModel()

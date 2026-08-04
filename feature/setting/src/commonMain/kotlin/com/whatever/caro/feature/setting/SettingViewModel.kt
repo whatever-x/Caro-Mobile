@@ -2,6 +2,7 @@ package com.whatever.caro.feature.setting
 
 import com.whatever.caro.core.data.repository.auth.AuthRepository
 import com.whatever.caro.core.data.repository.profile.ProfileRepository
+import com.whatever.caro.core.data.util.suspendRunCatching
 import com.whatever.caro.core.viewmodel.BaseViewModel
 import com.whatever.caro.core.viewmodel.ExceptionFilter
 import com.whatever.caro.feature.setting.model.SnackbarType
@@ -19,11 +20,7 @@ class SettingViewModel(
         initialState = SettingState(),
         exceptionFilter = exceptionFilter,
     ) {
-    private var isInitializing = false
-
-    override fun handleClientException(throwable: Throwable) {
-        reduce { copy(isLoading = false) }
-    }
+    private var initializeGeneration = 0L
 
     override suspend fun handleIntent(intent: SettingIntent) {
         when (intent) {
@@ -80,17 +77,24 @@ class SettingViewModel(
     }
 
     private suspend fun initialize() {
-        if (isInitializing) return
-        isInitializing = true
+        val generation = ++initializeGeneration
         reduce { copy(isLoading = true) }
-        try {
-            val nickname = profileRepository.getMyNickname()
-            reduce { copy(isLoading = false, nickname = nickname) }
-        } catch (throwable: Throwable) {
+        suspendRunCatching {
+            profileRepository.getMyInfo()
+        }.onSuccess { myInfo ->
+            if (generation != initializeGeneration) return
+            reduce {
+                copy(
+                    isLoading = false,
+                    nickname = myInfo.nickname,
+                    emailAddress = myInfo.email,
+                    socialLoginType = myInfo.socialLoginType,
+                )
+            }
+        }.onFailure {
+            if (generation != initializeGeneration) return
             reduce { copy(isLoading = false) }
-            throw throwable
-        } finally {
-            isInitializing = false
+            postSideEffect(SettingSideEffect.ShowSnackbar(type = SnackbarType.USER_INFO_LOAD_ERROR))
         }
     }
 
@@ -99,33 +103,31 @@ class SettingViewModel(
     }
 
     private suspend fun deleteAccount() {
-        if (currentState.isLoading) return
-        reduce { copy(isLoading = true) }
-
-        runCatching {
+        if (currentState.isDeletingAccount) return
+        reduce { copy(isDeletingAccount = true) }
+        try {
             authRepository.withdraw()
-        }.onSuccess {
-            reduce {
-                copy(
-                    isLoading = false,
-                    accountDeleteDialogVisible = false,
-                )
-            }
+            reduce { copy(accountDeleteDialogVisible = false) }
             postSideEffect(SettingSideEffect.ShowSnackbar(type = SnackbarType.DELETE_ACCOUNT))
             postSideEffect(SettingSideEffect.NavigateToLogin)
-        }.onFailure { throwable ->
-            if (throwable is CancellationException) throw throwable
-            reduce { copy(isLoading = false) }
+        } catch (throwable: CancellationException) {
+            throw throwable
+        } catch (_: Throwable) {
             postSideEffect(SettingSideEffect.ShowSnackbar(type = SnackbarType.DELETE_ACCOUNT_ERROR))
+        } finally {
+            reduce { copy(isDeletingAccount = false) }
         }
     }
 
     private suspend fun logout() {
         if (currentState.isLoading) return
         reduce { copy(isLoading = true) }
-        authRepository.logout()
-        reduce { copy(isLoading = false) }
-        postSideEffect(SettingSideEffect.ShowSnackbar(type = SnackbarType.LOGOUT))
-        postSideEffect(SettingSideEffect.NavigateToLogin)
+        try {
+            authRepository.logout()
+            postSideEffect(SettingSideEffect.ShowSnackbar(type = SnackbarType.LOGOUT))
+            postSideEffect(SettingSideEffect.NavigateToLogin)
+        } finally {
+            reduce { copy(isLoading = false) }
+        }
     }
 }

@@ -1,10 +1,8 @@
 package com.whatever.caro.feature.learning
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -27,10 +25,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import caromobile.core.designsystem.generated.resources.Res
-import caromobile.core.designsystem.generated.resources.learning_close
 import caromobile.core.designsystem.generated.resources.learning_dialog_submit_error
 import caromobile.core.designsystem.generated.resources.learning_front_instruction
-import caromobile.core.designsystem.generated.resources.learning_rest
 import caromobile.core.designsystem.generated.resources.learning_swipe_instruction
 import com.whatever.caro.core.designsystem.themes.CaroTheme
 import com.whatever.caro.core.model.learning.LearningMode
@@ -62,13 +58,6 @@ fun LearningScreen(
     when {
         state.isLoading -> {
             LoadingContent()
-        }
-
-        state.isRestDay -> {
-            LearningMessage(
-                stringResource(Res.string.learning_rest),
-                stringResource(Res.string.learning_close),
-            ) { onIntent(LearningIntent.ClickBackButton) }
         }
 
         state.isCompleted -> {
@@ -256,45 +245,8 @@ private fun LoadingContent() {
     }
 }
 
-@Composable
-private fun LearningMessage(
-    message: String,
-    action: String,
-    onClick: () -> Unit,
-) {
-    Box(
-        Modifier
-            .fillMaxSize()
-            .background(CaroTheme.color.background.primary)
-            .padding(CaroTheme.spacing.xl2),
-        contentAlignment = Alignment.Center,
-    ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(
-                text = message,
-                style = CaroTheme.typography.heading2,
-                color = CaroTheme.color.text.primary,
-                textAlign = TextAlign.Center,
-            )
-            Spacer(Modifier.height(CaroTheme.spacing.xl2))
-            Box(
-                modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .height(LearningMessageActionHeight)
-                        .background(CaroTheme.color.surface.brand, CaroTheme.shape.xxl)
-                        .clickable(onClick = onClick),
-                contentAlignment = Alignment.Center,
-            ) {
-                Text(text = action, style = CaroTheme.typography.body2.semiBold, color = CaroTheme.color.text.inverse)
-            }
-        }
-    }
-}
-
 private val LearningProgressHeight = 5.dp
 private val LearningInstructionHeight = 44.dp
-private val LearningMessageActionHeight = 52.dp
 
 private val learningPreviewState =
     LearningState(

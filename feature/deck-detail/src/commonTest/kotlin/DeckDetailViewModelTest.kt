@@ -284,32 +284,55 @@ class DeckDetailViewModelTest : FunSpec() {
             }
         }
 
-        test("덱 삭제 확인 시 실제 삭제 후 뒤로 이동한다") {
+        test("ClickDeckEditBottomSheetDelete 는 바텀시트를 닫고 삭제 확인 다이얼로그를 연다") {
             runTest(dispatcher) {
+                val viewModel = createViewModel(deck = createDeck())
+
+                viewModel.intent(DeckDetailIntent.ClickEditDeck)
+                viewModel.intent(DeckDetailIntent.ClickDeckEditBottomSheetDelete)
+                advanceUntilIdle()
+
+                viewModel.state.value.isDeckEditBottomSheetVisible shouldBe false
+                viewModel.state.value.isDeleteDeckDialogVisible shouldBe true
+            }
+        }
+
+        test("ClickDeleteDeckCancel 은 삭제 확인 다이얼로그를 닫는다") {
+            runTest(dispatcher) {
+                val viewModel = createViewModel(deck = createDeck())
+
+                viewModel.intent(DeckDetailIntent.ClickDeckEditBottomSheetDelete)
+                viewModel.intent(DeckDetailIntent.ClickDeleteDeckCancel)
+                advanceUntilIdle()
+
+                viewModel.state.value.isDeleteDeckDialogVisible shouldBe false
+            }
+        }
+
+        test("ClickDeleteDeckConfirm 은 덱을 삭제하고 홈 이동 side effect를 방출한다") {
+            runTest(dispatcher) {
+                val deck = createDeck()
                 val deckRepository =
                     mock<DeckRepository> {
                         everySuspend { getDeckCards(any()) } returns createDeckCards()
                         everySuspend { deleteDeck(any()) } returns Unit
                     }
-                val viewModel = createViewModel(deck = createDeck(), deckRepository = deckRepository)
+                val viewModel = createViewModel(deck = deck, deckRepository = deckRepository)
                 advanceUntilIdle()
-                viewModel.intent(DeckDetailIntent.ClickDeckEditBottomSheetDelete)
-                advanceUntilIdle()
-                viewModel.state.value.isDeckDeleteDialogVisible shouldBe true
 
                 viewModel.sideEffect.test {
-                    viewModel.intent(DeckDetailIntent.ClickDeckDeleteDialogConfirm)
+                    viewModel.intent(DeckDetailIntent.ClickDeleteDeckConfirm)
                     advanceUntilIdle()
 
-                    awaitItem() shouldBe DeckDetailSideEffect.NavigateBack
+                    awaitItem() shouldBe DeckDetailSideEffect.NavigateToHome
                 }
 
-                viewModel.state.value.isDeckDeleteDialogVisible shouldBe false
-                verifySuspend { deckRepository.deleteDeck(deckId = 1L) }
+                viewModel.state.value.isDeleteDeckDialogVisible shouldBe false
+                verifySuspend { deckRepository.deleteDeck(deckId = deck.id) }
             }
         }
 
-        test("덱 삭제 실패 시 다이얼로그를 유지하고 에러를 방출한다") {
+        test("덱 삭제 실패 시 ShowDeckDeleteError 를 방출하고 로딩을 해제한다") {
             runTest(dispatcher) {
                 val deckRepository =
                     mock<DeckRepository> {
@@ -318,17 +341,14 @@ class DeckDetailViewModelTest : FunSpec() {
                     }
                 val viewModel = createViewModel(deck = createDeck(), deckRepository = deckRepository)
                 advanceUntilIdle()
-                viewModel.intent(DeckDetailIntent.ClickDeckEditBottomSheetDelete)
-                advanceUntilIdle()
 
                 viewModel.sideEffect.test {
-                    viewModel.intent(DeckDetailIntent.ClickDeckDeleteDialogConfirm)
+                    viewModel.intent(DeckDetailIntent.ClickDeleteDeckConfirm)
                     advanceUntilIdle()
 
                     awaitItem() shouldBe DeckDetailSideEffect.ShowDeckDeleteError
                 }
 
-                viewModel.state.value.isDeckDeleteDialogVisible shouldBe true
                 viewModel.state.value.isDeckDeleting shouldBe false
             }
         }
