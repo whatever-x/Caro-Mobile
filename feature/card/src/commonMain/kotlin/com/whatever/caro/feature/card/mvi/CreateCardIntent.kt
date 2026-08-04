@@ -22,4 +22,10 @@ sealed interface CreateCardIntent : UiIntent {
     data object ClickSave : CreateCardIntent
 
     data object ClickBack : CreateCardIntent
+
+    data object ConfirmDiscard : CreateCardIntent
+
+    data object DismissDiscardDialog : CreateCardIntent
+
+    data object DismissMaxCardsDialog : CreateCardIntent
 }

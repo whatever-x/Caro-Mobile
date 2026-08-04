@@ -115,6 +115,13 @@
 	<string name="card_delete_dialog_button_cancel">Cancel</string>
 	<string name="card_load_error">Failed to load cards. Please try again.</string>
 	<string name="card_delete_error">Failed to delete cards. Please try again.</string>
+	<string name="card_field_max_reached">You can enter up to %1$d characters.</string>
+	<string name="card_discard_dialog_title">All entered cards will be lost.</string>
+	<string name="card_discard_dialog_body">Do you want to cancel?</string>
+	<string name="card_discard_dialog_button_leave">Go back</string>
+	<string name="card_discard_dialog_button_stay">Cancel</string>
+	<string name="card_max_dialog_body">You can add only %1$d cards at a time.</string>
+	<string name="card_max_dialog_button_confirm">OK</string>
 	<!-- home -->
 	<string name="home_banner_title">Hello, %1$s!</string>
 	<string name="home_streak_not_started_description">Create a new deck\nto start learning.</string>

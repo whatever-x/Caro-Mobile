@@ -227,7 +227,7 @@ class CreateCardViewModelTest : FunSpec() {
             }
         }
 
-        test("ClickBack 은 NavigateBack 을 emit 한다") {
+        test("입력이 없으면 ClickBack 은 바로 NavigateBack 을 emit 한다") {
             runTest(dispatcher) {
                 val viewModel = createViewModel()
 
@@ -237,6 +237,112 @@ class CreateCardViewModelTest : FunSpec() {
 
                     awaitItem() shouldBe CreateCardSideEffect.NavigateBack
                 }
+                viewModel.state.value.isDiscardDialogVisible shouldBe false
+            }
+        }
+
+        test("입력 중인 텍스트가 있으면 ClickBack 은 확인 다이얼로그만 띄운다") {
+            runTest(dispatcher) {
+                val viewModel = createViewModel()
+
+                viewModel.sideEffect.test {
+                    viewModel.intent(CreateCardIntent.UpdateFront("Run"))
+                    viewModel.intent(CreateCardIntent.ClickBack)
+                    advanceUntilIdle()
+
+                    expectNoEvents()
+                }
+                viewModel.state.value.isDiscardDialogVisible shouldBe true
+            }
+        }
+
+        test("추가된 카드가 있으면 ClickBack 은 확인 다이얼로그를 띄우고 ConfirmDiscard 로 나간다") {
+            runTest(dispatcher) {
+                val viewModel = createViewModel()
+
+                viewModel.intent(CreateCardIntent.UpdateFront("Run"))
+                viewModel.intent(CreateCardIntent.UpdateBack("달리다"))
+                viewModel.intent(CreateCardIntent.ClickAddCard)
+                viewModel.intent(CreateCardIntent.ClickBack)
+                advanceUntilIdle()
+
+                viewModel.state.value.isDiscardDialogVisible shouldBe true
+
+                viewModel.sideEffect.test {
+                    viewModel.intent(CreateCardIntent.ConfirmDiscard)
+                    advanceUntilIdle()
+
+                    awaitItem() shouldBe CreateCardSideEffect.NavigateBack
+                }
+            }
+        }
+
+        test("DismissDiscardDialog 는 다이얼로그만 닫고 화면을 유지한다") {
+            runTest(dispatcher) {
+                val viewModel = createViewModel()
+
+                viewModel.intent(CreateCardIntent.UpdateFront("Run"))
+                viewModel.intent(CreateCardIntent.ClickBack)
+                advanceUntilIdle()
+
+                viewModel.sideEffect.test {
+                    viewModel.intent(CreateCardIntent.DismissDiscardDialog)
+                    advanceUntilIdle()
+
+                    expectNoEvents()
+                }
+                viewModel.state.value.isDiscardDialogVisible shouldBe false
+                viewModel.state.value.front shouldBe "Run"
+            }
+        }
+
+        test("MAX_CARDS 장에 도달하면 한도 다이얼로그를 띄우고 isAddEnabled 를 false 로 만든다") {
+            runTest(dispatcher) {
+                val viewModel = createViewModel()
+
+                repeat(CardInputLimits.MAX_CARDS) { index ->
+                    viewModel.intent(CreateCardIntent.UpdateFront("front$index"))
+                    viewModel.intent(CreateCardIntent.UpdateBack("back$index"))
+                    viewModel.intent(CreateCardIntent.ClickAddCard)
+                }
+                advanceUntilIdle()
+
+                viewModel.state.value.addedCards.size shouldBe CardInputLimits.MAX_CARDS
+                viewModel.state.value.isMaxCardsDialogVisible shouldBe true
+                viewModel.state.value.isMaxCardsReached shouldBe true
+
+                viewModel.intent(CreateCardIntent.UpdateFront("overflow"))
+                viewModel.intent(CreateCardIntent.UpdateBack("초과"))
+                advanceUntilIdle()
+
+                viewModel.state.value.isAddEnabled shouldBe false
+            }
+        }
+
+        test("한도 도달 전에는 한도 다이얼로그를 띄우지 않는다") {
+            runTest(dispatcher) {
+                val viewModel = createViewModel()
+
+                viewModel.intent(CreateCardIntent.UpdateFront("Run"))
+                viewModel.intent(CreateCardIntent.UpdateBack("달리다"))
+                viewModel.intent(CreateCardIntent.ClickAddCard)
+                advanceUntilIdle()
+
+                viewModel.state.value.isMaxCardsDialogVisible shouldBe false
+            }
+        }
+
+        test("FIELD_MAX 에 도달하면 isFrontMaxReached 가 true 다") {
+            runTest(dispatcher) {
+                val viewModel = createViewModel()
+
+                viewModel.intent(CreateCardIntent.UpdateFront("가".repeat(CardInputLimits.FIELD_MAX - 1)))
+                advanceUntilIdle()
+                viewModel.state.value.isFrontMaxReached shouldBe false
+
+                viewModel.intent(CreateCardIntent.UpdateFront("가".repeat(CardInputLimits.FIELD_MAX + 10)))
+                advanceUntilIdle()
+                viewModel.state.value.isFrontMaxReached shouldBe true
             }
         }
     }

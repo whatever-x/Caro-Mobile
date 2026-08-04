@@ -113,6 +113,13 @@
     <string name="card_delete_dialog_button_cancel">취소</string>
     <string name="card_load_error">카드 목록을 불러오지 못했어요. 다시 시도해 주세요.</string>
     <string name="card_delete_error">카드 삭제에 실패했어요. 다시 시도해 주세요.</string>
+    <string name="card_field_max_reached">최대 %1$d자까지 입력할 수 있어요.</string>
+    <string name="card_discard_dialog_title">입력된 카드가 전부 사라집니다.</string>
+    <string name="card_discard_dialog_body">취소하시겠습니까?</string>
+    <string name="card_discard_dialog_button_leave">뒤로가기</string>
+    <string name="card_discard_dialog_button_stay">취소</string>
+    <string name="card_max_dialog_body">카드는 한번에 %1$d장만 추가 가능합니다.</string>
+    <string name="card_max_dialog_button_confirm">확인</string>
     <!-- home -->
     <string name="home_banner_title">%1$s님, 안녕하세요!</string>
     <string name="home_streak_not_started_description">새 덱을 만들고\n학습을 시작해볼까요?</string>

@@ -28,7 +28,10 @@ class CreateCardViewModel(
             is CreateCardIntent.ClickAddCard -> handleAddCard()
             is CreateCardIntent.ClickRemoveCard -> handleRemoveCard(intent.id)
             is CreateCardIntent.ClickSave -> handleSave()
-            is CreateCardIntent.ClickBack -> postSideEffect(CreateCardSideEffect.NavigateBack)
+            is CreateCardIntent.ClickBack -> handleBack()
+            is CreateCardIntent.ConfirmDiscard -> postSideEffect(CreateCardSideEffect.NavigateBack)
+            is CreateCardIntent.DismissDiscardDialog -> reduce { copy(isDiscardDialogVisible = false) }
+            is CreateCardIntent.DismissMaxCardsDialog -> reduce { copy(isMaxCardsDialogVisible = false) }
         }
     }
 
@@ -47,15 +50,26 @@ class CreateCardViewModel(
     private fun handleAddCard() {
         if (currentState.isAddEnabled.not()) return
         reduce {
+            val added =
+                addedCards.toPersistentList().add(
+                    StagedCard(id = nextCardId, content = CardContent(front = front, back = back)),
+                )
             copy(
-                addedCards =
-                    addedCards.toPersistentList().add(
-                        StagedCard(id = nextCardId, content = CardContent(front = front, back = back)),
-                    ),
+                addedCards = added,
                 nextCardId = nextCardId + 1,
                 front = "",
                 back = "",
+                // 한도에 도달한 그 순간에만 안내한다(이후 추가 버튼은 계속 비활성).
+                isMaxCardsDialogVisible = added.size >= CardInputLimits.MAX_CARDS,
             )
+        }
+    }
+
+    private fun handleBack() {
+        if (currentState.hasUnsavedInput) {
+            reduce { copy(isDiscardDialogVisible = true) }
+        } else {
+            postSideEffect(CreateCardSideEffect.NavigateBack)
         }
     }
 
@@ -66,7 +80,7 @@ class CreateCardViewModel(
     private fun handleSave() {
         if (currentState.isSaveEnabled.not()) return
         val cards = currentState.addedCards.map { it.content }
-        reduce { copy(isSaving = true) }
+        reduce { copy(isSaving = true, isMaxCardsDialogVisible = false) }
 
         launch {
             runCatching {
