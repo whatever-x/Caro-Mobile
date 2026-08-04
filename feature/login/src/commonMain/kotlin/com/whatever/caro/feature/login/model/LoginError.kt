@@ -4,4 +4,5 @@ enum class LoginError {
     UNKNOWN,
     USER_CANCELLED,
     NETWORK,
+    SERVER,
 }

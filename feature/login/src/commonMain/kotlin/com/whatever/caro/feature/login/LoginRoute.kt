@@ -10,6 +10,7 @@ import caromobile.core.designsystem.generated.resources.Res
 import caromobile.core.designsystem.generated.resources.login_snackbar_cancel
 import caromobile.core.designsystem.generated.resources.login_snackbar_error
 import caromobile.core.designsystem.generated.resources.login_snackbar_network_error
+import caromobile.core.designsystem.generated.resources.login_snackbar_server_error
 import com.whatever.caro.core.designsystem.components.CaroSnackbarStyle
 import com.whatever.caro.core.model.auth.SocialLoginType
 import com.whatever.caro.core.navigator.contract.NavCommand
@@ -43,8 +44,9 @@ fun LoginRoute(
     val loginErrorMessage = stringResource(Res.string.login_snackbar_error)
     val loginCancelledMessage = stringResource(Res.string.login_snackbar_cancel)
     val loginNetworkErrorMessage = stringResource(Res.string.login_snackbar_network_error)
+    val loginServerErrorMessage = stringResource(Res.string.login_snackbar_server_error)
     val socialLoginAuth: (SocialLoginType) -> Unit =
-        remember {
+        remember(coroutineScope, googleAuthenticator, appleAuthenticator) {
             { type ->
                 coroutineScope.launch {
                     when (type) {
@@ -80,6 +82,7 @@ fun LoginRoute(
                             LoginError.UNKNOWN -> loginErrorMessage
                             LoginError.USER_CANCELLED -> loginCancelledMessage
                             LoginError.NETWORK -> loginNetworkErrorMessage
+                            LoginError.SERVER -> loginServerErrorMessage
                         }
                     snackbarController.show(
                         SnackBarMessage(
