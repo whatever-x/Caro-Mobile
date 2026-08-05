@@ -3,6 +3,7 @@ import com.whatever.caro.feature.learning.runEvaluationTransition
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.shouldBe
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.cancelAndJoin
@@ -38,6 +39,20 @@ class LearningEvaluationTransitionTest :
                 )
 
                 evaluations shouldContainExactly listOf(StudyRating.FAIR)
+            }
+        }
+
+        test("다른 소유자가 애니메이션을 가져가 취소해도 평가한다") {
+            runTest {
+                var evaluated: StudyRating? = null
+
+                runEvaluationTransition(
+                    rating = StudyRating.EASY,
+                    animate = { throw CancellationException("mutation interrupted") },
+                    onEvaluate = { evaluated = it },
+                )
+
+                evaluated shouldBe StudyRating.EASY
             }
         }
 

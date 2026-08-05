@@ -32,6 +32,10 @@ internal fun learningInteractionAvailability(
     hasPendingRating: Boolean,
 ): LearningInteractionAvailability =
     LearningInteractionAvailability(
-        swipeEnabled = !isSubmitting && !hasPendingRating,
+        // 버튼 평가 중에는 스와이프 modifier 를 끄지 않는다.
+        // enabled = false 는 modifier 가 카드를 원점으로 되돌리게 만들고, 그 애니메이션이
+        // 같은 Animatable 을 가져가면서 버튼 퇴장 애니메이션을 취소한다.
+        // 추가 입력 차단은 evaluationEnabled 가 담당한다.
+        swipeEnabled = !isSubmitting,
         evaluationEnabled = !isSubmitting && !hasPendingRating,
     )

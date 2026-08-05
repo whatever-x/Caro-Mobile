@@ -47,8 +47,11 @@ import com.whatever.caro.feature.learning.mapper.toRating
 import com.whatever.caro.feature.learning.mapper.toSwipeDirection
 import com.whatever.caro.feature.learning.mvi.LearningIntent
 import com.whatever.caro.feature.learning.mvi.LearningState
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withTimeoutOrNull
 import org.jetbrains.compose.resources.stringResource
+import kotlin.coroutines.coroutineContext
 
 @Composable
 fun LearningScreen(
@@ -195,7 +198,14 @@ internal suspend fun runEvaluationTransition(
     onEvaluate: (StudyRating) -> Unit,
     timeoutMillis: Long = EVALUATION_ANIMATION_TIMEOUT_MILLIS,
 ) {
-    withTimeoutOrNull(timeoutMillis) { animate() }
+    // 퇴장 애니메이션은 연출이라 실패해도 되지만 평가 전달은 실패하면 안 된다.
+    // 다른 소유자가 Animatable 을 가져가면 여기로 외부 CancellationException 이 올라오는데,
+    // 이 화면 코루틴 자체가 취소된 경우에만 평가를 포기한다.
+    try {
+        withTimeoutOrNull(timeoutMillis) { animate() }
+    } catch (cancellation: CancellationException) {
+        coroutineContext.ensureActive()
+    }
     onEvaluate(rating)
 }
 
