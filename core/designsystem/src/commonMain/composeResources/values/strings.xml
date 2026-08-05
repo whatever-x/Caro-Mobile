@@ -179,7 +179,8 @@
 	<string name="learning_retry">Retry</string>
 	<string name="learning_dialog_title">Notice</string>
 	<string name="learning_dialog_submit_error">An unknown error occurred.</string>
-	<string name="learning_dialog_confirm">OK</string>
+	<string name="learning_dialog_network_error">Check your network connection and try again.</string>
+	<string name="learning_dialog_exit">Exit</string>
 	<string name="learning_complete_description">Let’s review again tomorrow</string>
 	<!-- card detail -->
 	<string name="card_detail_back">Go back</string>

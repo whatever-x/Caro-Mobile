@@ -8,6 +8,7 @@ import com.whatever.caro.core.model.card.DeckCard
 import com.whatever.caro.core.model.deck.Deck
 import com.whatever.caro.core.model.deck.DeckState
 import com.whatever.caro.core.model.exception.CaroServerException
+import com.whatever.caro.core.model.exception.NetworkException
 import com.whatever.caro.core.model.learning.ActiveDailyStudySession
 import com.whatever.caro.core.model.learning.DailyStudyStartResult
 import com.whatever.caro.core.model.learning.LearningMode
@@ -17,6 +18,7 @@ import com.whatever.caro.core.model.learning.StudyRating
 import com.whatever.caro.core.model.learning.StudyRatingCounts
 import com.whatever.caro.core.viewmodel.ExceptionFilter
 import com.whatever.caro.feature.learning.LearningViewModel
+import com.whatever.caro.feature.learning.mvi.LearningError
 import com.whatever.caro.feature.learning.mvi.LearningIntent
 import com.whatever.caro.feature.learning.mvi.LearningSideEffect
 import io.kotest.core.spec.style.FunSpec
@@ -246,8 +248,7 @@ class LearningViewModelTest : FunSpec() {
 
                     expectNoEvents()
                     viewModel.state.value.isSubmitting shouldBe false
-                    viewModel.state.value.isShowErrorDialog shouldBe true
-                    viewModel.state.value.errorMessage shouldBe null
+                    viewModel.state.value.error shouldBe LearningError.Unknown
                     viewModel.state.value.showStopDialog shouldBe false
 
                     viewModel.intent(LearningIntent.ConfirmError)
@@ -277,8 +278,76 @@ class LearningViewModelTest : FunSpec() {
                 viewModel.intent(LearningIntent.Evaluate(StudyRating.EASY))
                 advanceUntilIdle()
 
-                viewModel.state.value.isShowErrorDialog shouldBe true
-                viewModel.state.value.errorMessage shouldBe "서버 메시지"
+                viewModel.state.value.error shouldBe LearningError.Server("서버 메시지")
+            }
+        }
+
+        test("제출 실패 후 재시도는 같은 멱등키로 누적 평가를 다시 제출한다") {
+            runTest(dispatcher) {
+                val expected = StudyRatingCounts(easy = 1)
+                val study =
+                    FakeStudyRepository(
+                        session =
+                            activeDailyStudyResult(
+                                sessionId = 42L,
+                                studiedCardCount = 0,
+                                totalCardCount = 1,
+                                cards = listOf(StudyCard(1L, "앞", "뒤")),
+                            ),
+                        submitResult = expected,
+                    )
+                study.submitError = NetworkException.Connection("debug")
+                val viewModel = createViewModel(cards = emptyList(), study = study, mode = LearningMode.DAILY)
+                viewModel.intent(LearningIntent.Load)
+                advanceUntilIdle()
+                viewModel.intent(LearningIntent.Evaluate(StudyRating.EASY))
+                advanceUntilIdle()
+
+                viewModel.state.value.error shouldBe LearningError.Network
+                val firstKey = study.submittedIdempotencyKey
+
+                study.submitError = null
+                viewModel.intent(LearningIntent.RetryError)
+                advanceUntilIdle()
+
+                study.submitCount shouldBe 2
+                study.submittedIdempotencyKey shouldBe firstKey
+                study.submittedEvaluations.size shouldBe 1
+                viewModel.state.value.error shouldBe null
+                viewModel.state.value.isCompleted shouldBe true
+                viewModel.state.value.ratingCounts shouldBe expected
+            }
+        }
+
+        test("일일 학습 시작 실패 후 재시도는 같은 멱등키로 다시 조회한다") {
+            runTest(dispatcher) {
+                val study =
+                    FakeStudyRepository(
+                        activeDailyStudyResult(
+                            sessionId = 42L,
+                            studiedCardCount = 0,
+                            totalCardCount = 1,
+                            cards = listOf(StudyCard(1L, "앞", "뒤")),
+                        ),
+                    )
+                study.startDailyError = NetworkException.Timeout("debug")
+                val viewModel = createViewModel(cards = emptyList(), study = study, mode = LearningMode.DAILY)
+                viewModel.intent(LearningIntent.Load)
+                advanceUntilIdle()
+
+                viewModel.state.value.error shouldBe LearningError.Network
+                viewModel.state.value.isLoading shouldBe false
+                val firstKey = study.startDailyIdempotencyKey
+
+                study.startDailyError = null
+                viewModel.intent(LearningIntent.RetryError)
+                advanceUntilIdle()
+
+                study.startDailyCount shouldBe 2
+                study.startDailyIdempotencyKey shouldBe firstKey
+                viewModel.state.value.error shouldBe null
+                viewModel.state.value.cards
+                    .map { it.id } shouldBe listOf(1L)
             }
         }
 
@@ -448,6 +517,8 @@ private class FakeStudyRepository(
     private val submitResult: StudyRatingCounts = StudyRatingCounts(),
 ) : StudySessionRepository {
     var submitCount = 0
+    var startDailyCount = 0
+    var startDailyError: Throwable? = null
     var startDailyIdempotencyKey: String? = null
     var submittedSessionId: Long? = null
     var submittedEvaluations: List<StudyEvaluation> = emptyList()
@@ -459,7 +530,9 @@ private class FakeStudyRepository(
         deckId: Long,
         idempotencyKey: String,
     ): DailyStudyStartResult {
+        startDailyCount++
         startDailyIdempotencyKey = idempotencyKey
+        startDailyError?.let { throw it }
         return session ?: error("daily API must not be called")
     }
 
