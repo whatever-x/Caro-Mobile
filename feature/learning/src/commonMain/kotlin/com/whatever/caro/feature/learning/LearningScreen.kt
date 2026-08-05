@@ -47,8 +47,11 @@ import com.whatever.caro.feature.learning.mapper.toRating
 import com.whatever.caro.feature.learning.mapper.toSwipeDirection
 import com.whatever.caro.feature.learning.mvi.LearningIntent
 import com.whatever.caro.feature.learning.mvi.LearningState
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withTimeoutOrNull
 import org.jetbrains.compose.resources.stringResource
+import kotlin.coroutines.cancellation.CancellationException
+import kotlin.coroutines.coroutineContext
 
 @Composable
 fun LearningScreen(
@@ -195,7 +198,13 @@ internal suspend fun runEvaluationTransition(
     onEvaluate: (StudyRating) -> Unit,
     timeoutMillis: Long = EVALUATION_ANIMATION_TIMEOUT_MILLIS,
 ) {
-    withTimeoutOrNull(timeoutMillis) { animate() }
+    try {
+        withTimeoutOrNull(timeoutMillis) { animate() }
+    } catch (cancellation: CancellationException) {
+        // 카드 애니메이션이 다른 애니메이션에 밀려 취소돼도 평가는 그대로 진행한다.
+        // 화면 자체가 사라진 경우에는 ensureActive 가 다시 던져 평가를 막는다.
+        coroutineContext.ensureActive()
+    }
     onEvaluate(rating)
 }
 

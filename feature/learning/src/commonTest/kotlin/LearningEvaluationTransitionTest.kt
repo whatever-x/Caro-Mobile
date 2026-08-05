@@ -9,6 +9,7 @@ import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
+import kotlin.coroutines.cancellation.CancellationException
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class LearningEvaluationTransitionTest :
@@ -38,6 +39,24 @@ class LearningEvaluationTransitionTest :
                 )
 
                 evaluations shouldContainExactly listOf(StudyRating.FAIR)
+            }
+        }
+
+        test("애니메이션만 취소되고 화면이 살아 있으면 평가한다") {
+            runTest {
+                var evaluated: StudyRating? = null
+
+                val job =
+                    launch {
+                        runEvaluationTransition(
+                            rating = StudyRating.EASY,
+                            animate = { throw CancellationException("animation interrupted") },
+                            onEvaluate = { evaluated = it },
+                        )
+                    }
+                job.join()
+
+                evaluated shouldBe StudyRating.EASY
             }
         }
 
