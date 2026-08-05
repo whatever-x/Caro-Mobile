@@ -74,6 +74,7 @@ class DeckDetailViewModelTest : FunSpec() {
             runTest(dispatcher) {
                 val deckRepository =
                     mock<DeckRepository> {
+                        everySuspend { getDecks() } returns listOf(createDeck())
                         everySuspend { getDeckCards(any()) } returns
                             listOf(
                                 DeckCard(
@@ -105,6 +106,7 @@ class DeckDetailViewModelTest : FunSpec() {
             runTest(dispatcher) {
                 val deckRepository =
                     mock<DeckRepository> {
+                        everySuspend { getDecks() } returns listOf(createDeck())
                         everySuspend { getDeckCards(any()) } returns createDeckCards()
                     }
                 val viewModel = createViewModel(deck = createDeck(), deckRepository = deckRepository)
@@ -126,10 +128,45 @@ class DeckDetailViewModelTest : FunSpec() {
             }
         }
 
+        test("RefreshCards 는 덱 학습 상태를 서버 값으로 갱신한다") {
+            runTest(dispatcher) {
+                val emptyDeck =
+                    createDeck().copy(
+                        cardTotalCount = 0,
+                        todayLearningCount = 0,
+                        todayCompleteCount = 0,
+                        state = DeckState.NOT_STARTED,
+                    )
+                val deckRepository =
+                    mock<DeckRepository> {
+                        everySuspend { getDecks() } returns listOf(emptyDeck)
+                        everySuspend { getDeckCards(any()) } returns emptyList()
+                    }
+                val viewModel = createViewModel(deck = emptyDeck, deckRepository = deckRepository)
+                advanceUntilIdle()
+
+                everySuspend { deckRepository.getDecks() } returns
+                    listOf(
+                        emptyDeck.copy(
+                            todayLearningCount = 2,
+                            state = DeckState.LEARNING,
+                        ),
+                    )
+                everySuspend { deckRepository.getDeckCards(any()) } returns createDeckCards()
+                viewModel.intent(DeckDetailIntent.RefreshCards)
+                advanceUntilIdle()
+
+                viewModel.state.value.deck.todayLearningCount shouldBe 2
+                viewModel.state.value.deck.state shouldBe DeckState.LEARNING
+                viewModel.state.value.deck.cardTotalCount shouldBe 2
+            }
+        }
+
         test("카드 목록 로드 실패 시 ShowCardLoadError 를 방출한다") {
             runTest(dispatcher) {
                 val deckRepository =
                     mock<DeckRepository> {
+                        everySuspend { getDecks() } returns listOf(createDeck())
                         everySuspend { getDeckCards(any()) } throws RuntimeException("network")
                     }
                 val viewModel = createViewModel(deck = createDeck(), deckRepository = deckRepository)
@@ -253,6 +290,7 @@ class DeckDetailViewModelTest : FunSpec() {
                 val deck = createDeck()
                 val deckRepository =
                     mock<DeckRepository> {
+                        everySuspend { getDecks() } returns listOf(createDeck())
                         everySuspend { getDeckCards(any()) } returns createDeckCards()
                         everySuspend { deleteDeck(any()) } returns Unit
                     }
@@ -275,6 +313,7 @@ class DeckDetailViewModelTest : FunSpec() {
             runTest(dispatcher) {
                 val deckRepository =
                     mock<DeckRepository> {
+                        everySuspend { getDecks() } returns listOf(createDeck())
                         everySuspend { getDeckCards(any()) } returns createDeckCards()
                         everySuspend { deleteDeck(any()) } throws RuntimeException("network")
                     }
@@ -349,6 +388,7 @@ private fun createViewModel(
     deck: Deck,
     deckRepository: DeckRepository =
         mock {
+            everySuspend { getDecks() } returns listOf(createDeck())
             everySuspend { getDeckCards(any()) } returns createDeckCards()
         },
 ): DeckDetailViewModel =

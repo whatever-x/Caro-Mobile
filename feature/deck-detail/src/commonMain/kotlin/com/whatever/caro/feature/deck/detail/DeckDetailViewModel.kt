@@ -13,7 +13,6 @@ import com.whatever.caro.feature.deck.detail.mvi.DeckDetailIntent
 import com.whatever.caro.feature.deck.detail.mvi.DeckDetailSideEffect
 import com.whatever.caro.feature.deck.detail.mvi.DeckDetailState
 import kotlinx.collections.immutable.toPersistentList
-import kotlinx.coroutines.CancellationException
 
 class DeckDetailViewModel(
     private val deckRepository: DeckRepository,
@@ -27,7 +26,7 @@ class DeckDetailViewModel(
         exceptionFilter = exceptionFilter,
     ) {
     init {
-        loadCards()
+        loadDeckDetail()
     }
 
     override fun handleClientException(throwable: Throwable) {
@@ -142,7 +141,7 @@ class DeckDetailViewModel(
             }
 
             DeckDetailIntent.RefreshCards -> {
-                loadCards()
+                loadDeckDetail()
             }
         }
     }
@@ -181,19 +180,22 @@ class DeckDetailViewModel(
         }
     }
 
-    private fun loadCards() {
+    private fun loadDeckDetail() {
         if (currentState.isCardListLoading) return
         reduce {
             copy(isCardListLoading = true)
         }
 
         launch {
-            runCatching {
-                deckRepository.getDeckCards(deckId = currentState.deck.id)
-            }.onSuccess { cards ->
+            val deckId = currentState.deck.id
+            suspendRunCatching {
+                // 단건 덱 조회 API 가 없어 목록에서 찾는다.
+                val refreshedDeck = deckRepository.getDecks().firstOrNull { it.id == deckId }
+                refreshedDeck to deckRepository.getDeckCards(deckId = deckId)
+            }.onSuccess { (refreshedDeck, cards) ->
                 reduce {
                     copy(
-                        deck = deck.copy(cardTotalCount = cards.size),
+                        deck = (refreshedDeck ?: deck).copy(cardTotalCount = cards.size),
                         deckCardList =
                             cards
                                 .map { card ->
@@ -208,8 +210,7 @@ class DeckDetailViewModel(
                         isCardListLoading = false,
                     )
                 }
-            }.onFailure { throwable ->
-                if (throwable is CancellationException) throw throwable
+            }.onFailure {
                 reduce {
                     copy(isCardListLoading = false)
                 }
