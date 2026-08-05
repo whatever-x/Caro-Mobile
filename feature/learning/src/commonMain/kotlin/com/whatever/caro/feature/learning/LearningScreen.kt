@@ -1,5 +1,7 @@
 package com.whatever.caro.feature.learning
 
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -105,8 +107,13 @@ private fun LearningContent(
             total = state.totalCount,
             onBack = { onIntent(LearningIntent.RequestStop) },
         )
+        val progress by animateFloatAsState(
+            targetValue = ((state.progress + 1).toFloat() / state.totalCount.coerceAtLeast(1)).coerceIn(0f, 1f),
+            animationSpec = tween(LEARNING_PROGRESS_ANIMATION_DURATION_MILLIS),
+            label = "learningProgress",
+        )
         LinearProgressIndicator(
-            progress = { ((state.progress + 1).toFloat() / state.totalCount.coerceAtLeast(1)).coerceIn(0f, 1f) },
+            progress = { progress },
             modifier = Modifier.fillMaxWidth().height(LearningProgressHeight),
             color = CaroTheme.color.border.progress,
             trackColor = CaroTheme.color.surface.progress,
@@ -244,6 +251,8 @@ private fun LoadingContent() {
         CircularProgressIndicator(color = CaroTheme.color.icon.primary)
     }
 }
+
+private const val LEARNING_PROGRESS_ANIMATION_DURATION_MILLIS = 300
 
 private val LearningProgressHeight = 5.dp
 private val LearningInstructionHeight = 44.dp
