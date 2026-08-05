@@ -1,7 +1,6 @@
 package com.whatever.caro.feature.card.delete.components
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -23,6 +22,7 @@ import caromobile.core.designsystem.generated.resources.card_delete_dialog_butto
 import caromobile.core.designsystem.generated.resources.card_delete_dialog_button_delete
 import caromobile.core.designsystem.generated.resources.card_delete_dialog_title
 import com.whatever.caro.core.designsystem.components.CaroDialog
+import com.whatever.caro.core.designsystem.modifier.noRippleClickable
 import com.whatever.caro.core.designsystem.themes.CaroTheme
 import org.jetbrains.compose.resources.stringResource
 
@@ -92,7 +92,7 @@ internal fun DialogButton(
                 .height(DialogButtonHeight)
                 .clip(CaroTheme.shape.xxl)
                 .background(backgroundColor)
-                .clickable(onClick = onClick),
+                .noRippleClickable(onClick = onClick),
         contentAlignment = Alignment.Center,
     ) {
         Text(

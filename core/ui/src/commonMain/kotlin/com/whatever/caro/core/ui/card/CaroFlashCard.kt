@@ -6,7 +6,6 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -40,6 +39,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import com.whatever.caro.core.designsystem.modifier.noRippleClickable
 import com.whatever.caro.core.designsystem.themes.CaroTheme
 
 @Composable
@@ -72,7 +72,7 @@ fun CaroFlashCard(
                 .graphicsLayer {
                     this.rotationY = rotationY.value
                     this.cameraDistance = cameraDistance
-                }.clickable(
+                }.noRippleClickable(
                     onClickLabel = flipHint,
                     role = Role.Button,
                     onClick = onFlip,
@@ -205,7 +205,7 @@ private fun FlashCardPrimaryText(
                 modifier =
                     Modifier
                         .background(CaroTheme.color.surface.tertiary, CaroTheme.shape.xxl)
-                        .clickable(
+                        .noRippleClickable(
                             role = Role.Button,
                             onClick = onShowMore,
                         ).padding(

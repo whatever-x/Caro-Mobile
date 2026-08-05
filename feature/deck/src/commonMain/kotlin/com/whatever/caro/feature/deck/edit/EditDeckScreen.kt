@@ -1,7 +1,6 @@
 package com.whatever.caro.feature.deck.edit
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -41,6 +40,7 @@ import caromobile.core.designsystem.generated.resources.ic_x_circle_24
 import com.whatever.caro.core.designsystem.components.CaroTextArea
 import com.whatever.caro.core.designsystem.components.CaroTextField
 import com.whatever.caro.core.designsystem.components.CaroTopBar
+import com.whatever.caro.core.designsystem.modifier.noRippleClickable
 import com.whatever.caro.core.designsystem.themes.CaroTheme
 import com.whatever.caro.core.ui.loading.CaroLoadingOverlayBox
 import com.whatever.caro.feature.deck.component.CtaButton
@@ -78,7 +78,7 @@ internal fun EditDeckScreen(
                         modifier =
                             Modifier
                                 .size(24.dp)
-                                .clickable { onIntent(EditDeckIntent.ClickBack) },
+                                .noRippleClickable { onIntent(EditDeckIntent.ClickBack) },
                         painter = painterResource(Res.drawable.ic_chevron_left_24),
                         contentDescription = stringResource(Res.string.deck_content_description_back),
                         tint = CaroTheme.color.icon.brand,
@@ -121,7 +121,7 @@ internal fun EditDeckScreen(
                                     modifier =
                                         Modifier
                                             .size(24.dp)
-                                            .clickable { onIntent(EditDeckIntent.UpdateName("")) },
+                                            .noRippleClickable { onIntent(EditDeckIntent.UpdateName("")) },
                                     painter = painterResource(Res.drawable.ic_x_circle_24),
                                     contentDescription = stringResource(Res.string.deck_content_description_clear),
                                     tint = CaroTheme.color.icon.tertiary,

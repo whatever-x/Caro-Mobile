@@ -1,7 +1,6 @@
 package com.whatever.caro.feature.deck.detail.components
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -19,8 +18,8 @@ import androidx.compose.ui.unit.dp
 import caromobile.core.designsystem.generated.resources.Res
 import caromobile.core.designsystem.generated.resources.ic_arrow_left_24
 import caromobile.core.designsystem.generated.resources.ic_more_vertical_24
+import com.whatever.caro.core.designsystem.modifier.noRippleClickable
 import com.whatever.caro.core.designsystem.themes.CaroTheme
-import com.whatever.caro.core.ui.modifier.noRippleClickable
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
@@ -52,7 +51,7 @@ internal fun DeckDetailTopBar(
                 modifier =
                     Modifier
                         .size(24.dp)
-                        .clickable(onClick = onBack),
+                        .noRippleClickable(onClick = onBack),
                 tint = CaroTheme.color.icon.inverse,
             )
 
