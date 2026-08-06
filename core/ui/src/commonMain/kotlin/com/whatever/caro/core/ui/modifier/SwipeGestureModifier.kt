@@ -101,8 +101,9 @@ fun Modifier.swipeGesture(
             }
         }
 
+        // 호출부가 직접 실행 중인 애니메이션을 reset 이 가로채면 그 애니메이션이 취소되므로 건너뛴다.
         LaunchedEffect(enabled) {
-            if (!enabled) {
+            if (!enabled && !state.isAnimationRunning) {
                 animationJob?.cancel()
                 state.reset(animationSpec = motionConfig.resetAnimationSpec)
             }
