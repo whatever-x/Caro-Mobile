@@ -32,9 +32,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -46,8 +48,13 @@ import caromobile.core.designsystem.generated.resources.card_content_description
 import caromobile.core.designsystem.generated.resources.card_content_description_remove
 import caromobile.core.designsystem.generated.resources.card_content_description_swap
 import caromobile.core.designsystem.generated.resources.card_counter_added
+import caromobile.core.designsystem.generated.resources.card_discard_dialog_body
+import caromobile.core.designsystem.generated.resources.card_discard_dialog_button_leave
+import caromobile.core.designsystem.generated.resources.card_discard_dialog_button_stay
+import caromobile.core.designsystem.generated.resources.card_discard_dialog_title
 import caromobile.core.designsystem.generated.resources.card_field_label_back
 import caromobile.core.designsystem.generated.resources.card_field_label_front
+import caromobile.core.designsystem.generated.resources.card_field_max_reached
 import caromobile.core.designsystem.generated.resources.card_field_placeholder_back
 import caromobile.core.designsystem.generated.resources.card_field_placeholder_front
 import caromobile.core.designsystem.generated.resources.card_field_required
@@ -59,11 +66,14 @@ import caromobile.core.designsystem.generated.resources.ic_add_16
 import caromobile.core.designsystem.generated.resources.ic_chevron_left_24
 import caromobile.core.designsystem.generated.resources.ic_switch_16
 import caromobile.core.designsystem.generated.resources.ic_x_circle_16
+import com.whatever.caro.core.designsystem.components.CaroDialog
+import com.whatever.caro.core.designsystem.components.CaroDialogButton
 import com.whatever.caro.core.designsystem.components.CaroTextArea
 import com.whatever.caro.core.designsystem.components.CaroTopBar
 import com.whatever.caro.core.designsystem.modifier.noRippleClickable
 import com.whatever.caro.core.designsystem.themes.CaroTheme
 import com.whatever.caro.core.model.card.CardContent
+import com.whatever.caro.core.model.card.CardInputLimits
 import com.whatever.caro.core.ui.loading.CaroLoadingOverlayBox
 import com.whatever.caro.feature.card.mvi.CreateCardIntent
 import com.whatever.caro.feature.card.mvi.CreateCardState
@@ -90,6 +100,17 @@ internal fun CreateCardScreen(
     state: CreateCardState,
     onIntent: (CreateCardIntent) -> Unit,
 ) {
+    val frontFocusRequester = remember { FocusRequester() }
+    val contentScrollState = rememberScrollState()
+    // nextCardId 는 카드 추가 시에만 증가하므로, 추가 직후에만 앞면으로 포커스를 되돌린다.
+    // 포커스만 옮기면 화면은 뒷면에 머물러 커서가 보이지 않으므로 최상단으로 함께 스크롤한다.
+    LaunchedEffect(state.nextCardId) {
+        if (state.nextCardId > 0L) {
+            contentScrollState.animateScrollTo(0)
+            frontFocusRequester.requestFocus()
+        }
+    }
+
     CaroLoadingOverlayBox(isLoading = state.isSaving) {
         Column(
             modifier =
@@ -127,7 +148,7 @@ internal fun CreateCardScreen(
                     Modifier
                         .fillMaxWidth()
                         .weight(1f)
-                        .verticalScroll(rememberScrollState())
+                        .verticalScroll(contentScrollState)
                         .padding(
                             horizontal = CaroTheme.spacing.xl,
                             vertical = CaroTheme.spacing.m,
@@ -139,7 +160,13 @@ internal fun CreateCardScreen(
                     onValueChange = { onIntent(CreateCardIntent.UpdateFront(it)) },
                     placeholder = stringResource(Res.string.card_field_placeholder_front),
                     header = { RequiredFieldHeader(label = stringResource(Res.string.card_field_label_front)) },
-                    footer = { FieldCounter(count = state.frontCount) },
+                    footer = {
+                        FieldCounter(
+                            count = state.frontCount,
+                            isMaxReached = state.isFrontMaxReached,
+                        )
+                    },
+                    focusRequester = frontFocusRequester,
                 )
 
                 SwapButton(onClick = { onIntent(CreateCardIntent.ClickSwap) })
@@ -149,7 +176,12 @@ internal fun CreateCardScreen(
                     onValueChange = { onIntent(CreateCardIntent.UpdateBack(it)) },
                     placeholder = stringResource(Res.string.card_field_placeholder_back),
                     header = { RequiredFieldHeader(label = stringResource(Res.string.card_field_label_back)) },
-                    footer = { FieldCounter(count = state.backCount) },
+                    footer = {
+                        FieldCounter(
+                            count = state.backCount,
+                            isMaxReached = state.isBackMaxReached,
+                        )
+                    },
                 )
 
                 TipSection()
@@ -157,6 +189,7 @@ internal fun CreateCardScreen(
                 AddedCardsSection(
                     addedCount = state.addedCount,
                     addedCards = state.addedCards,
+                    scrollToEndKey = state.nextCardId,
                     onRemove = { id -> onIntent(CreateCardIntent.ClickRemoveCard(id)) },
                 )
             }
@@ -169,7 +202,63 @@ internal fun CreateCardScreen(
                 onSave = { onIntent(CreateCardIntent.ClickSave) },
             )
         }
+
+        if (state.isDiscardDialogVisible) {
+            DiscardConfirmDialog(
+                onLeave = { onIntent(CreateCardIntent.ConfirmDiscard) },
+                onStay = { onIntent(CreateCardIntent.DismissDiscardDialog) },
+            )
+        }
     }
+}
+
+@Composable
+private fun DiscardConfirmDialog(
+    onLeave: () -> Unit,
+    onStay: () -> Unit,
+) {
+    CaroDialog(
+        onDismissRequest = onStay,
+        title = {
+            Text(
+                modifier = Modifier.fillMaxWidth(),
+                text = stringResource(Res.string.card_discard_dialog_title),
+                style = CaroTheme.typography.heading2,
+                color = CaroTheme.color.text.primary,
+            )
+        },
+        content = {
+            Spacer(modifier = Modifier.size(CaroTheme.spacing.s))
+            Text(
+                modifier = Modifier.fillMaxWidth(),
+                text = stringResource(Res.string.card_discard_dialog_body),
+                style = CaroTheme.typography.body2.medium,
+                color = CaroTheme.color.text.secondary,
+            )
+            Spacer(modifier = Modifier.size(CaroTheme.spacing.l))
+        },
+        buttons = {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(CaroTheme.spacing.s),
+            ) {
+                CaroDialogButton(
+                    modifier = Modifier.weight(1f),
+                    text = stringResource(Res.string.card_discard_dialog_button_leave),
+                    backgroundColor = CaroTheme.color.surface.dangerous,
+                    textColor = CaroTheme.color.text.dangerous,
+                    onClick = onLeave,
+                )
+                CaroDialogButton(
+                    modifier = Modifier.weight(1f),
+                    text = stringResource(Res.string.card_discard_dialog_button_stay),
+                    backgroundColor = CaroTheme.color.surface.tertiary,
+                    textColor = CaroTheme.color.text.brand,
+                    onClick = onStay,
+                )
+            }
+        },
+    )
 }
 
 @Composable
@@ -192,16 +281,27 @@ private fun RequiredFieldHeader(label: String) {
 }
 
 @Composable
-private fun FieldCounter(count: String) {
+private fun FieldCounter(
+    count: String,
+    isMaxReached: Boolean,
+) {
     Row(
         modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(CaroTheme.spacing.s),
         verticalAlignment = Alignment.CenterVertically,
     ) {
+        if (isMaxReached) {
+            Text(
+                text = stringResource(Res.string.card_field_max_reached, CardInputLimits.FIELD_MAX),
+                style = CaroTheme.typography.caption1.regular,
+                color = CaroTheme.color.text.dangerous,
+            )
+        }
         Spacer(modifier = Modifier.weight(1f))
         Text(
             text = count,
             style = CaroTheme.typography.caption1.regular,
-            color = CaroTheme.color.text.tertiary,
+            color = if (isMaxReached) CaroTheme.color.text.dangerous else CaroTheme.color.text.tertiary,
             textAlign = TextAlign.End,
         )
     }
@@ -277,6 +377,7 @@ private fun TipRow(text: String) {
 private fun AddedCardsSection(
     addedCount: Int,
     addedCards: ImmutableList<StagedCard>,
+    scrollToEndKey: Long,
     onRemove: (Long) -> Unit,
 ) {
     Column(
@@ -288,7 +389,8 @@ private fun AddedCardsSection(
         if (addedCards.isNotEmpty()) {
             val listState = rememberLazyListState()
             // 카드를 추가하면 맨 끝에 붙으므로, 방금 추가된 카드를 보이도록 끝으로 스크롤한다.
-            LaunchedEffect(addedCards.size) {
+            // 삭제로는 스크롤이 튀지 않도록, 추가 시에만 증가하는 키를 사용한다.
+            LaunchedEffect(scrollToEndKey) {
                 listState.animateScrollToItem(addedCards.lastIndex)
             }
             LazyRow(
