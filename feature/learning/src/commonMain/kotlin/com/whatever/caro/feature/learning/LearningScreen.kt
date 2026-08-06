@@ -27,6 +27,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import caromobile.core.designsystem.generated.resources.Res
+import caromobile.core.designsystem.generated.resources.learning_dialog_network_error
 import caromobile.core.designsystem.generated.resources.learning_dialog_submit_error
 import caromobile.core.designsystem.generated.resources.learning_front_instruction
 import caromobile.core.designsystem.generated.resources.learning_swipe_instruction
@@ -47,6 +48,7 @@ import com.whatever.caro.feature.learning.components.LearningStopDialog
 import com.whatever.caro.feature.learning.components.LearningTopBar
 import com.whatever.caro.feature.learning.mapper.toRating
 import com.whatever.caro.feature.learning.mapper.toSwipeDirection
+import com.whatever.caro.feature.learning.mvi.LearningError
 import com.whatever.caro.feature.learning.mvi.LearningIntent
 import com.whatever.caro.feature.learning.mvi.LearningState
 import kotlinx.coroutines.ensureActive
@@ -90,13 +92,22 @@ fun LearningScreen(
         )
     }
 
-    if (state.isShowErrorDialog) {
+    state.error?.let { error ->
         LearningErrorDialog(
-            message = state.errorMessage ?: stringResource(Res.string.learning_dialog_submit_error),
+            message = error.toMessage(),
+            onRetry = { onIntent(LearningIntent.RetryError) },
             onConfirm = { onIntent(LearningIntent.ConfirmError) },
         )
     }
 }
+
+@Composable
+private fun LearningError.toMessage(): String =
+    when (this) {
+        is LearningError.Server -> message
+        LearningError.Network -> stringResource(Res.string.learning_dialog_network_error)
+        LearningError.Unknown -> stringResource(Res.string.learning_dialog_submit_error)
+    }
 
 @Composable
 private fun LearningContent(
@@ -132,11 +143,11 @@ private fun LearningContent(
                     hasPendingRating = pendingEvaluation.hasPendingRating,
                 )
 
-            LaunchedEffect(state.isSubmitting, state.isShowErrorDialog) {
+            LaunchedEffect(state.isSubmitting, state.error) {
                 pendingEvaluation =
                     pendingEvaluation.onSubmissionStateChanged(
                         isSubmitting = state.isSubmitting,
-                        hasSubmissionError = state.isShowErrorDialog,
+                        hasSubmissionError = state.error != null,
                     )
             }
 

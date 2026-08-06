@@ -147,11 +147,7 @@ fun CaroApp(
             when (event) {
                 AuthSessionEvent.Expired -> {
                     Napier.w { "Auth session expired → navigate to LoginEntry" }
-                    if (backStack.first() == SplashEntry) {
-                        navDispatcher.emit(NavCommand.ResetTo(LoginEntry))
-                    } else {
-                        // TODO: 팝업 처리 이후 emit
-                    }
+                    navDispatcher.emit(NavCommand.ResetTo(LoginEntry))
                 }
             }
         }

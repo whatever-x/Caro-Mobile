@@ -45,7 +45,7 @@ import caromobile.core.designsystem.generated.resources.learning_back
 import caromobile.core.designsystem.generated.resources.learning_complete_description
 import caromobile.core.designsystem.generated.resources.learning_complete_title
 import caromobile.core.designsystem.generated.resources.learning_continue
-import caromobile.core.designsystem.generated.resources.learning_dialog_confirm
+import caromobile.core.designsystem.generated.resources.learning_dialog_exit
 import caromobile.core.designsystem.generated.resources.learning_dialog_title
 import caromobile.core.designsystem.generated.resources.learning_easy
 import caromobile.core.designsystem.generated.resources.learning_evaluated_cards
@@ -53,6 +53,7 @@ import caromobile.core.designsystem.generated.resources.learning_fair
 import caromobile.core.designsystem.generated.resources.learning_flip_back_hint
 import caromobile.core.designsystem.generated.resources.learning_flip_hint
 import caromobile.core.designsystem.generated.resources.learning_home
+import caromobile.core.designsystem.generated.resources.learning_retry
 import caromobile.core.designsystem.generated.resources.learning_stop
 import caromobile.core.designsystem.generated.resources.learning_stop_body
 import caromobile.core.designsystem.generated.resources.learning_stop_title
@@ -336,6 +337,7 @@ internal fun LearningStopDialog(
 @Composable
 internal fun LearningErrorDialog(
     message: String,
+    onRetry: () -> Unit,
     onConfirm: () -> Unit,
 ) {
     CaroDialog(
@@ -361,9 +363,17 @@ internal fun LearningErrorDialog(
                 )
                 Spacer(Modifier.height(CaroTheme.spacing.m))
                 DialogAction(
-                    text = stringResource(Res.string.learning_dialog_confirm),
+                    text = stringResource(Res.string.learning_retry),
                     backgroundColor = CaroTheme.color.surface.brand,
                     textColor = CaroTheme.color.text.inverse,
+                    onClick = onRetry,
+                )
+                Spacer(Modifier.height(CaroTheme.spacing.s))
+                DialogAction(
+                    text = stringResource(Res.string.learning_dialog_exit),
+                    backgroundColor = CaroTheme.color.surface.primary,
+                    textColor = CaroTheme.color.text.brand,
+                    borderColor = CaroTheme.color.border.primary,
                     onClick = onConfirm,
                 )
             }
