@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Scaffold
@@ -199,7 +200,11 @@ fun CaroApp(
                 containerColor = Color.Transparent,
                 snackbarHost = {
                     CaroSnackBarHost(
-                        modifier = Modifier.padding(bottom = snackbarBottomPadding),
+                        // Scaffold 는 systemBars 만 반영해 키보드가 올라오면 스낵바가 IME 뒤로 가려진다.
+                        modifier =
+                            Modifier
+                                .imePadding()
+                                .padding(bottom = snackbarBottomPadding),
                         hostState = snackBarHostState,
                         snackbar = { snackbarData ->
                             CaroSnackbar(

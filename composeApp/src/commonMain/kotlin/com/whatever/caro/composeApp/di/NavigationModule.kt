@@ -72,6 +72,7 @@ val navEntryModule: Module =
             EditProfileRoute(
                 viewModel = koinViewModel<EditProfileViewModel> { parametersOf(navKey.nickname) },
                 navDispatcher = get(),
+                snackbarController = get(),
             )
         }
 
@@ -115,6 +116,7 @@ val navEntryModule: Module =
             HomeRoute(
                 viewModel = koinViewModel(),
                 navDispatcher = get(),
+                snackbarController = get(),
             )
         }
 

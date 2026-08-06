@@ -35,8 +35,16 @@ internal class AuthRepositoryImpl(
         return response.isRegistrationComplete
     }
 
+    /**
+     * 로그아웃은 "이 기기의 세션을 끝낸다"는 사용자 의도이므로 원격 호출 실패(네트워크·서버 오류)로 되돌리지 않는다.
+     * 실패로 처리하면 사용자가 로그아웃하지 못한 채 유효한 토큰을 들고 앱에 남는다.
+     */
     override suspend fun logout() {
-        remoteAuthDataSource.logout()
+        suspendRunCatching {
+            remoteAuthDataSource.logout()
+        }.onFailure { throwable ->
+            Napier.w(throwable = throwable) { "remote logout failed" }
+        }
         clearLocalSession()
     }
 

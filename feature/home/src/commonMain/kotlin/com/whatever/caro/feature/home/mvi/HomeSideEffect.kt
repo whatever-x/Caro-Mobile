@@ -15,4 +15,6 @@ sealed interface HomeSideEffect : UiSideEffect {
     data class NavigateToDeckDetail(
         val deck: Deck,
     ) : HomeSideEffect
+
+    data object ShowDeckLoadError : HomeSideEffect
 }

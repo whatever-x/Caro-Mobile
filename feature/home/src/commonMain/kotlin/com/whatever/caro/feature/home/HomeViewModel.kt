@@ -123,6 +123,10 @@ class HomeViewModel(
                 )
             }
 
+            if (decksResult.isFailure) {
+                postSideEffect(HomeSideEffect.ShowDeckLoadError)
+            }
+
             exceptions.firstOrNull()?.let { primary ->
                 primary.addSuppressedExceptions(exceptions.drop(1))
                 throw primary
