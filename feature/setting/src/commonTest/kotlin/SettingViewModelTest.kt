@@ -240,6 +240,9 @@ class SettingViewModelTest : FunSpec() {
             runTest {
                 val (viewModel, authRepository) = createViewModel()
 
+                viewModel.intent(SettingIntent.Initialize)
+                advanceUntilIdle()
+
                 viewModel.sideEffect.test {
                     viewModel.intent(SettingIntent.ClickLogOut)
                     advanceUntilIdle()
@@ -248,6 +251,27 @@ class SettingViewModelTest : FunSpec() {
                     awaitItem() shouldBe SettingSideEffect.NavigateToLogin
                 }
                 verifySuspend(exactly(1)) { authRepository.logout() }
+            }
+        }
+
+        test("로그아웃 실패 시 로딩을 해제하고 성공 sideEffect를 방출하지 않는다") {
+            runTest {
+                val authRepository =
+                    mock<AuthRepository> {
+                        everySuspend { logout() } throws RuntimeException("logout failed")
+                    }
+                val (viewModel) = createViewModel(authRepository = authRepository)
+
+                viewModel.intent(SettingIntent.Initialize)
+                advanceUntilIdle()
+
+                viewModel.sideEffect.test {
+                    viewModel.intent(SettingIntent.ClickLogOut)
+                    advanceUntilIdle()
+
+                    expectNoEvents()
+                }
+                viewModel.state.value.isLoading shouldBe false
             }
         }
 
@@ -424,7 +448,7 @@ class SettingViewModelTest : FunSpec() {
             }
         }
 
-        test("회원탈퇴 실패 시 다이얼로그를 유지하고 성공 sideEffect를 방출하지 않는다") {
+        test("회원탈퇴 실패 시 다이얼로그를 유지하고 에러 스낵바를 방출한다") {
             runTest {
                 val authRepository =
                     mock<AuthRepository> {
@@ -439,6 +463,8 @@ class SettingViewModelTest : FunSpec() {
                     viewModel.intent(SettingIntent.ClickDeleteAccountDialogConfirm)
                     advanceUntilIdle()
 
+                    awaitItem() shouldBe
+                        SettingSideEffect.ShowSnackbar(type = SnackbarType.DELETE_ACCOUNT_ERROR)
                     expectNoEvents()
                 }
                 viewModel.state.value.accountDeleteDialogVisible shouldBe true

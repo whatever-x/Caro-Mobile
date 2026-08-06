@@ -26,7 +26,6 @@ data class CreateCardState(
         get() =
             front.isNotBlank() &&
                 back.isNotBlank() &&
-                addedCards.size < CardInputLimits.MAX_CARDS &&
                 isSaving.not()
 
     val isSaveEnabled: Boolean

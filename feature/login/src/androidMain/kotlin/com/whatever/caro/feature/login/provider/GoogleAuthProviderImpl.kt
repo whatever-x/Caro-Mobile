@@ -2,6 +2,7 @@ package com.whatever.caro.feature.login.provider
 
 import android.content.Context
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.credentials.Credential
 import androidx.credentials.CredentialManager
@@ -24,12 +25,12 @@ class GoogleAuthProviderImpl : GoogleAuthProvider {
     @Composable
     override fun get(): SocialAuthenticator<GoogleUser> {
         val context = LocalContext.current
-        val credentialManager = CredentialManager.create(context)
-
-        return GoogleAuthenticator(
-            context = context,
-            credentialManager = credentialManager,
-        )
+        return remember(context) {
+            GoogleAuthenticator(
+                context = context,
+                credentialManager = CredentialManager.create(context),
+            )
+        }
     }
 }
 

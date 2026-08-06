@@ -13,6 +13,13 @@ internal fun com.whatever.caro.feature.home.HomeScreen(state: com.whatever.caro.
     - onIntent: STABLE (function type)
 
 @Composable
+private fun com.whatever.caro.feature.home.HomeStreakBanner(state: com.whatever.caro.feature.home.mvi.HomeState): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - state: STABLE (class with no mutable properties)
+
+@Composable
 private fun com.whatever.caro.feature.home.component.CtaButton(state: com.whatever.caro.core.model.deck.DeckState, onClick: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
   skippable: true
   restartable: true
@@ -51,4 +58,10 @@ private fun com.whatever.caro.feature.home.component.ProgressContent(modifier: a
     - modifier: STABLE (marked @Stable or @Immutable)
     - deckState: STABLE (class with no mutable properties)
     - todayLearningPercentage: STABLE (primitive type)
+
+@Composable
+private fun com.whatever.caro.feature.home.toBannerContent(): com.whatever.caro.feature.home.HomeStreakBannerContent?
+  skippable: true
+  restartable: true
+  params:
 

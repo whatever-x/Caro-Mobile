@@ -1,8 +1,11 @@
 package com.whatever.caro
 
+import android.Manifest
 import android.content.Intent
 import android.content.pm.ActivityInfo
+import android.content.pm.PackageManager
 import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
@@ -33,6 +36,7 @@ class MainActivity : ComponentActivity() {
         )
 
         IntentMessagingPublisher.publishFromIntent(intent)
+        requestNotificationPermissionIfNeeded()
 
         setContent {
             CaroApp()
@@ -59,6 +63,22 @@ class MainActivity : ComponentActivity() {
         if (requestedOrientation != orientation) {
             requestedOrientation = orientation
         }
+    }
+
+    private fun requestNotificationPermissionIfNeeded() {
+        if (
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+            checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
+        ) {
+            requestPermissions(
+                arrayOf(Manifest.permission.POST_NOTIFICATIONS),
+                NOTIFICATION_PERMISSION_REQUEST_CODE,
+            )
+        }
+    }
+
+    private companion object {
+        const val NOTIFICATION_PERMISSION_REQUEST_CODE = 1001
     }
 }
 

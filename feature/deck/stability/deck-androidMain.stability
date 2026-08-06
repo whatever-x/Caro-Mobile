@@ -36,30 +36,12 @@ internal fun com.whatever.caro.feature.deck.component.RequiredFieldHeader(label:
     - label: STABLE (String is immutable)
 
 @Composable
-public fun com.whatever.caro.feature.deck.create.CreateDeckRoute(viewModel: com.whatever.caro.feature.deck.create.CreateDeckViewModel, navDispatcher: com.whatever.caro.core.navigator.dispatcher.NavigationDispatcher, snackbarController: com.whatever.caro.core.ui.snackbar.SnackbarController): kotlin.Unit
-  skippable: false
-  restartable: true
-  params:
-    - viewModel: RUNTIME (requires runtime check)
-    - navDispatcher: RUNTIME (requires runtime check)
-    - snackbarController: RUNTIME (requires runtime check)
-
-@Composable
 internal fun com.whatever.caro.feature.deck.edit.CreateDeckScreen(state: com.whatever.caro.feature.deck.create.mvi.CreateDeckState, onIntent: kotlin.Function1<com.whatever.caro.feature.deck.create.mvi.CreateDeckIntent, kotlin.Unit>): kotlin.Unit
   skippable: true
   restartable: true
   params:
     - state: STABLE (class with no mutable properties)
     - onIntent: STABLE (function type)
-
-@Composable
-public fun com.whatever.caro.feature.deck.edit.EditDeckRoute(viewModel: com.whatever.caro.feature.deck.edit.EditDeckViewModel, navDispatcher: com.whatever.caro.core.navigator.dispatcher.NavigationDispatcher, snackbarController: com.whatever.caro.core.ui.snackbar.SnackbarController): kotlin.Unit
-  skippable: false
-  restartable: true
-  params:
-    - viewModel: RUNTIME (requires runtime check)
-    - navDispatcher: RUNTIME (requires runtime check)
-    - snackbarController: RUNTIME (requires runtime check)
 
 @Composable
 internal fun com.whatever.caro.feature.deck.edit.EditDeckScreen(state: com.whatever.caro.feature.deck.edit.mvi.EditDeckState, onIntent: kotlin.Function1<com.whatever.caro.feature.deck.edit.mvi.EditDeckIntent, kotlin.Unit>): kotlin.Unit

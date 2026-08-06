@@ -1,24 +1,45 @@
 package com.whatever.caro.composeApp
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.rememberNavBackStack
+import androidx.navigationevent.NavigationEventInfo
+import androidx.navigationevent.compose.NavigationBackHandler
+import androidx.navigationevent.compose.rememberNavigationEventState
 import androidx.savedstate.serialization.SavedStateConfiguration
+import caromobile.core.designsystem.generated.resources.Res
+import caromobile.core.designsystem.generated.resources.app_exit_dialog_button_cancel
+import caromobile.core.designsystem.generated.resources.app_exit_dialog_button_exit
+import caromobile.core.designsystem.generated.resources.app_exit_dialog_title
+import com.whatever.caro.core.data.repository.fcm.FcmTokenRepository
+import com.whatever.caro.core.designsystem.components.CaroDialog
+import com.whatever.caro.core.designsystem.components.CaroDialogButton
 import com.whatever.caro.core.designsystem.components.CaroSnackBarHost
 import com.whatever.caro.core.designsystem.components.CaroSnackbar
 import com.whatever.caro.core.designsystem.components.showSnackbarMessage
 import com.whatever.caro.core.designsystem.themes.CaroTheme
+import com.whatever.caro.core.messaging.MessagingClient
 import com.whatever.caro.core.model.auth.AuthSessionEvent
 import com.whatever.caro.core.model.auth.AuthSessionEventBus
 import com.whatever.caro.core.navigator.contract.NavCommand
@@ -40,8 +61,11 @@ import com.whatever.caro.core.navigator.entries.SplashEntry
 import com.whatever.caro.core.ui.image.ConfigureCaroImageLoader
 import com.whatever.caro.core.ui.snackbar.SnackbarController
 import io.github.aakira.napier.Napier
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 
 private val HomeSnackbarBottomPadding = 88.dp
@@ -54,6 +78,8 @@ fun CaroApp(
     navDispatcher: NavigationDispatcher = koinInject(),
     authSessionEventBus: AuthSessionEventBus = koinInject(),
     snackbarController: SnackbarController = koinInject(),
+    messagingClient: MessagingClient = koinInject(),
+    fcmTokenRepository: FcmTokenRepository = koinInject(),
 ) {
     ConfigureCaroImageLoader()
 
@@ -83,6 +109,13 @@ fun CaroApp(
         }
 
     val backStack = rememberNavBackStack(savedStateConfiguration, SplashEntry)
+
+    LaunchedEffect(messagingClient, fcmTokenRepository) {
+        messagingClient.tokenFlow
+            .filter(String::isNotBlank)
+            .distinctUntilChanged()
+            .collect(fcmTokenRepository::syncToken)
+    }
 
     LaunchedEffect(navDispatcher) {
         navDispatcher.commands.collect { command ->
@@ -114,11 +147,7 @@ fun CaroApp(
             when (event) {
                 AuthSessionEvent.Expired -> {
                     Napier.w { "Auth session expired → navigate to LoginEntry" }
-                    if (backStack.first() == SplashEntry) {
-                        navDispatcher.emit(NavCommand.ResetTo(LoginEntry))
-                    } else {
-                        // TODO: 팝업 처리 이후 emit
-                    }
+                    navDispatcher.emit(NavCommand.ResetTo(LoginEntry))
                 }
             }
         }
@@ -126,6 +155,27 @@ fun CaroApp(
     CaroTheme {
         val snackBarHostState = remember { SnackbarHostState() }
         val currentDestination = backStack.lastOrNull()
+        val exitApp = rememberAppExit()
+        var showExitDialog by remember { mutableStateOf(false) }
+        val backState = rememberNavigationEventState(currentInfo = NavigationEventInfo.None)
+
+        // 백스택 루트(로그인/홈 등)에서의 뒤로가기만 가로챈다. 하위 화면은 각 Route 의 핸들러가 먼저 처리한다.
+        NavigationBackHandler(
+            state = backState,
+            isBackEnabled = backStack.size <= 1,
+            onBackCompleted = { showExitDialog = true },
+        )
+
+        if (showExitDialog) {
+            AppExitDialog(
+                // iOS 의 exitApp 은 no-op 이라 먼저 닫지 않으면 다이얼로그가 남는다.
+                onExit = {
+                    showExitDialog = false
+                    exitApp()
+                },
+                onCancel = { showExitDialog = false },
+            )
+        }
         val systemBarBackgroundRoles = systemBarBackgroundRoles(currentDestination)
         val snackbarBottomPadding = snackbarHostBottomPadding(currentDestination)
 
@@ -172,4 +222,47 @@ fun CaroApp(
             }
         }
     }
+}
+
+@Composable
+private fun AppExitDialog(
+    onExit: () -> Unit,
+    onCancel: () -> Unit,
+) {
+    CaroDialog(
+        onDismissRequest = onCancel,
+        title = {
+            Text(
+                modifier = Modifier.fillMaxWidth(),
+                text = stringResource(Res.string.app_exit_dialog_title),
+                color = CaroTheme.color.text.primary,
+                style = CaroTheme.typography.heading2,
+                textAlign = TextAlign.Center,
+            )
+        },
+        content = {
+            Spacer(modifier = Modifier.size(CaroTheme.spacing.l))
+        },
+        buttons = {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(CaroTheme.spacing.s),
+            ) {
+                CaroDialogButton(
+                    modifier = Modifier.weight(1f),
+                    text = stringResource(Res.string.app_exit_dialog_button_exit),
+                    backgroundColor = CaroTheme.color.surface.dangerous,
+                    textColor = CaroTheme.color.text.dangerous,
+                    onClick = onExit,
+                )
+                CaroDialogButton(
+                    modifier = Modifier.weight(1f),
+                    text = stringResource(Res.string.app_exit_dialog_button_cancel),
+                    backgroundColor = CaroTheme.color.surface.tertiary,
+                    textColor = CaroTheme.color.text.brand,
+                    onClick = onCancel,
+                )
+            }
+        },
+    )
 }

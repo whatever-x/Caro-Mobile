@@ -21,6 +21,8 @@ sealed interface DeckDetailSideEffect : UiSideEffect {
 
     data class NavigateToEditDeck(
         val deckId: Long,
+        val deckName: String,
+        val deckDescription: String,
     ) : DeckDetailSideEffect
 
     data class NavigateToCardDetail(
