@@ -70,7 +70,9 @@ buildkonfig {
             buildConfigField(
                 FieldSpec.Type.STRING,
                 "GOOGLE_WEB_CLIENT_ID",
-                getLocalProperty("GOOGLE_WEB_CLIENT_ID_DEV") ?: error("GOOGLE_WEB_CLIENT_ID_DEV를 찾을 수 없습니다."),
+                getLocalProperty("GOOGLE_WEB_CLIENT_ID_DEV")
+                    ?: getLocalProperty("GOOGLE_WEB_CLIENT_ID")
+                    ?: error("GOOGLE_WEB_CLIENT_ID_DEV를 찾을 수 없습니다."),
             )
         }
     }
@@ -80,7 +82,9 @@ buildkonfig {
             buildConfigField(
                 FieldSpec.Type.STRING,
                 "GOOGLE_WEB_CLIENT_ID",
-                getLocalProperty("GOOGLE_WEB_CLIENT_ID_DEV") ?: error("GOOGLE_WEB_CLIENT_ID_DEV를 찾을 수 없습니다."),
+                getLocalProperty("GOOGLE_WEB_CLIENT_ID_DEV")
+                    ?: getLocalProperty("GOOGLE_WEB_CLIENT_ID")
+                    ?: error("GOOGLE_WEB_CLIENT_ID_DEV를 찾을 수 없습니다."),
             )
         }
     }
@@ -90,7 +94,9 @@ buildkonfig {
             buildConfigField(
                 FieldSpec.Type.STRING,
                 "GOOGLE_WEB_CLIENT_ID",
-                getLocalProperty("GOOGLE_WEB_CLIENT_ID_PROD") ?: error("GOOGLE_WEB_CLIENT_ID_PROD를 찾을 수 없습니다."),
+                getLocalProperty("GOOGLE_WEB_CLIENT_ID_PROD")
+                    ?: getLocalProperty("GOOGLE_WEB_CLIENT_ID")
+                    ?: error("GOOGLE_WEB_CLIENT_ID_PROD를 찾을 수 없습니다."),
             )
         }
     }

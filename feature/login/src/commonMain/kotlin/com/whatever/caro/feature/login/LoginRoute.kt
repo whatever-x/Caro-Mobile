@@ -3,8 +3,6 @@ package com.whatever.caro.feature.login
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import caromobile.core.designsystem.generated.resources.Res
 import caromobile.core.designsystem.generated.resources.login_snackbar_cancel
@@ -27,7 +25,6 @@ import com.whatever.caro.feature.login.mvi.LoginIntent
 import com.whatever.caro.feature.login.mvi.LoginSideEffect
 import com.whatever.caro.feature.login.provider.AppleAuthProvider
 import com.whatever.caro.feature.login.provider.GoogleAuthProvider
-import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 
@@ -40,16 +37,19 @@ fun LoginRoute(
     appleAuthenticator: SocialAuthenticator<AppleUser> = koinInject<AppleAuthProvider>().get(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
-    val coroutineScope = rememberCoroutineScope()
     val loginErrorMessage = stringResource(Res.string.login_snackbar_error)
     val loginCancelledMessage = stringResource(Res.string.login_snackbar_cancel)
     val loginNetworkErrorMessage = stringResource(Res.string.login_snackbar_network_error)
     val loginServerErrorMessage = stringResource(Res.string.login_snackbar_server_error)
-    val socialLoginAuth: (SocialLoginType) -> Unit =
-        remember(coroutineScope, googleAuthenticator, appleAuthenticator) {
-            { type ->
-                coroutineScope.launch {
-                    when (type) {
+
+    LaunchedEffect(Unit) {
+        viewModel.sideEffect.collect { sideEffect ->
+            loginNavigationCommand(sideEffect)?.let { command ->
+                navDispatcher.emit(command = command)
+            }
+            when (sideEffect) {
+                is LoginSideEffect.LaunchSocialAuthentication -> {
+                    when (sideEffect.type) {
                         SocialLoginType.GOOGLE -> {
                             val result = googleAuthenticator.authenticate()
                             viewModel.intent(LoginIntent.ClickGoogleLoginButton(result))
@@ -60,18 +60,12 @@ fun LoginRoute(
                             viewModel.intent(LoginIntent.ClickAppleLoginButton(result))
                         }
 
-                        SocialLoginType.NONE -> {}
+                        SocialLoginType.NONE -> {
+                            Unit
+                        }
                     }
                 }
-            }
-        }
 
-    LaunchedEffect(Unit) {
-        viewModel.sideEffect.collect { sideEffect ->
-            loginNavigationCommand(sideEffect)?.let { command ->
-                navDispatcher.emit(command = command)
-            }
-            when (sideEffect) {
                 is LoginSideEffect.NavigateHome -> {
                     Unit
                 }
@@ -102,7 +96,6 @@ fun LoginRoute(
     LoginScreen(
         state = state,
         onIntent = viewModel::intent,
-        onLaunch = { socialLoginType -> socialLoginAuth(socialLoginType) },
     )
 }
 
@@ -110,5 +103,6 @@ internal fun loginNavigationCommand(sideEffect: LoginSideEffect): NavCommand? =
     when (sideEffect) {
         LoginSideEffect.NavigateHome -> NavCommand.ResetTo(key = HomeEntry)
         LoginSideEffect.NavigateCreateProfile -> NavCommand.To(key = CreateProfileEntry)
+        is LoginSideEffect.LaunchSocialAuthentication -> null
         is LoginSideEffect.ShowErrorSnackbar -> null
     }

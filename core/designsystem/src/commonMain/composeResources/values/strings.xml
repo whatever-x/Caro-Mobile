@@ -108,6 +108,7 @@
 	<string name="card_button_save">Save</string>
 	<string name="card_button_update">Update</string>
 	<string name="card_save_error">Failed to save cards. Please try again.</string>
+	<string name="card_max_cards_reached">A deck can contain up to 200 cards.</string>
 	<string name="card_update_error">Failed to update the card. Please try again.</string>
 	<string name="card_list_error">Failed to load cards. Please try again.</string>
 	<string name="card_title_edit">Edit Cards</string>
@@ -123,6 +124,8 @@
 	<string name="card_delete_error">Failed to delete cards. Please try again.</string>
 	<!-- home -->
 	<string name="home_banner_title">Hello, %1$s!</string>
+	<string name="home_load_error">Some data could not be loaded.</string>
+	<string name="home_retry">Retry</string>
 	<string name="home_streak_not_started_description">Create a new deck\nto start learning.</string>
 	<string name="home_streak_not_started_label">Start your first learning streak</string>
 	<string name="home_streak_active_description">You’re on day %1$d.\nFinish today’s reviews and one new deck.</string>
@@ -155,6 +158,7 @@
 	<string name="setting_report_bug_url">https://forms.gle/tCVKgkuNc6ZHuNkp9</string>
 	<string name="setting_snackbar_logout">Successfully logged out.</string>
 	<string name="setting_snackbar_delete_account">Account deleted successfully.</string>
+	<string name="setting_snackbar_delete_account_error">Failed to delete your account. Please try again.</string>
 	<string name="setting_snackbar_user_info_load_error">Failed to load your profile. Please try again.</string>
 	<string name="setting_dialog_title">Are you sure you want to delete your account?</string>
 	<string name="setting_dialog_content">All your saved data will be permanently removed.</string>
