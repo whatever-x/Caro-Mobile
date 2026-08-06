@@ -277,6 +277,26 @@ class CreateCardViewModelTest : FunSpec() {
             }
         }
 
+        test("ConfirmDiscard 를 연타해도 NavigateBack 은 한 번만 발생한다") {
+            runTest(dispatcher) {
+                val viewModel = createViewModel()
+
+                viewModel.intent(CreateCardIntent.UpdateFront("Run"))
+                viewModel.intent(CreateCardIntent.ClickBack)
+                advanceUntilIdle()
+
+                viewModel.sideEffect.test {
+                    viewModel.intent(CreateCardIntent.ConfirmDiscard)
+                    viewModel.intent(CreateCardIntent.ConfirmDiscard)
+                    advanceUntilIdle()
+
+                    awaitItem() shouldBe CreateCardSideEffect.NavigateBack
+                    expectNoEvents()
+                }
+                viewModel.state.value.isDiscardDialogVisible shouldBe false
+            }
+        }
+
         test("DismissDiscardDialog 는 다이얼로그만 닫고 화면을 유지한다") {
             runTest(dispatcher) {
                 val viewModel = createViewModel()

@@ -29,7 +29,7 @@ class CreateCardViewModel(
             is CreateCardIntent.ClickRemoveCard -> handleRemoveCard(intent.id)
             is CreateCardIntent.ClickSave -> handleSave()
             is CreateCardIntent.ClickBack -> handleBack()
-            is CreateCardIntent.ConfirmDiscard -> postSideEffect(CreateCardSideEffect.NavigateBack)
+            is CreateCardIntent.ConfirmDiscard -> handleConfirmDiscard()
             is CreateCardIntent.DismissDiscardDialog -> reduce { copy(isDiscardDialogVisible = false) }
             is CreateCardIntent.DismissMaxCardsDialog -> reduce { copy(isMaxCardsDialogVisible = false) }
         }
@@ -71,6 +71,13 @@ class CreateCardViewModel(
         } else {
             postSideEffect(CreateCardSideEffect.NavigateBack)
         }
+    }
+
+    // 다이얼로그가 떠 있는 동안만 1회 소비한다. 연타하면 NavigateBack 이 쌓여 두 화면 뒤로 간다.
+    private fun handleConfirmDiscard() {
+        if (currentState.isDiscardDialogVisible.not()) return
+        reduce { copy(isDiscardDialogVisible = false) }
+        postSideEffect(CreateCardSideEffect.NavigateBack)
     }
 
     private fun handleRemoveCard(id: Long) {
