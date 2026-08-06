@@ -15,7 +15,6 @@ import com.whatever.caro.feature.deck.detail.mvi.DeckDetailSideEffect
 import com.whatever.caro.feature.deck.detail.mvi.DeckDetailSortOption
 import com.whatever.caro.feature.deck.detail.mvi.DeckDetailState
 import kotlinx.collections.immutable.toPersistentList
-import kotlinx.coroutines.CancellationException
 
 class DeckDetailViewModel(
     private val deckRepository: DeckRepository,
@@ -31,7 +30,7 @@ class DeckDetailViewModel(
     private var cardLoadGeneration = 0L
 
     init {
-        loadCards()
+        loadDeckDetail()
     }
 
     override fun handleClientException(throwable: Throwable) {
@@ -86,7 +85,7 @@ class DeckDetailViewModel(
                         isSortBottomSheetVisible = false,
                     )
                 }
-                loadCards()
+                loadDeckDetail(refreshDeck = false)
             }
 
             DeckDetailIntent.ClickEditCardList -> {
@@ -109,7 +108,14 @@ class DeckDetailViewModel(
                 reduce {
                     copy(isDeckEditBottomSheetVisible = false)
                 }
-                postSideEffect(DeckDetailSideEffect.NavigateToEditDeck(deckId = currentState.deck.id))
+                val deck = currentState.deck
+                postSideEffect(
+                    DeckDetailSideEffect.NavigateToEditDeck(
+                        deckId = deck.id,
+                        deckName = deck.title,
+                        deckDescription = deck.description,
+                    ),
+                )
             }
 
             DeckDetailIntent.ClickDeckEditBottomSheetDelete -> {
@@ -147,7 +153,7 @@ class DeckDetailViewModel(
             }
 
             DeckDetailIntent.RefreshCards -> {
-                loadCards()
+                loadDeckDetail()
             }
         }
     }
@@ -186,7 +192,9 @@ class DeckDetailViewModel(
         }
     }
 
-    private fun loadCards() {
+    // 화면 진입/복귀 시에는 refreshDeck = true 로 덱 메타를 서버에서 재조회하고,
+    // 정렬 변경처럼 덱 자체는 그대로인 경우에는 false 로 카드만 다시 로드한다.
+    private fun loadDeckDetail(refreshDeck: Boolean = true) {
         val generation = ++cardLoadGeneration
         val deckId = currentState.deck.id
         val sortOption = currentState.selectedSortOption
@@ -195,26 +203,35 @@ class DeckDetailViewModel(
         }
 
         launch {
-            runCatching {
-                when (sortOption) {
-                    DeckDetailSortOption.CREATED -> {
-                        deckRepository.getDeckCards(deckId = deckId)
+            suspendRunCatching {
+                // 단건 덱 조회 API 가 없어 목록에서 찾는다.
+                val refreshedDeck =
+                    if (refreshDeck) {
+                        deckRepository.getDecks().firstOrNull { it.id == deckId }
+                    } else {
+                        null
                     }
+                val cards =
+                    when (sortOption) {
+                        DeckDetailSortOption.CREATED -> {
+                            deckRepository.getDeckCards(deckId = deckId)
+                        }
 
-                    DeckDetailSortOption.LAST_REVIEWED,
-                    DeckDetailSortOption.FREQUENCY,
-                    -> {
-                        deckRepository.getDeckCards(
-                            deckId = deckId,
-                            sortType = sortOption.toDeckCardSortType(),
-                        )
+                        DeckDetailSortOption.LAST_REVIEWED,
+                        DeckDetailSortOption.FREQUENCY,
+                        -> {
+                            deckRepository.getDeckCards(
+                                deckId = deckId,
+                                sortType = sortOption.toDeckCardSortType(),
+                            )
+                        }
                     }
-                }
-            }.onSuccess { cards ->
+                refreshedDeck to cards
+            }.onSuccess { (refreshedDeck, cards) ->
                 if (generation != cardLoadGeneration) return@onSuccess
                 reduce {
                     copy(
-                        deck = deck.copy(cardTotalCount = cards.size),
+                        deck = (refreshedDeck ?: deck).copy(cardTotalCount = cards.size),
                         deckCardList =
                             cards
                                 .map { card ->
@@ -229,8 +246,7 @@ class DeckDetailViewModel(
                         isCardListLoading = false,
                     )
                 }
-            }.onFailure { throwable ->
-                if (throwable is CancellationException) throw throwable
+            }.onFailure {
                 if (generation != cardLoadGeneration) return@onFailure
                 reduce {
                     copy(isCardListLoading = false)

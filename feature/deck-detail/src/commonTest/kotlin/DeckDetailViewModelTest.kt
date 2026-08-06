@@ -78,6 +78,7 @@ class DeckDetailViewModelTest : FunSpec() {
             runTest(dispatcher) {
                 val deckRepository =
                     mock<DeckRepository> {
+                        everySuspend { getDecks() } returns listOf(createDeck())
                         everySuspend { getDeckCards(any()) } returns
                             listOf(
                                 DeckCard(
@@ -109,6 +110,7 @@ class DeckDetailViewModelTest : FunSpec() {
             runTest(dispatcher) {
                 val deckRepository =
                     mock<DeckRepository> {
+                        everySuspend { getDecks() } returns listOf(createDeck())
                         everySuspend { getDeckCards(any()) } returns createDeckCards()
                     }
                 val viewModel = createViewModel(deck = createDeck(), deckRepository = deckRepository)
@@ -130,10 +132,45 @@ class DeckDetailViewModelTest : FunSpec() {
             }
         }
 
+        test("RefreshCards 는 덱 학습 상태를 서버 값으로 갱신한다") {
+            runTest(dispatcher) {
+                val emptyDeck =
+                    createDeck().copy(
+                        cardTotalCount = 0,
+                        todayLearningCount = 0,
+                        todayCompleteCount = 0,
+                        state = DeckState.NOT_STARTED,
+                    )
+                val deckRepository =
+                    mock<DeckRepository> {
+                        everySuspend { getDecks() } returns listOf(emptyDeck)
+                        everySuspend { getDeckCards(any()) } returns emptyList()
+                    }
+                val viewModel = createViewModel(deck = emptyDeck, deckRepository = deckRepository)
+                advanceUntilIdle()
+
+                everySuspend { deckRepository.getDecks() } returns
+                    listOf(
+                        emptyDeck.copy(
+                            todayLearningCount = 2,
+                            state = DeckState.LEARNING,
+                        ),
+                    )
+                everySuspend { deckRepository.getDeckCards(any()) } returns createDeckCards()
+                viewModel.intent(DeckDetailIntent.RefreshCards)
+                advanceUntilIdle()
+
+                viewModel.state.value.deck.todayLearningCount shouldBe 2
+                viewModel.state.value.deck.state shouldBe DeckState.LEARNING
+                viewModel.state.value.deck.cardTotalCount shouldBe 2
+            }
+        }
+
         test("정렬 옵션을 선택하면 해당 타입으로 카드 목록을 다시 로드한다") {
             runTest(dispatcher) {
                 val deckRepository =
                     mock<DeckRepository> {
+                        everySuspend { getDecks() } returns listOf(createDeck())
                         everySuspend { getDeckCards(any()) } returns createDeckCards()
                         everySuspend { getDeckCards(any(), any()) } returns createDeckCards().reversed()
                     }
@@ -163,6 +200,7 @@ class DeckDetailViewModelTest : FunSpec() {
                 val initialCards = CompletableDeferred<List<DeckCard>>()
                 val deckRepository =
                     mock<DeckRepository> {
+                        everySuspend { getDecks() } returns listOf(createDeck())
                         everySuspend { getDeckCards(any()) } calls { initialCards.await() }
                         everySuspend { getDeckCards(any(), any()) } returns createDeckCards().reversed()
                     }
@@ -191,6 +229,7 @@ class DeckDetailViewModelTest : FunSpec() {
             runTest(dispatcher) {
                 val deckRepository =
                     mock<DeckRepository> {
+                        everySuspend { getDecks() } returns listOf(createDeck())
                         everySuspend { getDeckCards(any()) } throws RuntimeException("network")
                     }
                 val viewModel = createViewModel(deck = createDeck(), deckRepository = deckRepository)
@@ -277,7 +316,12 @@ class DeckDetailViewModelTest : FunSpec() {
                 viewModel.sideEffect.test {
                     viewModel.intent(DeckDetailIntent.ClickDeckEditBottomSheetEdit)
 
-                    awaitItem() shouldBe DeckDetailSideEffect.NavigateToEditDeck(deckId = deck.id)
+                    awaitItem() shouldBe
+                        DeckDetailSideEffect.NavigateToEditDeck(
+                            deckId = deck.id,
+                            deckName = deck.title,
+                            deckDescription = deck.description,
+                        )
                 }
 
                 viewModel.state.value.isDeckEditBottomSheetVisible shouldBe false
@@ -314,6 +358,7 @@ class DeckDetailViewModelTest : FunSpec() {
                 val deck = createDeck()
                 val deckRepository =
                     mock<DeckRepository> {
+                        everySuspend { getDecks() } returns listOf(createDeck())
                         everySuspend { getDeckCards(any()) } returns createDeckCards()
                         everySuspend { deleteDeck(any()) } returns Unit
                     }
@@ -336,6 +381,7 @@ class DeckDetailViewModelTest : FunSpec() {
             runTest(dispatcher) {
                 val deckRepository =
                     mock<DeckRepository> {
+                        everySuspend { getDecks() } returns listOf(createDeck())
                         everySuspend { getDeckCards(any()) } returns createDeckCards()
                         everySuspend { deleteDeck(any()) } throws RuntimeException("network")
                     }
@@ -410,6 +456,7 @@ private fun createViewModel(
     deck: Deck,
     deckRepository: DeckRepository =
         mock {
+            everySuspend { getDecks() } returns listOf(createDeck())
             everySuspend { getDeckCards(any()) } returns createDeckCards()
         },
 ): DeckDetailViewModel =
