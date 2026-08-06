@@ -23,3 +23,17 @@ internal fun com.whatever.caro.composeApp.CaroNavHost(modifier: androidx.compose
     - modifier: STABLE (marked @Stable or @Immutable)
     - backStack: RUNTIME (requires runtime check)
 
+@Composable
+internal fun com.whatever.caro.composeApp.CaroSystemBarBackground(roles: com.whatever.caro.composeApp.SystemBarBackgroundRoles, content: @[Composable] androidx.compose.runtime.internal.ComposableFunction0<kotlin.Unit>): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - roles: STABLE (class with no mutable properties)
+    - content: STABLE (composable function type)
+
+@Composable
+private fun com.whatever.caro.composeApp.color(): androidx.compose.ui.graphics.Color
+  skippable: true
+  restartable: true
+  params:
+
