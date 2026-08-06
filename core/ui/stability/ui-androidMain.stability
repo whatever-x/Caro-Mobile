@@ -80,6 +80,22 @@ public fun com.whatever.caro.core.ui.image.ConfigureCaroImageLoader(config: com.
     - config: STABLE (marked @Stable or @Immutable)
 
 @Composable
+public fun com.whatever.caro.core.ui.loading.CaroLoadingOverlay(modifier: androidx.compose.ui.Modifier): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - modifier: STABLE (marked @Stable or @Immutable)
+
+@Composable
+public fun com.whatever.caro.core.ui.loading.CaroLoadingOverlayBox(isLoading: kotlin.Boolean, modifier: androidx.compose.ui.Modifier, content: @[Composable] @[ExtensionFunctionType] androidx.compose.runtime.internal.ComposableFunction1<androidx.compose.foundation.layout.BoxScope, kotlin.Unit>): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - isLoading: STABLE (primitive type)
+    - modifier: STABLE (marked @Stable or @Immutable)
+    - content: STABLE (composable function type)
+
+@Composable
 public fun com.whatever.caro.core.ui.swipe.rememberSwipeGestureState(): com.whatever.caro.core.ui.swipe.SwipeGestureState
   skippable: true
   restartable: true

@@ -21,11 +21,12 @@ internal fun com.whatever.caro.feature.deck.detail.components.DeckDetailGuid(onA
     - modifier: STABLE (marked @Stable or @Immutable)
 
 @Composable
-internal fun com.whatever.caro.feature.deck.detail.components.DeckDetailTopBar(title: kotlin.String, onBack: kotlin.Function0<kotlin.Unit>, onEditDeck: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+internal fun com.whatever.caro.feature.deck.detail.components.DeckDetailTopBar(title: kotlin.String, isLoading: kotlin.Boolean, onBack: kotlin.Function0<kotlin.Unit>, onEditDeck: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
   skippable: true
   restartable: true
   params:
     - title: STABLE (String is immutable)
+    - isLoading: STABLE (primitive type)
     - onBack: STABLE (function type)
     - onEditDeck: STABLE (function type)
     - modifier: STABLE (marked @Stable or @Immutable)
@@ -50,6 +51,14 @@ private fun com.whatever.caro.feature.deck.detail.components.DeckEditBottomSheet
     - contentColor: STABLE (marked @Stable or @Immutable)
     - onClick: STABLE (function type)
     - modifier: STABLE (marked @Stable or @Immutable)
+
+@Composable
+internal fun com.whatever.caro.feature.deck.detail.components.DeleteDeckDialog(onDelete: kotlin.Function0<kotlin.Unit>, onCancel: kotlin.Function0<kotlin.Unit>): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - onDelete: STABLE (function type)
+    - onCancel: STABLE (function type)
 
 @Composable
 internal fun com.whatever.caro.feature.deck.detail.components.SortBottomSheet(selectedSortOption: com.whatever.caro.feature.deck.detail.mvi.DeckDetailSortOption, onSortOptionClick: kotlin.Function1<com.whatever.caro.feature.deck.detail.mvi.DeckDetailSortOption, kotlin.Unit>, onDismissRequest: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
@@ -155,11 +164,12 @@ private fun com.whatever.caro.feature.deck.detail.components.lazycolumn.RestCard
     - modifier: STABLE (marked @Stable or @Immutable)
 
 @Composable
-internal fun com.whatever.caro.feature.deck.detail.components.lazycolumn.SwipeToRevealCardItem(card: com.whatever.caro.feature.deck.detail.model.CardItem, onEdit: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+internal fun com.whatever.caro.feature.deck.detail.components.lazycolumn.SwipeToRevealCardItem(card: com.whatever.caro.feature.deck.detail.model.CardItem, onClick: kotlin.Function0<kotlin.Unit>, onEdit: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
   skippable: true
   restartable: true
   params:
     - card: STABLE (marked @Stable or @Immutable)
+    - onClick: STABLE (function type)
     - onEdit: STABLE (function type)
     - modifier: STABLE (marked @Stable or @Immutable)
 
@@ -169,13 +179,4 @@ private fun com.whatever.caro.feature.deck.detail.components.lazycolumn.Unavaila
   restartable: true
   params:
     - modifier: STABLE (marked @Stable or @Immutable)
-
-@Composable
-public fun com.whatever.caro.feature.deck.detail.route.DeckDetailRoute(viewModel: com.whatever.caro.feature.deck.detail.DeckDetailViewModel, navDispatcher: com.whatever.caro.core.navigator.dispatcher.NavigationDispatcher, snackbarController: com.whatever.caro.core.ui.snackbar.SnackbarController): kotlin.Unit
-  skippable: false
-  restartable: true
-  params:
-    - viewModel: UNSTABLE (has mutable properties or unstable members)
-    - navDispatcher: RUNTIME (requires runtime check)
-    - snackbarController: RUNTIME (requires runtime check)
 

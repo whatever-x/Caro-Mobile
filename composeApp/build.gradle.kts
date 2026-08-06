@@ -42,6 +42,7 @@ kotlin {
             implementation(libs.koin.compose.navigation3)
 
             implementation(libs.jetbrains.androidx.lifecycle.viewmodel.nav3)
+            implementation(libs.jetbrains.androidx.navigation3.event)
         }
     }
 }

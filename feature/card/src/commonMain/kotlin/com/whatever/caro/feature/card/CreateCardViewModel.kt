@@ -46,6 +46,10 @@ class CreateCardViewModel(
 
     private fun handleAddCard() {
         if (currentState.isAddEnabled.not()) return
+        if (currentState.addedCards.size >= CardInputLimits.MAX_CARDS) {
+            postSideEffect(CreateCardSideEffect.ShowMaxCardsReached)
+            return
+        }
         reduce {
             copy(
                 addedCards =

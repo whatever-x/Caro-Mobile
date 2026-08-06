@@ -195,6 +195,29 @@ class AuthRepositoryImplTest : FunSpec() {
             }
         }
 
+        test("logout은 원격 로그아웃이 실패해도 로컬 토큰을 비우고 예외를 전파하지 않는다") {
+            runTest {
+                val remoteAuthDataSource =
+                    mock<AuthDataSource> {
+                        everySuspend { logout() } throws RuntimeException("network error")
+                    }
+                val localAuthDataSource =
+                    mock<LocalAuthDataSource> { everySuspend { clear() } returns Unit }
+                val repository =
+                    repositoryWith(
+                        remoteAuthDataSource = remoteAuthDataSource,
+                        localAuthDataSource = localAuthDataSource,
+                    )
+
+                shouldNotThrowAny { repository.logout() }
+
+                verifySuspend {
+                    remoteAuthDataSource.logout()
+                    localAuthDataSource.clear()
+                }
+            }
+        }
+
         test("withdraw는 원격 회원탈퇴 실패 시 로컬 토큰을 유지한다") {
             runTest {
                 val failure = RuntimeException("withdraw failed")

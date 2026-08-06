@@ -1,5 +1,6 @@
 import app.cash.turbine.test
 import com.whatever.caro.core.data.repository.profile.ProfileRepository
+import com.whatever.caro.core.model.exception.NetworkException
 import com.whatever.caro.core.viewmodel.ExceptionFilter
 import com.whatever.caro.feature.profile.NicknameValidationResult
 import com.whatever.caro.feature.profile.NicknameValidator
@@ -8,6 +9,7 @@ import com.whatever.caro.feature.profile.edit.mvi.EditProfileIntent
 import com.whatever.caro.feature.profile.edit.mvi.EditProfileSideEffect
 import dev.mokkery.answering.calls
 import dev.mokkery.answering.returns
+import dev.mokkery.answering.throws
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
 import dev.mokkery.mock
@@ -213,6 +215,74 @@ class EditProfileViewModelTest : FunSpec() {
                     advanceUntilIdle()
 
                     awaitItem() shouldBe EditProfileSideEffect.NavigateBack
+                }
+            }
+        }
+
+        test("닉네임 중복 확인 실패는 ShowNicknameCheckError 를 emit 하고 입력을 막지 않는다") {
+            runTest {
+                val (viewModel, profileRepository) = createViewModel()
+                advanceUntilIdle()
+                everySuspend { profileRepository.isNicknameAvailable(any()) } throws
+                    RuntimeException("check failed")
+
+                viewModel.sideEffect.test {
+                    viewModel.intent(EditProfileIntent.UpdateNickname("새로운닉네임"))
+                    advanceUntilIdle()
+
+                    awaitItem() shouldBe EditProfileSideEffect.ShowNicknameCheckError
+                }
+                viewModel.state.value.validationResult shouldBe NicknameValidationResult.Valid
+            }
+        }
+
+        test("랜덤 닉네임 조회 실패는 ShowRandomNicknameError 를 emit 한다") {
+            runTest {
+                val (viewModel, profileRepository) = createViewModel()
+                advanceUntilIdle()
+                everySuspend { profileRepository.getRandomNickname() } throws
+                    RuntimeException("random failed")
+
+                viewModel.sideEffect.test {
+                    viewModel.intent(EditProfileIntent.ClickRefresh)
+                    advanceUntilIdle()
+
+                    awaitItem() shouldBe EditProfileSideEffect.ShowRandomNicknameError
+                }
+            }
+        }
+
+        test("닉네임 변경 실패는 ShowUpdateNicknameError 를 emit 한다") {
+            runTest {
+                val (viewModel, profileRepository) = createViewModel()
+                advanceUntilIdle()
+                viewModel.intent(EditProfileIntent.UpdateNickname("새로운닉네임"))
+                advanceUntilIdle()
+                everySuspend { profileRepository.updateNickname(any()) } throws
+                    RuntimeException("update failed")
+
+                viewModel.sideEffect.test {
+                    viewModel.intent(EditProfileIntent.ClickConfirm)
+                    advanceUntilIdle()
+
+                    awaitItem() shouldBe EditProfileSideEffect.ShowUpdateNicknameError
+                }
+                viewModel.state.value.isLoading shouldBe false
+            }
+        }
+
+        test("네트워크 오류는 작업 종류와 무관하게 ShowNetworkError 를 emit 한다") {
+            runTest {
+                val (viewModel, profileRepository) = createViewModel()
+                advanceUntilIdle()
+                everySuspend { profileRepository.getRandomNickname() } throws
+                    NetworkException.Connection(debugMessage = "no network")
+
+                viewModel.sideEffect.test {
+                    viewModel.intent(EditProfileIntent.ClickRefresh)
+                    advanceUntilIdle()
+
+                    awaitItem() shouldBe EditProfileSideEffect.ShowNetworkError
                 }
             }
         }

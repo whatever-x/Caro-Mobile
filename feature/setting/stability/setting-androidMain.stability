@@ -13,7 +13,7 @@ internal fun com.whatever.caro.feature.setting.SettingScreen(state: com.whatever
     - onIntent: STABLE (function type)
 
 @Composable
-private fun com.whatever.caro.feature.setting.UserInfo(modifier: androidx.compose.ui.Modifier, nickname: kotlin.String, emailAddress: kotlin.String, socialLoginType: com.whatever.caro.core.model.auth.SocialLoginType, onNicknameChangeClick: kotlin.Function0<kotlin.Unit>): kotlin.Unit
+private fun com.whatever.caro.feature.setting.UserInfo(modifier: androidx.compose.ui.Modifier, nickname: kotlin.String, emailAddress: kotlin.String, socialLoginType: com.whatever.caro.core.model.auth.SocialLoginType, isLoading: kotlin.Boolean, onNicknameChangeClick: kotlin.Function0<kotlin.Unit>): kotlin.Unit
   skippable: true
   restartable: true
   params:
@@ -21,6 +21,7 @@ private fun com.whatever.caro.feature.setting.UserInfo(modifier: androidx.compos
     - nickname: STABLE (String is immutable)
     - emailAddress: STABLE (String is immutable)
     - socialLoginType: STABLE (class with no mutable properties)
+    - isLoading: STABLE (primitive type)
     - onNicknameChangeClick: STABLE (function type)
 
 @Composable
@@ -42,4 +43,24 @@ internal fun com.whatever.caro.feature.setting.component.MenuSection(modifier: a
     - modifier: STABLE (marked @Stable or @Immutable)
     - items: STABLE (known stable type)
     - onClickMenu: STABLE (function type)
+
+@Composable
+private fun com.whatever.caro.feature.setting.route.DeleteAccountDialog(enabled: kotlin.Boolean, onDeleteAccountClick: kotlin.Function0<kotlin.Unit>, onCancelClick: kotlin.Function0<kotlin.Unit>): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - enabled: STABLE (primitive type)
+    - onDeleteAccountClick: STABLE (function type)
+    - onCancelClick: STABLE (function type)
+
+@Composable
+private fun com.whatever.caro.feature.setting.route.DialogButton(text: kotlin.String, enabled: kotlin.Boolean, backgroundColor: androidx.compose.ui.graphics.Color, contentColor: androidx.compose.ui.graphics.Color, onClick: kotlin.Function0<kotlin.Unit>): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - text: STABLE (String is immutable)
+    - enabled: STABLE (primitive type)
+    - backgroundColor: STABLE (marked @Stable or @Immutable)
+    - contentColor: STABLE (marked @Stable or @Immutable)
+    - onClick: STABLE (function type)
 

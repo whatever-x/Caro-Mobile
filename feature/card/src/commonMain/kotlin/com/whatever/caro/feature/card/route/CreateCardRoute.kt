@@ -5,6 +5,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import caromobile.core.designsystem.generated.resources.Res
+import caromobile.core.designsystem.generated.resources.card_max_cards_reached
 import caromobile.core.designsystem.generated.resources.card_save_error
 import com.whatever.caro.core.designsystem.components.CaroSnackbarStyle
 import com.whatever.caro.core.navigator.contract.NavCommand
@@ -24,6 +25,7 @@ fun CreateCardRoute(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val saveErrorMessage = stringResource(Res.string.card_save_error)
+    val maxCardsReachedMessage = stringResource(Res.string.card_max_cards_reached)
 
     LaunchedEffect(Unit) {
         viewModel.sideEffect.collect { sideEffect ->
@@ -37,6 +39,15 @@ fun CreateCardRoute(
                         SnackBarMessage(
                             message = saveErrorMessage,
                             style = CaroSnackbarStyle.Error,
+                        ),
+                    )
+                }
+
+                CreateCardSideEffect.ShowMaxCardsReached -> {
+                    snackbarController.show(
+                        SnackBarMessage(
+                            message = maxCardsReachedMessage,
+                            style = CaroSnackbarStyle.Info,
                         ),
                     )
                 }
