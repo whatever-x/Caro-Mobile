@@ -110,7 +110,7 @@ private fun LearningContent(
         val progress by animateFloatAsState(
             targetValue = ((state.progress + 1).toFloat() / state.totalCount.coerceAtLeast(1)).coerceIn(0f, 1f),
             animationSpec = tween(LEARNING_PROGRESS_ANIMATION_DURATION_MILLIS),
-            label = "learningProgress",
+            label = "learning_progress",
         )
         LinearProgressIndicator(
             progress = { progress },
