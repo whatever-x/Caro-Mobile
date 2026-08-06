@@ -6,6 +6,7 @@ import androidx.compose.ui.uikit.LocalUIViewController
 import com.whatever.caro.feature.login.model.AppleUser
 import com.whatever.caro.feature.login.model.SocialAuthenticator
 import com.whatever.caro.feature.login.model.SocialLoginResult
+import io.github.aakira.napier.Napier
 import kotlinx.cinterop.BetaInteropApi
 import kotlinx.coroutines.suspendCancellableCoroutine
 import platform.AuthenticationServices.ASAuthorization
@@ -102,6 +103,7 @@ private class AppleAuthenticatorImpl(
                         val idToken = credential?.extractIdToken()
 
                         if (idToken.isNullOrBlank()) {
+                            Napier.e { "apple login: identityToken is null or blank" }
                             resumeOnce(SocialLoginResult.Failed)
                             return
                         }
@@ -123,6 +125,11 @@ private class AppleAuthenticatorImpl(
                             }
 
                             else -> {
+                                Napier.e {
+                                    "apple login failed: code=${didCompleteWithError.code} " +
+                                        "domain=${didCompleteWithError.domain} " +
+                                        "message=${didCompleteWithError.localizedDescription}"
+                                }
                                 resumeOnce(SocialLoginResult.Failed)
                             }
                         }

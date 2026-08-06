@@ -1,10 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <resources>
+	<!-- app -->
+	<string name="app_exit_dialog_title">Exit the app?</string>
+	<string name="app_exit_dialog_button_exit">Exit</string>
+	<string name="app_exit_dialog_button_cancel">Cancel</string>
 	<!-- splash -->
 	<string name="splash_content">Build your daily study habit\nwith just one card</string>
 	<!-- login -->
 	<string name="login_snackbar_cancel">Cancelled.</string>
 	<string name="login_snackbar_error">An error occurred.</string>
+	<string name="login_snackbar_network_error">Please check your network connection.</string>
+	<string name="login_snackbar_server_error">A server error occurred.</string>
 	<string name="login_text_logo_description">Build your daily study habit\nwith just one card</string>
 	<string name="login_text_bottom_terms_of_service">By continuing, you agree to the Terms of Service and Privacy Policy.</string>
 	<string name="login_button_google">Sign in with Google</string>
