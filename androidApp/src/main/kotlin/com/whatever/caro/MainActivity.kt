@@ -2,6 +2,7 @@ package com.whatever.caro
 
 import android.Manifest
 import android.content.Intent
+import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.os.Build
@@ -18,6 +19,8 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
         super.onCreate(savedInstanceState)
+
+        applyOrientationPolicy()
 
         enableEdgeToEdge(
             statusBarStyle =
@@ -45,6 +48,23 @@ class MainActivity : ComponentActivity() {
         IntentMessagingPublisher.publishFromIntent(intent)
     }
 
+    /**
+     * 폰(접힌 폴더블 포함)은 세로 고정, 태블릿·펼친 폴더블은 회전 허용.
+     * 폴더블 접기/펼치기는 smallestScreenSize 설정 변경이라 Activity 가 재생성되며 여기서 다시 계산된다.
+     */
+    private fun applyOrientationPolicy() {
+        val orientation =
+            if (resources.configuration.smallestScreenWidthDp < LARGE_SCREEN_MIN_WIDTH_DP) {
+                ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+            } else {
+                ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+            }
+        // setRequestedOrientation 은 값이 같아도 재구성을 유발할 수 있어 달라질 때만 대입한다.
+        if (requestedOrientation != orientation) {
+            requestedOrientation = orientation
+        }
+    }
+
     private fun requestNotificationPermissionIfNeeded() {
         if (
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
@@ -61,3 +81,5 @@ class MainActivity : ComponentActivity() {
         const val NOTIFICATION_PERMISSION_REQUEST_CODE = 1001
     }
 }
+
+private const val LARGE_SCREEN_MIN_WIDTH_DP = 600
