@@ -2,7 +2,6 @@ package com.whatever.caro.feature.deck.detail.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -27,8 +26,8 @@ import caromobile.core.designsystem.generated.resources.deck_detail_button_empty
 import caromobile.core.designsystem.generated.resources.deck_detail_sub_title_empty_guid
 import caromobile.core.designsystem.generated.resources.deck_detail_title_empty_guid
 import caromobile.core.designsystem.generated.resources.ic_add_16
+import com.whatever.caro.core.designsystem.modifier.noRippleClickable
 import com.whatever.caro.core.designsystem.themes.CaroTheme
-import com.whatever.caro.core.ui.modifier.noRippleClickable
 import io.github.alexzhirkevich.compottie.Compottie
 import io.github.alexzhirkevich.compottie.LottieCompositionSpec
 import io.github.alexzhirkevich.compottie.rememberLottieComposition
@@ -101,12 +100,12 @@ internal fun DeckDetailGuid(
                             color = CaroTheme.color.surface.brand,
                             shape = CaroTheme.shape.xxl,
                         ).clip(shape = CaroTheme.shape.xxl)
-                        .clickable(
+                        .noRippleClickable(
                             onClick = onAddFirstCard,
                         ).padding(
                             horizontal = CaroTheme.spacing.l,
                             vertical = CaroTheme.spacing.m,
-                        ).noRippleClickable(onClick = onAddFirstCard),
+                        ),
                 horizontalArrangement =
                     Arrangement.spacedBy(
                         space = CaroTheme.spacing.xs,

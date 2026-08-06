@@ -2,7 +2,6 @@ package com.whatever.caro.feature.learning.components
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -32,6 +31,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import caromobile.core.designsystem.generated.resources.Res
 import caromobile.core.designsystem.generated.resources.learning_more
+import com.whatever.caro.core.designsystem.modifier.noRippleClickable
 import com.whatever.caro.core.designsystem.themes.CaroTheme
 import com.whatever.caro.core.model.learning.LearningPolicy
 import org.jetbrains.compose.resources.stringResource
@@ -75,7 +75,7 @@ internal fun LearningCardPrimaryText(
                 modifier =
                     Modifier
                         .background(CaroTheme.color.surface.tertiary, CaroTheme.shape.xxl)
-                        .clickable(onClick = onShowMore)
+                        .noRippleClickable(onClick = onShowMore)
                         .padding(
                             horizontal = CaroTheme.spacing.xl,
                             vertical = CaroTheme.spacing.s,

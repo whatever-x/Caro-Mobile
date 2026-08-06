@@ -35,12 +35,12 @@ import caromobile.core.designsystem.generated.resources.setting_snackbar_user_in
 import caromobile.core.designsystem.generated.resources.setting_terms_of_service_url
 import com.whatever.caro.core.designsystem.components.CaroDialog
 import com.whatever.caro.core.designsystem.components.CaroSnackbarStyle
+import com.whatever.caro.core.designsystem.modifier.noRippleClickable
 import com.whatever.caro.core.designsystem.themes.CaroTheme
 import com.whatever.caro.core.navigator.contract.NavCommand
 import com.whatever.caro.core.navigator.dispatcher.NavigationDispatcher
 import com.whatever.caro.core.navigator.entries.EditProfileEntry
 import com.whatever.caro.core.navigator.entries.LoginEntry
-import com.whatever.caro.core.ui.modifier.noRippleClickable
 import com.whatever.caro.core.ui.snackbar.SnackBarMessage
 import com.whatever.caro.core.ui.snackbar.SnackbarController
 import com.whatever.caro.feature.setting.SettingScreen

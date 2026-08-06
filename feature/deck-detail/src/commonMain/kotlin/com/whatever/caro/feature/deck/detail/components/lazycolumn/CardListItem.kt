@@ -2,7 +2,6 @@ package com.whatever.caro.feature.deck.detail.components.lazycolumn
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -22,6 +21,7 @@ import caromobile.core.designsystem.generated.resources.deck_detail_badge_hard
 import caromobile.core.designsystem.generated.resources.deck_detail_badge_new
 import caromobile.core.designsystem.generated.resources.deck_detail_badge_review
 import caromobile.core.designsystem.generated.resources.deck_detail_caption_review_count
+import com.whatever.caro.core.designsystem.modifier.noRippleClickable
 import com.whatever.caro.core.designsystem.themes.CaroTheme
 import com.whatever.caro.feature.deck.detail.model.CardItem
 import com.whatever.caro.feature.deck.detail.model.CardReviewState
@@ -66,7 +66,7 @@ internal fun DeckCardItem(
                     color = CaroTheme.color.border.secondary,
                     shape = CaroTheme.shape.m,
                 ).clip(shape = CaroTheme.shape.m)
-                .clickable(onClick = onClick)
+                .noRippleClickable(onClick = onClick)
                 .padding(
                     horizontal = CaroTheme.spacing.xl,
                     vertical = CaroTheme.spacing.xl,

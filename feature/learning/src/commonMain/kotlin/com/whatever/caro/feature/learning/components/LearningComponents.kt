@@ -3,7 +3,6 @@ package com.whatever.caro.feature.learning.components
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -59,6 +58,7 @@ import caromobile.core.designsystem.generated.resources.learning_stop_body
 import caromobile.core.designsystem.generated.resources.learning_stop_title
 import caromobile.core.designsystem.generated.resources.learning_total
 import com.whatever.caro.core.designsystem.components.CaroDialog
+import com.whatever.caro.core.designsystem.modifier.noRippleClickable
 import com.whatever.caro.core.designsystem.themes.CaroTheme
 import io.github.alexzhirkevich.compottie.LottieCompositionSpec
 import io.github.alexzhirkevich.compottie.rememberLottieComposition
@@ -88,7 +88,7 @@ internal fun LearningTopBar(
                     .align(Alignment.CenterStart)
                     .padding(start = CaroTheme.spacing.xl2)
                     .size(LearningIconSize)
-                    .clickable(onClick = onBack),
+                    .noRippleClickable(onClick = onBack),
         )
         Box(
             modifier =
@@ -127,7 +127,7 @@ internal fun LearningCard(
     Surface(
         modifier =
             modifier
-                .clickable(onClick = onFlip)
+                .noRippleClickable(onClick = onFlip)
                 .border(LearningCardBorderWidth, borderColor, CaroTheme.shape.l),
         shape = CaroTheme.shape.l,
         color = CaroTheme.color.surface.primary,
@@ -246,7 +246,7 @@ private fun EvaluationButton(
                 .height(LearningEvaluationButtonHeight)
                 .clip(CaroTheme.shape.m)
                 .background(color)
-                .clickable(enabled = enabled, onClick = onClick),
+                .noRippleClickable(enabled = enabled, onClick = onClick),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
@@ -406,7 +406,7 @@ private fun DialogAction(
                     } else {
                         Modifier
                     },
-                ).clickable(onClick = onClick),
+                ).noRippleClickable(onClick = onClick),
         contentAlignment = Alignment.Center,
     ) {
         Text(text = text, style = CaroTheme.typography.caption1.regular, color = textColor)
@@ -545,7 +545,7 @@ internal fun LearningCompletion(
                         .fillMaxWidth()
                         .clip(CaroTheme.shape.xxl)
                         .background(CaroTheme.color.surface.brand)
-                        .clickable(onClick = onClickBackToHome)
+                        .noRippleClickable(onClick = onClickBackToHome)
                         .padding(
                             horizontal = CaroTheme.spacing.xl,
                             vertical = CaroTheme.spacing.l,

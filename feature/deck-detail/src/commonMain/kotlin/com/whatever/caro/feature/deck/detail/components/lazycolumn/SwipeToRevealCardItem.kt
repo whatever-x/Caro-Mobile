@@ -4,7 +4,6 @@ import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.gestures.rememberDraggableState
@@ -33,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import caromobile.core.designsystem.generated.resources.Res
 import caromobile.core.designsystem.generated.resources.deck_detail_button_card_edit
 import caromobile.core.designsystem.generated.resources.ic_edit_16
+import com.whatever.caro.core.designsystem.modifier.noRippleClickable
 import com.whatever.caro.core.designsystem.themes.CaroTheme
 import com.whatever.caro.feature.deck.detail.model.CardItem
 import com.whatever.caro.feature.deck.detail.model.CardReviewState
@@ -103,7 +103,7 @@ internal fun SwipeToRevealCardItem(
                     Modifier
                         .fillMaxHeight()
                         .width(RevealActionWidth)
-                        .clickable(onClick = onEdit),
+                        .noRippleClickable(onClick = onEdit),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(EditActionSpacing, Alignment.CenterVertically),
             ) {

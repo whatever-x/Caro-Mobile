@@ -2,7 +2,6 @@ package com.whatever.caro.feature.card
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -47,6 +46,7 @@ import caromobile.core.designsystem.generated.resources.ic_chevron_left_24
 import caromobile.core.designsystem.generated.resources.ic_switch_16
 import com.whatever.caro.core.designsystem.components.CaroTextArea
 import com.whatever.caro.core.designsystem.components.CaroTopBar
+import com.whatever.caro.core.designsystem.modifier.noRippleClickable
 import com.whatever.caro.core.designsystem.themes.CaroTheme
 import com.whatever.caro.core.ui.loading.CaroLoadingOverlayBox
 import com.whatever.caro.feature.card.mvi.EditCardIntent
@@ -84,7 +84,7 @@ internal fun EditCardScreen(
                             modifier =
                                 Modifier
                                     .size(TopBarIconSize)
-                                    .clickable { onIntent(EditCardIntent.ClickBack) },
+                                    .noRippleClickable { onIntent(EditCardIntent.ClickBack) },
                             painter = painterResource(Res.drawable.ic_chevron_left_24),
                             contentDescription = stringResource(Res.string.card_content_description_back),
                             tint = CaroTheme.color.icon.brand,
@@ -188,7 +188,7 @@ private fun SwapButton(onClick: () -> Unit) {
                         width = HairlineThickness,
                         color = CaroTheme.color.border.secondary,
                         shape = CircleShape,
-                    ).clickable(onClick = onClick),
+                    ).noRippleClickable(onClick = onClick),
             contentAlignment = Alignment.Center,
         ) {
             Icon(
@@ -231,7 +231,7 @@ private fun EditBottomBar(
                 ).heightIn(min = CtaButtonHeight)
                 .clip(CaroTheme.shape.xxl)
                 .background(backgroundColor)
-                .clickable(enabled = enabled, onClick = onClick)
+                .noRippleClickable(enabled = enabled, onClick = onClick)
                 .padding(
                     horizontal = CaroTheme.spacing.xl,
                     vertical = CaroTheme.spacing.l,

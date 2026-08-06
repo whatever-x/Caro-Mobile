@@ -14,8 +14,8 @@ import caromobile.core.designsystem.generated.resources.card_content_description
 import caromobile.core.designsystem.generated.resources.card_text_select_all
 import caromobile.core.designsystem.generated.resources.card_title_edit
 import caromobile.core.designsystem.generated.resources.ic_chevron_left_24
+import com.whatever.caro.core.designsystem.modifier.noRippleClickable
 import com.whatever.caro.core.designsystem.themes.CaroTheme
-import com.whatever.caro.core.ui.modifier.noRippleClickable
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 

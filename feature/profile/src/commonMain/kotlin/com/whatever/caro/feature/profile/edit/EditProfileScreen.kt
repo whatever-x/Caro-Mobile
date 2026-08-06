@@ -1,7 +1,6 @@
 package com.whatever.caro.feature.profile.edit
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -20,6 +19,7 @@ import caromobile.core.designsystem.generated.resources.profile_button_done
 import caromobile.core.designsystem.generated.resources.profile_content_description_back
 import caromobile.core.designsystem.generated.resources.profile_title_edit
 import com.whatever.caro.core.designsystem.components.CaroTopBar
+import com.whatever.caro.core.designsystem.modifier.noRippleClickable
 import com.whatever.caro.core.designsystem.themes.CaroTheme
 import com.whatever.caro.feature.profile.components.NicknameField
 import com.whatever.caro.feature.profile.components.ProfileCtaButton
@@ -47,7 +47,7 @@ internal fun EditProfileScreen(
                     modifier =
                         Modifier
                             .size(24.dp)
-                            .clickable(enabled = state.isLoading.not()) {
+                            .noRippleClickable(enabled = state.isLoading.not()) {
                                 onIntent(EditProfileIntent.ClickBack)
                             },
                     painter = painterResource(Res.drawable.ic_arrow_left_24),

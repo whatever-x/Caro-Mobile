@@ -1,7 +1,6 @@
 package com.whatever.caro.feature.deck.detail.components.lazycolumn
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -18,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import caromobile.core.designsystem.generated.resources.Res
 import caromobile.core.designsystem.generated.resources.deck_detail_button_add_card
 import caromobile.core.designsystem.generated.resources.ic_add_24
+import com.whatever.caro.core.designsystem.modifier.noRippleClickable
 import com.whatever.caro.core.designsystem.themes.CaroTheme
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
@@ -42,7 +42,7 @@ internal fun AddCardButtonItem(
                         color = CaroTheme.color.surface.brand,
                         shape = CaroTheme.shape.m,
                     ).clip(shape = CaroTheme.shape.m)
-                    .clickable(onClick = onAddCard)
+                    .noRippleClickable(onClick = onAddCard)
                     .padding(
                         horizontal = CaroTheme.spacing.xl,
                     ),
