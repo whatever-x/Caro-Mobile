@@ -9,5 +9,11 @@ object IntentMessagingPublisher {
      * */
     fun publishFromIntent(intent: Intent?) {
         val extras = intent?.extras ?: return
+        if (extras.containsKey(MESSAGE_VALUE_KEY).not()) return
+        MessagingEventBus.publishMessage(
+            CloudMessage(anyValue = extras.getString(MESSAGE_VALUE_KEY)),
+        )
     }
+
+    private const val MESSAGE_VALUE_KEY = "anyValue"
 }

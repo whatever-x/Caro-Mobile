@@ -22,6 +22,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 
@@ -68,6 +69,29 @@ class LoginViewModelTest : FunSpec() {
                         provider = SocialLoginType.GOOGLE,
                         idToken = "google-token",
                     )
+                }
+            }
+        }
+
+        test("소셜 로그인 버튼을 연타해도 인증 요청은 한 번만 방출한다") {
+            runTest(testDispatcher) {
+                val viewModel = viewModelWith()
+
+                viewModel.sideEffect.test {
+                    viewModel.intent(
+                        LoginIntent.ClickSocialLoginButton(SocialLoginType.GOOGLE),
+                    )
+                    runCurrent()
+                    awaitItem() shouldBe
+                        LoginSideEffect.LaunchSocialAuthentication(SocialLoginType.GOOGLE)
+
+                    viewModel.intent(
+                        LoginIntent.ClickSocialLoginButton(SocialLoginType.APPLE),
+                    )
+                    runCurrent()
+
+                    expectNoEvents()
+                    viewModel.state.value.isLoading shouldBe true
                 }
             }
         }

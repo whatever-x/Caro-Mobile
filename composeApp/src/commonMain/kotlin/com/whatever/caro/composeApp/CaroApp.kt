@@ -15,10 +15,12 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.savedstate.serialization.SavedStateConfiguration
+import com.whatever.caro.core.data.repository.fcm.FcmTokenRepository
 import com.whatever.caro.core.designsystem.components.CaroSnackBarHost
 import com.whatever.caro.core.designsystem.components.CaroSnackbar
 import com.whatever.caro.core.designsystem.components.showSnackbarMessage
 import com.whatever.caro.core.designsystem.themes.CaroTheme
+import com.whatever.caro.core.messaging.MessagingClient
 import com.whatever.caro.core.model.auth.AuthSessionEvent
 import com.whatever.caro.core.model.auth.AuthSessionEventBus
 import com.whatever.caro.core.navigator.contract.NavCommand
@@ -40,6 +42,8 @@ import com.whatever.caro.core.navigator.entries.SplashEntry
 import com.whatever.caro.core.ui.image.ConfigureCaroImageLoader
 import com.whatever.caro.core.ui.snackbar.SnackbarController
 import io.github.aakira.napier.Napier
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
 import org.koin.compose.koinInject
@@ -54,6 +58,8 @@ fun CaroApp(
     navDispatcher: NavigationDispatcher = koinInject(),
     authSessionEventBus: AuthSessionEventBus = koinInject(),
     snackbarController: SnackbarController = koinInject(),
+    messagingClient: MessagingClient = koinInject(),
+    fcmTokenRepository: FcmTokenRepository = koinInject(),
 ) {
     ConfigureCaroImageLoader()
 
@@ -83,6 +89,13 @@ fun CaroApp(
         }
 
     val backStack = rememberNavBackStack(savedStateConfiguration, SplashEntry)
+
+    LaunchedEffect(messagingClient, fcmTokenRepository) {
+        messagingClient.tokenFlow
+            .filter(String::isNotBlank)
+            .distinctUntilChanged()
+            .collect(fcmTokenRepository::syncToken)
+    }
 
     LaunchedEffect(navDispatcher) {
         navDispatcher.commands.collect { command ->
