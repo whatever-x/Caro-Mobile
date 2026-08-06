@@ -180,12 +180,3 @@ private fun com.whatever.caro.feature.deck.detail.components.lazycolumn.Unavaila
   params:
     - modifier: STABLE (marked @Stable or @Immutable)
 
-@Composable
-public fun com.whatever.caro.feature.deck.detail.route.DeckDetailRoute(viewModel: com.whatever.caro.feature.deck.detail.DeckDetailViewModel, navDispatcher: com.whatever.caro.core.navigator.dispatcher.NavigationDispatcher, snackbarController: com.whatever.caro.core.ui.snackbar.SnackbarController): kotlin.Unit
-  skippable: false
-  restartable: true
-  params:
-    - viewModel: UNSTABLE (has mutable properties or unstable members)
-    - navDispatcher: RUNTIME (requires runtime check)
-    - snackbarController: RUNTIME (requires runtime check)
-
