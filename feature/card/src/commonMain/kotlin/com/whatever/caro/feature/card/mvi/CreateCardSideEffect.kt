@@ -6,4 +6,6 @@ sealed interface CreateCardSideEffect : UiSideEffect {
     data object NavigateBack : CreateCardSideEffect
 
     data object ShowSaveError : CreateCardSideEffect
+
+    data object ShowMaxCardsReached : CreateCardSideEffect
 }

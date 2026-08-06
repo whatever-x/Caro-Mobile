@@ -38,10 +38,13 @@ class CmpPlugin : Plugin<Project> {
             composeStabilityAnalyzer {
                 stabilityValidation {
                     enabled.set(true)
-                    ignoredPackages.set(
-                        listOf(
-                            "com.whatever.caro.feature.${name}.route",
-                        )
+                    // Route 는 ViewModel 을 받아 태생적으로 UNSTABLE 이라 추적 대상에서 제외한다.
+                    // 패키지 경로가 모듈마다 달라(feature.profile.edit, feature.card.detail.route ...)
+                    // 패키지 프리픽스 대신 `*Route.kt` 파일명(= 함수명)으로 제외한다.
+                    ignoredClasses.set(
+                        fileTree("src") { include("**/*Route.kt") }
+                            .map { it.name.removeSuffix(".kt") }
+                            .sorted()
                     )
                     ignoreNonRegressiveChanges.set(true) // 안정성 저하가 발생하지 않으면 통과
                 }

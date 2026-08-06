@@ -1,6 +1,8 @@
 import app.cash.turbine.test
 import com.whatever.caro.core.data.repository.auth.AuthRepository
 import com.whatever.caro.core.model.auth.SocialLoginType
+import com.whatever.caro.core.model.exception.CaroServerException
+import com.whatever.caro.core.model.exception.NetworkException
 import com.whatever.caro.core.viewmodel.ExceptionFilter
 import com.whatever.caro.feature.login.LoginViewModel
 import com.whatever.caro.feature.login.model.AppleUser
@@ -22,6 +24,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 
@@ -68,6 +71,29 @@ class LoginViewModelTest : FunSpec() {
                         provider = SocialLoginType.GOOGLE,
                         idToken = "google-token",
                     )
+                }
+            }
+        }
+
+        test("소셜 로그인 버튼을 연타해도 인증 요청은 한 번만 방출한다") {
+            runTest(testDispatcher) {
+                val viewModel = viewModelWith()
+
+                viewModel.sideEffect.test {
+                    viewModel.intent(
+                        LoginIntent.ClickSocialLoginButton(SocialLoginType.GOOGLE),
+                    )
+                    runCurrent()
+                    awaitItem() shouldBe
+                        LoginSideEffect.LaunchSocialAuthentication(SocialLoginType.GOOGLE)
+
+                    viewModel.intent(
+                        LoginIntent.ClickSocialLoginButton(SocialLoginType.APPLE),
+                    )
+                    runCurrent()
+
+                    expectNoEvents()
+                    viewModel.state.value.isLoading shouldBe true
                 }
             }
         }
@@ -204,6 +230,54 @@ class LoginViewModelTest : FunSpec() {
                         ),
                     )
                     awaitItem() shouldBe LoginSideEffect.ShowErrorSnackbar(LoginError.UNKNOWN)
+                }
+
+                viewModel.state.value.isLoading shouldBe false
+            }
+        }
+
+        test("소셜 로그인 호출이 네트워크 오류로 실패하면 NETWORK 스낵바를 방출하고 isLoading이 false로 복귀한다") {
+            runTest(testDispatcher) {
+                val authRepository =
+                    mock<AuthRepository> {
+                        everySuspend { loginWithSocial(any(), any()) } throws
+                            NetworkException.Connection(debugMessage = "unresolved address")
+                    }
+                val viewModel = viewModelWith(authRepository)
+
+                viewModel.sideEffect.test {
+                    viewModel.intent(
+                        LoginIntent.ClickGoogleLoginButton(
+                            SocialLoginResult.Success(GoogleUser(idToken = "google-token")),
+                        ),
+                    )
+                    awaitItem() shouldBe LoginSideEffect.ShowErrorSnackbar(LoginError.NETWORK)
+                }
+
+                viewModel.state.value.isLoading shouldBe false
+            }
+        }
+
+        test("소셜 로그인 호출이 서버 오류로 실패하면 SERVER 스낵바를 방출하고 isLoading이 false로 복귀한다") {
+            runTest(testDispatcher) {
+                val authRepository =
+                    mock<AuthRepository> {
+                        everySuspend { loginWithSocial(any(), any()) } throws
+                            CaroServerException(
+                                code = "AUTH_500",
+                                message = "Server Error",
+                                debugMessage = "internal server error",
+                            )
+                    }
+                val viewModel = viewModelWith(authRepository)
+
+                viewModel.sideEffect.test {
+                    viewModel.intent(
+                        LoginIntent.ClickGoogleLoginButton(
+                            SocialLoginResult.Success(GoogleUser(idToken = "google-token")),
+                        ),
+                    )
+                    awaitItem() shouldBe LoginSideEffect.ShowErrorSnackbar(LoginError.SERVER)
                 }
 
                 viewModel.state.value.isLoading shouldBe false

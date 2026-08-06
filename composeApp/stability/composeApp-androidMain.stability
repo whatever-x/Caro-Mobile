@@ -5,13 +5,15 @@
 //   ./gradlew :composeApp:stabilityDump
 
 @Composable
-public fun com.whatever.caro.composeApp.CaroApp(navDispatcher: com.whatever.caro.core.navigator.dispatcher.NavigationDispatcher, authSessionEventBus: com.whatever.caro.core.model.auth.AuthSessionEventBus, snackbarController: com.whatever.caro.core.ui.snackbar.SnackbarController): kotlin.Unit
+public fun com.whatever.caro.composeApp.CaroApp(navDispatcher: com.whatever.caro.core.navigator.dispatcher.NavigationDispatcher, authSessionEventBus: com.whatever.caro.core.model.auth.AuthSessionEventBus, snackbarController: com.whatever.caro.core.ui.snackbar.SnackbarController, messagingClient: com.whatever.caro.core.messaging.MessagingClient, fcmTokenRepository: com.whatever.caro.core.data.repository.fcm.FcmTokenRepository): kotlin.Unit
   skippable: false
   restartable: true
   params:
     - navDispatcher: RUNTIME (requires runtime check)
     - authSessionEventBus: RUNTIME (requires runtime check)
     - snackbarController: RUNTIME (requires runtime check)
+    - messagingClient: RUNTIME (requires runtime check)
+    - fcmTokenRepository: RUNTIME (requires runtime check)
 
 @Composable
 internal fun com.whatever.caro.composeApp.CaroNavHost(modifier: androidx.compose.ui.Modifier, backStack: androidx.navigation3.runtime.NavBackStack<androidx.navigation3.runtime.NavKey>): kotlin.Unit
@@ -20,4 +22,18 @@ internal fun com.whatever.caro.composeApp.CaroNavHost(modifier: androidx.compose
   params:
     - modifier: STABLE (marked @Stable or @Immutable)
     - backStack: RUNTIME (requires runtime check)
+
+@Composable
+internal fun com.whatever.caro.composeApp.CaroSystemBarBackground(roles: com.whatever.caro.composeApp.SystemBarBackgroundRoles, content: @[Composable] androidx.compose.runtime.internal.ComposableFunction0<kotlin.Unit>): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - roles: STABLE (class with no mutable properties)
+    - content: STABLE (composable function type)
+
+@Composable
+private fun com.whatever.caro.composeApp.color(): androidx.compose.ui.graphics.Color
+  skippable: true
+  restartable: true
+  params:
 

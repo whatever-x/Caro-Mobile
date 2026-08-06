@@ -49,29 +49,12 @@ internal fun com.whatever.caro.feature.profile.components.ProfileCtaButton(text:
     - modifier: STABLE (marked @Stable or @Immutable)
 
 @Composable
-public fun com.whatever.caro.feature.profile.create.CreateProfileRoute(viewModel: com.whatever.caro.feature.profile.create.CreateProfileViewModel, navDispatcher: com.whatever.caro.core.navigator.dispatcher.NavigationDispatcher): kotlin.Unit
-  skippable: false
-  restartable: true
-  params:
-    - viewModel: UNSTABLE (has mutable properties or unstable members)
-    - navDispatcher: RUNTIME (requires runtime check)
-
-@Composable
 internal fun com.whatever.caro.feature.profile.create.CreateProfileScreen(state: com.whatever.caro.feature.profile.create.mvi.CreateProfileState, onIntent: kotlin.Function1<com.whatever.caro.feature.profile.create.mvi.CreateProfileIntent, kotlin.Unit>): kotlin.Unit
   skippable: true
   restartable: true
   params:
     - state: STABLE (class with no mutable properties)
     - onIntent: STABLE (function type)
-
-@Composable
-public fun com.whatever.caro.feature.profile.edit.EditProfileRoute(viewModel: com.whatever.caro.feature.profile.edit.EditProfileViewModel, navDispatcher: com.whatever.caro.core.navigator.dispatcher.NavigationDispatcher, snackbarController: com.whatever.caro.core.ui.snackbar.SnackbarController): kotlin.Unit
-  skippable: false
-  restartable: true
-  params:
-    - viewModel: UNSTABLE (has mutable properties or unstable members)
-    - navDispatcher: RUNTIME (requires runtime check)
-    - snackbarController: RUNTIME (requires runtime check)
 
 @Composable
 internal fun com.whatever.caro.feature.profile.edit.EditProfileScreen(state: com.whatever.caro.feature.profile.edit.mvi.EditProfileState, onIntent: kotlin.Function1<com.whatever.caro.feature.profile.edit.mvi.EditProfileIntent, kotlin.Unit>): kotlin.Unit

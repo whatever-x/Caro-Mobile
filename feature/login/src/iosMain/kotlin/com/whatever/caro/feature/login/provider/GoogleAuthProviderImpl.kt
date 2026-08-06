@@ -6,6 +6,7 @@ import GoogleSignIn.GIDConfiguration
 import GoogleSignIn.GIDSignIn
 import GoogleSignIn.kGIDSignInErrorCodeCanceled
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import com.whatever.caro.feature.login.config.GoogleAuthConfig
 import com.whatever.caro.feature.login.model.GoogleUser
 import com.whatever.caro.feature.login.model.SocialAuthenticator
@@ -19,7 +20,7 @@ import kotlin.coroutines.resume
 
 class GoogleAuthProviderImpl : GoogleAuthProvider {
     @Composable
-    override fun get(): SocialAuthenticator<GoogleUser> = GoogleAuthenticator()
+    override fun get(): SocialAuthenticator<GoogleUser> = remember { GoogleAuthenticator() }
 }
 
 private class GoogleAuthenticator : SocialAuthenticator<GoogleUser> {

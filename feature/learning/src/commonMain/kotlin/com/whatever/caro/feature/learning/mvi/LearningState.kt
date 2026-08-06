@@ -20,9 +20,18 @@ data class LearningState(
     val ratingCounts: StudyRatingCounts? = null,
     val showStopDialog: Boolean = false,
     val isCompleted: Boolean = false,
-    val errorMessage: String? = null,
-    val isShowErrorDialog: Boolean = false,
+    val error: LearningError? = null,
 ) : UiState {
     val currentCard: StudyCard? get() = cards.getOrNull(index)
     val progress: Int get() = studiedBefore + index + if (isCompleted) 1 else 0
+}
+
+sealed interface LearningError {
+    data class Server(
+        val message: String,
+    ) : LearningError
+
+    data object Network : LearningError
+
+    data object Unknown : LearningError
 }

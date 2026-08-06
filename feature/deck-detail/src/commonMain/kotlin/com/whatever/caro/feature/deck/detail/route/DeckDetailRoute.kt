@@ -93,9 +93,9 @@ fun DeckDetailRoute(
                         NavCommand.To(
                             key =
                                 EditDeckEntry(
-                                    deckId = state.deck.id,
-                                    deckName = state.deck.title,
-                                    deckDescription = state.deck.description,
+                                    deckId = sideEffect.deckId,
+                                    deckName = sideEffect.deckName,
+                                    deckDescription = sideEffect.deckDescription,
                                 ),
                         ),
                     )

@@ -45,6 +45,18 @@ public fun com.whatever.caro.core.designsystem.components.CaroDialog(onDismissRe
     - content: STABLE (composable function type)
 
 @Composable
+public fun com.whatever.caro.core.designsystem.components.CaroDialogButton(text: kotlin.String, backgroundColor: androidx.compose.ui.graphics.Color, textColor: androidx.compose.ui.graphics.Color, onClick: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier, enabled: kotlin.Boolean): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - text: STABLE (String is immutable)
+    - backgroundColor: STABLE (marked @Stable or @Immutable)
+    - textColor: STABLE (marked @Stable or @Immutable)
+    - onClick: STABLE (function type)
+    - modifier: STABLE (marked @Stable or @Immutable)
+    - enabled: STABLE (primitive type)
+
+@Composable
 private fun com.whatever.caro.core.designsystem.components.CaroDialogContent(modifier: androidx.compose.ui.Modifier, title: @[Composable] androidx.compose.runtime.internal.ComposableFunction0<kotlin.Unit>?, buttons: @[Composable] androidx.compose.runtime.internal.ComposableFunction0<kotlin.Unit>?, content: @[Composable] androidx.compose.runtime.internal.ComposableFunction0<kotlin.Unit>): kotlin.Unit
   skippable: true
   restartable: true
