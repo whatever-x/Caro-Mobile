@@ -42,21 +42,21 @@ class LearningEvaluationTransitionTest :
             }
         }
 
-        test("애니메이션만 취소되고 화면이 살아 있으면 평가한다") {
+        test("애니메이션만 취소되고 화면이 살아 있으면 한 번만 평가한다") {
             runTest {
-                var evaluated: StudyRating? = null
+                val evaluations = mutableListOf<StudyRating>()
 
                 val job =
                     launch {
                         runEvaluationTransition(
                             rating = StudyRating.EASY,
                             animate = { throw CancellationException("animation interrupted") },
-                            onEvaluate = { evaluated = it },
+                            onEvaluate = evaluations::add,
                         )
                     }
                 job.join()
 
-                evaluated shouldBe StudyRating.EASY
+                evaluations shouldContainExactly listOf(StudyRating.EASY)
             }
         }
 
