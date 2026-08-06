@@ -13,15 +13,6 @@ private fun com.whatever.caro.feature.learning.LearningContent(state: com.whatev
     - onIntent: STABLE (function type)
 
 @Composable
-private fun com.whatever.caro.feature.learning.LearningMessage(message: kotlin.String, action: kotlin.String, onClick: kotlin.Function0<kotlin.Unit>): kotlin.Unit
-  skippable: true
-  restartable: true
-  params:
-    - message: STABLE (String is immutable)
-    - action: STABLE (String is immutable)
-    - onClick: STABLE (function type)
-
-@Composable
 public fun com.whatever.caro.feature.learning.LearningScreen(state: com.whatever.caro.feature.learning.mvi.LearningState, onIntent: kotlin.Function1<com.whatever.caro.feature.learning.mvi.LearningIntent, kotlin.Unit>): kotlin.Unit
   skippable: false
   restartable: true
@@ -59,14 +50,13 @@ private fun com.whatever.caro.feature.learning.components.DialogAction(text: kot
     - onClick: STABLE (function type)
 
 @Composable
-private fun com.whatever.caro.feature.learning.components.EvaluationButton(label: org.jetbrains.compose.resources.StringResource, icon: org.jetbrains.compose.resources.DrawableResource, color: androidx.compose.ui.graphics.Color, selected: kotlin.Boolean, enabled: kotlin.Boolean, onClick: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+private fun com.whatever.caro.feature.learning.components.EvaluationButton(label: org.jetbrains.compose.resources.StringResource, icon: org.jetbrains.compose.resources.DrawableResource, color: androidx.compose.ui.graphics.Color, enabled: kotlin.Boolean, onClick: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
   skippable: true
   restartable: true
   params:
     - label: STABLE (marked @Stable or @Immutable)
     - icon: STABLE (marked @Stable or @Immutable)
     - color: STABLE (marked @Stable or @Immutable)
-    - selected: STABLE (primitive type)
     - enabled: STABLE (primitive type)
     - onClick: STABLE (function type)
     - modifier: STABLE (marked @Stable or @Immutable)
@@ -121,12 +111,11 @@ internal fun com.whatever.caro.feature.learning.components.LearningErrorDialog(m
     - onConfirm: STABLE (function type)
 
 @Composable
-internal fun com.whatever.caro.feature.learning.components.LearningEvaluationControls(enabled: kotlin.Boolean, selectedIndex: kotlin.Int?, onEasy: kotlin.Function0<kotlin.Unit>, onFair: kotlin.Function0<kotlin.Unit>, onAgain: kotlin.Function0<kotlin.Unit>): kotlin.Unit
+internal fun com.whatever.caro.feature.learning.components.LearningEvaluationControls(enabled: kotlin.Boolean, onEasy: kotlin.Function0<kotlin.Unit>, onFair: kotlin.Function0<kotlin.Unit>, onAgain: kotlin.Function0<kotlin.Unit>): kotlin.Unit
   skippable: true
   restartable: true
   params:
     - enabled: STABLE (primitive type)
-    - selectedIndex: STABLE (class with no mutable properties)
     - onEasy: STABLE (function type)
     - onFair: STABLE (function type)
     - onAgain: STABLE (function type)

@@ -5,7 +5,6 @@ import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -58,6 +57,7 @@ import caromobile.core.designsystem.generated.resources.ic_edit_24
 import caromobile.core.designsystem.generated.resources.ic_trash_24
 import com.whatever.caro.core.designsystem.components.CaroDialog
 import com.whatever.caro.core.designsystem.components.CaroTopBar
+import com.whatever.caro.core.designsystem.modifier.noRippleClickable
 import com.whatever.caro.core.designsystem.themes.CaroTheme
 import com.whatever.caro.core.model.card.CardBadge
 import com.whatever.caro.core.model.card.CardContent
@@ -300,7 +300,7 @@ private fun CardDetailIcon(
         modifier =
             Modifier
                 .size(CardDetailIconSize)
-                .clickable(
+                .noRippleClickable(
                     role = Role.Button,
                     onClick = onClick,
                 ),
@@ -355,7 +355,7 @@ private fun CardDetailPageButton(
                 .clip(CaroTheme.shape.xxl)
                 .background(CaroTheme.color.surface.primary)
                 .border(CardDetailBorderWidth, CaroTheme.color.border.secondary, CaroTheme.shape.xxl)
-                .clickable(
+                .noRippleClickable(
                     enabled = enabled,
                     role = Role.Button,
                     onClick = onClick,
@@ -454,7 +454,7 @@ private fun CardDetailDialogButton(
                 .height(CardDetailDialogButtonHeight)
                 .clip(CaroTheme.shape.xxl)
                 .background(backgroundColor)
-                .clickable(
+                .noRippleClickable(
                     enabled = enabled,
                     role = Role.Button,
                     onClick = onClick,

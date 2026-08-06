@@ -220,15 +220,6 @@ internal fun com.whatever.caro.feature.card.delete.components.SelectCheckbox(isS
     - isSelected: STABLE (primitive type)
 
 @Composable
-public fun com.whatever.caro.feature.card.delete.route.DeleteCardsRoute(viewModel: com.whatever.caro.feature.card.delete.DeleteCardsViewModel, navDispatcher: com.whatever.caro.core.navigator.dispatcher.NavigationDispatcher, snackbarController: com.whatever.caro.core.ui.snackbar.SnackbarController): kotlin.Unit
-  skippable: false
-  restartable: true
-  params:
-    - viewModel: RUNTIME (requires runtime check)
-    - navDispatcher: RUNTIME (requires runtime check)
-    - snackbarController: RUNTIME (requires runtime check)
-
-@Composable
 private fun com.whatever.caro.feature.card.detail.CardDetailBottomBar(enabled: kotlin.Boolean, onPrevious: kotlin.Function0<kotlin.Unit>, onNext: kotlin.Function0<kotlin.Unit>): kotlin.Unit
   skippable: true
   restartable: true
@@ -321,13 +312,4 @@ private fun com.whatever.caro.feature.card.detail.CardDetailTopBar(current: kotl
     - onBack: STABLE (function type)
     - onEdit: STABLE (function type)
     - onDelete: STABLE (function type)
-
-@Composable
-public fun com.whatever.caro.feature.card.detail.route.CardDetailRoute(viewModel: com.whatever.caro.feature.card.detail.CardDetailViewModel, navDispatcher: com.whatever.caro.core.navigator.dispatcher.NavigationDispatcher, snackbarController: com.whatever.caro.core.ui.snackbar.SnackbarController): kotlin.Unit
-  skippable: false
-  restartable: true
-  params:
-    - viewModel: RUNTIME (requires runtime check)
-    - navDispatcher: RUNTIME (requires runtime check)
-    - snackbarController: RUNTIME (requires runtime check)
 

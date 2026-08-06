@@ -2,7 +2,6 @@ package com.whatever.caro.core.designsystem.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.Arrangement
@@ -39,6 +38,7 @@ import androidx.compose.ui.unit.dp
 import caromobile.core.designsystem.generated.resources.Res
 import caromobile.core.designsystem.generated.resources.ic_renew_16
 import caromobile.core.designsystem.generated.resources.ic_x_circle_24
+import com.whatever.caro.core.designsystem.modifier.noRippleClickable
 import com.whatever.caro.core.designsystem.themes.CaroTheme
 import org.jetbrains.compose.resources.painterResource
 
@@ -272,7 +272,7 @@ private fun CaroTextFieldWithCtaPreview() {
                             Modifier
                                 .align(Alignment.CenterEnd)
                                 .clip(CaroTheme.shape.xxl)
-                                .clickable(onClick = {}),
+                                .noRippleClickable(onClick = {}),
                         horizontalArrangement = Arrangement.spacedBy(CaroTheme.spacing.xs),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {

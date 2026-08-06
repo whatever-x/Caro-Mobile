@@ -26,6 +26,4 @@ sealed interface CreateCardIntent : UiIntent {
     data object ConfirmDiscard : CreateCardIntent
 
     data object DismissDiscardDialog : CreateCardIntent
-
-    data object DismissMaxCardsDialog : CreateCardIntent
 }

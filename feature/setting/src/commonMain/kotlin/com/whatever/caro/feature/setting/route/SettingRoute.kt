@@ -29,16 +29,18 @@ import caromobile.core.designsystem.generated.resources.setting_dialog_title
 import caromobile.core.designsystem.generated.resources.setting_privcay_policy_url
 import caromobile.core.designsystem.generated.resources.setting_report_bug_url
 import caromobile.core.designsystem.generated.resources.setting_snackbar_delete_account
+import caromobile.core.designsystem.generated.resources.setting_snackbar_delete_account_error
 import caromobile.core.designsystem.generated.resources.setting_snackbar_logout
 import caromobile.core.designsystem.generated.resources.setting_snackbar_user_info_load_error
 import caromobile.core.designsystem.generated.resources.setting_terms_of_service_url
 import com.whatever.caro.core.designsystem.components.CaroDialog
+import com.whatever.caro.core.designsystem.components.CaroSnackbarStyle
+import com.whatever.caro.core.designsystem.modifier.noRippleClickable
 import com.whatever.caro.core.designsystem.themes.CaroTheme
 import com.whatever.caro.core.navigator.contract.NavCommand
 import com.whatever.caro.core.navigator.dispatcher.NavigationDispatcher
 import com.whatever.caro.core.navigator.entries.EditProfileEntry
 import com.whatever.caro.core.navigator.entries.LoginEntry
-import com.whatever.caro.core.ui.modifier.noRippleClickable
 import com.whatever.caro.core.ui.snackbar.SnackBarMessage
 import com.whatever.caro.core.ui.snackbar.SnackbarController
 import com.whatever.caro.feature.setting.SettingScreen
@@ -64,6 +66,8 @@ fun SettingRoute(
     val logoutSnackbarMessage = stringResource(resource = Res.string.setting_snackbar_logout)
     val deleteAccountSnackbarMessage =
         stringResource(resource = Res.string.setting_snackbar_delete_account)
+    val deleteAccountErrorSnackbarMessage =
+        stringResource(resource = Res.string.setting_snackbar_delete_account_error)
     val userInfoLoadErrorSnackbarMessage =
         stringResource(resource = Res.string.setting_snackbar_user_info_load_error)
 
@@ -120,9 +124,20 @@ fun SettingRoute(
                         when (sideEffect.type) {
                             SnackbarType.LOGOUT -> logoutSnackbarMessage
                             SnackbarType.DELETE_ACCOUNT -> deleteAccountSnackbarMessage
+                            SnackbarType.DELETE_ACCOUNT_ERROR -> deleteAccountErrorSnackbarMessage
                             SnackbarType.USER_INFO_LOAD_ERROR -> userInfoLoadErrorSnackbarMessage
                         }
-                    snackbarController.show(SnackBarMessage(message = message))
+                    val style =
+                        when (sideEffect.type) {
+                            SnackbarType.DELETE_ACCOUNT_ERROR,
+                            SnackbarType.USER_INFO_LOAD_ERROR,
+                            -> CaroSnackbarStyle.Error
+
+                            SnackbarType.LOGOUT,
+                            SnackbarType.DELETE_ACCOUNT,
+                            -> CaroSnackbarStyle.Normal
+                        }
+                    snackbarController.show(SnackBarMessage(message = message, style = style))
                 }
             }
         }

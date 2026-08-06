@@ -8,6 +8,7 @@ import androidx.navigationevent.NavigationEventInfo
 import androidx.navigationevent.compose.NavigationBackHandler
 import androidx.navigationevent.compose.rememberNavigationEventState
 import caromobile.core.designsystem.generated.resources.Res
+import caromobile.core.designsystem.generated.resources.card_max_cards_reached
 import caromobile.core.designsystem.generated.resources.card_save_error
 import com.whatever.caro.core.designsystem.components.CaroSnackbarStyle
 import com.whatever.caro.core.navigator.contract.NavCommand
@@ -28,6 +29,7 @@ fun CreateCardRoute(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val saveErrorMessage = stringResource(Res.string.card_save_error)
+    val maxCardsReachedMessage = stringResource(Res.string.card_max_cards_reached)
     val backState = rememberNavigationEventState(currentInfo = NavigationEventInfo.None)
 
     // 시스템 뒤로가기도 상단 화살표와 같은 경로를 타야 입력이 조용히 사라지지 않는다.
@@ -52,6 +54,15 @@ fun CreateCardRoute(
                         SnackBarMessage(
                             message = saveErrorMessage,
                             style = CaroSnackbarStyle.Error,
+                        ),
+                    )
+                }
+
+                CreateCardSideEffect.ShowMaxCardsReached -> {
+                    snackbarController.show(
+                        SnackBarMessage(
+                            message = maxCardsReachedMessage,
+                            style = CaroSnackbarStyle.Info,
                         ),
                     )
                 }

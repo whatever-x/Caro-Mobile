@@ -31,6 +31,8 @@ import caromobile.core.designsystem.generated.resources.Res
 import caromobile.core.designsystem.generated.resources.home_banner_title
 import caromobile.core.designsystem.generated.resources.home_deck_field_empty
 import caromobile.core.designsystem.generated.resources.home_floating_button
+import caromobile.core.designsystem.generated.resources.home_load_error
+import caromobile.core.designsystem.generated.resources.home_retry
 import caromobile.core.designsystem.generated.resources.home_streak_active_description
 import caromobile.core.designsystem.generated.resources.home_streak_active_label
 import caromobile.core.designsystem.generated.resources.home_streak_broken_description
@@ -46,11 +48,11 @@ import caromobile.core.designsystem.generated.resources.img_home_streak_broken
 import caromobile.core.designsystem.generated.resources.img_home_streak_not_started
 import caromobile.core.designsystem.generated.resources.img_streak_broken
 import com.whatever.caro.core.designsystem.components.CaroTopBar
+import com.whatever.caro.core.designsystem.modifier.noRippleClickable
 import com.whatever.caro.core.designsystem.themes.CaroTheme
 import com.whatever.caro.core.model.deck.Deck
 import com.whatever.caro.core.model.deck.DeckState
 import com.whatever.caro.core.ui.loading.CaroLoadingOverlayBox
-import com.whatever.caro.core.ui.modifier.noRippleClickable
 import com.whatever.caro.feature.home.component.Deck
 import com.whatever.caro.feature.home.mvi.HomeIntent
 import com.whatever.caro.feature.home.mvi.HomeState
@@ -113,6 +115,37 @@ internal fun HomeScreen(
                     )
                 },
             )
+
+            if (state.hasLoadError) {
+                Row(
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .background(CaroTheme.color.surface.error)
+                            .padding(
+                                horizontal = CaroTheme.spacing.xl2,
+                                vertical = CaroTheme.spacing.m,
+                            ),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        modifier = Modifier.weight(1f),
+                        text = stringResource(Res.string.home_load_error),
+                        style = CaroTheme.typography.label1,
+                        color = CaroTheme.color.text.primary,
+                    )
+                    Text(
+                        modifier =
+                            Modifier
+                                .padding(start = CaroTheme.spacing.m)
+                                .noRippleClickable { onIntent(HomeIntent.ClickRetry) },
+                        text = stringResource(Res.string.home_retry),
+                        style = CaroTheme.typography.label1,
+                        color = CaroTheme.color.text.brand,
+                    )
+                }
+            }
 
             if (state.isLoadedContentVisible) {
                 LazyColumn(modifier = Modifier.fillMaxWidth()) {

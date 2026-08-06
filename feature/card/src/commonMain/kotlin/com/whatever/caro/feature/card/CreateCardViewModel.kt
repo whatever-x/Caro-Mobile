@@ -31,7 +31,6 @@ class CreateCardViewModel(
             is CreateCardIntent.ClickBack -> handleBack()
             is CreateCardIntent.ConfirmDiscard -> handleConfirmDiscard()
             is CreateCardIntent.DismissDiscardDialog -> reduce { copy(isDiscardDialogVisible = false) }
-            is CreateCardIntent.DismissMaxCardsDialog -> reduce { copy(isMaxCardsDialogVisible = false) }
         }
     }
 
@@ -49,6 +48,10 @@ class CreateCardViewModel(
 
     private fun handleAddCard() {
         if (currentState.isAddEnabled.not()) return
+        if (currentState.addedCards.size >= CardInputLimits.MAX_CARDS) {
+            postSideEffect(CreateCardSideEffect.ShowMaxCardsReached)
+            return
+        }
         reduce {
             val added =
                 addedCards.toPersistentList().add(
@@ -59,8 +62,6 @@ class CreateCardViewModel(
                 nextCardId = nextCardId + 1,
                 front = "",
                 back = "",
-                // 한도에 도달한 그 순간에만 안내한다(이후 추가 버튼은 계속 비활성).
-                isMaxCardsDialogVisible = added.size >= CardInputLimits.MAX_CARDS,
             )
         }
     }
@@ -87,7 +88,7 @@ class CreateCardViewModel(
     private fun handleSave() {
         if (currentState.isSaveEnabled.not()) return
         val cards = currentState.addedCards.map { it.content }
-        reduce { copy(isSaving = true, isMaxCardsDialogVisible = false) }
+        reduce { copy(isSaving = true) }
 
         launch {
             runCatching {

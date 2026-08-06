@@ -23,6 +23,8 @@ import platform.UserNotifications.UNUserNotificationCenter
 import platform.UserNotifications.UNUserNotificationCenterDelegateProtocol
 import platform.darwin.NSObject
 
+private const val MESSAGE_VALUE_KEY = "anyValue"
+
 @OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
 internal class IosFirebaseMessagingClient : MessagingClient {
     private val mutableTokenFlow = MutableStateFlow("")
@@ -56,7 +58,7 @@ private class MessagingDelegate(
         didReceiveRegistrationToken: String?,
     ) {
         val token = didReceiveRegistrationToken ?: return
-        Napier.d { "FCM token refreshed: $token" }
+        Napier.d { "FCM token refreshed" }
         tokenFlow.tryEmit(token)
     }
 
@@ -67,7 +69,7 @@ private class MessagingDelegate(
         withCompletionHandler: (UNNotificationPresentationOptions) -> Unit,
     ) {
         val userInfo = willPresentNotification.request.content.userInfo
-        // TODO: userInfo 파싱 후 CloudMessage 발행
+        messages.trySend(CloudMessage(anyValue = userInfo[MESSAGE_VALUE_KEY]?.toString()))
         withCompletionHandler(
             UNNotificationPresentationOptionBanner or
                 UNNotificationPresentationOptionList or
@@ -82,7 +84,7 @@ private class MessagingDelegate(
         withCompletionHandler: () -> Unit,
     ) {
         val userInfo = didReceiveNotificationResponse.notification.request.content.userInfo
-        // TODO: userInfo 파싱 후 CloudMessage 발행
+        messages.trySend(CloudMessage(anyValue = userInfo[MESSAGE_VALUE_KEY]?.toString()))
         withCompletionHandler()
     }
 }

@@ -2,7 +2,6 @@ package com.whatever.caro.feature.card
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -59,8 +58,6 @@ import caromobile.core.designsystem.generated.resources.card_field_max_reached
 import caromobile.core.designsystem.generated.resources.card_field_placeholder_back
 import caromobile.core.designsystem.generated.resources.card_field_placeholder_front
 import caromobile.core.designsystem.generated.resources.card_field_required
-import caromobile.core.designsystem.generated.resources.card_max_dialog_body
-import caromobile.core.designsystem.generated.resources.card_max_dialog_button_confirm
 import caromobile.core.designsystem.generated.resources.card_tip_label
 import caromobile.core.designsystem.generated.resources.card_tip_max_cards
 import caromobile.core.designsystem.generated.resources.card_tip_split_by_topic
@@ -73,6 +70,7 @@ import com.whatever.caro.core.designsystem.components.CaroDialog
 import com.whatever.caro.core.designsystem.components.CaroDialogButton
 import com.whatever.caro.core.designsystem.components.CaroTextArea
 import com.whatever.caro.core.designsystem.components.CaroTopBar
+import com.whatever.caro.core.designsystem.modifier.noRippleClickable
 import com.whatever.caro.core.designsystem.themes.CaroTheme
 import com.whatever.caro.core.model.card.CardContent
 import com.whatever.caro.core.model.card.CardInputLimits
@@ -131,7 +129,7 @@ internal fun CreateCardScreen(
                             modifier =
                                 Modifier
                                     .size(TopBarIconSize)
-                                    .clickable { onIntent(CreateCardIntent.ClickBack) },
+                                    .noRippleClickable { onIntent(CreateCardIntent.ClickBack) },
                             painter = painterResource(Res.drawable.ic_chevron_left_24),
                             contentDescription = stringResource(Res.string.card_content_description_back),
                             tint = CaroTheme.color.icon.brand,
@@ -211,13 +209,6 @@ internal fun CreateCardScreen(
                 onStay = { onIntent(CreateCardIntent.DismissDiscardDialog) },
             )
         }
-
-        if (state.isMaxCardsDialogVisible) {
-            MaxCardsDialog(
-                onConfirm = { onIntent(CreateCardIntent.DismissMaxCardsDialog) },
-                onSave = { onIntent(CreateCardIntent.ClickSave) },
-            )
-        }
     }
 }
 
@@ -264,46 +255,6 @@ private fun DiscardConfirmDialog(
                     backgroundColor = CaroTheme.color.surface.tertiary,
                     textColor = CaroTheme.color.text.brand,
                     onClick = onStay,
-                )
-            }
-        },
-    )
-}
-
-@Composable
-private fun MaxCardsDialog(
-    onConfirm: () -> Unit,
-    onSave: () -> Unit,
-) {
-    CaroDialog(
-        onDismissRequest = onConfirm,
-        content = {
-            Text(
-                modifier = Modifier.fillMaxWidth(),
-                text = stringResource(Res.string.card_max_dialog_body, CardInputLimits.MAX_CARDS),
-                style = CaroTheme.typography.body2.medium,
-                color = CaroTheme.color.text.primary,
-            )
-            Spacer(modifier = Modifier.size(CaroTheme.spacing.l))
-        },
-        buttons = {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(CaroTheme.spacing.s),
-            ) {
-                CaroDialogButton(
-                    modifier = Modifier.weight(1f),
-                    text = stringResource(Res.string.card_max_dialog_button_confirm),
-                    backgroundColor = CaroTheme.color.surface.tertiary,
-                    textColor = CaroTheme.color.text.brand,
-                    onClick = onConfirm,
-                )
-                CaroDialogButton(
-                    modifier = Modifier.weight(1f),
-                    text = stringResource(Res.string.card_button_save),
-                    backgroundColor = CaroTheme.color.surface.brand,
-                    textColor = CaroTheme.color.text.inverse,
-                    onClick = onSave,
                 )
             }
         },
@@ -372,7 +323,7 @@ private fun SwapButton(onClick: () -> Unit) {
                         width = HairlineThickness,
                         color = CaroTheme.color.border.secondary,
                         shape = CircleShape,
-                    ).clickable(onClick = onClick),
+                    ).noRippleClickable(onClick = onClick),
             contentAlignment = Alignment.Center,
         ) {
             Icon(
@@ -526,7 +477,7 @@ private fun CardPreview(
                 Modifier
                     .align(Alignment.TopEnd)
                     .size(RemoveHitTargetSize)
-                    .clickable(onClick = onRemove),
+                    .noRippleClickable(onClick = onRemove),
             contentAlignment = Alignment.TopEnd,
         ) {
             Icon(
@@ -609,7 +560,7 @@ private fun AddCardButton(
                 .heightIn(min = CtaButtonHeight)
                 .clip(CaroTheme.shape.xxl)
                 .background(backgroundColor)
-                .clickable(enabled = enabled, onClick = onClick)
+                .noRippleClickable(enabled = enabled, onClick = onClick)
                 .padding(
                     horizontal = CaroTheme.spacing.xl,
                     vertical = CaroTheme.spacing.l,
@@ -647,7 +598,7 @@ private fun SaveButton(
         modifier =
             Modifier
                 .fillMaxWidth()
-                .clickable(enabled = enabled, onClick = onClick)
+                .noRippleClickable(enabled = enabled, onClick = onClick)
                 .padding(vertical = CaroTheme.spacing.m),
         contentAlignment = Alignment.Center,
     ) {

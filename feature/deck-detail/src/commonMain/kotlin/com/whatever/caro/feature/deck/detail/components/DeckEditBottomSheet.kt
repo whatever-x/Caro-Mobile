@@ -24,8 +24,8 @@ import caromobile.core.designsystem.generated.resources.deck_detail_button_botto
 import caromobile.core.designsystem.generated.resources.deck_detail_button_bottom_sheet_deck_edit
 import caromobile.core.designsystem.generated.resources.ic_edit_24
 import caromobile.core.designsystem.generated.resources.ic_trash_24
+import com.whatever.caro.core.designsystem.modifier.noRippleClickable
 import com.whatever.caro.core.designsystem.themes.CaroTheme
-import com.whatever.caro.core.ui.modifier.noRippleClickable
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource

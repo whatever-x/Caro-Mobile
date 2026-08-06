@@ -3,7 +3,6 @@ package com.whatever.caro.feature.learning.components
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -45,7 +44,7 @@ import caromobile.core.designsystem.generated.resources.learning_back
 import caromobile.core.designsystem.generated.resources.learning_complete_description
 import caromobile.core.designsystem.generated.resources.learning_complete_title
 import caromobile.core.designsystem.generated.resources.learning_continue
-import caromobile.core.designsystem.generated.resources.learning_dialog_confirm
+import caromobile.core.designsystem.generated.resources.learning_dialog_exit
 import caromobile.core.designsystem.generated.resources.learning_dialog_title
 import caromobile.core.designsystem.generated.resources.learning_easy
 import caromobile.core.designsystem.generated.resources.learning_evaluated_cards
@@ -53,11 +52,13 @@ import caromobile.core.designsystem.generated.resources.learning_fair
 import caromobile.core.designsystem.generated.resources.learning_flip_back_hint
 import caromobile.core.designsystem.generated.resources.learning_flip_hint
 import caromobile.core.designsystem.generated.resources.learning_home
+import caromobile.core.designsystem.generated.resources.learning_retry
 import caromobile.core.designsystem.generated.resources.learning_stop
 import caromobile.core.designsystem.generated.resources.learning_stop_body
 import caromobile.core.designsystem.generated.resources.learning_stop_title
 import caromobile.core.designsystem.generated.resources.learning_total
 import com.whatever.caro.core.designsystem.components.CaroDialog
+import com.whatever.caro.core.designsystem.modifier.noRippleClickable
 import com.whatever.caro.core.designsystem.themes.CaroTheme
 import io.github.alexzhirkevich.compottie.LottieCompositionSpec
 import io.github.alexzhirkevich.compottie.rememberLottieComposition
@@ -87,7 +88,7 @@ internal fun LearningTopBar(
                     .align(Alignment.CenterStart)
                     .padding(start = CaroTheme.spacing.xl2)
                     .size(LearningIconSize)
-                    .clickable(onClick = onBack),
+                    .noRippleClickable(onClick = onBack),
         )
         Box(
             modifier =
@@ -126,7 +127,7 @@ internal fun LearningCard(
     Surface(
         modifier =
             modifier
-                .clickable(onClick = onFlip)
+                .noRippleClickable(onClick = onFlip)
                 .border(LearningCardBorderWidth, borderColor, CaroTheme.shape.l),
         shape = CaroTheme.shape.l,
         color = CaroTheme.color.surface.primary,
@@ -245,7 +246,7 @@ private fun EvaluationButton(
                 .height(LearningEvaluationButtonHeight)
                 .clip(CaroTheme.shape.m)
                 .background(color)
-                .clickable(enabled = enabled, onClick = onClick),
+                .noRippleClickable(enabled = enabled, onClick = onClick),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
@@ -336,6 +337,7 @@ internal fun LearningStopDialog(
 @Composable
 internal fun LearningErrorDialog(
     message: String,
+    onRetry: () -> Unit,
     onConfirm: () -> Unit,
 ) {
     CaroDialog(
@@ -361,9 +363,17 @@ internal fun LearningErrorDialog(
                 )
                 Spacer(Modifier.height(CaroTheme.spacing.m))
                 DialogAction(
-                    text = stringResource(Res.string.learning_dialog_confirm),
+                    text = stringResource(Res.string.learning_retry),
                     backgroundColor = CaroTheme.color.surface.brand,
                     textColor = CaroTheme.color.text.inverse,
+                    onClick = onRetry,
+                )
+                Spacer(Modifier.height(CaroTheme.spacing.s))
+                DialogAction(
+                    text = stringResource(Res.string.learning_dialog_exit),
+                    backgroundColor = CaroTheme.color.surface.primary,
+                    textColor = CaroTheme.color.text.brand,
+                    borderColor = CaroTheme.color.border.primary,
                     onClick = onConfirm,
                 )
             }
@@ -396,7 +406,7 @@ private fun DialogAction(
                     } else {
                         Modifier
                     },
-                ).clickable(onClick = onClick),
+                ).noRippleClickable(onClick = onClick),
         contentAlignment = Alignment.Center,
     ) {
         Text(text = text, style = CaroTheme.typography.caption1.regular, color = textColor)
@@ -535,7 +545,7 @@ internal fun LearningCompletion(
                         .fillMaxWidth()
                         .clip(CaroTheme.shape.xxl)
                         .background(CaroTheme.color.surface.brand)
-                        .clickable(onClick = onClickBackToHome)
+                        .noRippleClickable(onClick = onClickBackToHome)
                         .padding(
                             horizontal = CaroTheme.spacing.xl,
                             vertical = CaroTheme.spacing.l,

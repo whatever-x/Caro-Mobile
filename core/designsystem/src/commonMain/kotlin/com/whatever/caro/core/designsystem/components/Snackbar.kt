@@ -1,7 +1,6 @@
 package com.whatever.caro.core.designsystem.components
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
@@ -18,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextAlign
 import com.whatever.caro.core.designsystem.animation.SlideInSlideOutSnackbarHost
+import com.whatever.caro.core.designsystem.modifier.noRippleClickable
 import com.whatever.caro.core.designsystem.themes.CaroTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
@@ -134,7 +134,7 @@ fun CaroSnackbar(
         snackbarData.visuals.actionLabel?.let { actionLabel ->
             Text(
                 modifier =
-                    Modifier.clickable(
+                    Modifier.noRippleClickable(
                         role = Role.Button,
                         onClick = { performCaroSnackbarAction(snackbarData) },
                     ),

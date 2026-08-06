@@ -1,7 +1,6 @@
 package com.whatever.caro.feature.card.delete.components
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -23,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import caromobile.core.designsystem.generated.resources.Res
 import caromobile.core.designsystem.generated.resources.card_button_cancel
 import caromobile.core.designsystem.generated.resources.card_button_delete_selected
+import com.whatever.caro.core.designsystem.modifier.noRippleClickable
 import com.whatever.caro.core.designsystem.themes.CaroTheme
 import org.jetbrains.compose.resources.stringResource
 
@@ -87,7 +87,7 @@ internal fun DeleteSelectedButton(
                 .height(DeleteButtonHeight)
                 .clip(CaroTheme.shape.xxl)
                 .background(backgroundColor)
-                .clickable(enabled = enabled, onClick = onClick),
+                .noRippleClickable(enabled = enabled, onClick = onClick),
         contentAlignment = Alignment.Center,
     ) {
         Text(
@@ -109,7 +109,7 @@ internal fun CancelButton(
                 .height(DeleteButtonHeight)
                 .clip(CaroTheme.shape.xxl)
                 .background(CaroTheme.color.surface.inverse)
-                .clickable(onClick = onClick),
+                .noRippleClickable(onClick = onClick),
         contentAlignment = Alignment.Center,
     ) {
         Text(

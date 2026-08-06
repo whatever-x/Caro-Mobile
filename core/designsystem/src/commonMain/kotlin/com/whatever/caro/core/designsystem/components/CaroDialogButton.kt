@@ -1,7 +1,6 @@
 package com.whatever.caro.core.designsystem.components
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.Text
@@ -13,6 +12,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.whatever.caro.core.designsystem.modifier.noRippleClickable
 import com.whatever.caro.core.designsystem.themes.CaroTheme
 
 private val CaroDialogButtonHeight = 38.dp
@@ -38,7 +38,7 @@ fun CaroDialogButton(
                 .height(CaroDialogButtonHeight)
                 .clip(CaroTheme.shape.xxl)
                 .background(backgroundColor)
-                .clickable(
+                .noRippleClickable(
                     enabled = enabled,
                     role = Role.Button,
                     onClick = onClick,

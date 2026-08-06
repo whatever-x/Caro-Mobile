@@ -13,7 +13,6 @@ data class CreateCardState(
     val nextCardId: Long = 0L,
     val isSaving: Boolean = false,
     val isDiscardDialogVisible: Boolean = false,
-    val isMaxCardsDialogVisible: Boolean = false,
 ) : UiState {
     val frontCount: String
         get() = "${front.length}/${CardInputLimits.FIELD_MAX}"
@@ -41,7 +40,6 @@ data class CreateCardState(
         get() =
             front.isNotBlank() &&
                 back.isNotBlank() &&
-                isMaxCardsReached.not() &&
                 isSaving.not()
 
     val isSaveEnabled: Boolean

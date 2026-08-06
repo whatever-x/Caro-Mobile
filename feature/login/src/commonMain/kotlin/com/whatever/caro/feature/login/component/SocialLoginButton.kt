@@ -15,13 +15,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.disabled
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import caromobile.core.designsystem.generated.resources.Res
 import caromobile.core.designsystem.generated.resources.ic_logo_google
 import caromobile.core.designsystem.generated.resources.login_button_google
+import com.whatever.caro.core.designsystem.modifier.noRippleClickable
 import com.whatever.caro.core.designsystem.themes.CaroTheme
-import com.whatever.caro.core.ui.modifier.noRippleClickable
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.painterResource
@@ -33,6 +38,7 @@ internal fun SocialLoginButton(
     iconRes: DrawableResource,
     contentRes: StringResource,
     textColor: Color,
+    enabled: Boolean = true,
     onClick: () -> Unit,
 ) {
     Box(
@@ -40,7 +46,11 @@ internal fun SocialLoginButton(
             modifier
                 .heightIn(min = 52.dp)
                 .padding(vertical = CaroTheme.spacing.xs)
-                .noRippleClickable(onClick = onClick),
+                .graphicsLayer { alpha = if (enabled) 1f else 0.6f }
+                .semantics {
+                    role = Role.Button
+                    if (!enabled) disabled()
+                }.noRippleClickable(enabled = enabled, onClick = onClick),
         contentAlignment = Alignment.Center,
     ) {
         Row(
