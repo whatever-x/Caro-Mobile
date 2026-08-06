@@ -31,6 +31,8 @@ import caromobile.core.designsystem.generated.resources.Res
 import caromobile.core.designsystem.generated.resources.home_banner_title
 import caromobile.core.designsystem.generated.resources.home_deck_field_empty
 import caromobile.core.designsystem.generated.resources.home_floating_button
+import caromobile.core.designsystem.generated.resources.home_load_error
+import caromobile.core.designsystem.generated.resources.home_retry
 import caromobile.core.designsystem.generated.resources.home_streak_active_description
 import caromobile.core.designsystem.generated.resources.home_streak_active_label
 import caromobile.core.designsystem.generated.resources.home_streak_broken_description
@@ -113,6 +115,37 @@ internal fun HomeScreen(
                     )
                 },
             )
+
+            if (state.hasLoadError) {
+                Row(
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .background(CaroTheme.color.surface.error)
+                            .padding(
+                                horizontal = CaroTheme.spacing.xl2,
+                                vertical = CaroTheme.spacing.m,
+                            ),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        modifier = Modifier.weight(1f),
+                        text = stringResource(Res.string.home_load_error),
+                        style = CaroTheme.typography.label1,
+                        color = CaroTheme.color.text.primary,
+                    )
+                    Text(
+                        modifier =
+                            Modifier
+                                .padding(start = CaroTheme.spacing.m)
+                                .noRippleClickable { onIntent(HomeIntent.ClickRetry) },
+                        text = stringResource(Res.string.home_retry),
+                        style = CaroTheme.typography.label1,
+                        color = CaroTheme.color.text.brand,
+                    )
+                }
+            }
 
             if (state.isLoadedContentVisible) {
                 LazyColumn(modifier = Modifier.fillMaxWidth()) {

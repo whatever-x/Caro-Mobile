@@ -100,6 +100,7 @@
     <string name="card_button_save">저장하기</string>
     <string name="card_button_update">수정하기</string>
     <string name="card_save_error">카드 저장에 실패했어요. 다시 시도해 주세요.</string>
+    <string name="card_max_cards_reached">한 덱에는 카드 200장까지 추가할 수 있어요.</string>
     <string name="card_update_error">카드 수정에 실패했어요. 다시 시도해 주세요.</string>
     <string name="card_list_error">카드를 불러오지 못했어요. 다시 시도해 주세요.</string>
     <string name="card_title_edit">카드 편집</string>
@@ -115,6 +116,8 @@
     <string name="card_delete_error">카드 삭제에 실패했어요. 다시 시도해 주세요.</string>
     <!-- home -->
     <string name="home_banner_title">%1$s님, 안녕하세요!</string>
+    <string name="home_load_error">일부 정보를 불러오지 못했어요.</string>
+    <string name="home_retry">다시 시도</string>
     <string name="home_streak_not_started_description">새 덱을 만들고\n학습을 시작해볼까요?</string>
     <string name="home_streak_not_started_label">첫 연속 학습에 도전해 보세요</string>
     <string name="home_streak_active_description">%1$d일 째 학습 중이에요.\n오늘은 복습 카드와 새 덱 하나를 끝내봐요.</string>
@@ -144,6 +147,7 @@
     <string name="setting_description_app_version">현재 앱 버전 : %1$s</string>
     <string name="setting_snackbar_logout">로그아웃을 하였습니다.</string>
     <string name="setting_snackbar_delete_account">회원탈퇴를 하였습니다.</string>
+    <string name="setting_snackbar_delete_account_error">회원탈퇴에 실패했어요. 다시 시도해 주세요.</string>
     <string name="setting_snackbar_user_info_load_error">사용자 정보를 불러오지 못했습니다. 다시 시도해 주세요.</string>
     <string name="setting_dialog_title">정말 계정을 탈퇴하시겠습니까?</string>
     <string name="setting_dialog_content">저장된 모든 기록이 소멸될 수 있습니다.</string>

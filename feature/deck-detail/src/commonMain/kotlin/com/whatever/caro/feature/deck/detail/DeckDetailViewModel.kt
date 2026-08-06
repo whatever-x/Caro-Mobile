@@ -4,6 +4,7 @@ import com.whatever.caro.core.data.repository.deck.DeckRepository
 import com.whatever.caro.core.data.util.suspendRunCatching
 import com.whatever.caro.core.model.card.CardBadge
 import com.whatever.caro.core.model.deck.Deck
+import com.whatever.caro.core.model.deck.DeckCardSortType
 import com.whatever.caro.core.model.learning.LearningMode
 import com.whatever.caro.core.viewmodel.BaseViewModel
 import com.whatever.caro.core.viewmodel.ExceptionFilter
@@ -11,6 +12,7 @@ import com.whatever.caro.feature.deck.detail.model.CardItem
 import com.whatever.caro.feature.deck.detail.model.CardReviewState
 import com.whatever.caro.feature.deck.detail.mvi.DeckDetailIntent
 import com.whatever.caro.feature.deck.detail.mvi.DeckDetailSideEffect
+import com.whatever.caro.feature.deck.detail.mvi.DeckDetailSortOption
 import com.whatever.caro.feature.deck.detail.mvi.DeckDetailState
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.CancellationException
@@ -26,6 +28,8 @@ class DeckDetailViewModel(
             ),
         exceptionFilter = exceptionFilter,
     ) {
+    private var cardLoadGeneration = 0L
+
     init {
         loadCards()
     }
@@ -82,6 +86,7 @@ class DeckDetailViewModel(
                         isSortBottomSheetVisible = false,
                     )
                 }
+                loadCards()
             }
 
             DeckDetailIntent.ClickEditCardList -> {
@@ -182,15 +187,31 @@ class DeckDetailViewModel(
     }
 
     private fun loadCards() {
-        if (currentState.isCardListLoading) return
+        val generation = ++cardLoadGeneration
+        val deckId = currentState.deck.id
+        val sortOption = currentState.selectedSortOption
         reduce {
             copy(isCardListLoading = true)
         }
 
         launch {
             runCatching {
-                deckRepository.getDeckCards(deckId = currentState.deck.id)
+                when (sortOption) {
+                    DeckDetailSortOption.CREATED -> {
+                        deckRepository.getDeckCards(deckId = deckId)
+                    }
+
+                    DeckDetailSortOption.LAST_REVIEWED,
+                    DeckDetailSortOption.FREQUENCY,
+                    -> {
+                        deckRepository.getDeckCards(
+                            deckId = deckId,
+                            sortType = sortOption.toDeckCardSortType(),
+                        )
+                    }
+                }
             }.onSuccess { cards ->
+                if (generation != cardLoadGeneration) return@onSuccess
                 reduce {
                     copy(
                         deck = deck.copy(cardTotalCount = cards.size),
@@ -210,6 +231,7 @@ class DeckDetailViewModel(
                 }
             }.onFailure { throwable ->
                 if (throwable is CancellationException) throw throwable
+                if (generation != cardLoadGeneration) return@onFailure
                 reduce {
                     copy(isCardListLoading = false)
                 }
@@ -217,6 +239,13 @@ class DeckDetailViewModel(
             }
         }
     }
+
+    private fun DeckDetailSortOption.toDeckCardSortType(): DeckCardSortType =
+        when (this) {
+            DeckDetailSortOption.CREATED -> DeckCardSortType.CREATED
+            DeckDetailSortOption.LAST_REVIEWED -> DeckCardSortType.LAST_REVIEWED
+            DeckDetailSortOption.FREQUENCY -> DeckCardSortType.FREQUENCY
+        }
 
     private fun CardBadge.toCardReviewState(): CardReviewState =
         when (this) {

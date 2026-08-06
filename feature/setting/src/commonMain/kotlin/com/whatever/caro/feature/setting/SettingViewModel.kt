@@ -10,6 +10,7 @@ import com.whatever.caro.feature.setting.model.WebViewType
 import com.whatever.caro.feature.setting.mvi.SettingIntent
 import com.whatever.caro.feature.setting.mvi.SettingSideEffect
 import com.whatever.caro.feature.setting.mvi.SettingState
+import kotlinx.coroutines.CancellationException
 
 class SettingViewModel(
     private val authRepository: AuthRepository,
@@ -109,14 +110,24 @@ class SettingViewModel(
             reduce { copy(accountDeleteDialogVisible = false) }
             postSideEffect(SettingSideEffect.ShowSnackbar(type = SnackbarType.DELETE_ACCOUNT))
             postSideEffect(SettingSideEffect.NavigateToLogin)
+        } catch (throwable: CancellationException) {
+            throw throwable
+        } catch (_: Throwable) {
+            postSideEffect(SettingSideEffect.ShowSnackbar(type = SnackbarType.DELETE_ACCOUNT_ERROR))
         } finally {
             reduce { copy(isDeletingAccount = false) }
         }
     }
 
     private suspend fun logout() {
-        authRepository.logout()
-        postSideEffect(SettingSideEffect.ShowSnackbar(type = SnackbarType.LOGOUT))
-        postSideEffect(SettingSideEffect.NavigateToLogin)
+        if (currentState.isLoading) return
+        reduce { copy(isLoading = true) }
+        try {
+            authRepository.logout()
+            postSideEffect(SettingSideEffect.ShowSnackbar(type = SnackbarType.LOGOUT))
+            postSideEffect(SettingSideEffect.NavigateToLogin)
+        } finally {
+            reduce { copy(isLoading = false) }
+        }
     }
 }
