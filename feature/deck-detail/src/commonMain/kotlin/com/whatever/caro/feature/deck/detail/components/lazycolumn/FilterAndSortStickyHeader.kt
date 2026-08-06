@@ -22,8 +22,8 @@ import caromobile.core.designsystem.generated.resources.deck_detail_button_botto
 import caromobile.core.designsystem.generated.resources.deck_detail_button_edit
 import caromobile.core.designsystem.generated.resources.deck_detail_label_total_count
 import caromobile.core.designsystem.generated.resources.ic_arrow_down_16
+import com.whatever.caro.core.designsystem.modifier.noRippleClickable
 import com.whatever.caro.core.designsystem.themes.CaroTheme
-import com.whatever.caro.core.ui.modifier.noRippleClickable
 import com.whatever.caro.feature.deck.detail.mvi.DeckDetailSortOption
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource

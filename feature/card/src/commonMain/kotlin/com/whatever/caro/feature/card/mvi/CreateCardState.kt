@@ -12,6 +12,7 @@ data class CreateCardState(
     val addedCards: ImmutableList<StagedCard> = persistentListOf(),
     val nextCardId: Long = 0L,
     val isSaving: Boolean = false,
+    val isDiscardDialogVisible: Boolean = false,
 ) : UiState {
     val frontCount: String
         get() = "${front.length}/${CardInputLimits.FIELD_MAX}"
@@ -19,14 +20,26 @@ data class CreateCardState(
     val backCount: String
         get() = "${back.length}/${CardInputLimits.FIELD_MAX}"
 
+    val isFrontMaxReached: Boolean
+        get() = front.length >= CardInputLimits.FIELD_MAX
+
+    val isBackMaxReached: Boolean
+        get() = back.length >= CardInputLimits.FIELD_MAX
+
     val addedCount: Int
         get() = addedCards.size
+
+    val isMaxCardsReached: Boolean
+        get() = addedCards.size >= CardInputLimits.MAX_CARDS
+
+    /** 뒤로가기 시 잃을 입력이 있는지. 스테이징된 카드 또는 작성 중인 텍스트. */
+    val hasUnsavedInput: Boolean
+        get() = addedCards.isNotEmpty() || front.isNotBlank() || back.isNotBlank()
 
     val isAddEnabled: Boolean
         get() =
             front.isNotBlank() &&
                 back.isNotBlank() &&
-                addedCards.size < CardInputLimits.MAX_CARDS &&
                 isSaving.not()
 
     val isSaveEnabled: Boolean

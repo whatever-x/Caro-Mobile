@@ -21,8 +21,8 @@ import caromobile.core.designsystem.generated.resources.Res
 import caromobile.core.designsystem.generated.resources.ic_arrow_right_16
 import caromobile.core.designsystem.generated.resources.ic_logo_apple
 import caromobile.core.designsystem.generated.resources.login_button_google
+import com.whatever.caro.core.designsystem.modifier.noRippleClickable
 import com.whatever.caro.core.designsystem.themes.CaroTheme
-import com.whatever.caro.core.ui.modifier.noRippleClickable
 import com.whatever.caro.feature.setting.model.SettingMenu
 import com.whatever.caro.feature.setting.mvi.SettingIntent
 import kotlinx.collections.immutable.ImmutableList

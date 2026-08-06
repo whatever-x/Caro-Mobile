@@ -9,19 +9,16 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.selection.LocalTextSelectionColors
 import androidx.compose.foundation.text.selection.TextSelectionColors
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -144,42 +141,45 @@ private fun TextAreaBox(
                     ),
             contentAlignment = Alignment.TopStart,
         ) {
-            Box(
-                modifier = Modifier.fillMaxWidth().height(INPUT_BOX_HEIGHT.dp),
-                contentAlignment = Alignment.TopStart,
-            ) {
-                BasicTextField(
-                    value = value,
-                    onValueChange = onValueChange,
-                    modifier =
-                        Modifier
-                            .fillMaxSize()
-                            .verticalScroll(rememberScrollState())
-                            .then(
-                                focusRequester?.let { Modifier.focusRequester(it) } ?: Modifier,
-                            ),
-                    enabled = enabled,
-                    readOnly = readOnly,
-                    textStyle = mergedTextStyle,
-                    singleLine = false,
-                    cursorBrush = SolidColor(CaroTheme.color.text.brand),
-                    keyboardOptions = keyboardOptions,
-                    keyboardActions = keyboardActions,
-                    interactionSource = interactionSource,
+            // 입력이 늘어나면 최대 높이까지 커지고, 그 뒤로는 BasicTextField 내부 스크롤이 커서를 따라간다.
+            // 크기 제약은 BasicTextField 자체에 준다. 바깥 Box 로 감싸면 필드가 첫 줄 높이만 차지해
+            // 나머지 영역이 터치 死영역이 되고, 외부 verticalScroll 로 감싸면 높이가 무한이 되어
+            // 내부 커서 추적 스크롤이 죽는다.
+            BasicTextField(
+                value = value,
+                onValueChange = onValueChange,
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .heightIn(min = InputBoxMinHeight, max = InputBoxMaxHeight)
+                        .then(
+                            focusRequester?.let { Modifier.focusRequester(it) } ?: Modifier,
+                        ),
+                enabled = enabled,
+                readOnly = readOnly,
+                textStyle = mergedTextStyle,
+                singleLine = false,
+                cursorBrush = SolidColor(CaroTheme.color.text.brand),
+                keyboardOptions = keyboardOptions,
+                keyboardActions = keyboardActions,
+                interactionSource = interactionSource,
+            )
+            if (value.isEmpty() && placeholder != null) {
+                Text(
+                    text = placeholder,
+                    style = CaroTheme.typography.body1,
+                    color = CaroTheme.color.text.tertiary,
                 )
-                if (value.isEmpty() && placeholder != null) {
-                    Text(
-                        text = placeholder,
-                        style = CaroTheme.typography.body1,
-                        color = CaroTheme.color.text.tertiary,
-                    )
-                }
             }
         }
     }
 }
 
-private const val INPUT_BOX_HEIGHT = 90
+private val InputBoxMinHeight = 90.dp
+
+// 키보드가 올라온 상태의 스크롤 뷰포트 안에 라벨·카운터까지 함께 들어가는 상한.
+// 이보다 크면 필드 하단(= 커서가 머무는 줄)이 뷰포트 밖으로 잘린다.
+private val InputBoxMaxHeight = 140.dp
 
 @Preview
 @Composable

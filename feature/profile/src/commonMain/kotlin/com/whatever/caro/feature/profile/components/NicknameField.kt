@@ -1,6 +1,5 @@
 package com.whatever.caro.feature.profile.components
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -26,6 +25,7 @@ import caromobile.core.designsystem.generated.resources.profile_field_placeholde
 import caromobile.core.designsystem.generated.resources.profile_field_required
 import caromobile.core.designsystem.generated.resources.profile_field_rule_nickname
 import com.whatever.caro.core.designsystem.components.CaroTextField
+import com.whatever.caro.core.designsystem.modifier.noRippleClickable
 import com.whatever.caro.core.designsystem.themes.CaroTheme
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
@@ -67,7 +67,7 @@ internal fun NicknameField(
                         modifier =
                             Modifier
                                 .size(24.dp)
-                                .clickable(enabled = enabled) { onValueChange("") },
+                                .noRippleClickable(enabled = enabled) { onValueChange("") },
                         painter = painterResource(Res.drawable.ic_x_circle_24),
                         contentDescription = stringResource(Res.string.profile_content_description_clear),
                         tint =
@@ -117,7 +117,7 @@ private fun NicknameHeader(
                 Modifier
                     .align(Alignment.CenterEnd)
                     .clip(CaroTheme.shape.xxl)
-                    .clickable(enabled = enabled, onClick = onRefreshClick),
+                    .noRippleClickable(enabled = enabled, onClick = onRefreshClick),
             horizontalArrangement = Arrangement.spacedBy(CaroTheme.spacing.xs),
             verticalAlignment = Alignment.CenterVertically,
         ) {

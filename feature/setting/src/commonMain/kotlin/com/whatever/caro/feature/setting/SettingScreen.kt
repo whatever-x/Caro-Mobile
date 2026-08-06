@@ -38,9 +38,9 @@ import caromobile.core.designsystem.generated.resources.setting_menu_terms_of_se
 import caromobile.core.designsystem.generated.resources.setting_title
 import caromobile.core.designsystem.generated.resources.setting_userinfo_nickname_change
 import com.whatever.caro.core.designsystem.components.CaroTopBar
+import com.whatever.caro.core.designsystem.modifier.noRippleClickable
 import com.whatever.caro.core.designsystem.themes.CaroTheme
 import com.whatever.caro.core.model.auth.SocialLoginType
-import com.whatever.caro.core.ui.modifier.noRippleClickable
 import com.whatever.caro.feature.setting.component.MenuSection
 import com.whatever.caro.feature.setting.model.AppConfig
 import com.whatever.caro.feature.setting.model.SettingMenu

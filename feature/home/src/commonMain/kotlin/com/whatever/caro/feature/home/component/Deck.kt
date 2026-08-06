@@ -38,9 +38,9 @@ import caromobile.core.designsystem.generated.resources.home_deck_rest_descripti
 import caromobile.core.designsystem.generated.resources.home_deck_rest_title
 import caromobile.core.designsystem.generated.resources.ic_dot
 import caromobile.core.designsystem.generated.resources.img_card
+import com.whatever.caro.core.designsystem.modifier.noRippleClickable
 import com.whatever.caro.core.designsystem.themes.CaroTheme
 import com.whatever.caro.core.model.deck.DeckState
-import com.whatever.caro.core.ui.modifier.noRippleClickable
 import com.whatever.caro.core.util.NumberFormatter.formatWithComma
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource

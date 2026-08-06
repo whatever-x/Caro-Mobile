@@ -3,7 +3,6 @@ package com.whatever.caro.feature.deck.detail.components.lazycolumn
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -38,6 +37,7 @@ import caromobile.core.designsystem.generated.resources.deck_detail_label_daily_
 import caromobile.core.designsystem.generated.resources.deck_detail_label_learning_card_count
 import caromobile.core.designsystem.generated.resources.deck_detail_label_learning_progress
 import caromobile.core.designsystem.generated.resources.deck_detail_title_daily_learning
+import com.whatever.caro.core.designsystem.modifier.noRippleClickable
 import com.whatever.caro.core.designsystem.themes.CaroTheme
 import com.whatever.caro.core.model.deck.DeckState
 import org.jetbrains.compose.resources.stringResource
@@ -356,7 +356,7 @@ private fun DeckDetailButton(
                         },
                     shape = CaroTheme.shape.m,
                 ).clip(CaroTheme.shape.m)
-                .clickable(onClick = onClick),
+                .noRippleClickable(onClick = onClick),
         contentAlignment = Alignment.Center,
     ) {
         Text(

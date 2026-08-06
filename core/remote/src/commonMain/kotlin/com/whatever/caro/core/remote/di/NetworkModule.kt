@@ -18,6 +18,7 @@ val networkModule =
         single<Json> {
             Json {
                 ignoreUnknownKeys = true
+                explicitNulls = false
                 prettyPrint = true
             }
         }

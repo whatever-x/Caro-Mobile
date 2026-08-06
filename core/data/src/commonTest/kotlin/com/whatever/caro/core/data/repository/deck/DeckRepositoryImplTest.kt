@@ -2,6 +2,7 @@ package com.whatever.caro.core.data.repository.deck
 
 import com.whatever.caro.core.model.card.CardBadge
 import com.whatever.caro.core.model.deck.Deck
+import com.whatever.caro.core.model.deck.DeckCardSortType
 import com.whatever.caro.core.model.deck.DeckState
 import com.whatever.caro.core.model.exception.CaroInvalidResponseException
 import com.whatever.caro.core.remote.datasource.deck.DeckDataSource
@@ -198,6 +199,28 @@ class DeckRepositoryImplTest : FunSpec() {
                 card.content.back shouldBe "달리다"
                 card.badge shouldBe CardBadge.HARD
                 card.reviewCount shouldBe 5
+            }
+        }
+
+        test("getDeckCards는 선택한 정렬 타입을 데이터소스에 전달한다") {
+            runTest {
+                val deckDataSource =
+                    mock<DeckDataSource> {
+                        everySuspend { getDeckCards(any(), any()) } returns emptyList()
+                    }
+                val repository = DeckRepositoryImpl(deckDataSource)
+
+                repository.getDeckCards(
+                    deckId = 42L,
+                    sortType = DeckCardSortType.LAST_REVIEWED,
+                )
+
+                verifySuspend {
+                    deckDataSource.getDeckCards(
+                        deckId = 42L,
+                        sortType = "LAST_REVIEWED",
+                    )
+                }
             }
         }
     }

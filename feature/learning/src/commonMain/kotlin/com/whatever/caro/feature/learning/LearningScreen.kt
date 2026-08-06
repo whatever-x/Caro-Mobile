@@ -1,5 +1,7 @@
 package com.whatever.caro.feature.learning
 
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,6 +27,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import caromobile.core.designsystem.generated.resources.Res
+import caromobile.core.designsystem.generated.resources.learning_dialog_network_error
 import caromobile.core.designsystem.generated.resources.learning_dialog_submit_error
 import caromobile.core.designsystem.generated.resources.learning_front_instruction
 import caromobile.core.designsystem.generated.resources.learning_swipe_instruction
@@ -45,10 +48,14 @@ import com.whatever.caro.feature.learning.components.LearningStopDialog
 import com.whatever.caro.feature.learning.components.LearningTopBar
 import com.whatever.caro.feature.learning.mapper.toRating
 import com.whatever.caro.feature.learning.mapper.toSwipeDirection
+import com.whatever.caro.feature.learning.mvi.LearningError
 import com.whatever.caro.feature.learning.mvi.LearningIntent
 import com.whatever.caro.feature.learning.mvi.LearningState
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withTimeoutOrNull
 import org.jetbrains.compose.resources.stringResource
+import kotlin.coroutines.cancellation.CancellationException
+import kotlin.coroutines.coroutineContext
 
 @Composable
 fun LearningScreen(
@@ -85,13 +92,22 @@ fun LearningScreen(
         )
     }
 
-    if (state.isShowErrorDialog) {
+    state.error?.let { error ->
         LearningErrorDialog(
-            message = state.errorMessage ?: stringResource(Res.string.learning_dialog_submit_error),
+            message = error.toMessage(),
+            onRetry = { onIntent(LearningIntent.RetryError) },
             onConfirm = { onIntent(LearningIntent.ConfirmError) },
         )
     }
 }
+
+@Composable
+private fun LearningError.toMessage(): String =
+    when (this) {
+        is LearningError.Server -> message
+        LearningError.Network -> stringResource(Res.string.learning_dialog_network_error)
+        LearningError.Unknown -> stringResource(Res.string.learning_dialog_submit_error)
+    }
 
 @Composable
 private fun LearningContent(
@@ -105,8 +121,13 @@ private fun LearningContent(
             total = state.totalCount,
             onBack = { onIntent(LearningIntent.RequestStop) },
         )
+        val progress by animateFloatAsState(
+            targetValue = ((state.progress + 1).toFloat() / state.totalCount.coerceAtLeast(1)).coerceIn(0f, 1f),
+            animationSpec = tween(LEARNING_PROGRESS_ANIMATION_DURATION_MILLIS),
+            label = "learning_progress",
+        )
         LinearProgressIndicator(
-            progress = { ((state.progress + 1).toFloat() / state.totalCount.coerceAtLeast(1)).coerceIn(0f, 1f) },
+            progress = { progress },
             modifier = Modifier.fillMaxWidth().height(LearningProgressHeight),
             color = CaroTheme.color.border.progress,
             trackColor = CaroTheme.color.surface.progress,
@@ -122,11 +143,11 @@ private fun LearningContent(
                     hasPendingRating = pendingEvaluation.hasPendingRating,
                 )
 
-            LaunchedEffect(state.isSubmitting, state.isShowErrorDialog) {
+            LaunchedEffect(state.isSubmitting, state.error) {
                 pendingEvaluation =
                     pendingEvaluation.onSubmissionStateChanged(
                         isSubmitting = state.isSubmitting,
-                        hasSubmissionError = state.isShowErrorDialog,
+                        hasSubmissionError = state.error != null,
                     )
             }
 
@@ -195,7 +216,13 @@ internal suspend fun runEvaluationTransition(
     onEvaluate: (StudyRating) -> Unit,
     timeoutMillis: Long = EVALUATION_ANIMATION_TIMEOUT_MILLIS,
 ) {
-    withTimeoutOrNull(timeoutMillis) { animate() }
+    try {
+        withTimeoutOrNull(timeoutMillis) { animate() }
+    } catch (cancellation: CancellationException) {
+        // 카드 애니메이션이 다른 애니메이션에 밀려 취소돼도 평가는 그대로 진행한다.
+        // 화면 자체가 사라진 경우에는 ensureActive 가 다시 던져 평가를 막는다.
+        coroutineContext.ensureActive()
+    }
     onEvaluate(rating)
 }
 
@@ -244,6 +271,8 @@ private fun LoadingContent() {
         CircularProgressIndicator(color = CaroTheme.color.icon.primary)
     }
 }
+
+private const val LEARNING_PROGRESS_ANIMATION_DURATION_MILLIS = 300
 
 private val LearningProgressHeight = 5.dp
 private val LearningInstructionHeight = 44.dp

@@ -105,6 +105,58 @@ class CreateCardViewModelTest : FunSpec() {
             }
         }
 
+        test("200장을 채운 뒤 추가를 시도하면 안내를 emit 하고 입력을 보존한다") {
+            runTest(dispatcher) {
+                val viewModel = createViewModel()
+
+                repeat(CardInputLimits.MAX_CARDS) { index ->
+                    viewModel.intent(CreateCardIntent.UpdateFront("front-$index"))
+                    viewModel.intent(CreateCardIntent.UpdateBack("back-$index"))
+                    viewModel.intent(CreateCardIntent.ClickAddCard)
+                    advanceUntilIdle()
+                }
+                viewModel.intent(CreateCardIntent.UpdateFront("overflow-front"))
+                viewModel.intent(CreateCardIntent.UpdateBack("overflow-back"))
+                advanceUntilIdle()
+
+                viewModel.sideEffect.test {
+                    viewModel.intent(CreateCardIntent.ClickAddCard)
+                    advanceUntilIdle()
+
+                    awaitItem() shouldBe CreateCardSideEffect.ShowMaxCardsReached
+                }
+
+                viewModel.state.value.addedCards.size shouldBe CardInputLimits.MAX_CARDS
+                viewModel.state.value.front shouldBe "overflow-front"
+                viewModel.state.value.back shouldBe "overflow-back"
+            }
+        }
+
+        test("199장에서 카드 추가를 빠르게 두 번 눌러도 200장을 초과하지 않는다") {
+            runTest(dispatcher) {
+                val viewModel = createViewModel()
+
+                repeat(CardInputLimits.MAX_CARDS - 1) { index ->
+                    viewModel.intent(CreateCardIntent.UpdateFront("front-$index"))
+                    viewModel.intent(CreateCardIntent.UpdateBack("back-$index"))
+                    viewModel.intent(CreateCardIntent.ClickAddCard)
+                }
+                advanceUntilIdle()
+
+                viewModel.intent(CreateCardIntent.UpdateFront("last-front"))
+                viewModel.intent(CreateCardIntent.UpdateBack("last-back"))
+                viewModel.intent(CreateCardIntent.ClickAddCard)
+                viewModel.intent(CreateCardIntent.ClickAddCard)
+                advanceUntilIdle()
+
+                viewModel.state.value.addedCards.size shouldBe CardInputLimits.MAX_CARDS
+                viewModel.state.value.addedCards
+                    .last()
+                    .content shouldBe
+                    CardContent(front = "last-front", back = "last-back")
+            }
+        }
+
         test("ClickRemoveCard 는 해당 id 의 카드를 제거한다") {
             runTest(dispatcher) {
                 val viewModel = createViewModel()
@@ -227,7 +279,7 @@ class CreateCardViewModelTest : FunSpec() {
             }
         }
 
-        test("ClickBack 은 NavigateBack 을 emit 한다") {
+        test("입력이 없으면 ClickBack 은 바로 NavigateBack 을 emit 한다") {
             runTest(dispatcher) {
                 val viewModel = createViewModel()
 
@@ -237,6 +289,96 @@ class CreateCardViewModelTest : FunSpec() {
 
                     awaitItem() shouldBe CreateCardSideEffect.NavigateBack
                 }
+                viewModel.state.value.isDiscardDialogVisible shouldBe false
+            }
+        }
+
+        test("입력 중인 텍스트가 있으면 ClickBack 은 확인 다이얼로그만 띄운다") {
+            runTest(dispatcher) {
+                val viewModel = createViewModel()
+
+                viewModel.sideEffect.test {
+                    viewModel.intent(CreateCardIntent.UpdateFront("Run"))
+                    viewModel.intent(CreateCardIntent.ClickBack)
+                    advanceUntilIdle()
+
+                    expectNoEvents()
+                }
+                viewModel.state.value.isDiscardDialogVisible shouldBe true
+            }
+        }
+
+        test("추가된 카드가 있으면 ClickBack 은 확인 다이얼로그를 띄우고 ConfirmDiscard 로 나간다") {
+            runTest(dispatcher) {
+                val viewModel = createViewModel()
+
+                viewModel.intent(CreateCardIntent.UpdateFront("Run"))
+                viewModel.intent(CreateCardIntent.UpdateBack("달리다"))
+                viewModel.intent(CreateCardIntent.ClickAddCard)
+                viewModel.intent(CreateCardIntent.ClickBack)
+                advanceUntilIdle()
+
+                viewModel.state.value.isDiscardDialogVisible shouldBe true
+
+                viewModel.sideEffect.test {
+                    viewModel.intent(CreateCardIntent.ConfirmDiscard)
+                    advanceUntilIdle()
+
+                    awaitItem() shouldBe CreateCardSideEffect.NavigateBack
+                }
+            }
+        }
+
+        test("ConfirmDiscard 를 연타해도 NavigateBack 은 한 번만 발생한다") {
+            runTest(dispatcher) {
+                val viewModel = createViewModel()
+
+                viewModel.intent(CreateCardIntent.UpdateFront("Run"))
+                viewModel.intent(CreateCardIntent.ClickBack)
+                advanceUntilIdle()
+
+                viewModel.sideEffect.test {
+                    viewModel.intent(CreateCardIntent.ConfirmDiscard)
+                    viewModel.intent(CreateCardIntent.ConfirmDiscard)
+                    advanceUntilIdle()
+
+                    awaitItem() shouldBe CreateCardSideEffect.NavigateBack
+                    expectNoEvents()
+                }
+                viewModel.state.value.isDiscardDialogVisible shouldBe false
+            }
+        }
+
+        test("DismissDiscardDialog 는 다이얼로그만 닫고 화면을 유지한다") {
+            runTest(dispatcher) {
+                val viewModel = createViewModel()
+
+                viewModel.intent(CreateCardIntent.UpdateFront("Run"))
+                viewModel.intent(CreateCardIntent.ClickBack)
+                advanceUntilIdle()
+
+                viewModel.sideEffect.test {
+                    viewModel.intent(CreateCardIntent.DismissDiscardDialog)
+                    advanceUntilIdle()
+
+                    expectNoEvents()
+                }
+                viewModel.state.value.isDiscardDialogVisible shouldBe false
+                viewModel.state.value.front shouldBe "Run"
+            }
+        }
+
+        test("FIELD_MAX 에 도달하면 isFrontMaxReached 가 true 다") {
+            runTest(dispatcher) {
+                val viewModel = createViewModel()
+
+                viewModel.intent(CreateCardIntent.UpdateFront("가".repeat(CardInputLimits.FIELD_MAX - 1)))
+                advanceUntilIdle()
+                viewModel.state.value.isFrontMaxReached shouldBe false
+
+                viewModel.intent(CreateCardIntent.UpdateFront("가".repeat(CardInputLimits.FIELD_MAX + 10)))
+                advanceUntilIdle()
+                viewModel.state.value.isFrontMaxReached shouldBe true
             }
         }
     }
