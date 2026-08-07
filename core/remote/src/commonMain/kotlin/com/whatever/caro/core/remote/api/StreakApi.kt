@@ -5,9 +5,9 @@ import de.jensklingenberg.ktorfit.http.GET
 import de.jensklingenberg.ktorfit.http.POST
 
 internal interface StreakApi {
-    @GET("v1/streaks")
+    @GET("streaks")
     suspend fun requestStreak(): StreakResponse
 
-    @POST("v1/streaks/sync")
+    @POST("streaks/sync")
     suspend fun requestSyncStreak()
 }

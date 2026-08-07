@@ -13,18 +13,18 @@ import de.jensklingenberg.ktorfit.http.Path
 import de.jensklingenberg.ktorfit.http.Query
 
 internal interface StudySessionApi {
-    @GET("v1/study-sessions/daily/summary")
+    @GET("study-sessions/daily/summary")
     suspend fun requestTodayDailyStudySummary(
         @Query("deckId") deckId: Long,
     ): DailyStudySummaryResponse
 
-    @POST("v1/study-sessions/daily")
+    @POST("study-sessions/daily")
     suspend fun requestStartDailyStudy(
         @Header("Idempotency-Key") idempotencyKey: String,
         @Body request: StartDailyStudyRequest,
     ): DailyStudyResponse
 
-    @POST("v1/study-sessions/{sessionId}/evaluations")
+    @POST("study-sessions/{sessionId}/evaluations")
     suspend fun requestEvaluate(
         @Path("sessionId") sessionId: Long,
         @Header("Idempotency-Key") idempotencyKey: String,

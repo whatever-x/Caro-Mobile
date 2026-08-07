@@ -15,29 +15,29 @@ import de.jensklingenberg.ktorfit.http.POST
 import de.jensklingenberg.ktorfit.http.Path
 
 internal interface CardApi {
-    @POST("v1/decks/{deckId}/cards")
+    @POST("decks/{deckId}/cards")
     suspend fun requestCreateCards(
         @Path("deckId") deckId: Long,
         @Body request: CreateCardsRequest,
     ): CreateCardsResponse
 
-    @GET("v1/decks/{deckId}/cards")
+    @GET("decks/{deckId}/cards")
     suspend fun requestCardsByDeck(
         @Path("deckId") deckId: Long,
     ): List<CardResponse>
 
-    @GET("v1/cards/{id}")
+    @GET("cards/{id}")
     suspend fun requestCard(
         @Path("id") id: Long,
     ): CardResponse
 
-    @PATCH("v1/cards/{id}")
+    @PATCH("cards/{id}")
     suspend fun requestUpdateCard(
         @Path("id") id: Long,
         @Body request: UpdateCardRequest,
     ): UpdateCardResponse
 
-    @DELETE("v1/cards")
+    @DELETE("cards")
     suspend fun requestDeleteCards(
         @Body request: DeleteCardsRequest,
     ): DeleteCardResponse

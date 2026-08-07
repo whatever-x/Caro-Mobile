@@ -10,24 +10,24 @@ import de.jensklingenberg.ktorfit.http.DELETE
 import de.jensklingenberg.ktorfit.http.POST
 
 internal interface AuthApi {
-    @POST("v1/auth/social-login")
+    @POST("auth/social-login")
     suspend fun requestSocialLogin(
         @Body request: SocialLoginRequest,
     ): SocialLoginResponse
 
-    @POST("v1/auth/refresh")
+    @POST("auth/refresh")
     suspend fun requestRefreshToken(
         @Body request: RefreshTokenRequest,
     ): TokenResponse
 
-    @POST("v1/auth/complete-registration")
+    @POST("auth/complete-registration")
     suspend fun requestCompleteRegistration(
         @Body request: CompleteRegistrationRequest,
     ): TokenResponse
 
-    @POST("v1/auth/logout")
+    @POST("auth/logout")
     suspend fun requestLogout()
 
-    @DELETE("v1/auth/withdraw")
+    @DELETE("auth/withdraw")
     suspend fun requestWithdraw()
 }

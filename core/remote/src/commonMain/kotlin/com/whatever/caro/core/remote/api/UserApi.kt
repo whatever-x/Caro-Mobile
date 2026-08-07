@@ -10,15 +10,15 @@ import de.jensklingenberg.ktorfit.http.PATCH
 import de.jensklingenberg.ktorfit.http.Path
 
 internal interface UserApi {
-    @GET("v1/users/me/info")
+    @GET("users/me/info")
     suspend fun requestMyInfo(): MyInfoResponse
 
-    @GET("v1/users/nicknames/{nickname}/availability")
+    @GET("users/nicknames/{nickname}/availability")
     suspend fun requestCheckNicknameAvailability(
         @Path("nickname") nickname: String,
     ): NicknameCheckResponse
 
-    @PATCH("v1/users/me/nickname")
+    @PATCH("users/me/nickname")
     suspend fun requestUpdateNickname(
         @Body request: UpdateNicknameRequest,
     ): UpdateNicknameResponse

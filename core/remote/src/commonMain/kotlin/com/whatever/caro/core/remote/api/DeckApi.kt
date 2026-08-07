@@ -16,26 +16,26 @@ import de.jensklingenberg.ktorfit.http.Path
 import de.jensklingenberg.ktorfit.http.Query
 
 internal interface DeckApi {
-    @GET("v1/decks")
+    @GET("decks")
     suspend fun requestDecks(): List<DeckListResponse>
 
-    @POST("v1/decks")
+    @POST("decks")
     suspend fun requestCreateDeck(
         @Body request: CreateDeckRequest,
     ): CreateDeckResponse
 
-    @PATCH("v1/decks/{deckId}")
+    @PATCH("decks/{deckId}")
     suspend fun requestUpdateDeck(
         @Path("deckId") deckId: Long,
         @Body request: UpdateDeckRequest,
     ): UpdateDeckResponse
 
-    @DELETE("v1/decks/{deckId}")
+    @DELETE("decks/{deckId}")
     suspend fun requestDeleteDeck(
         @Path("deckId") deckId: Long,
     ): DeleteDeckResponse
 
-    @GET("v2/decks/{deckId}/cards")
+    @GET("decks/{deckId}/cards")
     suspend fun requestCardsByDeck(
         @Path("deckId") deckId: Long,
         @Query("sortType") sortType: String?,
