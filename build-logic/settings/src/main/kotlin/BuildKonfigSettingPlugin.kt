@@ -5,13 +5,19 @@ class BuildKonfigSettingPlugin : Plugin<Settings> {
 
     override fun apply(target: Settings) {
         with(target) {
-            val cli = gradle.startParameter.projectProperties["buildkonfig.flavor"]
-            val inferred = inferFromTasks(gradle.startParameter.taskNames)
+            val cli = gradle.startParameter
+                .projectProperties["buildkonfig.flavor"]
+
+            val inferred = inferFromTasks(
+                gradle.startParameter.taskNames,
+            )
 
             gradle.beforeProject {
                 val value = cli ?: inferred ?: return@beforeProject
 
-                if (path == ":") println("buildkonfig.flavor decided = $value")
+                if (path == ":") {
+                    println("buildkonfig.flavor decided = $value")
+                }
 
                 if (findProperty("buildkonfig.flavor") == null) {
                     extensions.extraProperties["buildkonfig.flavor"] = value
@@ -21,44 +27,38 @@ class BuildKonfigSettingPlugin : Plugin<Settings> {
     }
 
     private fun inferFromTasks(taskNames: List<String>): String? {
-        val tasks = taskNames.joinToString(" ")
+        val tasks = taskNames.map {
+            it.substringAfterLast(":")
+        }
 
-        fun has(vararg patterns: String): Boolean =
-            patterns.any { Regex(it, RegexOption.IGNORE_CASE).containsMatchIn(tasks) }
+        val flavors = buildSet {
+            if (tasks.any { it.containsVariant("Dev") }) {
+                add("dev")
+            }
 
-        return when {
-            has(
-                """:androidApp:.*\bDev\b""",
-                """\bassembleDevDebug\b""",
-                """\bassembleDevRelease\b""",
-                """\binstallDevDebug\b""",
-                """\binstallDevRelease\b""",
-                """\btestDevDebug\b""",
-                """\btestDevRelease\b""",
-            ) -> "dev"
+            if (tasks.any { it.containsVariant("Qa") }) {
+                add("qa")
+            }
 
-            has(
-                """:androidApp:.*\bQa\b""",
-                """\bassembleQaDebug\b""",
-                """\bassembleQaRelease\b""",
-                """\binstallQaDebug\b""",
-                """\binstallQaRelease\b""",
-                """\btestQaDebug\b""",
-                """\btestQaRelease\b""",
-            ) -> "qa"
+            if (tasks.any { it.containsVariant("Prod") }) {
+                add("prod")
+            }
+        }
 
-            has(
-                """:androidApp:.*\bProd\b""",
-                """\bassembleProdDebug\b""",
-                """\bassembleProdRelease\b""",
-                """\binstallProdDebug\b""",
-                """\binstallProdRelease\b""",
-                """\btestProdDebug\b""",
-                """\btestProdRelease\b""",
-            ) -> "prod"
+        return when (flavors.size) {
+            0 -> null
 
-            else -> null
+            1 -> flavors.single()
+
+            else -> error(
+                "Multiple BuildKonfig flavors detected: $flavors. " +
+                        "Specify one explicitly with " +
+                        "-Pbuildkonfig.flavor=<dev|qa|prod>"
+            )
         }
     }
 
+    private fun String.containsVariant(flavor: String): Boolean =
+        contains("${flavor}Debug", ignoreCase = true) ||
+                contains("${flavor}Release", ignoreCase = true)
 }
