@@ -85,6 +85,7 @@
 				E9890E3B2F9646BB00C7B318 /* Copy Firebase Config */,
 				93D351359868C2117AA3B653 /* Sources */,
 				2635DAEAD9BE729AAE3F244F /* Frameworks */,
+				E910D8E03025FBE500E79D29 /* Upload Crashlytics dSYM */,
 			);
 			buildRules = (
 			);
@@ -181,6 +182,30 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "if [ \"YES\" = \"$OVERRIDE_KOTLIN_BUILD_IDE_SUPPORTED\" ]; then\n  echo \"Skipping Gradle build task invocation due to OVERRIDE_KOTLIN_BUILD_IDE_SUPPORTED environment variable set to \\\"YES\\\"\"\n  exit 0\nfi\n\ncd \"$SRCROOT/..\"\n\nif [[ \"$CONFIGURATION\" == *\"Release\"* ]]; then\n    export KOTLIN_FRAMEWORK_BUILD_TYPE=\"release\"\nelse\n    export KOTLIN_FRAMEWORK_BUILD_TYPE=\"debug\"\nfi\n# 💡 [여기까지 추가]\n\n./gradlew :composeApp:embedAndSignAppleFrameworkForXcode\n";
+		};
+		E910D8E03025FBE500E79D29 /* Upload Crashlytics dSYM */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}",
+				"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}/Contents/Resources/DWARF/${PRODUCT_NAME}",
+				"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}/Contents/Info.plist",
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/GoogleService-Info.plist",
+				"$(TARGET_BUILD_DIR)/$(EXECUTABLE_PATH)",
+			);
+			name = "Upload Crashlytics dSYM";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "CRASHLYTICS_RUN=\"${BUILD_DIR%Build/*}/SourcePackages/checkouts/firebase-ios-sdk/Crashlytics/run\"\n\nif [ ! -f \"$CRASHLYTICS_RUN\" ]; then\n    echo \"❌ Firebase Crashlytics run script를 찾을 수 없습니다.\"\n    echo \"경로: $CRASHLYTICS_RUN\"\n    exit 1\nfi\n\necho \"✅ Crashlytics run script: $CRASHLYTICS_RUN\"\n\n\"$CRASHLYTICS_RUN\"\n";
 		};
 		E9890E3B2F9646BB00C7B318 /* Copy Firebase Config */ = {
 			isa = PBXShellScriptBuildPhase;
