@@ -205,7 +205,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "CRASHLYTICS_RUN=\"${BUILD_DIR%Build/*}/SourcePackages/checkouts/firebase-ios-sdk/Crashlytics/run\"\n\nif [ ! -f \"$CRASHLYTICS_RUN\" ]; then\n    echo \"❌ Firebase Crashlytics run script를 찾을 수 없습니다.\"\n    echo \"경로: $CRASHLYTICS_RUN\"\n    exit 1\nfi\n\necho \"✅ Crashlytics run script: $CRASHLYTICS_RUN\"\n\n\"$CRASHLYTICS_RUN\"\n";
+			shellScript = "if [[ \"$PLATFORM_NAME\" == \"iphonesimulator\" || \"$CONFIGURATION\" != *\"Release\"* ]]; then\n    echo \"Crashlytics dSYM upload skipped for $CONFIGURATION on $PLATFORM_NAME\"\n    exit 0\nfi\n\nCRASHLYTICS_RUN=\"${BUILD_DIR%Build/*}/SourcePackages/checkouts/firebase-ios-sdk/Crashlytics/run\"\n\nif [ ! -f \"$CRASHLYTICS_RUN\" ]; then\n    echo \"❌ Firebase Crashlytics run script를 찾을 수 없습니다.\"\n    echo \"경로: $CRASHLYTICS_RUN\"\n    exit 1\nfi\n\necho \"✅ Crashlytics run script: $CRASHLYTICS_RUN\"\n\n\"$CRASHLYTICS_RUN\"\n";
 		};
 		E9890E3B2F9646BB00C7B318 /* Copy Firebase Config */ = {
 			isa = PBXShellScriptBuildPhase;
