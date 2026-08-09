@@ -20,6 +20,7 @@ repositories {
 
 dependencies {
     compileOnly(libs.bundles.build.logic.plugins)
+    compileOnly(libs.kmp.spm.gradleplugin)
 }
 
 java {
@@ -50,6 +51,10 @@ gradlePlugin {
         register("kmpIos") {
             id = "caro.kmp.ios"
             implementationClass = "KmpIosPlugin"
+        }
+        register("kmpIosSpm") {
+            id = "caro.kmp.ios.spm"
+            implementationClass = "KmpIosSpmPlugin"
         }
         register("kotlinSerialization") {
             id = "caro.kotlin.serialization"

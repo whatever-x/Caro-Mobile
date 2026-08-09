@@ -5,6 +5,8 @@ plugins {
     id("caro.cmp")
     id("caro.koin")
     id("caro.kmp.test")
+    alias(libs.plugins.kmp.spm)
+    id("caro.kmp.ios.spm")
 }
 
 kotlin {

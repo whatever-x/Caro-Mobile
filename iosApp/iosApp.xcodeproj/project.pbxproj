@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		E997A36230284A7C00B40CBC /* CaroNativeDependencies in Frameworks */ = {isa = PBXBuildFile; productRef = E997A36130284A7C00B40CBC /* CaroNativeDependencies */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		3E06E91E468A67CBE7F646FC /* iosApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iosApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -45,6 +49,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E997A36230284A7C00B40CBC /* CaroNativeDependencies in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -90,6 +95,7 @@
 			);
 			name = iosApp;
 			packageProductDependencies = (
+				E997A36130284A7C00B40CBC /* CaroNativeDependencies */,
 			);
 			productName = iosApp;
 			productReference = 3E06E91E468A67CBE7F646FC /* iosApp.app */;
@@ -120,6 +126,7 @@
 			mainGroup = 78BDD31C79EA60842533B039;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
+				E997A36030284A7B00B40CBC /* XCLocalSwiftPackageReference "../composeApp/exportedIosArm64" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = FA83853C7BB573C5EFE88810 /* Products */;
@@ -236,6 +243,10 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 0.9.2;
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-ObjC",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.whatever.caro.dev;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -341,6 +352,10 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 0.9.2;
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-ObjC",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.whatever.caro;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -446,6 +461,10 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 0.9.2;
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-ObjC",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.whatever.caro.qa;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -551,6 +570,10 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 0.9.2;
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-ObjC",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.whatever.caro;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -708,6 +731,10 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 0.9.2;
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-ObjC",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.whatever.caro.dev;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -806,6 +833,10 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 0.9.2;
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-ObjC",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.whatever.caro.qa;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -846,6 +877,20 @@
 			defaultConfigurationName = DevDebug;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		E997A36030284A7B00B40CBC /* XCLocalSwiftPackageReference "../composeApp/exportedIosArm64" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../composeApp/exportedIosArm64;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		E997A36130284A7C00B40CBC /* CaroNativeDependencies */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = CaroNativeDependencies;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 3A843BE3CB8F6534283C4600 /* Project object */;
 }

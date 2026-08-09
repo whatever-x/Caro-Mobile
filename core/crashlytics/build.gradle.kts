@@ -1,5 +1,4 @@
-import io.github.frankois944.spmForKmp.swiftPackageConfig
-import java.net.URI
+import com.whatever.caro.configureFirebaseCrashlytics
 
 plugins {
     id("caro.kmp")
@@ -14,19 +13,7 @@ kotlin {
         iosArm64(),
         iosSimulatorArm64(),
     ).forEach { iosTarget ->
-        iosTarget.swiftPackageConfig {
-            minIos = "15.0"
-
-            dependency {
-                remotePackageVersion(
-                    url = URI("https://github.com/firebase/firebase-ios-sdk"),
-                    version = "12.14.0",
-                    products = {
-                        add("FirebaseCrashlytics", exportToKotlin = true)
-                    },
-                )
-            }
-        }
+        iosTarget.configureFirebaseCrashlytics()
     }
 
     android {
