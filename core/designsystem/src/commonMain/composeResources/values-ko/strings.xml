@@ -54,6 +54,9 @@
     <string name="deck_detail_title_empty_guid">첫 카드를 만들어\n학습을 시작하세요</string>
     <string name="deck_detail_sub_title_empty_guid">카드를 추가하면 매일 자동으로\n학습 일정이 만들어집니다</string>
     <string name="deck_detail_button_empty_guid">첫 카드 추가하기</string>
+    <string name="deck_detail_title_card_load_error">카드를 불러오지 못했어요</string>
+    <string name="deck_detail_sub_title_card_load_error">연결 상태를 확인하고\n다시 시도해 주세요</string>
+    <string name="deck_detail_button_card_load_error_retry">다시 시도</string>
     <string name="deck_detail_title_daily_learning">하루 학습</string>
     <string name="deck_detail_sub_title_daily_learning">학습한 카드</string>
     <string name="deck_detail_caption_daily_learning_ready">일일 학습을 시작해봐요 🌱</string>
