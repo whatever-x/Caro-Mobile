@@ -1,10 +1,6 @@
-@file:OptIn(ExperimentalSpmForKmpFeature::class)
-
 import com.codingfeline.buildkonfig.compiler.FieldSpec
-import io.github.frankois944.spmForKmp.swiftPackageConfig
-import io.github.frankois944.spmForKmp.utils.ExperimentalSpmForKmpFeature
+import com.whatever.caro.configureGoogleSignIn
 import org.jetbrains.compose.internal.utils.getLocalProperty
-import java.net.URI
 
 plugins {
     id("caro.kmp")
@@ -24,20 +20,7 @@ kotlin {
         iosArm64(),
         iosSimulatorArm64(),
     ).forEach { iosTarget ->
-        iosTarget.swiftPackageConfig {
-            minIos = "15.0"
-
-            dependency {
-                remotePackageVersion(
-                    url = URI("https://github.com/google/GoogleSignIn-iOS"),
-                    version = "9.1.0",
-                    products = {
-                        add("GoogleSignIn", exportToKotlin = true)
-                        add("GoogleSignInSwift", exportToKotlin = true)
-                    },
-                )
-            }
-        }
+        iosTarget.configureGoogleSignIn()
     }
 
     android {

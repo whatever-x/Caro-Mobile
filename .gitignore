@@ -36,6 +36,18 @@ core/database/schemas
 **/xcshareddata/WorkspaceSettings.xcsettings
 *.xcconfig
 
+# Generated spm4Kmp package; Xcode uses the tracked iosArm64 manifest for both SDKs.
+/composeApp/exportedIosSimulatorArm64/
+
+# Share only the SwiftPM lockfile from Xcode's generated workspace.
+!iosApp/iosApp.xcodeproj/project.xcworkspace/
+iosApp/iosApp.xcodeproj/project.xcworkspace/*
+!iosApp/iosApp.xcodeproj/project.xcworkspace/xcshareddata/
+iosApp/iosApp.xcodeproj/project.xcworkspace/xcshareddata/*
+!iosApp/iosApp.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/
+iosApp/iosApp.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/*
+!iosApp/iosApp.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
+
 # Swagger Skil
 .claude/skills/swagger-sync/.swagger-credentials
 openapi.json
