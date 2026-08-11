@@ -1,0 +1,37 @@
+platform :ios do
+  lane :dev_match do
+    match(
+      type: "development",
+      app_identifier: ["com.whatever.caro.dev"],
+      readonly: true
+    )
+  end
+
+  lane :qa_match do
+    match(
+      type: "development",
+      app_identifier: ["com.whatever.caro.qa"],
+      readonly: true
+    )
+
+    match(
+      type: "appstore",
+      app_identifier: ["com.whatever.caro.qa"],
+      readonly: true
+    )
+  end
+
+  lane :prod_match do
+    match(
+      type: "development",
+      app_identifier: ["com.whatever.caro"],
+      readonly: true
+    )
+
+    match(
+      type: "appstore",
+      app_identifier: ["com.whatever.caro"],
+      readonly: true
+    )
+  end
+end

@@ -1,0 +1,45 @@
+name: Slack Branch Notifier
+
+on:
+  push:
+  create:
+    branches:
+  delete:
+    branches:
+
+jobs:
+  # ✅ 브랜치 생성
+  notify-branch-created:
+    if: |
+      github.event.ref_type == 'branch' &&
+      github.event_name == 'create'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/slack_notifier/branch/branch-created
+        with:
+          slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+  # ✅ 브랜치 삭제
+  notify-branch-deleted:
+    if: |
+      github.event.ref_type == 'branch' &&
+      github.event_name == 'delete'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/slack_notifier/branch/branch-deleted
+        with:
+          slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+  # ✅ 커밋 푸시
+  notify-push-commit:
+    if: |
+      github.event_name == 'push' &&
+      startsWith(github.ref, 'refs/heads/')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/slack_notifier/branch/branch-push-commit
+        with:
+          slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}

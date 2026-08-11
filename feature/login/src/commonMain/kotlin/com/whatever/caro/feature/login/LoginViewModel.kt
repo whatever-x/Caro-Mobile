@@ -1,0 +1,107 @@
+package com.whatever.caro.feature.login
+
+import com.whatever.caro.core.data.repository.auth.AuthRepository
+import com.whatever.caro.core.model.auth.SocialLoginType
+import com.whatever.caro.core.model.exception.CaroServerException
+import com.whatever.caro.core.model.exception.NetworkException
+import com.whatever.caro.core.viewmodel.BaseViewModel
+import com.whatever.caro.core.viewmodel.ExceptionFilter
+import com.whatever.caro.feature.login.model.AppleUser
+import com.whatever.caro.feature.login.model.GoogleUser
+import com.whatever.caro.feature.login.model.LoginError
+import com.whatever.caro.feature.login.model.SocialLoginResult
+import com.whatever.caro.feature.login.mvi.LoginIntent
+import com.whatever.caro.feature.login.mvi.LoginSideEffect
+import com.whatever.caro.feature.login.mvi.LoginState
+import io.github.aakira.napier.Napier
+
+class LoginViewModel(
+    private val authRepository: AuthRepository,
+    exceptionFilter: ExceptionFilter,
+) : BaseViewModel<LoginState, LoginIntent, LoginSideEffect>(
+        initialState = LoginState(),
+        exceptionFilter = exceptionFilter,
+    ) {
+    override fun handleClientException(throwable: Throwable) {
+        Napier.e(throwable = throwable) { "login failed: ${throwable.message}" }
+        reduce { copy(isLoading = false) }
+        val error =
+            when (throwable) {
+                is NetworkException -> LoginError.NETWORK
+                is CaroServerException -> LoginError.SERVER
+                else -> LoginError.UNKNOWN
+            }
+        postSideEffect(LoginSideEffect.ShowErrorSnackbar(error = error))
+    }
+
+    override suspend fun handleIntent(intent: LoginIntent) {
+        when (intent) {
+            is LoginIntent.ClickSocialLoginButton -> launchAuthentication(intent.type)
+            is LoginIntent.ClickGoogleLoginButton -> loginWithGoogle(intent)
+            is LoginIntent.ClickAppleLoginButton -> loginWithApple(intent)
+        }
+    }
+
+    private fun launchAuthentication(type: SocialLoginType) {
+        if (type == SocialLoginType.NONE || currentState.isLoading) return
+        reduce { copy(isLoading = true) }
+        postSideEffect(LoginSideEffect.LaunchSocialAuthentication(type))
+    }
+
+    private suspend fun loginWithGoogle(intent: LoginIntent.ClickGoogleLoginButton) {
+        when (intent.result) {
+            SocialLoginResult.Failed -> {
+                reduce { copy(isLoading = false) }
+                postSideEffect(LoginSideEffect.ShowErrorSnackbar(error = LoginError.UNKNOWN))
+            }
+
+            SocialLoginResult.UserCancelled -> {
+                reduce { copy(isLoading = false) }
+                postSideEffect(LoginSideEffect.ShowErrorSnackbar(error = LoginError.USER_CANCELLED))
+            }
+
+            is SocialLoginResult.Success<GoogleUser> -> {
+                requestLogin(
+                    provider = SocialLoginType.GOOGLE,
+                    idToken = intent.result.authResult.idToken,
+                )
+            }
+        }
+    }
+
+    private suspend fun loginWithApple(intent: LoginIntent.ClickAppleLoginButton) {
+        when (intent.result) {
+            SocialLoginResult.Failed -> {
+                reduce { copy(isLoading = false) }
+                postSideEffect(LoginSideEffect.ShowErrorSnackbar(error = LoginError.UNKNOWN))
+            }
+
+            SocialLoginResult.UserCancelled -> {
+                reduce { copy(isLoading = false) }
+                postSideEffect(LoginSideEffect.ShowErrorSnackbar(error = LoginError.USER_CANCELLED))
+            }
+
+            is SocialLoginResult.Success<AppleUser> -> {
+                requestLogin(
+                    provider = SocialLoginType.APPLE,
+                    idToken = intent.result.authResult.idToken,
+                )
+            }
+        }
+    }
+
+    private suspend fun requestLogin(
+        provider: SocialLoginType,
+        idToken: String,
+    ) {
+        reduce { copy(isLoading = true) }
+        val registrationResult =
+            authRepository.loginWithSocial(provider = provider, idToken = idToken)
+        reduce { copy(isLoading = false) }
+        if (registrationResult) {
+            postSideEffect(LoginSideEffect.NavigateHome)
+        } else {
+            postSideEffect(LoginSideEffect.NavigateCreateProfile)
+        }
+    }
+}

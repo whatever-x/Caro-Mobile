@@ -1,0 +1,2 @@
+apple_id(ENV["APP_STORE_ID"])
+team_id(ENV["APP_STORE_CONNECT_TEAM_ID"])

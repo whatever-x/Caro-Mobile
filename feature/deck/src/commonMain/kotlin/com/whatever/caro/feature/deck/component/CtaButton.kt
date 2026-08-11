@@ -1,0 +1,54 @@
+package com.whatever.caro.feature.deck.component
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import com.whatever.caro.core.designsystem.modifier.noRippleClickable
+import com.whatever.caro.core.designsystem.themes.CaroTheme
+
+@Composable
+internal fun CtaButton(
+    enabled: Boolean,
+    text: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val backgroundColor =
+        if (enabled) {
+            CaroTheme.color.surface.brand
+        } else {
+            CaroTheme.color.surface.disabled
+        }
+    val textColor =
+        if (enabled) {
+            CaroTheme.color.text.inverse
+        } else {
+            CaroTheme.color.text.disabled
+        }
+
+    Box(
+        modifier =
+            modifier
+                .heightIn(min = CtaButtonHeight)
+                .clip(CaroTheme.shape.xxl)
+                .background(backgroundColor)
+                .noRippleClickable(enabled = enabled, onClick = onClick)
+                .padding(
+                    horizontal = CaroTheme.spacing.xl,
+                    vertical = CaroTheme.spacing.l,
+                ),
+        contentAlignment = Alignment.Center,
+    ) {
+        Text(
+            text = text,
+            style = CaroTheme.typography.label1,
+            color = textColor,
+        )
+    }
+}

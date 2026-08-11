@@ -1,0 +1,40 @@
+name: Get ProjectV2 Item ID from PR
+
+inputs:
+  repository_token:
+    required: true
+  pr_node_id:
+    required: true
+
+outputs:
+  item_id:
+    value: ${{ steps.get.outputs.item_id }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Get item id
+      id: get
+      shell: bash
+      env:
+        REPOSITORY_TOKEN: ${{ inputs.repository_token }}
+        PR_NODE_ID: ${{ inputs.pr_node_id }}
+      run: |
+        set -euo pipefail
+
+        response="$(curl -sS -X POST \
+          -H "Authorization: Bearer ${REPOSITORY_TOKEN}" \
+          -H "Content-Type: application/json" \
+          -d "{\"query\":\"query { node(id: \\\"${PR_NODE_ID}\\\") { ... on PullRequest { projectItems(first: 10) { nodes { id } } } } }\"}" \
+          https://api.github.com/graphql)"
+
+        item_id="$(echo "${response}" | jq -r '.data.node.projectItems.nodes[0].id')"
+
+        if [ "${item_id}" != "null" ] && [ -n "${item_id}" ]; then
+          echo "✅ Successfully retrieved item ID: ${item_id}"
+          echo "item_id=${item_id}" >> "${GITHUB_OUTPUT}"
+        else
+          echo "❌ Failed to retrieve item ID. Response:"
+          echo "${response}"
+          exit 1
+        fi

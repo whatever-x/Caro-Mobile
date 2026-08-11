@@ -1,0 +1,59 @@
+# Root
+*.iml
+.kotlin/
+.gradle
+**/build/
+xcuserdata
+!src/**/build/
+local.properties
+.idea
+.DS_Store
+captures
+.externalNativeBuild
+.cxx
+*.jks
+*.aab
+*.apk
+fastlane/.env
+fastlane/report.xml
+fastlane/*.p8
+
+androidApp/google-services.json
+core/database/schemas
+*/*/exported*/*
+
+# Xcode
+**/FirebaseConfig/*
+**/GoogleService-Info.plist
+**/GoogleService-Info-Dev.plist
+**/GoogleService-Info-Qa.plist
+**/GoogleService-Info-Prod.plist
+*.xcworkspace
+*.xcuserdata/
+!*.xcworkspace/contents.xcworkspacedata
+!*.xcodeproj/project.pbxproj
+!*.xcodeproj/xcshareddata/
+**/xcshareddata/WorkspaceSettings.xcsettings
+*.xcconfig
+
+# Generated spm4Kmp package; Xcode uses the tracked iosArm64 manifest for both SDKs.
+/composeApp/exportedIosSimulatorArm64/
+
+# Share only the SwiftPM lockfile from Xcode's generated workspace.
+!iosApp/iosApp.xcodeproj/project.xcworkspace/
+iosApp/iosApp.xcodeproj/project.xcworkspace/*
+!iosApp/iosApp.xcodeproj/project.xcworkspace/xcshareddata/
+iosApp/iosApp.xcodeproj/project.xcworkspace/xcshareddata/*
+!iosApp/iosApp.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/
+iosApp/iosApp.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/*
+!iosApp/iosApp.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
+
+# Swagger Skil
+.claude/skills/swagger-sync/.swagger-credentials
+openapi.json
+openapitools.json
+cookies.txt
+build/generated/
+
+# Design/spec docs (generated locally, not tracked)
+docs/

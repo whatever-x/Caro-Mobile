@@ -1,0 +1,7 @@
+addAssignees: author
+addReviewers: true
+numberOfReviewers: 2
+reviewers:
+  - ham2174
+  - RyuSw-cs
+  - evergreentree97

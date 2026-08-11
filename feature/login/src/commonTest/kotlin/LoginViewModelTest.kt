@@ -1,0 +1,287 @@
+import app.cash.turbine.test
+import com.whatever.caro.core.data.repository.auth.AuthRepository
+import com.whatever.caro.core.model.auth.SocialLoginType
+import com.whatever.caro.core.model.exception.CaroServerException
+import com.whatever.caro.core.model.exception.NetworkException
+import com.whatever.caro.core.viewmodel.ExceptionFilter
+import com.whatever.caro.feature.login.LoginViewModel
+import com.whatever.caro.feature.login.model.AppleUser
+import com.whatever.caro.feature.login.model.GoogleUser
+import com.whatever.caro.feature.login.model.LoginError
+import com.whatever.caro.feature.login.model.SocialLoginResult
+import com.whatever.caro.feature.login.mvi.LoginIntent
+import com.whatever.caro.feature.login.mvi.LoginSideEffect
+import dev.mokkery.answering.returns
+import dev.mokkery.answering.throws
+import dev.mokkery.everySuspend
+import dev.mokkery.matcher.any
+import dev.mokkery.mock
+import dev.mokkery.verify.VerifyMode.Companion.exactly
+import dev.mokkery.verifySuspend
+import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.shouldBe
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.runCurrent
+import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
+
+@OptIn(ExperimentalCoroutinesApi::class)
+class LoginViewModelTest : FunSpec() {
+    init {
+        val testDispatcher = StandardTestDispatcher()
+
+        fun viewModelWith(
+            authRepository: AuthRepository =
+                mock {
+                    everySuspend { loginWithSocial(any(), any()) } returns true
+                },
+        ) = LoginViewModel(authRepository, ExceptionFilter.None)
+
+        beforeTest {
+            Dispatchers.setMain(testDispatcher)
+        }
+
+        afterTest {
+            Dispatchers.resetMain()
+        }
+
+        test("구글 로그인 성공 시 가입이 완료된 사용자면 NavigateHome을 방출한다") {
+            runTest(testDispatcher) {
+                val authRepository =
+                    mock<AuthRepository> {
+                        everySuspend { loginWithSocial(any(), any()) } returns true
+                    }
+                val viewModel = viewModelWith(authRepository)
+
+                viewModel.sideEffect.test {
+                    viewModel.intent(
+                        LoginIntent.ClickGoogleLoginButton(
+                            SocialLoginResult.Success(GoogleUser(idToken = "google-token")),
+                        ),
+                    )
+                    awaitItem() shouldBe LoginSideEffect.NavigateHome
+                }
+
+                viewModel.state.value.isLoading shouldBe false
+                verifySuspend {
+                    authRepository.loginWithSocial(
+                        provider = SocialLoginType.GOOGLE,
+                        idToken = "google-token",
+                    )
+                }
+            }
+        }
+
+        test("소셜 로그인 버튼을 연타해도 인증 요청은 한 번만 방출한다") {
+            runTest(testDispatcher) {
+                val viewModel = viewModelWith()
+
+                viewModel.sideEffect.test {
+                    viewModel.intent(
+                        LoginIntent.ClickSocialLoginButton(SocialLoginType.GOOGLE),
+                    )
+                    runCurrent()
+                    awaitItem() shouldBe
+                        LoginSideEffect.LaunchSocialAuthentication(SocialLoginType.GOOGLE)
+
+                    viewModel.intent(
+                        LoginIntent.ClickSocialLoginButton(SocialLoginType.APPLE),
+                    )
+                    runCurrent()
+
+                    expectNoEvents()
+                    viewModel.state.value.isLoading shouldBe true
+                }
+            }
+        }
+
+        test("애플 로그인 성공 시 가입이 완료된 사용자면 NavigateHome을 방출한다") {
+            runTest(testDispatcher) {
+                val authRepository =
+                    mock<AuthRepository> {
+                        everySuspend { loginWithSocial(any(), any()) } returns true
+                    }
+                val viewModel = viewModelWith(authRepository)
+
+                viewModel.sideEffect.test {
+                    viewModel.intent(
+                        LoginIntent.ClickAppleLoginButton(
+                            SocialLoginResult.Success(AppleUser(idToken = "apple-token")),
+                        ),
+                    )
+                    awaitItem() shouldBe LoginSideEffect.NavigateHome
+                }
+
+                verifySuspend {
+                    authRepository.loginWithSocial(
+                        provider = SocialLoginType.APPLE,
+                        idToken = "apple-token",
+                    )
+                }
+            }
+        }
+
+        test("로그인 성공 시 가입이 완료되지 않은 사용자면 NavigateCreateProfile을 방출한다") {
+            runTest(testDispatcher) {
+                val authRepository =
+                    mock<AuthRepository> {
+                        everySuspend { loginWithSocial(any(), any()) } returns false
+                    }
+                val viewModel = viewModelWith(authRepository)
+
+                viewModel.sideEffect.test {
+                    viewModel.intent(
+                        LoginIntent.ClickGoogleLoginButton(
+                            SocialLoginResult.Success(GoogleUser(idToken = "google-token")),
+                        ),
+                    )
+                    awaitItem() shouldBe LoginSideEffect.NavigateCreateProfile
+                }
+
+                viewModel.state.value.isLoading shouldBe false
+                verifySuspend {
+                    authRepository.loginWithSocial(
+                        provider = SocialLoginType.GOOGLE,
+                        idToken = "google-token",
+                    )
+                }
+            }
+        }
+
+        test("구글 로그인 결과가 Failed면 UNKNOWN 에러 스낵바를 방출하고 레포지토리를 호출하지 않는다") {
+            runTest(testDispatcher) {
+                val authRepository = mock<AuthRepository>()
+                val viewModel = viewModelWith(authRepository)
+
+                viewModel.sideEffect.test {
+                    viewModel.intent(LoginIntent.ClickGoogleLoginButton(SocialLoginResult.Failed))
+                    awaitItem() shouldBe LoginSideEffect.ShowErrorSnackbar(LoginError.UNKNOWN)
+                }
+
+                verifySuspend(exactly(0)) {
+                    authRepository.loginWithSocial(any(), any())
+                }
+            }
+        }
+
+        test("구글 로그인 결과가 UserCancelled면 USER_CANCELLED 에러 스낵바를 방출하고 레포지토리를 호출하지 않는다") {
+            runTest(testDispatcher) {
+                val authRepository = mock<AuthRepository>()
+                val viewModel = viewModelWith(authRepository)
+
+                viewModel.sideEffect.test {
+                    viewModel.intent(LoginIntent.ClickGoogleLoginButton(SocialLoginResult.UserCancelled))
+                    awaitItem() shouldBe LoginSideEffect.ShowErrorSnackbar(LoginError.USER_CANCELLED)
+                }
+
+                verifySuspend(exactly(0)) {
+                    authRepository.loginWithSocial(any(), any())
+                }
+            }
+        }
+
+        test("애플 로그인 결과가 Failed면 UNKNOWN 에러 스낵바를 방출하고 레포지토리를 호출하지 않는다") {
+            runTest(testDispatcher) {
+                val authRepository = mock<AuthRepository>()
+                val viewModel = viewModelWith(authRepository)
+
+                viewModel.sideEffect.test {
+                    viewModel.intent(LoginIntent.ClickAppleLoginButton(SocialLoginResult.Failed))
+                    awaitItem() shouldBe LoginSideEffect.ShowErrorSnackbar(LoginError.UNKNOWN)
+                }
+
+                verifySuspend(exactly(0)) {
+                    authRepository.loginWithSocial(any(), any())
+                }
+            }
+        }
+
+        test("애플 로그인 결과가 UserCancelled면 USER_CANCELLED 에러 스낵바를 방출하고 레포지토리를 호출하지 않는다") {
+            runTest(testDispatcher) {
+                val authRepository = mock<AuthRepository>()
+                val viewModel = viewModelWith(authRepository)
+
+                viewModel.sideEffect.test {
+                    viewModel.intent(LoginIntent.ClickAppleLoginButton(SocialLoginResult.UserCancelled))
+                    awaitItem() shouldBe LoginSideEffect.ShowErrorSnackbar(LoginError.USER_CANCELLED)
+                }
+
+                verifySuspend(exactly(0)) {
+                    authRepository.loginWithSocial(any(), any())
+                }
+            }
+        }
+
+        test("소셜 로그인 호출이 실패하면 UNKNOWN 스낵바를 방출하고 isLoading이 false로 복귀한다") {
+            runTest(testDispatcher) {
+                val authRepository =
+                    mock<AuthRepository> {
+                        everySuspend { loginWithSocial(any(), any()) } throws RuntimeException("network error")
+                    }
+                val viewModel = viewModelWith(authRepository)
+
+                viewModel.sideEffect.test {
+                    viewModel.intent(
+                        LoginIntent.ClickGoogleLoginButton(
+                            SocialLoginResult.Success(GoogleUser(idToken = "google-token")),
+                        ),
+                    )
+                    awaitItem() shouldBe LoginSideEffect.ShowErrorSnackbar(LoginError.UNKNOWN)
+                }
+
+                viewModel.state.value.isLoading shouldBe false
+            }
+        }
+
+        test("소셜 로그인 호출이 네트워크 오류로 실패하면 NETWORK 스낵바를 방출하고 isLoading이 false로 복귀한다") {
+            runTest(testDispatcher) {
+                val authRepository =
+                    mock<AuthRepository> {
+                        everySuspend { loginWithSocial(any(), any()) } throws
+                            NetworkException.Connection(debugMessage = "unresolved address")
+                    }
+                val viewModel = viewModelWith(authRepository)
+
+                viewModel.sideEffect.test {
+                    viewModel.intent(
+                        LoginIntent.ClickGoogleLoginButton(
+                            SocialLoginResult.Success(GoogleUser(idToken = "google-token")),
+                        ),
+                    )
+                    awaitItem() shouldBe LoginSideEffect.ShowErrorSnackbar(LoginError.NETWORK)
+                }
+
+                viewModel.state.value.isLoading shouldBe false
+            }
+        }
+
+        test("소셜 로그인 호출이 서버 오류로 실패하면 SERVER 스낵바를 방출하고 isLoading이 false로 복귀한다") {
+            runTest(testDispatcher) {
+                val authRepository =
+                    mock<AuthRepository> {
+                        everySuspend { loginWithSocial(any(), any()) } throws
+                            CaroServerException(
+                                code = "AUTH_500",
+                                message = "Server Error",
+                                debugMessage = "internal server error",
+                            )
+                    }
+                val viewModel = viewModelWith(authRepository)
+
+                viewModel.sideEffect.test {
+                    viewModel.intent(
+                        LoginIntent.ClickGoogleLoginButton(
+                            SocialLoginResult.Success(GoogleUser(idToken = "google-token")),
+                        ),
+                    )
+                    awaitItem() shouldBe LoginSideEffect.ShowErrorSnackbar(LoginError.SERVER)
+                }
+
+                viewModel.state.value.isLoading shouldBe false
+            }
+        }
+    }
+}

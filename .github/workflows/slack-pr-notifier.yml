@@ -1,0 +1,104 @@
+name: Slack PR Notifier
+
+on:
+  pull_request:
+    types: [ opened, closed ]
+  pull_request_review:
+    types: [ submitted ]
+  pull_request_review_comment:
+    types: [ created ]
+
+jobs:
+  # ✅ PR 생성 알림
+  notify-pr-opened:
+    if: |
+      github.event_name == 'pull_request' &&
+      github.event.action == 'opened'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/slack_notifier/pr/pr-opened
+        with:
+          slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+  # ✅ PR 병합 알림
+  notify-pr-merged:
+    if: |
+      github.event_name == 'pull_request' &&
+      github.event.action == 'closed' &&
+      github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/slack_notifier/pr/pr-merged
+        with:
+          slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+  # ✅ PR 강제 종료 알림
+  notify-pr-force-closed:
+    if: |
+      github.event_name == 'pull_request' &&
+      github.event.action == 'closed' &&
+      github.event.pull_request.merged == false
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/slack_notifier/pr/pr-force-closed
+        with:
+          slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+  # ✅ PR 리뷰 승인
+  notify-pr-review-approved:
+    if: |
+      github.event_name == 'pull_request_review' &&
+      github.event.action == 'submitted' &&
+      github.event.review.state == 'approved'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/slack_notifier/pr/pr-review-submitted
+        with:
+          slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
+          review_header: "✅ PR 리뷰 승인"
+
+  # ✅ PR 리뷰 변경 요청
+  notify-pr-review-changes:
+    if: |
+      github.event_name == 'pull_request_review' &&
+      github.event.action == 'submitted' &&
+      github.event.review.state == 'changes_requested'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/slack_notifier/pr/pr-review-submitted
+        with:
+          slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
+          review_header: "❗ PR 리뷰 변경 요청"
+
+  # ✅ PR 리뷰 코멘트
+  notify-pr-review-commented:
+    if: |
+      github.event_name == 'pull_request_review' &&
+      github.event.action == 'submitted' &&
+      github.event.review.state == 'commented' &&
+      github.event.review.user.type != 'Bot'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/slack_notifier/pr/pr-review-submitted
+        with:
+          slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
+          review_header: "💬 PR 리뷰 코멘트"
+
+  # ✅ PR 라인 코멘트
+  notify-pr-line-commented:
+    if: |
+      github.event_name == 'pull_request_review_comment' &&
+      github.event.action == 'created' &&
+      github.event.comment.user.type != 'Bot'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/slack_notifier/pr/pr-line-commented
+        with:
+          slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}

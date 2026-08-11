@@ -1,0 +1,181 @@
+name: Caro Mobile CI
+
+on:
+  pull_request:
+    branches: [main, develop]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint-check:
+    name: Spotless Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check Out
+        uses: actions/checkout@v6
+
+      - name: Set Up
+        uses: ./.github/actions/ci/set-up
+        with:
+          local_properties: ${{ secrets.LOCAL_PROPERTIES }}
+          google_services_json: ${{ secrets.GOOGLE_SERVICES_JSON }}
+          keystore_base64: ${{ secrets.KEYSTORE_BASE64 }}
+
+      - name: Spotless check
+        run: ./gradlew spotlessCheck --stacktrace
+
+  test-coverage:
+    name: Kover Test Coverage Measure
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - name: Check Out
+        uses: actions/checkout@v6
+
+      - name: Set Up
+        uses: ./.github/actions/ci/set-up
+        with:
+          local_properties: ${{ secrets.LOCAL_PROPERTIES }}
+          google_services_json: ${{ secrets.GOOGLE_SERVICES_JSON }}
+          keystore_base64: ${{ secrets.KEYSTORE_BASE64 }}
+
+      - name: Run test
+        run: ./gradlew allTests --build-cache --parallel
+
+      - name: Generate Kover XML
+        run: ./gradlew koverAllXmlReport --build-cache --parallel
+
+      - name: Verify coverage
+        run: ./gradlew koverAllVerify --build-cache --parallel
+
+      - name: Collect Kover XML Report Paths
+        id: report-paths
+        if: always()
+        run: |
+          echo "paths<<EOF" >> "$GITHUB_OUTPUT"
+          find . -path "*/build/reports/kover/report.xml" >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
+
+      - name: Comment coverage on PR
+        if: always()
+        uses: mi-kas/kover-report@v1.9
+        with:
+          path: ${{ steps.report-paths.outputs.paths }}
+          title: ViewModel / Repository Test Coverage
+          update-comment: true
+          min-coverage-overall: 80
+          min-coverage-changed-files: 80
+          coverage-counter-type: LINE
+
+  stability-check:
+    name: Compose Stability Check
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Check Out
+        uses: actions/checkout@v6
+
+      - name: Set Up
+        uses: ./.github/actions/ci/set-up
+        with:
+          local_properties: ${{ secrets.LOCAL_PROPERTIES }}
+          google_services_json: ${{ secrets.GOOGLE_SERVICES_JSON }}
+          keystore_base64: ${{ secrets.KEYSTORE_BASE64 }}
+
+      - name: Build Project
+        run: ./gradlew :androidApp:assembleDebug --build-cache
+
+      - name: Stability check
+        run: ./gradlew stabilityCheck
+
+  slack-notify:
+    name: Slack Notify CI Result
+    if: always()
+    runs-on: ubuntu-latest
+    needs: [lint-check, test-coverage, stability-check]
+
+    steps:
+      - name: Build Slack message
+        id: message
+        shell: bash
+        run: |
+          reasons=()
+
+          if [[ "${{ needs.lint-check.result }}" != "success" ]]; then
+            reasons+=("Lint 실패")
+          fi
+
+          if [[ "${{ needs.test-coverage.result }}" != "success" ]]; then
+            reasons+=("테스트 커버리지 미달성")
+          fi
+
+          if [[ "${{ needs.stability-check.result }}" != "success" ]]; then
+            reasons+=("Composable 불안정")
+          fi
+
+          if [[ ${#reasons[@]} -eq 0 ]]; then
+            title="PR #${{ github.event.pull_request.number }} CI 통과 :white_check_mark:"
+            reason_text="*결과*\\n모든 검사 통과"
+          else
+            title="PR #${{ github.event.pull_request.number }} CI 실패 :x:"
+            reason_text="*원인*"
+
+            for reason in "${reasons[@]}"; do
+              reason_text+="\\n- ${reason}"
+            done
+          fi
+
+          echo "title=${title}" >> "$GITHUB_OUTPUT"
+          echo "reason_text=${reason_text}" >> "$GITHUB_OUTPUT"
+
+      - name: Send Slack notification
+        uses: slackapi/slack-github-action@v2.1.1
+        with:
+          webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
+          webhook-type: incoming-webhook
+          payload: |
+            {
+              "text": "${{ steps.message.outputs.title }}",
+              "blocks": [
+                {
+                  "type": "header",
+                  "text": {
+                    "type": "plain_text",
+                    "text": "${{ steps.message.outputs.title }}",
+                    "emoji": true
+                  }
+                },
+                {
+                  "type": "divider"
+                },
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "${{ steps.message.outputs.reason_text }}"
+                  }
+                },
+                {
+                  "type": "actions",
+                  "elements": [
+                    {
+                      "type": "button",
+                      "text": {
+                        "type": "plain_text",
+                        "text": "Open PR #${{ github.event.pull_request.number }}",
+                        "emoji": true
+                      },
+                      "url": "${{ github.event.pull_request.html_url }}"
+                    }
+                  ]
+                }
+              ]
+            }

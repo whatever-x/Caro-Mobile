@@ -1,0 +1,122 @@
+import com.whatever.caro.androidApplication
+import com.whatever.caro.libs
+import com.whatever.caro.version
+import org.gradle.api.JavaVersion
+import org.gradle.api.Plugin
+import org.gradle.api.Project
+import java.io.FileInputStream
+import java.util.Properties
+
+class AndroidApplicationPlugin : Plugin<Project> {
+    override fun apply(target: Project) {
+        with(target) {
+            with(pluginManager) {
+                apply("com.android.application")
+                apply("org.jetbrains.compose")
+                apply("org.jetbrains.kotlin.plugin.compose")
+            }
+
+            androidApplication {
+                namespace?.let { this.namespace = it }
+
+                compileSdk = libs.version("android-compileSdk").toInt()
+
+                defaultConfig {
+                    minSdk = libs.version("android-minSdk").toInt()
+                    targetSdk = libs.version("android-targetSdk").toInt()
+                    versionCode = libs.version("version-code").toInt()
+                    versionName = libs.version("version-name")
+                }
+
+                buildFeatures {
+                    buildConfig = true
+                    resValues = true
+                }
+
+                packaging {
+                    resources {
+                        excludes += "/META-INF/{AL2.0,LGPL2.1}"
+                    }
+                }
+
+                compileOptions {
+                    sourceCompatibility = JavaVersion.VERSION_17
+                    targetCompatibility = JavaVersion.VERSION_17
+                }
+
+                signingConfigs {
+                    create(DEV) {
+                        val localPropsFile = rootProject.file("local.properties")
+                        if (localPropsFile.exists()) {
+                            Properties().run {
+                                load(FileInputStream(localPropsFile))
+                                (this["STORE_FILE"] as? String)?.let { storeFile = rootProject.file(it) }
+                                (this["KEY_ALIAS"] as? String)?.let { keyAlias = it }
+                                (this["KEY_PASSWORD"] as? String)?.let { keyPassword = it }
+                                (this["STORE_PASSWORD"] as? String)?.let { storePassword = it }
+                            }
+                        }
+                    }
+                    create(RELEASE) {
+                        val localPropsFile = rootProject.file("local.properties")
+                        if (localPropsFile.exists()) {
+                            Properties().run {
+                                load(FileInputStream(localPropsFile))
+                                (this["STORE_FILE"] as? String)?.let { storeFile = rootProject.file(it) }
+                                (this["KEY_ALIAS"] as? String)?.let { keyAlias = it }
+                                (this["KEY_PASSWORD"] as? String)?.let { keyPassword = it }
+                                (this["STORE_PASSWORD"] as? String)?.let { storePassword = it }
+                            }
+                        }
+                    }
+                }
+
+                flavorDimensions += "caro"
+                productFlavors {
+                    create(FLAVOR_DEV) {
+                        dimension = "caro"
+                        applicationIdSuffix = ".dev"
+                        versionNameSuffix = "-dev"
+                        resValue("string", "app_name", "Caro-Dev")
+                    }
+                    create(FLAVOR_QA) {
+                        dimension = "caro"
+                        applicationIdSuffix = ".qa"
+                        versionNameSuffix = "-qa"
+                        resValue("string", "app_name", "Caro-Qa")
+                    }
+                    create(FLAVOR_PRD) {
+                        dimension = "caro"
+                        resValue("string", "app_name", "Caro")
+                    }
+                }
+
+                buildTypes {
+                    debug {
+                        signingConfig =
+                            runCatching { signingConfigs.getByName(DEV) }.getOrDefault(
+                                signingConfigs.getByName(DEBUG)
+                            )
+                        isDebuggable = true
+                        isMinifyEnabled = false
+                    }
+
+                    release {
+                        signingConfig = signingConfigs.getByName(RELEASE)
+                        isDebuggable = false
+                        isMinifyEnabled = true
+                    }
+                }
+            }
+        }
+    }
+
+    companion object {
+        private const val DEBUG = "debug"
+        private const val DEV = "dev"
+        private const val RELEASE = "release"
+        private const val FLAVOR_QA = "qa"
+        private const val FLAVOR_DEV = "dev"
+        private const val FLAVOR_PRD = "prod"
+    }
+}

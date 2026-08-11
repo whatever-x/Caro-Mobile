@@ -1,0 +1,29 @@
+name: PR Merge Setting
+
+on:
+  pull_request:
+    types: [closed]
+
+jobs:
+  update-end-date:
+    if: ${{ github.event.pull_request.merged == true }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Retrieve Project Item ID for this PR
+        id: get_item
+        uses: ./.github/actions/project_v2/get-item-id-from-pr
+        with:
+          repository_token: ${{ secrets.REPOSITORY_TOKEN }}
+          pr_node_id: ${{ github.event.pull_request.node_id }}
+
+      - name: Update End Date field
+        uses: ./.github/actions/project_v2/set-end-date
+        with:
+          repository_token: ${{ secrets.REPOSITORY_TOKEN }}
+          project_id: ${{ secrets.PROJECT_ID }}
+          item_id: ${{ steps.get_item.outputs.item_id }}
+          end_date_field_id: ${{ secrets.END_DATE_FIELD_ID }}
+          merged_at: ${{ github.event.pull_request.merged_at }}

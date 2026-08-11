@@ -1,0 +1,43 @@
+name: Set ProjectV2 End Date
+
+inputs:
+  repository_token:
+    required: true
+  project_id:
+    required: true
+  item_id:
+    required: true
+  end_date_field_id:
+    required: true
+  merged_at:
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Update End Date field
+      shell: bash
+      env:
+        REPOSITORY_TOKEN: ${{ inputs.repository_token }}
+        PROJECT_ID: ${{ inputs.project_id }}
+        ITEM_ID: ${{ inputs.item_id }}
+        END_DATE_FIELD_ID: ${{ inputs.end_date_field_id }}
+        MERGED_AT: ${{ inputs.merged_at }}
+      run: |
+        set -euo pipefail
+
+        DATE_ONLY="$(echo "${MERGED_AT}" | cut -d'T' -f1)"
+
+        response="$(curl -sS -X POST \
+          -H "Authorization: Bearer ${REPOSITORY_TOKEN}" \
+          -H "Content-Type: application/json" \
+          -d "{\"query\":\"mutation { updateProjectV2ItemFieldValue(input: { projectId: \\\"${PROJECT_ID}\\\", itemId: \\\"${ITEM_ID}\\\", fieldId: \\\"${END_DATE_FIELD_ID}\\\", value: { date: \\\"${DATE_ONLY}\\\" } }) { clientMutationId } }\"}" \
+          https://api.github.com/graphql)"
+
+        if echo "${response}" | jq -e '.errors == null' > /dev/null; then
+          echo "✅ Successfully set End Date to ${DATE_ONLY}."
+        else
+          echo "❌ Failed to set End Date. Response:"
+          echo "${response}"
+          exit 1
+        fi
