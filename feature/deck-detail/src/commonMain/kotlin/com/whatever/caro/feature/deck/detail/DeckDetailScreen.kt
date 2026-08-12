@@ -17,6 +17,7 @@ import com.whatever.caro.core.model.deck.Deck
 import com.whatever.caro.core.model.deck.DeckState
 import com.whatever.caro.core.ui.loading.CaroLoadingOverlayBox
 import com.whatever.caro.feature.deck.detail.components.DeckDetailGuid
+import com.whatever.caro.feature.deck.detail.components.DeckDetailLoadError
 import com.whatever.caro.feature.deck.detail.components.DeckDetailTopBar
 import com.whatever.caro.feature.deck.detail.components.DeckEditBottomSheet
 import com.whatever.caro.feature.deck.detail.components.DeleteDeckDialog
@@ -49,7 +50,11 @@ internal fun DeckDetailScreen(
             )
 
             if (state.isLoadedContentVisible) {
-                if (state.isEmptyDeckCard) {
+                if (state.isCardLoadErrorVisible) {
+                    DeckDetailLoadError(
+                        onRetry = { onIntent(DeckDetailIntent.RefreshCards) },
+                    )
+                } else if (state.isEmptyDeckCard) {
                     DeckDetailGuid(
                         onAddFirstCard = { onIntent(DeckDetailIntent.ClickAddCard) },
                     )

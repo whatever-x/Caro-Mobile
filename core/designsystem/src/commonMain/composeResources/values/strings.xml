@@ -55,6 +55,9 @@
 	<string name="deck_detail_title_empty_guid">Create your first card\nto start learning</string>
 	<string name="deck_detail_sub_title_empty_guid">Add cards to create\na daily study schedule</string>
 	<string name="deck_detail_button_empty_guid">Add your first card</string>
+	<string name="deck_detail_title_card_load_error">Couldn't load cards</string>
+	<string name="deck_detail_sub_title_card_load_error">Check your connection\nand try again</string>
+	<string name="deck_detail_button_card_load_error_retry">Retry</string>
 	<string name="deck_detail_title_daily_learning">Daily Study</string>
 	<string name="deck_detail_sub_title_daily_learning">Cards studied</string>
 	<string name="deck_detail_caption_daily_learning_ready">Start today's study 🌱</string>
