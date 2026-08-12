@@ -72,7 +72,7 @@
 	<string name="deck_detail_button_all_learning">Cram mode (all cards)</string>
 	<string name="deck_detail_label_total_count">Total %1$d</string>
 	<string name="deck_detail_label_learning_card_count">%1$d cards</string>
-	<string name="deck_detail_label_learning_progress">%1$d%%</string>
+	<string name="deck_detail_label_learning_progress">%1$d%</string>
 	<string name="deck_detail_button_add_card">Add card</string>
 	<string name="deck_detail_button_edit">Edit</string>
 	<string name="deck_detail_button_card_edit">Edit</string>
