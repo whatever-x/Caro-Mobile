@@ -9,6 +9,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.key.onPreviewKeyEvent
@@ -25,8 +28,10 @@ import io.github.alexzhirkevich.compottie.Compottie
 import io.github.alexzhirkevich.compottie.LottieCompositionSpec
 import io.github.alexzhirkevich.compottie.rememberLottieComposition
 import io.github.alexzhirkevich.compottie.rememberLottiePainter
+import kotlinx.coroutines.delay
 
 private const val LOTTIE_SCREEN_LOADING_PATH = "files/lottie_screen_loading.json"
+private const val SCREEN_LOADING_VISUAL_DELAY_MILLIS = 200L
 private val ScreenLoadingSize = 90.dp
 
 @Composable
@@ -36,10 +41,13 @@ fun CaroLoadingOverlayBox(
     content: @Composable BoxScope.() -> Unit,
 ) {
     val focusManager = LocalFocusManager.current
+    var isVisualOverlayVisible by remember(isLoading) { mutableStateOf(false) }
 
     LaunchedEffect(isLoading) {
         if (isLoading) {
             focusManager.clearFocus(force = true)
+            delay(SCREEN_LOADING_VISUAL_DELAY_MILLIS)
+            isVisualOverlayVisible = true
         }
     }
 
@@ -72,9 +80,29 @@ fun CaroLoadingOverlayBox(
         )
 
         if (isLoading) {
+            LoadingInteractionBlocker()
+        }
+
+        if (isVisualOverlayVisible) {
             CaroLoadingOverlay()
         }
     }
+}
+
+@Composable
+private fun LoadingInteractionBlocker() {
+    Box(
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .pointerInput(Unit) {
+                    awaitPointerEventScope {
+                        while (true) {
+                            awaitPointerEvent().changes.forEach { it.consume() }
+                        }
+                    }
+                },
+    )
 }
 
 @Composable
