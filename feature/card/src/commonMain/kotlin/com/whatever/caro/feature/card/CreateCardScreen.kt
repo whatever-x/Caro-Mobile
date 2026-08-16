@@ -2,6 +2,7 @@ package com.whatever.caro.feature.card
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -96,8 +97,8 @@ private val TipDotSize = 4.dp
 private val HairlineThickness = 1.dp
 private val DividerThickness = 1.5.dp
 private val RemoveButtonOutsetOffset = RemoveIconSize / 2
-private val RemoveIconTopPadding = 2.dp
-private val RemoveIconEndPadding = 2.dp
+private val RemoveIconTopPadding = 4.dp
+private val RemoveIconEndPadding = 4.dp
 private const val PREVIEW_TEXT_MAX_LINES = 3
 
 @Composable
@@ -328,7 +329,7 @@ private fun SwapButton(onClick: () -> Unit) {
                         width = HairlineThickness,
                         color = CaroTheme.color.border.secondary,
                         shape = CircleShape,
-                    ).noRippleClickable(onClick = onClick),
+                    ).clickable(onClick = onClick),
             contentAlignment = Alignment.Center,
         ) {
             Icon(
