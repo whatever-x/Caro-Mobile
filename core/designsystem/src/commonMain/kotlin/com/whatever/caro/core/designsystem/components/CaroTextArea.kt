@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -29,6 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -94,6 +96,7 @@ private fun TextAreaBox(
     focusRequester: FocusRequester?,
 ) {
     val isFocused by interactionSource.collectIsFocusedAsState()
+    val isPressed by interactionSource.collectIsPressedAsState()
 
     val textColor =
         if (enabled) {
@@ -135,6 +138,18 @@ private fun TextAreaBox(
                         width = 1.dp,
                         color = borderColor,
                         shape = CaroTheme.shape.m,
+                    )
+                    // 눌리는 영역을 명시적으로 보여주기 위해 press 상태에만 반응하는 오버레이를 얹는다.
+                    // Material ripple(LocalIndication)은 focus 상태에도 계속 칠해져 입력 중에도 회색으로 보이므로 쓰지 않는다.
+                    .background(
+                        color =
+                            if (isPressed) {
+                                CaroTheme.color.text.primary
+                                    .copy(alpha = PRESSED_OVERLAY_ALPHA)
+                            } else {
+                                Color.Transparent
+                            },
+                        shape = CaroTheme.shape.m,
                     ).padding(
                         horizontal = CaroTheme.spacing.xl,
                         vertical = CaroTheme.spacing.l,
@@ -174,6 +189,8 @@ private fun TextAreaBox(
         }
     }
 }
+
+private const val PRESSED_OVERLAY_ALPHA = 0.06f
 
 private val InputBoxMinHeight = 90.dp
 

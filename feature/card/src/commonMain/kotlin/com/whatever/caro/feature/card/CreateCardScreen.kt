@@ -96,6 +96,8 @@ private val TipDotSize = 4.dp
 private val HairlineThickness = 1.dp
 private val DividerThickness = 1.5.dp
 private val RemoveButtonOutsetOffset = RemoveIconSize / 2
+private val RemoveIconTopPadding = 2.dp
+private val RemoveIconEndPadding = 2.dp
 private const val PREVIEW_TEXT_MAX_LINES = 3
 
 @Composable
@@ -494,7 +496,10 @@ private fun CardPreview(
             contentAlignment = Alignment.Center,
         ) {
             Icon(
-                modifier = Modifier.size(RemoveIconSize),
+                modifier =
+                    Modifier
+                        .padding(top = RemoveIconTopPadding, end = RemoveIconEndPadding)
+                        .size(RemoveIconSize),
                 painter = painterResource(Res.drawable.ic_x_circle_16),
                 contentDescription = stringResource(Res.string.card_content_description_remove),
                 tint = CaroTheme.color.icon.brand,
