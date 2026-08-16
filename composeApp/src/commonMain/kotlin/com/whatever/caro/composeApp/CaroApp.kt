@@ -194,6 +194,11 @@ fun CaroApp(
             }
         }
 
+        // 화면 이동 시 이전 화면에서 뜬 스낵바가 새 화면까지 남지 않도록 제거한다.
+        LaunchedEffect(currentDestination) {
+            snackBarHostState.currentSnackbarData?.dismiss()
+        }
+
         CaroSystemBarBackground(roles = systemBarBackgroundRoles) {
             Scaffold(
                 modifier = Modifier.fillMaxSize(),
