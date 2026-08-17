@@ -63,11 +63,7 @@ internal fun DeckDetailHeader(
         verticalArrangement = Arrangement.spacedBy(CaroTheme.spacing.m),
     ) {
         DailyLearningTitle(currentLearningStatus = currentLearningStatus)
-        Text(
-            text = description,
-            color = CaroTheme.color.text.secondary,
-            style = CaroTheme.typography.label2,
-        )
+        DeckDescription(description = description)
 
         if (currentLearningStatus == DeckState.REST_DAY) {
             UnavailableLearningMessage()
@@ -92,6 +88,19 @@ internal fun DeckDetailHeader(
             isPrimary = false,
         )
     }
+}
+
+@Composable
+internal fun DeckDescription(
+    description: String,
+    modifier: Modifier = Modifier,
+) {
+    Text(
+        text = description,
+        modifier = modifier,
+        color = CaroTheme.color.text.secondary,
+        style = CaroTheme.typography.label2,
+    )
 }
 
 @Composable
