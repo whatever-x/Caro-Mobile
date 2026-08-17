@@ -67,8 +67,6 @@ internal fun DeckDetailHeader(
             text = description,
             color = CaroTheme.color.text.secondary,
             style = CaroTheme.typography.label2,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
         )
 
         if (currentLearningStatus == DeckState.REST_DAY) {
