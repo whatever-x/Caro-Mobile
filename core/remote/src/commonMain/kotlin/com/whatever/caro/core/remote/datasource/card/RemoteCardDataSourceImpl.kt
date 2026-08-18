@@ -21,8 +21,6 @@ internal class RemoteCardDataSourceImpl(
             request = request,
         )
 
-    override suspend fun getCardsByDeck(deckId: Long): List<CardResponse> = cardApi.requestCardsByDeck(deckId = deckId)
-
     override suspend fun getCard(cardId: Long): CardResponse = cardApi.requestCard(id = cardId)
 
     override suspend fun updateCard(
