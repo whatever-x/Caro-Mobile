@@ -1,5 +1,6 @@
 package com.whatever.caro.core.data.mapper
 
+import com.whatever.caro.core.model.deck.DeckCardSortType
 import com.whatever.caro.core.model.deck.DeckState
 import com.whatever.caro.core.remote.dto.deck.response.DeckListResponse
 import com.whatever.caro.core.remote.dto.studySession.response.StudySessionProgressResponseDto
@@ -62,6 +63,12 @@ class DeckMapperTest : FunSpec() {
             StudySessionProgressResponseDto.StateDto.COMPLETED.toDeckState() shouldBe DeckState.COMPLETE
             StudySessionProgressResponseDto.StateDto.REST_DAY.toDeckState() shouldBe DeckState.REST_DAY
             null.toDeckState() shouldBe DeckState.NOT_STARTED
+        }
+
+        test("toSortTypeQuery는 서버가 정의한 정렬 파라미터 값으로 매핑한다") {
+            DeckCardSortType.CREATED.toSortTypeQuery() shouldBe "CREATED"
+            DeckCardSortType.LAST_REVIEWED.toSortTypeQuery() shouldBe "LAST_REVIEWED"
+            DeckCardSortType.FREQUENCY.toSortTypeQuery() shouldBe "REVIEW_FREQUENCY"
         }
     }
 }
