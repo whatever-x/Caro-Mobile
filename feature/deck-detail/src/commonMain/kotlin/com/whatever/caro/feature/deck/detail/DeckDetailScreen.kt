@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -35,6 +36,9 @@ internal fun DeckDetailScreen(
     state: DeckDetailState,
     onIntent: (DeckDetailIntent) -> Unit,
 ) {
+    // 새로고침 중에는 LazyColumn 이 컴포지션에서 빠지므로, 스크롤 위치를 화면 수준으로 끌어올려 유지한다.
+    val cardListState = rememberLazyListState()
+
     CaroLoadingOverlayBox(isLoading = state.isLoading) {
         Column(
             modifier =
@@ -63,6 +67,7 @@ internal fun DeckDetailScreen(
                         modifier =
                             Modifier
                                 .fillMaxSize(),
+                        state = cardListState,
                         overscrollEffect = null,
                     ) {
                         item {
