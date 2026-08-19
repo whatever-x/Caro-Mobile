@@ -148,7 +148,10 @@ internal fun HomeScreen(
             }
 
             if (state.isLoadedContentVisible) {
-                LazyColumn(modifier = Modifier.fillMaxWidth()) {
+                LazyColumn(
+                    modifier = Modifier.fillMaxWidth(),
+                    overscrollEffect = null,
+                ) {
                     item {
                         HomeStreakBanner(state = state)
                     }
