@@ -71,7 +71,7 @@
     <string name="deck_detail_button_all_learning">벼락치기 (전체학습)</string>
     <string name="deck_detail_label_total_count">전체 %1$d</string>
     <string name="deck_detail_label_learning_card_count">%1$d개 카드</string>
-    <string name="deck_detail_label_learning_progress">%1$d%%</string>
+    <string name="deck_detail_label_learning_progress">%1$d%</string>
     <string name="deck_detail_button_add_card">카드 추가하기</string>
     <string name="deck_detail_button_edit">편집</string>
     <string name="deck_detail_button_card_edit">수정</string>
