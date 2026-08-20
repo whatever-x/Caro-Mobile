@@ -179,7 +179,7 @@ private val InputBoxMinHeight = 90.dp
 
 // 키보드가 올라온 상태의 스크롤 뷰포트 안에 라벨·카운터까지 함께 들어가는 상한.
 // 이보다 크면 필드 하단(= 커서가 머무는 줄)이 뷰포트 밖으로 잘린다.
-private val InputBoxMaxHeight = 140.dp
+private val InputBoxMaxHeight = 130.dp
 
 @Preview
 @Composable
