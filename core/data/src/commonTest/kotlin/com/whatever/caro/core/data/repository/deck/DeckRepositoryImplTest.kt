@@ -223,5 +223,27 @@ class DeckRepositoryImplTest : FunSpec() {
                 }
             }
         }
+
+        test("getDeckCards는 복습 횟수 정렬을 서버 파라미터 REVIEW_FREQUENCY 로 전달한다") {
+            runTest {
+                val deckDataSource =
+                    mock<DeckDataSource> {
+                        everySuspend { getDeckCards(any(), any()) } returns emptyList()
+                    }
+                val repository = DeckRepositoryImpl(deckDataSource)
+
+                repository.getDeckCards(
+                    deckId = 42L,
+                    sortType = DeckCardSortType.FREQUENCY,
+                )
+
+                verifySuspend {
+                    deckDataSource.getDeckCards(
+                        deckId = 42L,
+                        sortType = "REVIEW_FREQUENCY",
+                    )
+                }
+            }
+        }
     }
 }

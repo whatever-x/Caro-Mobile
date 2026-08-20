@@ -2,6 +2,7 @@ package com.whatever.caro.core.data.repository.deck
 
 import com.whatever.caro.core.data.mapper.toDeckCardModel
 import com.whatever.caro.core.data.mapper.toDeckModel
+import com.whatever.caro.core.data.mapper.toSortTypeQuery
 import com.whatever.caro.core.model.card.DeckCard
 import com.whatever.caro.core.model.deck.Deck
 import com.whatever.caro.core.model.deck.DeckCardSortType
@@ -27,7 +28,7 @@ internal class DeckRepositoryImpl(
         sortType: DeckCardSortType,
     ): List<DeckCard> =
         deckDataSource
-            .getDeckCards(deckId = deckId, sortType = sortType.name)
+            .getDeckCards(deckId = deckId, sortType = sortType.toSortTypeQuery())
             .mapNotNull { it.toDeckCardModel() }
 
     override suspend fun createDeck(
