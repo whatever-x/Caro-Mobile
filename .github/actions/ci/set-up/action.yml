@@ -12,6 +12,10 @@ inputs:
   keystore_base64:
     description: Base64-encoded Android signing keystore.
     required: true
+  cache_read_only:
+    description: Whether the Gradle cache is read-only.
+    required: false
+    default: "true"
 
 runs:
   using: composite
@@ -58,4 +62,4 @@ runs:
     - name: Set Up Gradle
       uses: gradle/actions/setup-gradle@v5
       with:
-        cache-read-only: true
+        cache-read-only: ${{ inputs.cache_read_only }}
