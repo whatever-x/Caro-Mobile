@@ -24,6 +24,7 @@ import com.whatever.caro.feature.deck.detail.components.DeckEditBottomSheet
 import com.whatever.caro.feature.deck.detail.components.DeleteDeckDialog
 import com.whatever.caro.feature.deck.detail.components.SortBottomSheet
 import com.whatever.caro.feature.deck.detail.components.lazycolumn.AddCardButtonItem
+import com.whatever.caro.feature.deck.detail.components.lazycolumn.DeckDescription
 import com.whatever.caro.feature.deck.detail.components.lazycolumn.DeckDetailHeader
 import com.whatever.caro.feature.deck.detail.components.lazycolumn.FilterAndSortSection
 import com.whatever.caro.feature.deck.detail.components.lazycolumn.SwipeToRevealCardItem
@@ -59,9 +60,20 @@ internal fun DeckDetailScreen(
                         onRetry = { onIntent(DeckDetailIntent.RefreshCards) },
                     )
                 } else if (state.isEmptyDeckCard) {
-                    DeckDetailGuid(
-                        onAddFirstCard = { onIntent(DeckDetailIntent.ClickAddCard) },
-                    )
+                    Column(modifier = Modifier.fillMaxSize()) {
+                        DeckDescription(
+                            description = state.deck.description,
+                            modifier =
+                                Modifier.padding(
+                                    horizontal = CaroTheme.spacing.xl,
+                                    vertical = CaroTheme.spacing.xl,
+                                ),
+                        )
+                        DeckDetailGuid(
+                            onAddFirstCard = { onIntent(DeckDetailIntent.ClickAddCard) },
+                            modifier = Modifier.weight(1f),
+                        )
+                    }
                 } else {
                     LazyColumn(
                         modifier =
