@@ -199,7 +199,7 @@ class DeckDetailViewModel(
         val deckId = currentState.deck.id
         val sortOption = currentState.selectedSortOption
         reduce {
-            copy(isCardListLoading = true)
+            copy(isCardListLoading = true, isCardLoadError = false)
         }
 
         launch {
@@ -249,7 +249,7 @@ class DeckDetailViewModel(
             }.onFailure {
                 if (generation != cardLoadGeneration) return@onFailure
                 reduce {
-                    copy(isCardListLoading = false)
+                    copy(isCardListLoading = false, isCardLoadError = true)
                 }
                 postSideEffect(DeckDetailSideEffect.ShowCardLoadError)
             }

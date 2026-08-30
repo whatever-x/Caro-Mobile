@@ -55,6 +55,7 @@ import caromobile.core.designsystem.generated.resources.learning_home
 import caromobile.core.designsystem.generated.resources.learning_retry
 import caromobile.core.designsystem.generated.resources.learning_stop
 import caromobile.core.designsystem.generated.resources.learning_stop_body
+import caromobile.core.designsystem.generated.resources.learning_stop_body_daily
 import caromobile.core.designsystem.generated.resources.learning_stop_title
 import caromobile.core.designsystem.generated.resources.learning_total
 import com.whatever.caro.core.designsystem.components.CaroDialog
@@ -283,7 +284,14 @@ internal fun LearningStopDialog(
                 )
                 Spacer(Modifier.height(CaroTheme.spacing.s))
                 Text(
-                    text = stringResource(Res.string.learning_stop_body),
+                    text =
+                        stringResource(
+                            if (evaluatedCount != null) {
+                                Res.string.learning_stop_body_daily
+                            } else {
+                                Res.string.learning_stop_body
+                            },
+                        ),
                     style = CaroTheme.typography.body2.medium,
                     color = CaroTheme.color.text.secondary,
                 )

@@ -14,8 +14,6 @@ interface CardDataSource {
         request: CreateCardsRequest,
     ): CreateCardsResponse
 
-    suspend fun getCardsByDeck(deckId: Long): List<CardResponse>
-
     suspend fun getCard(cardId: Long): CardResponse
 
     suspend fun updateCard(

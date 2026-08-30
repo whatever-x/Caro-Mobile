@@ -54,6 +54,9 @@
     <string name="deck_detail_title_empty_guid">첫 카드를 만들어\n학습을 시작하세요</string>
     <string name="deck_detail_sub_title_empty_guid">카드를 추가하면 매일 자동으로\n학습 일정이 만들어집니다</string>
     <string name="deck_detail_button_empty_guid">첫 카드 추가하기</string>
+    <string name="deck_detail_title_card_load_error">카드를 불러오지 못했어요</string>
+    <string name="deck_detail_sub_title_card_load_error">연결 상태를 확인하고\n다시 시도해 주세요</string>
+    <string name="deck_detail_button_card_load_error_retry">다시 시도</string>
     <string name="deck_detail_title_daily_learning">하루 학습</string>
     <string name="deck_detail_sub_title_daily_learning">학습한 카드</string>
     <string name="deck_detail_caption_daily_learning_ready">일일 학습을 시작해봐요 🌱</string>
@@ -71,7 +74,7 @@
     <string name="deck_detail_button_all_learning">벼락치기 (전체학습)</string>
     <string name="deck_detail_label_total_count">전체 %1$d</string>
     <string name="deck_detail_label_learning_card_count">%1$d개 카드</string>
-    <string name="deck_detail_label_learning_progress">%1$d%%</string>
+    <string name="deck_detail_label_learning_progress">%1$d%</string>
     <string name="deck_detail_button_add_card">카드 추가하기</string>
     <string name="deck_detail_button_edit">편집</string>
     <string name="deck_detail_button_card_edit">수정</string>
@@ -187,6 +190,7 @@
     <string name="learning_front_instruction">Tip) 카드를 탭하면 뒷면을 확인할 수 있어요</string>
     <string name="learning_stop_title">학습을 중단할까요?</string>
     <string name="learning_stop_body">전체 학습 진행 상태는 저장되지 않아요</string>
+    <string name="learning_stop_body_daily">지금까지 평가한 카드는 저장돼요</string>
     <string name="learning_evaluated_cards">평가한 카드</string>
     <string name="learning_continue">계속 학습하기</string>
     <string name="learning_stop">중단하기</string>

@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -17,11 +18,13 @@ import com.whatever.caro.core.model.deck.Deck
 import com.whatever.caro.core.model.deck.DeckState
 import com.whatever.caro.core.ui.loading.CaroLoadingOverlayBox
 import com.whatever.caro.feature.deck.detail.components.DeckDetailGuid
+import com.whatever.caro.feature.deck.detail.components.DeckDetailLoadError
 import com.whatever.caro.feature.deck.detail.components.DeckDetailTopBar
 import com.whatever.caro.feature.deck.detail.components.DeckEditBottomSheet
 import com.whatever.caro.feature.deck.detail.components.DeleteDeckDialog
 import com.whatever.caro.feature.deck.detail.components.SortBottomSheet
 import com.whatever.caro.feature.deck.detail.components.lazycolumn.AddCardButtonItem
+import com.whatever.caro.feature.deck.detail.components.lazycolumn.DeckDescription
 import com.whatever.caro.feature.deck.detail.components.lazycolumn.DeckDetailHeader
 import com.whatever.caro.feature.deck.detail.components.lazycolumn.FilterAndSortSection
 import com.whatever.caro.feature.deck.detail.components.lazycolumn.SwipeToRevealCardItem
@@ -34,6 +37,9 @@ internal fun DeckDetailScreen(
     state: DeckDetailState,
     onIntent: (DeckDetailIntent) -> Unit,
 ) {
+    // 새로고침 중에는 LazyColumn 이 컴포지션에서 빠지므로, 스크롤 위치를 화면 수준으로 끌어올려 유지한다.
+    val cardListState = rememberLazyListState()
+
     CaroLoadingOverlayBox(isLoading = state.isLoading) {
         Column(
             modifier =
@@ -49,15 +55,31 @@ internal fun DeckDetailScreen(
             )
 
             if (state.isLoadedContentVisible) {
-                if (state.isEmptyDeckCard) {
-                    DeckDetailGuid(
-                        onAddFirstCard = { onIntent(DeckDetailIntent.ClickAddCard) },
+                if (state.isCardLoadErrorVisible) {
+                    DeckDetailLoadError(
+                        onRetry = { onIntent(DeckDetailIntent.RefreshCards) },
                     )
+                } else if (state.isEmptyDeckCard) {
+                    Column(modifier = Modifier.fillMaxSize()) {
+                        DeckDescription(
+                            description = state.deck.description,
+                            modifier =
+                                Modifier.padding(
+                                    horizontal = CaroTheme.spacing.xl,
+                                    vertical = CaroTheme.spacing.xl,
+                                ),
+                        )
+                        DeckDetailGuid(
+                            onAddFirstCard = { onIntent(DeckDetailIntent.ClickAddCard) },
+                            modifier = Modifier.weight(1f),
+                        )
+                    }
                 } else {
                     LazyColumn(
                         modifier =
                             Modifier
                                 .fillMaxSize(),
+                        state = cardListState,
                         overscrollEffect = null,
                     ) {
                         item {

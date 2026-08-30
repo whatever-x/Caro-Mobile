@@ -240,7 +240,34 @@ class DeckDetailViewModelTest : FunSpec() {
                     awaitItem() shouldBe DeckDetailSideEffect.ShowCardLoadError
                 }
                 viewModel.state.value.isCardListLoading shouldBe false
-                viewModel.state.value.isEmptyDeckCard shouldBe true
+                viewModel.state.value.isCardLoadErrorVisible shouldBe true
+                viewModel.state.value.isEmptyDeckCard shouldBe false
+            }
+        }
+
+        test("이미 목록이 있으면 새로고침 실패 시 목록을 유지하고 전체 오류 화면을 띄우지 않는다") {
+            runTest(dispatcher) {
+                var callCount = 0
+                val deckRepository =
+                    mock<DeckRepository> {
+                        everySuspend { getDecks() } returns listOf(createDeck())
+                        everySuspend { getDeckCards(any()) } calls {
+                            callCount++
+                            if (callCount == 1) createDeckCards() else throw RuntimeException("network")
+                        }
+                    }
+                val viewModel = createViewModel(deck = createDeck(), deckRepository = deckRepository)
+                advanceUntilIdle()
+                viewModel.state.value.deckCardList
+                    .isEmpty() shouldBe false
+
+                viewModel.intent(DeckDetailIntent.RefreshCards)
+                advanceUntilIdle()
+
+                viewModel.state.value.isCardLoadError shouldBe true
+                viewModel.state.value.isCardLoadErrorVisible shouldBe false
+                viewModel.state.value.deckCardList
+                    .isEmpty() shouldBe false
             }
         }
 
