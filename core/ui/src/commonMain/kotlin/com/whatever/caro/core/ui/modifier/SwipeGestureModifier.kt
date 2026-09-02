@@ -1,6 +1,7 @@
 package com.whatever.caro.core.ui.modifier
 
 import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -50,13 +51,21 @@ fun Modifier.swipeGesture(
 
         val activationThresholdPx = with(density) { motionConfig.directionActivationDistance.toPx() }
         val swipeThresholdPx = with(density) { motionConfig.swipeThreshold.toPx() }
-        val resolveSwipeSnapshot: (Offset) -> SwipeGestureSnapshot = { offset ->
-            offset.resolveSwipeGestureSnapshot(
-                enabledDirections = motionConfig.enabledDirections,
-                activationThreshold = activationThresholdPx,
-                swipeThreshold = swipeThresholdPx,
-                upToHorizontalSwitchRatio = motionConfig.upToHorizontalSwitchRatio,
-            )
+        val resolveSwipeSnapshot: (Offset) -> SwipeGestureSnapshot =
+            remember(motionConfig, density.density) {
+                { offset ->
+                    offset.resolveSwipeGestureSnapshot(
+                        enabledDirections = motionConfig.enabledDirections,
+                        activationThreshold = activationThresholdPx,
+                        swipeThreshold = swipeThresholdPx,
+                        upToHorizontalSwitchRatio = motionConfig.upToHorizontalSwitchRatio,
+                    )
+                }
+            }
+
+        DisposableEffect(state, resolveSwipeSnapshot) {
+            val registration = state.attachSnapshotResolver(resolver = resolveSwipeSnapshot)
+            onDispose { state.detachSnapshotResolver(registration = registration) }
         }
 
         SwipeFeedbackEffect(
@@ -83,6 +92,7 @@ fun Modifier.swipeGesture(
                 state,
                 enabled,
                 motionConfig,
+                resolveSwipeSnapshot,
             ) {
                 if (!enabled) return@pointerInput
 
@@ -174,23 +184,34 @@ fun Modifier.directionLockedSwipeGesture(
         val safeLockedSensitivity = motionConfig.lockedDragSensitivity.coerceAtLeast(0.1f)
         val activationThresholdPx = with(density) { motionConfig.lockedDirectionActivationDistance.toPx() }
         val swipeThresholdPx = with(density) { motionConfig.lockedSwipeThreshold.toPx() }
-        val resolveDraggedSwipeSnapshot: (Offset) -> SwipeGestureSnapshot = { offset ->
-            offset.resolveLockedSwipeGestureSnapshot(
-                enabledDirections = motionConfig.enabledDirections,
-                activationThreshold = activationThresholdPx,
-                swipeThreshold = swipeThresholdPx,
-                upToHorizontalSwitchRatio = motionConfig.lockedUpToHorizontalSwitchRatio,
-                projectToDirection = true,
-            )
-        }
-        val resolveAnimatedSwipeSnapshot: (Offset) -> SwipeGestureSnapshot = { offset ->
-            offset.resolveLockedSwipeGestureSnapshot(
-                enabledDirections = motionConfig.enabledDirections,
-                activationThreshold = activationThresholdPx,
-                swipeThreshold = swipeThresholdPx,
-                upToHorizontalSwitchRatio = motionConfig.lockedUpToHorizontalSwitchRatio,
-                projectToDirection = false,
-            )
+        val resolveDraggedSwipeSnapshot: (Offset) -> SwipeGestureSnapshot =
+            remember(motionConfig, density.density) {
+                { offset ->
+                    offset.resolveLockedSwipeGestureSnapshot(
+                        enabledDirections = motionConfig.enabledDirections,
+                        activationThreshold = activationThresholdPx,
+                        swipeThreshold = swipeThresholdPx,
+                        upToHorizontalSwitchRatio = motionConfig.lockedUpToHorizontalSwitchRatio,
+                        projectToDirection = true,
+                    )
+                }
+            }
+        val resolveAnimatedSwipeSnapshot: (Offset) -> SwipeGestureSnapshot =
+            remember(motionConfig, density.density) {
+                { offset ->
+                    offset.resolveLockedSwipeGestureSnapshot(
+                        enabledDirections = motionConfig.enabledDirections,
+                        activationThreshold = activationThresholdPx,
+                        swipeThreshold = swipeThresholdPx,
+                        upToHorizontalSwitchRatio = motionConfig.lockedUpToHorizontalSwitchRatio,
+                        projectToDirection = false,
+                    )
+                }
+            }
+
+        DisposableEffect(state, resolveAnimatedSwipeSnapshot) {
+            val registration = state.attachSnapshotResolver(resolver = resolveAnimatedSwipeSnapshot)
+            onDispose { state.detachSnapshotResolver(registration = registration) }
         }
 
         SwipeFeedbackEffect(
@@ -217,6 +238,7 @@ fun Modifier.directionLockedSwipeGesture(
                 state,
                 enabled,
                 motionConfig,
+                resolveDraggedSwipeSnapshot,
             ) {
                 if (!enabled) return@pointerInput
 

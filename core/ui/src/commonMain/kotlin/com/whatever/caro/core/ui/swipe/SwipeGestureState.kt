@@ -24,6 +24,7 @@ class SwipeGestureState internal constructor(
     private val animationProgress: Animatable<Float, AnimationVector1D>,
 ) {
     private var gestureSnapshot by mutableStateOf(SwipeGestureSnapshot())
+    private var snapshotResolverRegistration: SwipeGestureSnapshotResolverRegistration? = null
 
     /**
      * 현재 composable이 이동한 좌표입니다.
@@ -59,7 +60,7 @@ class SwipeGestureState internal constructor(
      * @param offset 변경할 목표 위치입니다.
      */
     fun snapTo(offset: Offset) {
-        gestureSnapshot = gestureSnapshot.copy(offset = offset)
+        gestureSnapshot = resolveSnapshot(offset)
     }
 
     /**
@@ -68,7 +69,7 @@ class SwipeGestureState internal constructor(
      * @param delta 이번 드래그 이벤트에서 이동한 거리입니다.
      */
     fun dragBy(delta: Offset) {
-        gestureSnapshot = gestureSnapshot.copy(offset = offset + delta)
+        snapTo(offset = offset + delta)
     }
 
     /**
@@ -107,7 +108,7 @@ class SwipeGestureState internal constructor(
         animateTo(
             targetOffset = targetOffset,
             animationSpec = animationSpec,
-            resolveSnapshot = { offset -> gestureSnapshot.copy(offset = offset) },
+            resolveSnapshot = ::resolveSnapshot,
         )
     }
 
@@ -141,6 +142,23 @@ class SwipeGestureState internal constructor(
     internal fun update(snapshot: SwipeGestureSnapshot) {
         gestureSnapshot = snapshot
     }
+
+    internal fun attachSnapshotResolver(resolver: SwipeGestureSnapshotResolver): SwipeGestureSnapshotResolverRegistration =
+        SwipeGestureSnapshotResolverRegistration(resolver = resolver).also { registration ->
+            snapshotResolverRegistration = registration
+        }
+
+    internal fun detachSnapshotResolver(registration: SwipeGestureSnapshotResolverRegistration) {
+        if (snapshotResolverRegistration === registration) {
+            snapshotResolverRegistration = null
+        }
+    }
+
+    private fun resolveSnapshot(offset: Offset): SwipeGestureSnapshot =
+        snapshotResolverRegistration
+            ?.resolver
+            ?.invoke(offset)
+            ?: gestureSnapshot.copy(offset = offset)
 }
 
 @Immutable
@@ -148,6 +166,12 @@ internal data class SwipeGestureSnapshot(
     val offset: Offset = Offset.Zero,
     val direction: SwipeDirection? = null,
     val progress: Float = 0f,
+)
+
+internal typealias SwipeGestureSnapshotResolver = (Offset) -> SwipeGestureSnapshot
+
+internal data class SwipeGestureSnapshotResolverRegistration(
+    val resolver: SwipeGestureSnapshotResolver,
 )
 
 /**
