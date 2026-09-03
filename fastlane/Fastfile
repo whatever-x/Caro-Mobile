@@ -34,4 +34,47 @@ platform :ios do
       readonly: true
     )
   end
+
+  # QA 배포: 서명 프로파일 fetch → 아카이브 → TestFlight 업로드
+  lane :qa_deploy do
+    qa_match
+
+    gym(
+      project: "iosApp/iosApp.xcodeproj",
+      scheme: "Caro-QaRelease",
+      configuration: "QaRelease",
+      export_method: "app-store",
+      output_directory: "build/ios"
+    )
+
+    api_key = app_store_connect_api_key(
+      key_id: ENV.fetch("APP_STORE_CONNECT_API_KEY_ID"),
+      issuer_id: ENV.fetch("APP_STORE_CONNECT_API_ISSUER_ID"),
+      key_filepath: File.expand_path("AuthKey_#{ENV.fetch('APP_STORE_CONNECT_API_KEY_ID')}.p8", __dir__)
+    )
+
+    pilot(
+      api_key: api_key,
+      app_identifier: "com.whatever.caro.qa",
+      skip_waiting_for_build_processing: true
+    )
+  end
+end
+
+platform :android do
+  # QA 배포: QA Release APK 빌드 → Firebase App Distribution 업로드
+  lane :qa_deploy do
+    gradle(
+      task: "assemble",
+      flavor: "Qa",
+      build_type: "Release"
+    )
+
+    firebase_app_distribution(
+      app: "1:1031334193504:android:d09321f78a2b81feb39605",
+      firebase_cli_token: ENV["FIREBASE_CLI_TOKEN"],
+      groups: ENV["FIREBASE_TESTER_GROUPS"],
+      android_artifact_type: "APK"
+    )
+  end
 end
