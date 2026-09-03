@@ -37,7 +37,9 @@ class CreateProfileViewModel(
             is CreateProfileIntent.UpdateNickname -> handleUpdateNickname(intent.nickname)
             is CreateProfileIntent.ClickRefresh -> fetchRandomNickname()
             is CreateProfileIntent.ClickConfirm -> handleConfirm()
-            is CreateProfileIntent.ClickBack -> handleBack()
+            is CreateProfileIntent.ClickBack -> reduce { copy(isCancelDialogVisible = true) }
+            is CreateProfileIntent.ConfirmCancel -> handleConfirmCancel()
+            is CreateProfileIntent.DismissCancelDialog -> reduce { copy(isCancelDialogVisible = false) }
         }
     }
 
@@ -109,12 +111,13 @@ class CreateProfileViewModel(
 
     /**
      * 닉네임 설정을 마치지 않은 세션은 앱을 다시 켜도 이 화면으로 돌아오므로,
-     * 뒤로가기는 저장된 토큰을 지우고 로그인 화면에서 다시 시작하게 한다.
+     * 회원가입 취소는 저장된 토큰을 지우고 로그인 화면에서 다시 시작하게 한다.
      */
-    private suspend fun handleBack() {
+    private suspend fun handleConfirmCancel() {
+        if (currentState.isCancelDialogVisible.not()) return
         nicknameValidationJob?.cancel()
         randomNicknameJob?.cancel()
-        reduce { copy(isLoading = true, isRandomNicknameLoading = false) }
+        reduce { copy(isCancelDialogVisible = false, isLoading = true, isRandomNicknameLoading = false) }
         authRepository.logout()
         postSideEffect(CreateProfileSideEffect.NavigateLogin)
     }

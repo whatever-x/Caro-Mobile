@@ -12,4 +12,8 @@ sealed interface CreateProfileIntent : UiIntent {
     data object ClickConfirm : CreateProfileIntent
 
     data object ClickBack : CreateProfileIntent
+
+    data object ConfirmCancel : CreateProfileIntent
+
+    data object DismissCancelDialog : CreateProfileIntent
 }
