@@ -187,17 +187,19 @@ class CreateProfileViewModelTest : FunSpec() {
             }
         }
 
-        test("ClickBack 은 NavigateBack 을 emit 한다") {
+        test("ClickBack 은 세션을 정리하고 NavigateLogin 을 emit 한다") {
             runTest {
-                val (viewModel, _, _) = createViewModel()
+                val (viewModel, authRepository, _) = createViewModel()
+                everySuspend { authRepository.logout() } returns Unit
                 advanceUntilIdle()
 
                 viewModel.sideEffect.test {
                     viewModel.intent(CreateProfileIntent.ClickBack)
                     advanceUntilIdle()
 
-                    awaitItem() shouldBe CreateProfileSideEffect.NavigateBack
+                    awaitItem() shouldBe CreateProfileSideEffect.NavigateLogin
                 }
+                verifySuspend(exactly(1)) { authRepository.logout() }
             }
         }
     }
