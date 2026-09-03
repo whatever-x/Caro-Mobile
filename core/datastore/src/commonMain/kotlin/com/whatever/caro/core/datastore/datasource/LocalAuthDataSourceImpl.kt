@@ -2,6 +2,7 @@ package com.whatever.caro.core.datastore.datasource
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.whatever.caro.core.datastore.read
@@ -23,15 +24,25 @@ internal class LocalAuthDataSourceImpl(
         }
     }
 
+    override suspend fun fetchRegistrationComplete(): Boolean? = dataStore.read(KEY_REGISTRATION_COMPLETE)
+
+    override suspend fun saveRegistrationComplete(isComplete: Boolean) {
+        dataStore.edit { prefs ->
+            prefs[KEY_REGISTRATION_COMPLETE] = isComplete
+        }
+    }
+
     override suspend fun clear() {
         dataStore.edit { prefs ->
             prefs.remove(KEY_ACCESS_TOKEN)
             prefs.remove(KEY_REFRESH_TOKEN)
+            prefs.remove(KEY_REGISTRATION_COMPLETE)
         }
     }
 
     private companion object {
         private val KEY_ACCESS_TOKEN = stringPreferencesKey("auth_access_token")
         private val KEY_REFRESH_TOKEN = stringPreferencesKey("auth_refresh_token")
+        private val KEY_REGISTRATION_COMPLETE = booleanPreferencesKey("auth_registration_complete")
     }
 }
