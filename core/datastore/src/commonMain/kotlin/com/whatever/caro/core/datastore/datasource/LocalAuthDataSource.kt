@@ -10,5 +10,9 @@ interface LocalAuthDataSource {
         refreshToken: String,
     )
 
+    suspend fun fetchRegistrationComplete(): Boolean?
+
+    suspend fun saveRegistrationComplete(isComplete: Boolean)
+
     suspend fun clear()
 }
