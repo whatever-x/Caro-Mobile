@@ -194,6 +194,7 @@
     <string name="learning_front_instruction">Tip) 카드를 탭하면 뒷면을 확인할 수 있어요</string>
     <string name="learning_stop_title">학습을 중단할까요?</string>
     <string name="learning_stop_body">전체 학습 진행 상태는 저장되지 않아요</string>
+    <string name="learning_stop_body_daily">지금까지 평가한 카드는 저장돼요</string>
     <string name="learning_evaluated_cards">평가한 카드</string>
     <string name="learning_continue">계속 학습하기</string>
     <string name="learning_stop">중단하기</string>

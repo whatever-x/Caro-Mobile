@@ -174,7 +174,7 @@
 	<string name="setting_description_app_version">Current App Version: %1$s</string>
 	<string name="setting_privcay_policy_url">https://given-dragon.notion.site/38b870f222b980b9b0c6f471c4cf7930</string>
 	<string name="setting_terms_of_service_url">https://given-dragon.notion.site/38b870f222b980cfb51fdb9a3ca850c5</string>
-	<string name="setting_report_bug_url">https://forms.gle/tCVKgkuNc6ZHuNkp9</string>
+	<string name="setting_report_bug_url">https://forms.gle/NLTHq7x2j2zyiMos5</string>
 	<string name="setting_snackbar_logout">Successfully logged out.</string>
 	<string name="setting_snackbar_delete_account">Account deleted successfully.</string>
 	<string name="setting_snackbar_delete_account_error">Failed to delete your account. Please try again.</string>
@@ -199,6 +199,7 @@
 	<string name="learning_front_instruction">Tip) Tap the card to see the back</string>
 	<string name="learning_stop_title">Stop learning?</string>
 	<string name="learning_stop_body">Your current learning progress won’t be saved</string>
+	<string name="learning_stop_body_daily">The cards you’ve rated so far will be saved</string>
 	<string name="learning_evaluated_cards">Rated cards</string>
 	<string name="learning_continue">Continue learning</string>
 	<string name="learning_stop">Stop</string>

@@ -2,6 +2,7 @@ package com.whatever.caro.feature.card
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,6 +17,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
@@ -83,7 +85,7 @@ import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
 private val PageHorizontalPadding = 28.dp
-private val CtaButtonHeight = 56.dp
+private val CtaButtonHeight = 48.dp
 private val TopBarIconSize = 24.dp
 private val SwapButtonSize = 32.dp
 private val SmallIconSize = 16.dp
@@ -93,6 +95,10 @@ private val PreviewCardWidth = 110.dp
 private val PreviewCardHeight = 133.dp
 private val TipDotSize = 4.dp
 private val HairlineThickness = 1.dp
+private val DividerThickness = 1.5.dp
+private val RemoveButtonOutsetOffset = RemoveIconSize / 2
+private val RemoveIconTopPadding = 4.dp
+private val RemoveIconEndPadding = 4.dp
 private const val PREVIEW_TEXT_MAX_LINES = 3
 
 @Composable
@@ -323,7 +329,7 @@ private fun SwapButton(onClick: () -> Unit) {
                         width = HairlineThickness,
                         color = CaroTheme.color.border.secondary,
                         shape = CircleShape,
-                    ).noRippleClickable(onClick = onClick),
+                    ).clickable(onClick = onClick),
             contentAlignment = Alignment.Center,
         ) {
             Icon(
@@ -445,43 +451,56 @@ private fun CardPreview(
                     .padding(CaroTheme.spacing.m),
             verticalArrangement = Arrangement.spacedBy(CaroTheme.spacing.xs),
         ) {
-            Text(
+            Box(
                 modifier = Modifier.fillMaxWidth().weight(1f),
-                text = card.front,
-                style = CaroTheme.typography.caption1.regular,
-                color = CaroTheme.color.text.primary,
-                textAlign = TextAlign.Center,
-                maxLines = PREVIEW_TEXT_MAX_LINES,
-                overflow = TextOverflow.Ellipsis,
-            )
+                contentAlignment = Alignment.Center,
+            ) {
+                Text(
+                    text = card.front,
+                    style = CaroTheme.typography.caption1.regular,
+                    color = CaroTheme.color.text.primary,
+                    textAlign = TextAlign.Center,
+                    maxLines = PREVIEW_TEXT_MAX_LINES,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
             Box(
                 modifier =
                     Modifier
                         .fillMaxWidth()
-                        .height(HairlineThickness)
-                        .background(CaroTheme.color.divider.secondary),
+                        .height(DividerThickness)
+                        .background(CaroTheme.color.divider.primary),
             )
-            Text(
+            Box(
                 modifier = Modifier.fillMaxWidth().weight(1f),
-                text = card.back,
-                style = CaroTheme.typography.caption1.regular,
-                color = CaroTheme.color.text.secondary,
-                textAlign = TextAlign.Center,
-                maxLines = PREVIEW_TEXT_MAX_LINES,
-                overflow = TextOverflow.Ellipsis,
-            )
+                contentAlignment = Alignment.Center,
+            ) {
+                Text(
+                    text = card.back,
+                    style = CaroTheme.typography.caption1.regular,
+                    color = CaroTheme.color.text.secondary,
+                    textAlign = TextAlign.Center,
+                    maxLines = PREVIEW_TEXT_MAX_LINES,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
         }
-        // ✕ 아이콘의 시각 크기/위치는 그대로 두고, 터치 히트 영역만 넓힌다(접근성).
+        // ✕ 아이콘은 카드 모서리 라운드에 걸쳐 잘려 보이지 않도록 카드 밖으로 절반 튀어나오게 오프셋한다.
+        // 터치 히트 영역(40dp)은 아이콘(20dp)보다 넓게 유지한다(접근성).
         Box(
             modifier =
                 Modifier
                     .align(Alignment.TopEnd)
+                    .offset(x = RemoveButtonOutsetOffset, y = -RemoveButtonOutsetOffset)
                     .size(RemoveHitTargetSize)
                     .noRippleClickable(onClick = onRemove),
-            contentAlignment = Alignment.TopEnd,
+            contentAlignment = Alignment.Center,
         ) {
             Icon(
-                modifier = Modifier.size(RemoveIconSize),
+                modifier =
+                    Modifier
+                        .padding(top = RemoveIconTopPadding, end = RemoveIconEndPadding)
+                        .size(RemoveIconSize),
                 painter = painterResource(Res.drawable.ic_x_circle_16),
                 contentDescription = stringResource(Res.string.card_content_description_remove),
                 tint = CaroTheme.color.icon.brand,
@@ -506,7 +525,7 @@ private fun BottomBar(
                 .windowInsetsPadding(WindowInsets.ime.exclude(WindowInsets.navigationBars))
                 .padding(
                     horizontal = PageHorizontalPadding,
-                    vertical = CaroTheme.spacing.l,
+                    vertical = CaroTheme.spacing.m,
                 ),
         verticalArrangement = Arrangement.spacedBy(CaroTheme.spacing.s),
     ) {
@@ -587,9 +606,15 @@ private fun SaveButton(
     enabled: Boolean,
     onClick: () -> Unit,
 ) {
+    val backgroundColor =
+        if (enabled) {
+            CaroTheme.color.surface.tertiary
+        } else {
+            CaroTheme.color.surface.disabled
+        }
     val textColor =
         if (enabled) {
-            CaroTheme.color.text.primary
+            CaroTheme.color.text.brand
         } else {
             CaroTheme.color.text.disabled
         }
@@ -598,8 +623,10 @@ private fun SaveButton(
         modifier =
             Modifier
                 .fillMaxWidth()
-                .noRippleClickable(enabled = enabled, onClick = onClick)
-                .padding(vertical = CaroTheme.spacing.m),
+                .heightIn(min = CtaButtonHeight)
+                .clip(CaroTheme.shape.xxl)
+                .background(backgroundColor)
+                .noRippleClickable(enabled = enabled, onClick = onClick),
         contentAlignment = Alignment.Center,
     ) {
         Text(

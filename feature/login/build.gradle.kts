@@ -48,39 +48,25 @@ buildkonfig {
         buildConfigField(FieldSpec.Type.STRING, "GOOGLE_WEB_CLIENT_ID", "")
     }
 
-    targetConfigs("dev") {
-        create("android") {
-            buildConfigField(
-                FieldSpec.Type.STRING,
-                "GOOGLE_WEB_CLIENT_ID",
-                getLocalProperty("GOOGLE_WEB_CLIENT_ID_DEV")
-                    ?: getLocalProperty("GOOGLE_WEB_CLIENT_ID")
-                    ?: error("GOOGLE_WEB_CLIENT_ID_DEV를 찾을 수 없습니다."),
-            )
-        }
-    }
-
-    targetConfigs("qa") {
-        create("android") {
-            buildConfigField(
-                FieldSpec.Type.STRING,
-                "GOOGLE_WEB_CLIENT_ID",
-                getLocalProperty("GOOGLE_WEB_CLIENT_ID_DEV")
-                    ?: getLocalProperty("GOOGLE_WEB_CLIENT_ID")
-                    ?: error("GOOGLE_WEB_CLIENT_ID_DEV를 찾을 수 없습니다."),
-            )
-        }
-    }
-
-    targetConfigs("prod") {
-        create("android") {
-            buildConfigField(
-                FieldSpec.Type.STRING,
-                "GOOGLE_WEB_CLIENT_ID",
-                getLocalProperty("GOOGLE_WEB_CLIENT_ID_PROD")
-                    ?: getLocalProperty("GOOGLE_WEB_CLIENT_ID")
-                    ?: error("GOOGLE_WEB_CLIENT_ID_PROD를 찾을 수 없습니다."),
-            )
+    listOf(
+        "devDebug" to "DEV",
+        "devRelease" to "DEV",
+        "qaDebug" to "QA",
+        "qaRelease" to "QA",
+        "prodDebug" to "PROD",
+        "prodRelease" to "PROD",
+    ).forEach { (variant, flavor) ->
+        targetConfigs(variant) {
+            create("android") {
+                val flavorProperty = "GOOGLE_WEB_CLIENT_ID_$flavor"
+                buildConfigField(
+                    FieldSpec.Type.STRING,
+                    "GOOGLE_WEB_CLIENT_ID",
+                    getLocalProperty(flavorProperty)
+                        ?: getLocalProperty("GOOGLE_WEB_CLIENT_ID")
+                        ?: error("${flavorProperty}를 찾을 수 없습니다."),
+                )
+            }
         }
     }
 }
