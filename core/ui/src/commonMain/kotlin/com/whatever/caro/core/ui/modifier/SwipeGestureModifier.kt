@@ -1,8 +1,8 @@
 package com.whatever.caro.core.ui.modifier
 
 import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -13,7 +13,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.layout.onSizeChanged
@@ -24,12 +23,11 @@ import com.whatever.caro.core.ui.swipe.COMPLETE_PROGRESS
 import com.whatever.caro.core.ui.swipe.DEFAULT_CARD_WIDTH
 import com.whatever.caro.core.ui.swipe.SwipeDirection
 import com.whatever.caro.core.ui.swipe.SwipeGestureConfig
+import com.whatever.caro.core.ui.swipe.SwipeGestureSnapshot
 import com.whatever.caro.core.ui.swipe.SwipeGestureState
-import com.whatever.caro.core.ui.swipe.projectTo
 import com.whatever.caro.core.ui.swipe.resolveAlpha
-import com.whatever.caro.core.ui.swipe.resolveDirection
-import com.whatever.caro.core.ui.swipe.resolveLockedDirection
-import com.whatever.caro.core.ui.swipe.resolveProgress
+import com.whatever.caro.core.ui.swipe.resolveLockedSwipeGestureSnapshot
+import com.whatever.caro.core.ui.swipe.resolveSwipeGestureSnapshot
 import com.whatever.caro.core.ui.swipe.scaleBy
 import com.whatever.caro.core.ui.swipe.targetOffset
 import kotlinx.coroutines.Job
@@ -47,122 +45,111 @@ fun Modifier.swipeGesture(
         val hapticFeedback = LocalHapticFeedback.current
         val coroutineScope = rememberCoroutineScope()
         val updatedOnSwiped by rememberUpdatedState(newValue = onSwiped)
-        val updatedOnSwipeDirectionChanged by rememberUpdatedState(newValue = onSwipeDirectionChanged)
 
         var size by remember { mutableStateOf(IntSize.Zero) }
-        var animationJob by remember { mutableStateOf<Job?>(null) }
-        var lastHapticDirection by remember { mutableStateOf<SwipeDirection?>(null) }
+        var runtime by remember { mutableStateOf(SwipeGestureRuntime()) }
 
         val activationThresholdPx = with(density) { motionConfig.directionActivationDistance.toPx() }
         val swipeThresholdPx = with(density) { motionConfig.swipeThreshold.toPx() }
-        val direction =
-            state.offset.resolveDirection(
-                enabledDirections = motionConfig.enabledDirections,
-                activationThreshold = activationThresholdPx,
-                upToHorizontalSwitchRatio = motionConfig.upToHorizontalSwitchRatio,
-            )
-        val progress =
-            state.offset.resolveProgress(
-                direction = direction,
-                swipeThreshold = swipeThresholdPx,
-            )
-
-        SideEffect {
-            state.updateSwipeInfo(
-                direction = direction,
-                progress = progress,
-            )
-        }
-
-        LaunchedEffect(state.currentDirection) {
-            updatedOnSwipeDirectionChanged(state.currentDirection)
-        }
-
-        LaunchedEffect(
-            state.currentDirection,
-            state.progress,
-            motionConfig.hapticFeedbackEnabled,
-        ) {
-            val currentDirection = state.currentDirection
-            val shouldPerformHaptic =
-                motionConfig.hapticFeedbackEnabled &&
-                    currentDirection != null &&
-                    state.progress >= motionConfig.hapticProgressThreshold &&
-                    lastHapticDirection != currentDirection
-
-            if (shouldPerformHaptic) {
-                hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
-                lastHapticDirection = currentDirection
-            } else if (
-                currentDirection == null ||
-                state.progress < motionConfig.hapticProgressThreshold / 2f
-            ) {
-                lastHapticDirection = null
+        val resolveSwipeSnapshot: (Offset) -> SwipeGestureSnapshot =
+            remember(motionConfig, density.density) {
+                { offset ->
+                    offset.resolveSwipeGestureSnapshot(
+                        enabledDirections = motionConfig.enabledDirections,
+                        activationThreshold = activationThresholdPx,
+                        swipeThreshold = swipeThresholdPx,
+                        upToHorizontalSwitchRatio = motionConfig.upToHorizontalSwitchRatio,
+                    )
+                }
             }
+
+        DisposableEffect(state, resolveSwipeSnapshot) {
+            val registration = state.attachSnapshotResolver(resolver = resolveSwipeSnapshot)
+            onDispose { state.detachSnapshotResolver(registration = registration) }
         }
+
+        SwipeFeedbackEffect(
+            state = state,
+            motionConfig = motionConfig,
+            hapticFeedback = hapticFeedback,
+            onSwipeDirectionChanged = onSwipeDirectionChanged,
+        )
 
         // 호출부가 직접 실행 중인 애니메이션을 reset 이 가로채면 그 애니메이션이 취소되므로 건너뛴다.
         LaunchedEffect(enabled) {
             if (!enabled && !state.isAnimationRunning) {
-                animationJob?.cancel()
-                state.reset(animationSpec = motionConfig.resetAnimationSpec)
+                runtime.animationJob?.cancel()
+                runtime = runtime.copy(animationJob = null)
+                state.reset(
+                    animationSpec = motionConfig.resetAnimationSpec,
+                    resolveSnapshot = resolveSwipeSnapshot,
+                )
             }
         }
 
         onSizeChanged { size = it }
             .pointerInput(
+                state,
                 enabled,
                 motionConfig,
+                resolveSwipeSnapshot,
             ) {
                 if (!enabled) return@pointerInput
 
                 detectDragGestures(
                     onDragStart = {
-                        animationJob?.cancel()
+                        runtime.animationJob?.cancel()
+                        runtime = runtime.copy(animationJob = null)
                     },
                     onDragCancel = {
-                        animationJob =
-                            coroutineScope.launch {
-                                state.reset(animationSpec = motionConfig.resetAnimationSpec)
-                            }
+                        runtime =
+                            runtime.copy(
+                                animationJob =
+                                    coroutineScope.launch {
+                                        state.reset(
+                                            animationSpec = motionConfig.resetAnimationSpec,
+                                            resolveSnapshot = resolveSwipeSnapshot,
+                                        )
+                                    },
+                            )
                     },
                     onDragEnd = {
-                        val releasedDirection =
-                            state.offset.resolveDirection(
-                                enabledDirections = motionConfig.enabledDirections,
-                                activationThreshold = activationThresholdPx,
-                                upToHorizontalSwitchRatio = motionConfig.upToHorizontalSwitchRatio,
-                            )
-                        val releasedProgress =
-                            state.offset.resolveProgress(
-                                direction = releasedDirection,
-                                swipeThreshold = swipeThresholdPx,
-                            )
+                        val releasedDirection = state.currentDirection
+                        val releasedProgress = state.progress
 
-                        animationJob =
-                            coroutineScope.launch {
-                                if (releasedDirection != null && releasedProgress >= COMPLETE_PROGRESS) {
-                                    state.animateTo(
-                                        targetOffset =
-                                            motionConfig.targetOffset(
-                                                direction = releasedDirection,
-                                                density = density,
-                                                currentOffset = state.offset,
-                                            ),
-                                        animationSpec = motionConfig.exitAnimationSpec,
-                                    )
-                                    updatedOnSwiped(releasedDirection)
-                                } else {
-                                    state.reset(animationSpec = motionConfig.resetAnimationSpec)
-                                }
-                            }
+                        runtime =
+                            runtime.copy(
+                                animationJob =
+                                    coroutineScope.launch {
+                                        if (releasedDirection != null && releasedProgress >= COMPLETE_PROGRESS) {
+                                            state.animateTo(
+                                                targetOffset =
+                                                    motionConfig.targetOffset(
+                                                        direction = releasedDirection,
+                                                        density = density,
+                                                        currentOffset = state.offset,
+                                                    ),
+                                                animationSpec = motionConfig.exitAnimationSpec,
+                                                resolveSnapshot = resolveSwipeSnapshot,
+                                            )
+                                            updatedOnSwiped(releasedDirection)
+                                        } else {
+                                            state.reset(
+                                                animationSpec = motionConfig.resetAnimationSpec,
+                                                resolveSnapshot = resolveSwipeSnapshot,
+                                            )
+                                        }
+                                    },
+                            )
                     },
                     onDrag = { change, dragAmount ->
                         if (change.positionChange() != Offset.Zero) {
                             change.consume()
                         }
-                        state.dragBy(
-                            delta = dragAmount.scaleBy(factor = motionConfig.dragSensitivity),
+                        state.update(
+                            resolveSwipeSnapshot(
+                                state.offset + dragAmount.scaleBy(factor = motionConfig.dragSensitivity),
+                            ),
                         )
                     },
                 )
@@ -190,163 +177,137 @@ fun Modifier.directionLockedSwipeGesture(
         val hapticFeedback = LocalHapticFeedback.current
         val coroutineScope = rememberCoroutineScope()
         val updatedOnSwiped by rememberUpdatedState(newValue = onSwiped)
-        val updatedOnSwipeDirectionChanged by rememberUpdatedState(newValue = onSwipeDirectionChanged)
 
         var size by remember { mutableStateOf(IntSize.Zero) }
-        var dragOffset by remember { mutableStateOf(Offset.Zero) }
-        var animationJob by remember { mutableStateOf<Job?>(null) }
-        var lastHapticDirection by remember { mutableStateOf<SwipeDirection?>(null) }
+        var runtime by remember { mutableStateOf(SwipeGestureRuntime()) }
 
         val safeLockedSensitivity = motionConfig.lockedDragSensitivity.coerceAtLeast(0.1f)
         val activationThresholdPx = with(density) { motionConfig.lockedDirectionActivationDistance.toPx() }
         val swipeThresholdPx = with(density) { motionConfig.lockedSwipeThreshold.toPx() }
-        val effectiveDragOffset = dragOffset.scaleBy(factor = safeLockedSensitivity)
-        val direction =
-            effectiveDragOffset.resolveLockedDirection(
-                enabledDirections = motionConfig.enabledDirections,
-                activationThreshold = activationThresholdPx,
-                upToHorizontalSwitchRatio = motionConfig.lockedUpToHorizontalSwitchRatio,
-            )
-        val projectedDragOffset =
-            effectiveDragOffset.projectTo(
-                direction = direction,
-            )
-        val progress =
-            projectedDragOffset.resolveProgress(
-                direction = direction,
-                swipeThreshold = swipeThresholdPx,
-            )
-
-        SideEffect {
-            state.updateSwipeInfo(
-                direction = direction,
-                progress = progress,
-            )
-        }
-
-        LaunchedEffect(state.currentDirection) {
-            updatedOnSwipeDirectionChanged(state.currentDirection)
-        }
-
-        LaunchedEffect(
-            state.currentDirection,
-            state.progress,
-            motionConfig.hapticFeedbackEnabled,
-        ) {
-            val currentDirection = state.currentDirection
-            val shouldPerformHaptic =
-                motionConfig.hapticFeedbackEnabled &&
-                    currentDirection != null &&
-                    state.progress >= motionConfig.hapticProgressThreshold &&
-                    lastHapticDirection != currentDirection
-
-            if (shouldPerformHaptic) {
-                hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
-                lastHapticDirection = currentDirection
-            } else if (
-                currentDirection == null ||
-                state.progress < motionConfig.hapticProgressThreshold / 2f
-            ) {
-                lastHapticDirection = null
+        val resolveDraggedSwipeSnapshot: (Offset) -> SwipeGestureSnapshot =
+            remember(motionConfig, density.density) {
+                { offset ->
+                    offset.resolveLockedSwipeGestureSnapshot(
+                        enabledDirections = motionConfig.enabledDirections,
+                        activationThreshold = activationThresholdPx,
+                        swipeThreshold = swipeThresholdPx,
+                        upToHorizontalSwitchRatio = motionConfig.lockedUpToHorizontalSwitchRatio,
+                        projectToDirection = true,
+                    )
+                }
             }
+        val resolveAnimatedSwipeSnapshot: (Offset) -> SwipeGestureSnapshot =
+            remember(motionConfig, density.density) {
+                { offset ->
+                    offset.resolveLockedSwipeGestureSnapshot(
+                        enabledDirections = motionConfig.enabledDirections,
+                        activationThreshold = activationThresholdPx,
+                        swipeThreshold = swipeThresholdPx,
+                        upToHorizontalSwitchRatio = motionConfig.lockedUpToHorizontalSwitchRatio,
+                        projectToDirection = false,
+                    )
+                }
+            }
+
+        DisposableEffect(state, resolveAnimatedSwipeSnapshot) {
+            val registration = state.attachSnapshotResolver(resolver = resolveAnimatedSwipeSnapshot)
+            onDispose { state.detachSnapshotResolver(registration = registration) }
         }
 
-        LaunchedEffect(
-            direction,
-            projectedDragOffset,
-        ) {
-            if (!state.isAnimationRunning) {
-                state.snapTo(projectedDragOffset)
-            }
-        }
+        SwipeFeedbackEffect(
+            state = state,
+            motionConfig = motionConfig,
+            hapticFeedback = hapticFeedback,
+            onSwipeDirectionChanged = onSwipeDirectionChanged,
+        )
 
         LaunchedEffect(enabled) {
             if (!enabled) {
-                animationJob?.cancel()
-                state.reset(animationSpec = motionConfig.resetAnimationSpec)
-                dragOffset = Offset.Zero
+                runtime.animationJob?.cancel()
+                runtime = runtime.copy(animationJob = null)
+                state.reset(
+                    animationSpec = motionConfig.resetAnimationSpec,
+                    resolveSnapshot = resolveAnimatedSwipeSnapshot,
+                )
+                runtime = runtime.copy(dragOffset = Offset.Zero)
             }
         }
 
         onSizeChanged { size = it }
             .pointerInput(
+                state,
                 enabled,
                 motionConfig,
+                resolveDraggedSwipeSnapshot,
             ) {
                 if (!enabled) return@pointerInput
 
                 detectDragGestures(
                     onDragStart = {
-                        animationJob?.cancel()
-                        dragOffset =
-                            Offset(
-                                x = state.offset.x / safeLockedSensitivity,
-                                y = state.offset.y / safeLockedSensitivity,
+                        runtime.animationJob?.cancel()
+                        runtime =
+                            runtime.copy(
+                                animationJob = null,
+                                dragOffset =
+                                    Offset(
+                                        x = state.offset.x / safeLockedSensitivity,
+                                        y = state.offset.y / safeLockedSensitivity,
+                                    ),
                             )
                     },
                     onDragCancel = {
-                        animationJob =
-                            coroutineScope.launch {
-                                state.reset(animationSpec = motionConfig.resetAnimationSpec)
-                                dragOffset = Offset.Zero
-                            }
+                        runtime =
+                            runtime.copy(
+                                animationJob =
+                                    coroutineScope.launch {
+                                        state.reset(
+                                            animationSpec = motionConfig.resetAnimationSpec,
+                                            resolveSnapshot = resolveAnimatedSwipeSnapshot,
+                                        )
+                                        runtime = runtime.copy(dragOffset = Offset.Zero)
+                                    },
+                            )
                     },
                     onDragEnd = {
-                        val releasedEffectiveOffset =
-                            dragOffset.scaleBy(factor = safeLockedSensitivity)
-                        val releasedDirection =
-                            releasedEffectiveOffset.resolveLockedDirection(
-                                enabledDirections = motionConfig.enabledDirections,
-                                activationThreshold = activationThresholdPx,
-                                upToHorizontalSwitchRatio = motionConfig.lockedUpToHorizontalSwitchRatio,
-                            )
-                        val releasedOffset =
-                            releasedEffectiveOffset.projectTo(
-                                direction = releasedDirection,
-                            )
-                        val releasedProgress =
-                            releasedOffset.resolveProgress(
-                                direction = releasedDirection,
-                                swipeThreshold = swipeThresholdPx,
-                            )
+                        val releasedDirection = state.currentDirection
+                        val releasedOffset = state.offset
+                        val releasedProgress = state.progress
 
-                        animationJob =
-                            coroutineScope.launch {
-                                if (releasedDirection != null && releasedProgress >= COMPLETE_PROGRESS) {
-                                    state.animateTo(
-                                        targetOffset =
-                                            motionConfig.targetOffset(
-                                                direction = releasedDirection,
-                                                density = density,
-                                                currentOffset = releasedOffset,
-                                            ),
-                                        animationSpec = motionConfig.exitAnimationSpec,
-                                    )
-                                    updatedOnSwiped(releasedDirection)
-                                } else {
-                                    state.reset(animationSpec = motionConfig.resetAnimationSpec)
-                                    dragOffset = Offset.Zero
-                                }
-                            }
+                        runtime =
+                            runtime.copy(
+                                animationJob =
+                                    coroutineScope.launch {
+                                        if (releasedDirection != null && releasedProgress >= COMPLETE_PROGRESS) {
+                                            state.animateTo(
+                                                targetOffset =
+                                                    motionConfig.targetOffset(
+                                                        direction = releasedDirection,
+                                                        density = density,
+                                                        currentOffset = releasedOffset,
+                                                    ),
+                                                animationSpec = motionConfig.exitAnimationSpec,
+                                                resolveSnapshot = resolveAnimatedSwipeSnapshot,
+                                            )
+                                            updatedOnSwiped(releasedDirection)
+                                        } else {
+                                            state.reset(
+                                                animationSpec = motionConfig.resetAnimationSpec,
+                                                resolveSnapshot = resolveAnimatedSwipeSnapshot,
+                                            )
+                                            runtime = runtime.copy(dragOffset = Offset.Zero)
+                                        }
+                                    },
+                            )
                     },
                     onDrag = { change, dragAmount ->
                         if (change.positionChange() != Offset.Zero) {
                             change.consume()
                         }
-                        val nextDragOffset = dragOffset + dragAmount
-                        val nextEffectiveOffset =
-                            nextDragOffset.scaleBy(factor = safeLockedSensitivity)
-                        val nextDirection =
-                            nextEffectiveOffset.resolveLockedDirection(
-                                enabledDirections = motionConfig.enabledDirections,
-                                activationThreshold = activationThresholdPx,
-                                upToHorizontalSwitchRatio = motionConfig.lockedUpToHorizontalSwitchRatio,
-                            )
-                        dragOffset = nextDragOffset
+                        runtime = runtime.copy(dragOffset = runtime.dragOffset + dragAmount)
                         if (!state.isAnimationRunning) {
-                            state.snapTo(
-                                nextEffectiveOffset.projectTo(
-                                    direction = nextDirection,
+                            state.update(
+                                resolveDraggedSwipeSnapshot(
+                                    runtime.dragOffset.scaleBy(factor = safeLockedSensitivity),
                                 ),
                             )
                         }
@@ -363,3 +324,8 @@ fun Modifier.directionLockedSwipeGesture(
                 alpha = motionConfig.resolveAlpha(progress = progressFraction)
             }
     }
+
+private data class SwipeGestureRuntime(
+    val animationJob: Job? = null,
+    val dragOffset: Offset = Offset.Zero,
+)

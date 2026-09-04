@@ -4,6 +4,7 @@ import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.AnimationVector1D
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -22,27 +23,30 @@ import androidx.compose.ui.geometry.Offset
 class SwipeGestureState internal constructor(
     private val animationProgress: Animatable<Float, AnimationVector1D>,
 ) {
+    private var gestureSnapshot by mutableStateOf(SwipeGestureSnapshot())
+    private var snapshotResolverRegistration: SwipeGestureSnapshotResolverRegistration? = null
+
     /**
      * 현재 composable이 이동한 좌표입니다.
      */
-    var offset: Offset by mutableStateOf(Offset.Zero)
-        private set
+    val offset: Offset
+        get() = gestureSnapshot.offset
 
     /**
      * 현재 드래그 방향입니다.
      *
      * 아직 방향 판단 기준을 넘지 않았거나 제스처가 초기화된 경우 `null`입니다.
      */
-    var currentDirection: SwipeDirection? by mutableStateOf(null)
-        private set
+    val currentDirection: SwipeDirection?
+        get() = gestureSnapshot.direction
 
     /**
      * 현재 스와이프 진행률입니다.
      *
      * `0f`는 스와이프가 진행되지 않은 상태이고, `1f`는 완료 기준에 도달한 상태입니다.
      */
-    var progress: Float by mutableStateOf(0f)
-        private set
+    val progress: Float
+        get() = gestureSnapshot.progress
 
     /**
      * 현재 reset 또는 exit 애니메이션이 실행 중인지 여부입니다.
@@ -56,7 +60,7 @@ class SwipeGestureState internal constructor(
      * @param offset 변경할 목표 위치입니다.
      */
     fun snapTo(offset: Offset) {
-        this.offset = offset
+        gestureSnapshot = resolveSnapshot(offset)
     }
 
     /**
@@ -65,7 +69,7 @@ class SwipeGestureState internal constructor(
      * @param delta 이번 드래그 이벤트에서 이동한 거리입니다.
      */
     fun dragBy(delta: Offset) {
-        offset += delta
+        snapTo(offset = offset + delta)
     }
 
     /**
@@ -80,6 +84,17 @@ class SwipeGestureState internal constructor(
         )
     }
 
+    internal suspend fun reset(
+        animationSpec: AnimationSpec<Float>,
+        resolveSnapshot: (Offset) -> SwipeGestureSnapshot,
+    ) {
+        animateTo(
+            targetOffset = Offset.Zero,
+            animationSpec = animationSpec,
+            resolveSnapshot = resolveSnapshot,
+        )
+    }
+
     /**
      * 현재 위치에서 목표 위치까지 애니메이션으로 이동합니다.
      *
@@ -90,6 +105,18 @@ class SwipeGestureState internal constructor(
         targetOffset: Offset,
         animationSpec: AnimationSpec<Float>,
     ) {
+        animateTo(
+            targetOffset = targetOffset,
+            animationSpec = animationSpec,
+            resolveSnapshot = ::resolveSnapshot,
+        )
+    }
+
+    internal suspend fun animateTo(
+        targetOffset: Offset,
+        animationSpec: AnimationSpec<Float>,
+        resolveSnapshot: (Offset) -> SwipeGestureSnapshot,
+    ) {
         isAnimationRunning = true
         try {
             val startOffset = offset
@@ -98,11 +125,13 @@ class SwipeGestureState internal constructor(
                 targetValue = 1f,
                 animationSpec = animationSpec,
             ) {
-                offset =
-                    lerp(
-                        start = startOffset,
-                        stop = targetOffset,
-                        fraction = value,
+                gestureSnapshot =
+                    resolveSnapshot(
+                        lerp(
+                            start = startOffset,
+                            stop = targetOffset,
+                            fraction = value,
+                        ),
                     )
             }
         } finally {
@@ -110,14 +139,40 @@ class SwipeGestureState internal constructor(
         }
     }
 
-    internal fun updateSwipeInfo(
-        direction: SwipeDirection?,
-        progress: Float,
-    ) {
-        currentDirection = direction
-        this.progress = progress.coerceIn(0f, 1f)
+    internal fun update(snapshot: SwipeGestureSnapshot) {
+        gestureSnapshot = snapshot
     }
+
+    internal fun attachSnapshotResolver(resolver: SwipeGestureSnapshotResolver): SwipeGestureSnapshotResolverRegistration =
+        SwipeGestureSnapshotResolverRegistration(resolver = resolver).also { registration ->
+            snapshotResolverRegistration = registration
+        }
+
+    internal fun detachSnapshotResolver(registration: SwipeGestureSnapshotResolverRegistration) {
+        if (snapshotResolverRegistration === registration) {
+            snapshotResolverRegistration = null
+        }
+    }
+
+    private fun resolveSnapshot(offset: Offset): SwipeGestureSnapshot =
+        snapshotResolverRegistration
+            ?.resolver
+            ?.invoke(offset)
+            ?: gestureSnapshot.copy(offset = offset)
 }
+
+@Immutable
+internal data class SwipeGestureSnapshot(
+    val offset: Offset = Offset.Zero,
+    val direction: SwipeDirection? = null,
+    val progress: Float = 0f,
+)
+
+internal typealias SwipeGestureSnapshotResolver = (Offset) -> SwipeGestureSnapshot
+
+internal data class SwipeGestureSnapshotResolverRegistration(
+    val resolver: SwipeGestureSnapshotResolver,
+)
 
 /**
  * recomposition 사이에서 유지되는 [SwipeGestureState]를 생성합니다.
