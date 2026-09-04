@@ -50,7 +50,8 @@ platform :ios do
     api_key = app_store_connect_api_key(
       key_id: ENV.fetch("APP_STORE_CONNECT_API_KEY_ID"),
       issuer_id: ENV.fetch("APP_STORE_CONNECT_API_ISSUER_ID"),
-      key_filepath: File.expand_path("AuthKey_#{ENV.fetch('APP_STORE_CONNECT_API_KEY_ID')}.p8", __dir__)
+      # APP_STORE_CONNECT_API_KEY_FILE 은 repo 루트 기준 경로
+      key_filepath: File.expand_path(ENV.fetch("APP_STORE_CONNECT_API_KEY_FILE"), File.expand_path("..", __dir__))
     )
 
     pilot(
