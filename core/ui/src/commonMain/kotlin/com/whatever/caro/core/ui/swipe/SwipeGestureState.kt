@@ -6,10 +6,12 @@ import androidx.compose.animation.core.AnimationVector1D
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.structuralEqualityPolicy
 import androidx.compose.ui.geometry.Offset
 
 /**
@@ -24,13 +26,25 @@ class SwipeGestureState internal constructor(
     private val animationProgress: Animatable<Float, AnimationVector1D>,
 ) {
     private var gestureSnapshot by mutableStateOf(SwipeGestureSnapshot())
+    private val offsetState =
+        derivedStateOf(policy = structuralEqualityPolicy()) {
+            gestureSnapshot.offset
+        }
+    private val currentDirectionState =
+        derivedStateOf(policy = structuralEqualityPolicy()) {
+            gestureSnapshot.direction
+        }
+    private val progressState =
+        derivedStateOf(policy = structuralEqualityPolicy()) {
+            gestureSnapshot.progress
+        }
     private var snapshotResolverRegistration: SwipeGestureSnapshotResolverRegistration? = null
 
     /**
      * 현재 composable이 이동한 좌표입니다.
      */
     val offset: Offset
-        get() = gestureSnapshot.offset
+        get() = offsetState.value
 
     /**
      * 현재 드래그 방향입니다.
@@ -38,7 +52,7 @@ class SwipeGestureState internal constructor(
      * 아직 방향 판단 기준을 넘지 않았거나 제스처가 초기화된 경우 `null`입니다.
      */
     val currentDirection: SwipeDirection?
-        get() = gestureSnapshot.direction
+        get() = currentDirectionState.value
 
     /**
      * 현재 스와이프 진행률입니다.
@@ -46,7 +60,7 @@ class SwipeGestureState internal constructor(
      * `0f`는 스와이프가 진행되지 않은 상태이고, `1f`는 완료 기준에 도달한 상태입니다.
      */
     val progress: Float
-        get() = gestureSnapshot.progress
+        get() = progressState.value
 
     /**
      * 현재 reset 또는 exit 애니메이션이 실행 중인지 여부입니다.
@@ -84,17 +98,6 @@ class SwipeGestureState internal constructor(
         )
     }
 
-    internal suspend fun reset(
-        animationSpec: AnimationSpec<Float>,
-        resolveSnapshot: (Offset) -> SwipeGestureSnapshot,
-    ) {
-        animateTo(
-            targetOffset = Offset.Zero,
-            animationSpec = animationSpec,
-            resolveSnapshot = resolveSnapshot,
-        )
-    }
-
     /**
      * 현재 위치에서 목표 위치까지 애니메이션으로 이동합니다.
      *
@@ -104,18 +107,6 @@ class SwipeGestureState internal constructor(
     suspend fun animateTo(
         targetOffset: Offset,
         animationSpec: AnimationSpec<Float>,
-    ) {
-        animateTo(
-            targetOffset = targetOffset,
-            animationSpec = animationSpec,
-            resolveSnapshot = ::resolveSnapshot,
-        )
-    }
-
-    internal suspend fun animateTo(
-        targetOffset: Offset,
-        animationSpec: AnimationSpec<Float>,
-        resolveSnapshot: (Offset) -> SwipeGestureSnapshot,
     ) {
         isAnimationRunning = true
         try {
@@ -143,11 +134,19 @@ class SwipeGestureState internal constructor(
         gestureSnapshot = snapshot
     }
 
+    /**
+     * 현재 offset을 새 기준으로 즉시 다시 계산하고 resolver를 교체합니다.
+     *
+     * modifier에서는 observable state를 합성 중에 되쓰지 않도록 [androidx.compose.runtime.DisposableEffect]에서
+     * 등록하고 해제해야 합니다. 교체된 이전 registration의 해제는 현재 resolver에 영향을 주지 않습니다.
+     */
     internal fun attachSnapshotResolver(resolver: SwipeGestureSnapshotResolver): SwipeGestureSnapshotResolverRegistration =
         SwipeGestureSnapshotResolverRegistration(resolver = resolver).also { registration ->
             snapshotResolverRegistration = registration
+            gestureSnapshot = resolver(gestureSnapshot.offset)
         }
 
+    /** 활성 registration만 해제하며 마지막으로 계산된 snapshot은 유지합니다. */
     internal fun detachSnapshotResolver(registration: SwipeGestureSnapshotResolverRegistration) {
         if (snapshotResolverRegistration === registration) {
             snapshotResolverRegistration = null
