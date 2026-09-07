@@ -2,6 +2,7 @@ package com.whatever.caro.benchmark.swipe
 
 import android.os.SystemClock
 import androidx.test.uiautomator.By
+import androidx.test.uiautomator.StaleObjectException
 import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.UiObject2
 import androidx.test.uiautomator.Until
@@ -145,15 +146,14 @@ private fun UiDevice.requireSwipeState(
     contract: SwipeBenchmarkContract,
     timeoutMillis: Long,
 ): SwipeObservedState {
-    val stateNode =
-        requireNotNull(
-            wait(
-                Until.findObject(By.res(contract.stateResourceId)),
-                timeoutMillis,
-            ),
-        ) { "Swipe state '${contract.stateResourceId}' was not found within $timeoutMillis ms." }
+    val deadline = SystemClock.elapsedRealtime() + timeoutMillis
 
-    return stateNode.contentDescription.toSwipeObservedState(contract = contract)
+    while (SystemClock.elapsedRealtime() < deadline) {
+        readSwipeStateOrNull(contract = contract)?.let { state -> return state }
+        SystemClock.sleep(STATE_POLL_INTERVAL_MILLIS)
+    }
+
+    error("Swipe state '${contract.stateResourceId}' was not found within $timeoutMillis ms.")
 }
 
 private fun UiDevice.awaitNextSwipeState(
@@ -165,18 +165,15 @@ private fun UiDevice.awaitNextSwipeState(
     var latestState = previousState
 
     while (SystemClock.elapsedRealtime() < deadline) {
-        findObject(By.res(contract.stateResourceId))
-            ?.contentDescription
-            ?.toSwipeObservedState(contract = contract)
-            ?.let { observedState ->
-                latestState = observedState
-                if (observedState.eventSequence > previousState.eventSequence) {
-                    check(observedState.eventSequence == previousState.eventSequence + 1) {
-                        "Expected exactly one swipe event after $previousState but observed $observedState"
-                    }
-                    return observedState
+        readSwipeStateOrNull(contract = contract)?.let { observedState ->
+            latestState = observedState
+            if (observedState.eventSequence > previousState.eventSequence) {
+                check(observedState.eventSequence == previousState.eventSequence + 1) {
+                    "Expected exactly one swipe event after $previousState but observed $observedState"
                 }
+                return observedState
             }
+        }
         SystemClock.sleep(STATE_POLL_INTERVAL_MILLIS)
     }
 
@@ -185,6 +182,15 @@ private fun UiDevice.awaitNextSwipeState(
             "Previous=$previousState, latest=$latestState",
     )
 }
+
+private fun UiDevice.readSwipeStateOrNull(contract: SwipeBenchmarkContract): SwipeObservedState? =
+    findObject(By.res(contract.stateResourceId))?.let { stateNode ->
+        try {
+            stateNode.contentDescription.toSwipeObservedState(contract = contract)
+        } catch (_: StaleObjectException) {
+            null
+        }
+    }
 
 private fun UiDevice.requirePreparedSwipeCard(
     contract: SwipeBenchmarkContract,
@@ -196,7 +202,7 @@ private fun UiDevice.requirePreparedSwipeCard(
 
     while (SystemClock.elapsedRealtime() < deadline) {
         findObject(By.res(contract.cardResourceId))?.let { card ->
-            latestOrigin = card.toOrigin()
+            latestOrigin = card.toOriginOrNull() ?: return@let
             if (latestOrigin.isAt(origin)) return card
         }
         SystemClock.sleep(STATE_POLL_INTERVAL_MILLIS)
@@ -216,6 +222,13 @@ private fun UiObject2.toOrigin(): SwipeCardOrigin {
         height = bounds.height(),
     )
 }
+
+private fun UiObject2.toOriginOrNull(): SwipeCardOrigin? =
+    try {
+        toOrigin()
+    } catch (_: StaleObjectException) {
+        null
+    }
 
 private fun SwipeCardOrigin?.isAt(expected: SwipeCardOrigin): Boolean =
     this != null &&
