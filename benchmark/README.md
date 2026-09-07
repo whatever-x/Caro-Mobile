@@ -42,19 +42,33 @@ benchmark-target
 ## 스와이프 시나리오
 
 스와이프 입력은 화면 좌표 대신 카드 크기 대비 비율로 정의합니다. 기기 해상도가 달라져도 같은 비율의 제스처를 실행할 수 있습니다.
+입력 성공 여부는 `UiDevice.swipe()` 반환값만으로 판단하지 않습니다. target이 노출하는 안정적인 종료 이벤트를 기다리고 결과와 방향, 몇 번째 입력인지 나타내는 순번, 몇 번째 카드인지 나타내는 번호를 확인한 뒤 카드가 최초 위치에 준비됐는지 검증합니다.
 
 ```kotlin
 SwipeBenchmarkScenario(
     mode = SwipeBenchmarkMode.FREE,
+    expectedResult = SwipeTerminalResult.RESET,
     inputs =
         listOf(
             SwipeInput(
                 horizontalDistanceRatio = 0.25f,
-                verticalDistanceRatio = -0.2f,
+                verticalDistanceRatio = 0f,
+                expectedDirection = SwipeDirection.RIGHT,
             ),
         ),
 )
 ```
+
+### reset과 exit 측정
+
+두 결과는 애니메이션 길이와 화면 상태가 다르므로 서로 다른 테스트로 측정합니다.
+
+- `freeSwipeFrameTiming`, `lockedSwipeFrameTiming`: 기존과 같은 짧은 입력을 사용합니다. 280 x 360 dp 카드에서 가로 `0.25`, 세로 `0.2` 비율로 입력해 완료 기준 미만의 reset을 측정합니다. 각 입력 뒤 카드는 최초 중심과 크기로 돌아와야 하며 카드 세대가 바뀌면 실패합니다.
+- `freeSwipeExitFrameTiming`, `lockedSwipeExitFrameTiming`: 가로 `0.55`, 세로 `0.45` 비율의 긴 입력으로 exit를 측정합니다. 완료 콜백은 기대 방향으로 정확히 한 번 발생해야 하며, target은 종료된 카드를 새 세대의 원점 카드로 교체합니다.
+
+기본 제스처 설정은 민감도 `1.28`, 완료 기준 `88.dp`입니다. `detectDragGestures`가 touch slop 이후 이동량을 전달하므로 기존 가로 `0.25`, 세로 `0.2` 입력은 일반적으로 reset 경로에 해당합니다. 실제 기기별 입력 해석은 매 입력의 종료 결과 검증으로 확인합니다.
+
+관찰용 semantics는 드래그 위치나 진행률을 노출하지 않습니다. 방향이 활성화되거나 제스처가 종료될 때만 준비 여부, 입력 순번, 결과, 방향과 카드 번호를 갱신하므로 프레임마다 관찰 UI가 리컴포지션되지 않습니다.
 
 ## 실행
 
@@ -68,7 +82,7 @@ SwipeBenchmarkScenario(
 ./gradlew :benchmark:connectedBenchmarkAndroidTest \
   -Pandroid.testInstrumentationRunnerArguments.benchmarkIterations=10 \
   -Pandroid.testInstrumentationRunnerArguments.swipesPerIteration=12 \
-  -Pandroid.testInstrumentationRunnerArguments.resetSettleMillis=200
+  -Pandroid.testInstrumentationRunnerArguments.gestureTimeoutMillis=5000
 ```
 
 특정 시나리오만 실행할 수도 있습니다.
@@ -79,3 +93,11 @@ SwipeBenchmarkScenario(
 ```
 
 JSON과 Perfetto trace는 `benchmark/build/outputs/connected_android_test_additional_output`에 생성됩니다.
+이번 검증에서는 고정 200 ms 대기를 상태 기반 대기로 바꾸고 관찰 표식과 카드 교체를 추가했으므로 기존 그래프 수치와 직접 비교하지 않습니다. 새 기준선을 만든 뒤 reset은 reset 테스트끼리, exit는 exit 테스트끼리 비교합니다. 에뮬레이터 스모크 실행은 동작 계약 확인용이며 성능 개선 근거로 해석하지 않습니다.
+
+## 스와이프 입력 확장
+
+1. `benchmark-target` 화면에 프레임 단위 값이 아닌 안정적인 준비 표식과 종료 이벤트를 노출합니다.
+2. 시나리오의 `SwipeInput`에 기대 방향을, `SwipeBenchmarkScenario`에 기대 종료 결과를 명시합니다.
+3. driver에서 입력 전 원점, 입력 뒤 입력 순번 증가, 종료 결과와 다음 입력의 준비 상태를 검증합니다.
+4. reset과 exit처럼 렌더링 계약이 다른 결과는 테스트 함수를 분리해 결과 파일이 섞이지 않게 합니다.

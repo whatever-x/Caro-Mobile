@@ -1,6 +1,5 @@
 package com.whatever.caro.benchmark.swipe
 
-import android.os.SystemClock
 import androidx.benchmark.macro.CompilationMode
 import androidx.benchmark.macro.FrameTimingMetric
 import androidx.benchmark.macro.junit4.MacrobenchmarkRule
@@ -32,7 +31,19 @@ class SwipeGestureBenchmark {
         measureSwipe(scenario = lockedSwipeScenario())
     }
 
+    @Test
+    fun freeSwipeExitFrameTiming() {
+        measureSwipe(scenario = freeSwipeExitScenario())
+    }
+
+    @Test
+    fun lockedSwipeExitFrameTiming() {
+        measureSwipe(scenario = lockedSwipeExitScenario())
+    }
+
     private fun measureSwipe(scenario: SwipeBenchmarkScenario) {
+        lateinit var preparedSwipe: PreparedSwipe
+
         benchmarkRule.measureRepeated(
             packageName = swipeBenchmarkContract.target.packageName,
             metrics = listOf(FrameTimingMetric()),
@@ -41,16 +52,22 @@ class SwipeGestureBenchmark {
             setupBlock = {
                 killProcess()
                 startActivityAndWait(scenario.createIntent(contract = swipeBenchmarkContract))
-                requireNotNull(device.waitForSwipeCard(contract = swipeBenchmarkContract))
+                preparedSwipe =
+                    device.prepareSwipe(
+                        contract = swipeBenchmarkContract,
+                        timeoutMillis = config.gestureTimeoutMillis,
+                    )
             },
         ) {
-            val card = requireNotNull(device.waitForSwipeCard(contract = swipeBenchmarkContract))
             repeat(config.swipesPerIteration) { index ->
-                card.performSwipe(
-                    device = device,
-                    input = scenario.inputAt(index),
-                )
-                SystemClock.sleep(config.resetSettleMillis)
+                preparedSwipe =
+                    device.performSwipeAndAwait(
+                        contract = swipeBenchmarkContract,
+                        preparedSwipe = preparedSwipe,
+                        expectedResult = scenario.expectedResult,
+                        timeoutMillis = config.gestureTimeoutMillis,
+                        input = scenario.inputAt(index),
+                    )
             }
         }
     }

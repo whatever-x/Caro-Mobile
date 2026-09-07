@@ -7,11 +7,14 @@ internal data class SwipeBenchmarkContract(
     val target: BenchmarkTarget,
     val modeExtraName: String,
     val cardResourceId: String,
+    val stateResourceId: String,
+    val stateMarkerPrefix: String,
 )
 
 internal data class SwipeBenchmarkScenario(
     val mode: SwipeBenchmarkMode,
-    val inputs: List<SwipeInput> = defaultSwipeInputs(),
+    val expectedResult: SwipeTerminalResult,
+    val inputs: List<SwipeInput>,
 ) {
     init {
         require(inputs.isNotEmpty()) { "Swipe benchmark inputs must not be empty." }
@@ -21,6 +24,7 @@ internal data class SwipeBenchmarkScenario(
 internal data class SwipeInput(
     val horizontalDistanceRatio: Float,
     val verticalDistanceRatio: Float,
+    val expectedDirection: SwipeDirection,
     val steps: Int = DEFAULT_SWIPE_STEPS,
 ) {
     init {
@@ -35,6 +39,17 @@ internal enum class SwipeBenchmarkMode {
     LOCKED,
 }
 
+internal enum class SwipeTerminalResult {
+    RESET,
+    EXIT,
+}
+
+internal enum class SwipeDirection {
+    LEFT,
+    RIGHT,
+    UP,
+}
+
 internal val swipeBenchmarkContract =
     SwipeBenchmarkContract(
         target =
@@ -44,16 +59,36 @@ internal val swipeBenchmarkContract =
             ),
         modeExtraName = "swipe_mode",
         cardResourceId = "swipe_benchmark_card",
+        stateResourceId = "swipe_benchmark_state",
+        stateMarkerPrefix = "swipe_benchmark",
     )
 
 internal fun freeSwipeScenario(): SwipeBenchmarkScenario =
     SwipeBenchmarkScenario(
         mode = SwipeBenchmarkMode.FREE,
+        expectedResult = SwipeTerminalResult.RESET,
+        inputs = defaultResetSwipeInputs(),
     )
 
 internal fun lockedSwipeScenario(): SwipeBenchmarkScenario =
     SwipeBenchmarkScenario(
         mode = SwipeBenchmarkMode.LOCKED,
+        expectedResult = SwipeTerminalResult.RESET,
+        inputs = defaultResetSwipeInputs(),
+    )
+
+internal fun freeSwipeExitScenario(): SwipeBenchmarkScenario =
+    SwipeBenchmarkScenario(
+        mode = SwipeBenchmarkMode.FREE,
+        expectedResult = SwipeTerminalResult.EXIT,
+        inputs = defaultExitSwipeInputs(),
+    )
+
+internal fun lockedSwipeExitScenario(): SwipeBenchmarkScenario =
+    SwipeBenchmarkScenario(
+        mode = SwipeBenchmarkMode.LOCKED,
+        expectedResult = SwipeTerminalResult.EXIT,
+        inputs = defaultExitSwipeInputs(),
     )
 
 internal fun SwipeBenchmarkScenario.createIntent(contract: SwipeBenchmarkContract): Intent =
@@ -64,22 +99,46 @@ internal fun SwipeBenchmarkScenario.createIntent(contract: SwipeBenchmarkContrac
 
 internal fun SwipeBenchmarkScenario.inputAt(index: Int): SwipeInput = inputs[index.mod(inputs.size)]
 
-private fun defaultSwipeInputs(): List<SwipeInput> =
+private fun defaultResetSwipeInputs(): List<SwipeInput> =
     listOf(
         SwipeInput(
-            horizontalDistanceRatio = -HORIZONTAL_DISTANCE_RATIO,
+            horizontalDistanceRatio = -RESET_HORIZONTAL_DISTANCE_RATIO,
             verticalDistanceRatio = 0f,
+            expectedDirection = SwipeDirection.LEFT,
         ),
         SwipeInput(
-            horizontalDistanceRatio = HORIZONTAL_DISTANCE_RATIO,
+            horizontalDistanceRatio = RESET_HORIZONTAL_DISTANCE_RATIO,
             verticalDistanceRatio = 0f,
+            expectedDirection = SwipeDirection.RIGHT,
         ),
         SwipeInput(
             horizontalDistanceRatio = 0f,
-            verticalDistanceRatio = -VERTICAL_DISTANCE_RATIO,
+            verticalDistanceRatio = -RESET_VERTICAL_DISTANCE_RATIO,
+            expectedDirection = SwipeDirection.UP,
         ),
     )
 
-private const val HORIZONTAL_DISTANCE_RATIO = 0.25f
-private const val VERTICAL_DISTANCE_RATIO = 0.2f
+private fun defaultExitSwipeInputs(): List<SwipeInput> =
+    listOf(
+        SwipeInput(
+            horizontalDistanceRatio = -EXIT_HORIZONTAL_DISTANCE_RATIO,
+            verticalDistanceRatio = 0f,
+            expectedDirection = SwipeDirection.LEFT,
+        ),
+        SwipeInput(
+            horizontalDistanceRatio = EXIT_HORIZONTAL_DISTANCE_RATIO,
+            verticalDistanceRatio = 0f,
+            expectedDirection = SwipeDirection.RIGHT,
+        ),
+        SwipeInput(
+            horizontalDistanceRatio = 0f,
+            verticalDistanceRatio = -EXIT_VERTICAL_DISTANCE_RATIO,
+            expectedDirection = SwipeDirection.UP,
+        ),
+    )
+
+private const val RESET_HORIZONTAL_DISTANCE_RATIO = 0.25f
+private const val RESET_VERTICAL_DISTANCE_RATIO = 0.2f
+private const val EXIT_HORIZONTAL_DISTANCE_RATIO = 0.55f
+private const val EXIT_VERTICAL_DISTANCE_RATIO = 0.45f
 private const val DEFAULT_SWIPE_STEPS = 60
