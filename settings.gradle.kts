@@ -36,6 +36,8 @@ rootProject.name = "CaroMobile"
 
 include(":androidApp")
 include(":composeApp")
+include(":benchmark-target")
+include(":benchmark")
 
 // :Core
 include(":core:data")
