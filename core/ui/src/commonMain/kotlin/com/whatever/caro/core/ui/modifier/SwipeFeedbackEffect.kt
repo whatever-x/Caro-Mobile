@@ -9,6 +9,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
+import androidx.compose.runtime.structuralEqualityPolicy
 import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import com.whatever.caro.core.ui.swipe.SwipeDirection
@@ -28,7 +29,7 @@ internal fun SwipeFeedbackEffect(
     var feedbackMemory by remember(state) { mutableStateOf(SwipeFeedbackMemory()) }
     val feedbackState =
         remember(state, motionConfig.hapticProgressThreshold) {
-            derivedStateOf {
+            derivedStateOf(policy = structuralEqualityPolicy()) {
                 SwipeFeedbackSnapshot(
                     direction = state.currentDirection,
                     hapticThresholdState =
@@ -63,31 +64,31 @@ internal fun SwipeFeedbackEffect(
     }
 }
 
-private fun Float.resolveHapticThresholdState(threshold: Float): HapticThresholdState =
+internal fun Float.resolveHapticThresholdState(threshold: Float): HapticThresholdState =
     when {
         this >= threshold -> HapticThresholdState.REACHED
         this < threshold / 2f -> HapticThresholdState.RESET
         else -> HapticThresholdState.BETWEEN
     }
 
-private data class SwipeFeedbackMemory(
+internal data class SwipeFeedbackMemory(
     val hasNotifiedDirection: Boolean = false,
     val lastNotifiedDirection: SwipeDirection? = null,
     val lastHapticDirection: SwipeDirection? = null,
 )
 
-private data class SwipeFeedbackTransition(
+internal data class SwipeFeedbackTransition(
     val nextMemory: SwipeFeedbackMemory,
     val shouldNotifyDirection: Boolean,
     val shouldPerformHaptic: Boolean,
 )
 
-private data class SwipeFeedbackSnapshot(
+internal data class SwipeFeedbackSnapshot(
     val direction: SwipeDirection?,
     val hapticThresholdState: HapticThresholdState,
 )
 
-private fun SwipeFeedbackMemory.reduce(
+internal fun SwipeFeedbackMemory.reduce(
     feedback: SwipeFeedbackSnapshot,
     hapticFeedbackEnabled: Boolean,
 ): SwipeFeedbackTransition {
@@ -125,7 +126,7 @@ private fun SwipeFeedbackMemory.reduce(
     )
 }
 
-private enum class HapticThresholdState {
+internal enum class HapticThresholdState {
     RESET,
     BETWEEN,
     REACHED,

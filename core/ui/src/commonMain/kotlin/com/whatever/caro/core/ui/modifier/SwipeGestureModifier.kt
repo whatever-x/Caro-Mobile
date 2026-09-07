@@ -80,10 +80,7 @@ fun Modifier.swipeGesture(
             if (!enabled && !state.isAnimationRunning) {
                 runtime.animationJob?.cancel()
                 runtime = runtime.copy(animationJob = null)
-                state.reset(
-                    animationSpec = motionConfig.resetAnimationSpec,
-                    resolveSnapshot = resolveSwipeSnapshot,
-                )
+                state.reset(animationSpec = motionConfig.resetAnimationSpec)
             }
         }
 
@@ -106,10 +103,7 @@ fun Modifier.swipeGesture(
                             runtime.copy(
                                 animationJob =
                                     coroutineScope.launch {
-                                        state.reset(
-                                            animationSpec = motionConfig.resetAnimationSpec,
-                                            resolveSnapshot = resolveSwipeSnapshot,
-                                        )
+                                        state.reset(animationSpec = motionConfig.resetAnimationSpec)
                                     },
                             )
                     },
@@ -130,14 +124,10 @@ fun Modifier.swipeGesture(
                                                         currentOffset = state.offset,
                                                     ),
                                                 animationSpec = motionConfig.exitAnimationSpec,
-                                                resolveSnapshot = resolveSwipeSnapshot,
                                             )
                                             updatedOnSwiped(releasedDirection)
                                         } else {
-                                            state.reset(
-                                                animationSpec = motionConfig.resetAnimationSpec,
-                                                resolveSnapshot = resolveSwipeSnapshot,
-                                            )
+                                            state.reset(animationSpec = motionConfig.resetAnimationSpec)
                                         }
                                     },
                             )
@@ -225,10 +215,7 @@ fun Modifier.directionLockedSwipeGesture(
             if (!enabled) {
                 runtime.animationJob?.cancel()
                 runtime = runtime.copy(animationJob = null)
-                state.reset(
-                    animationSpec = motionConfig.resetAnimationSpec,
-                    resolveSnapshot = resolveAnimatedSwipeSnapshot,
-                )
+                state.reset(animationSpec = motionConfig.resetAnimationSpec)
                 runtime = runtime.copy(dragOffset = Offset.Zero)
             }
         }
@@ -260,10 +247,7 @@ fun Modifier.directionLockedSwipeGesture(
                             runtime.copy(
                                 animationJob =
                                     coroutineScope.launch {
-                                        state.reset(
-                                            animationSpec = motionConfig.resetAnimationSpec,
-                                            resolveSnapshot = resolveAnimatedSwipeSnapshot,
-                                        )
+                                        state.reset(animationSpec = motionConfig.resetAnimationSpec)
                                         runtime = runtime.copy(dragOffset = Offset.Zero)
                                     },
                             )
@@ -286,14 +270,10 @@ fun Modifier.directionLockedSwipeGesture(
                                                         currentOffset = releasedOffset,
                                                     ),
                                                 animationSpec = motionConfig.exitAnimationSpec,
-                                                resolveSnapshot = resolveAnimatedSwipeSnapshot,
                                             )
                                             updatedOnSwiped(releasedDirection)
                                         } else {
-                                            state.reset(
-                                                animationSpec = motionConfig.resetAnimationSpec,
-                                                resolveSnapshot = resolveAnimatedSwipeSnapshot,
-                                            )
+                                            state.reset(animationSpec = motionConfig.resetAnimationSpec)
                                             runtime = runtime.copy(dragOffset = Offset.Zero)
                                         }
                                     },
