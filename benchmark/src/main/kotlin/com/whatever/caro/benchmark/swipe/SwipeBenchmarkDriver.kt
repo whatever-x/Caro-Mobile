@@ -44,9 +44,8 @@ internal fun UiDevice.prepareSwipe(
     timeoutMillis: Long,
 ): PreparedSwipe {
     val card = requireSwipeCard(contract = contract, timeoutMillis = timeoutMillis)
-    val state = requireSwipeState(contract = contract, timeoutMillis = timeoutMillis)
+    val state = requireReadySwipeState(contract = contract, timeoutMillis = timeoutMillis)
 
-    check(state.isReady) { "Swipe target was not ready during setup: $state" }
     check(state.eventSequence == 0) { "Swipe target setup contained an unexpected completed event: $state" }
 
     return PreparedSwipe(
@@ -142,18 +141,25 @@ private fun UiDevice.requireSwipeCard(
         ),
     ) { "Swipe card '${contract.cardResourceId}' was not found within $timeoutMillis ms." }
 
-private fun UiDevice.requireSwipeState(
+private fun UiDevice.requireReadySwipeState(
     contract: SwipeBenchmarkContract,
     timeoutMillis: Long,
 ): SwipeObservedState {
     val deadline = SystemClock.elapsedRealtime() + timeoutMillis
+    var latestState: SwipeObservedState? = null
 
     while (SystemClock.elapsedRealtime() < deadline) {
-        readSwipeStateOrNull(contract = contract)?.let { state -> return state }
+        readSwipeStateOrNull(contract = contract)?.let { state ->
+            latestState = state
+            if (state.isReady) return state
+        }
         SystemClock.sleep(STATE_POLL_INTERVAL_MILLIS)
     }
 
-    error("Swipe state '${contract.stateResourceId}' was not found within $timeoutMillis ms.")
+    error(
+        "Swipe state '${contract.stateResourceId}' was not ready within $timeoutMillis ms. " +
+            "Latest=$latestState",
+    )
 }
 
 private fun UiDevice.awaitNextSwipeState(
@@ -167,7 +173,7 @@ private fun UiDevice.awaitNextSwipeState(
     while (SystemClock.elapsedRealtime() < deadline) {
         readSwipeStateOrNull(contract = contract)?.let { observedState ->
             latestState = observedState
-            if (observedState.eventSequence > previousState.eventSequence) {
+            if (observedState.eventSequence > previousState.eventSequence && observedState.isReady) {
                 check(observedState.eventSequence == previousState.eventSequence + 1) {
                     "Expected exactly one swipe event after $previousState but observed $observedState"
                 }

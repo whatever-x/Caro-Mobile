@@ -51,6 +51,7 @@ class SwipeBenchmarkActivity : ComponentActivity() {
 @Composable
 private fun SwipeBenchmarkScreen(mode: SwipeBenchmarkMode) {
     var observation by remember { mutableStateOf(SwipeBenchmarkObservation()) }
+    val cardGeneration = observation.cardGeneration
 
     MaterialTheme {
         Box(
@@ -61,10 +62,11 @@ private fun SwipeBenchmarkScreen(mode: SwipeBenchmarkMode) {
                     .semantics { testTagsAsResourceId = true },
             contentAlignment = Alignment.Center,
         ) {
-            key(observation.cardGeneration) {
+            key(cardGeneration) {
                 val swipeState = rememberSwipeGestureState()
 
                 LaunchedEffect(swipeState) {
+                    observation = observation.onCardReady(cardGeneration = cardGeneration)
                     snapshotFlow { swipeState.isAnimationRunning }
                         .distinctUntilChanged()
                         .collect { isAnimationRunning ->
@@ -134,13 +136,21 @@ private fun Modifier.benchmarkSwipeGesture(
 
 private data class SwipeBenchmarkObservation(
     val cardGeneration: Int = 0,
+    val readyCardGeneration: Int? = null,
     val eventSequence: Int = 0,
     val pendingDirection: SwipeDirection? = null,
     val terminalResult: SwipeTerminalResult = SwipeTerminalResult.NONE,
     val terminalDirection: SwipeDirection? = null,
 ) {
     val isReady: Boolean
-        get() = pendingDirection == null
+        get() = readyCardGeneration == cardGeneration && pendingDirection == null
+
+    fun onCardReady(cardGeneration: Int): SwipeBenchmarkObservation =
+        if (this.cardGeneration == cardGeneration) {
+            copy(readyCardGeneration = cardGeneration)
+        } else {
+            this
+        }
 
     fun onDirectionChanged(direction: SwipeDirection?): SwipeBenchmarkObservation =
         direction?.let { activeDirection -> copy(pendingDirection = activeDirection) } ?: this
