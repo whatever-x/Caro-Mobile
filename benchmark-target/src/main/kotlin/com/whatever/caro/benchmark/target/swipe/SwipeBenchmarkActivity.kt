@@ -5,8 +5,12 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -92,6 +96,8 @@ private fun SwipeBenchmarkScreen(mode: SwipeBenchmarkMode) {
                 modifier =
                     Modifier
                         .align(Alignment.TopStart)
+                        .windowInsetsPadding(WindowInsets.safeDrawing)
+                        .padding(8.dp)
                         .size(1.dp)
                         .testTag(SWIPE_STATE_TAG)
                         .semantics {
