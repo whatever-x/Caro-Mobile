@@ -43,6 +43,61 @@ internal fun Offset.resolveLockedDirection(
         upToHorizontalSwitchRatio = upToHorizontalSwitchRatio,
     )
 
+internal fun Offset.resolveSwipeGestureSnapshot(
+    enabledDirections: Set<SwipeDirection>,
+    activationThreshold: Float,
+    swipeThreshold: Float,
+    upToHorizontalSwitchRatio: Float,
+): SwipeGestureSnapshot {
+    val direction =
+        resolveDirection(
+            enabledDirections = enabledDirections,
+            activationThreshold = activationThreshold,
+            upToHorizontalSwitchRatio = upToHorizontalSwitchRatio,
+        )
+
+    return SwipeGestureSnapshot(
+        offset = this,
+        direction = direction,
+        progress =
+            resolveProgress(
+                direction = direction,
+                swipeThreshold = swipeThreshold,
+            ),
+    )
+}
+
+internal fun Offset.resolveLockedSwipeGestureSnapshot(
+    enabledDirections: Set<SwipeDirection>,
+    activationThreshold: Float,
+    swipeThreshold: Float,
+    upToHorizontalSwitchRatio: Float,
+    projectToDirection: Boolean,
+): SwipeGestureSnapshot {
+    val direction =
+        resolveLockedDirection(
+            enabledDirections = enabledDirections,
+            activationThreshold = activationThreshold,
+            upToHorizontalSwitchRatio = upToHorizontalSwitchRatio,
+        )
+    val displayedOffset =
+        if (projectToDirection) {
+            projectTo(direction = direction)
+        } else {
+            this
+        }
+
+    return SwipeGestureSnapshot(
+        offset = displayedOffset,
+        direction = direction,
+        progress =
+            displayedOffset.resolveProgress(
+                direction = direction,
+                swipeThreshold = swipeThreshold,
+            ),
+    )
+}
+
 internal fun Offset.resolveProgress(
     direction: SwipeDirection?,
     swipeThreshold: Float,
