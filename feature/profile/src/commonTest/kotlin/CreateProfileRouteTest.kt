@@ -1,5 +1,6 @@
 import com.whatever.caro.core.navigator.contract.NavCommand
 import com.whatever.caro.core.navigator.entries.HomeEntry
+import com.whatever.caro.core.navigator.entries.LoginEntry
 import com.whatever.caro.feature.profile.create.createProfileNavigationCommand
 import com.whatever.caro.feature.profile.create.mvi.CreateProfileSideEffect
 import io.kotest.core.spec.style.FunSpec
@@ -12,9 +13,9 @@ class CreateProfileRouteTest : FunSpec() {
                 NavCommand.ResetTo(HomeEntry)
         }
 
-        test("프로필 생성 취소는 이전 화면으로 돌아간다") {
-            createProfileNavigationCommand(CreateProfileSideEffect.NavigateBack) shouldBe
-                NavCommand.Back
+        test("프로필 생성 취소는 로그인 화면으로 백스택을 초기화한다") {
+            createProfileNavigationCommand(CreateProfileSideEffect.NavigateLogin) shouldBe
+                NavCommand.ResetTo(LoginEntry)
         }
     }
 }

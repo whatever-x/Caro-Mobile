@@ -71,36 +71,23 @@ buildkonfig {
         buildConfigField(FieldSpec.Type.BOOLEAN, "IS_DEBUG", "true")
     }
 
-    targetConfigs("qa") {
-        create("android") {
-            buildConfigField(
-                FieldSpec.Type.STRING,
-                "SERVER_BASE_URL",
-                getLocalProperty("CARO_QA_SERVER") ?: error("CARO_BASE_URL을 찾을 수 없습니다."),
-            )
-            buildConfigField(FieldSpec.Type.BOOLEAN, "IS_DEBUG", "true")
-        }
-    }
-
-    targetConfigs("dev") {
-        create("android") {
-            buildConfigField(
-                FieldSpec.Type.STRING,
-                "SERVER_BASE_URL",
-                getLocalProperty("CARO_DEV_SERVER") ?: error("CARO_BASE_URL을 찾을 수 없습니다."),
-            )
-            buildConfigField(FieldSpec.Type.BOOLEAN, "IS_DEBUG", "true")
-        }
-    }
-
-    targetConfigs("prod") {
-        create("android") {
-            buildConfigField(
-                FieldSpec.Type.STRING,
-                "SERVER_BASE_URL",
-                getLocalProperty("CARO_PROD_SERVER") ?: error("CARO_BASE_URL을 찾을 수 없습니다."),
-            )
-            buildConfigField(FieldSpec.Type.BOOLEAN, "IS_DEBUG", "false")
+    listOf(
+        Triple("devDebug", "CARO_DEV_SERVER", true),
+        Triple("devRelease", "CARO_DEV_SERVER", false),
+        Triple("qaDebug", "CARO_QA_SERVER", true),
+        Triple("qaRelease", "CARO_QA_SERVER", false),
+        Triple("prodDebug", "CARO_PROD_SERVER", true),
+        Triple("prodRelease", "CARO_PROD_SERVER", false),
+    ).forEach { (variant, serverProperty, isDebug) ->
+        targetConfigs(variant) {
+            create("android") {
+                buildConfigField(
+                    FieldSpec.Type.STRING,
+                    "SERVER_BASE_URL",
+                    getLocalProperty(serverProperty) ?: error("CARO_BASE_URL을 찾을 수 없습니다."),
+                )
+                buildConfigField(FieldSpec.Type.BOOLEAN, "IS_DEBUG", isDebug.toString())
+            }
         }
     }
 }

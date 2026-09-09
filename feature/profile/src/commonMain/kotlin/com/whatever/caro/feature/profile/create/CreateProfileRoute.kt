@@ -10,6 +10,7 @@ import androidx.navigationevent.compose.rememberNavigationEventState
 import com.whatever.caro.core.navigator.contract.NavCommand
 import com.whatever.caro.core.navigator.dispatcher.NavigationDispatcher
 import com.whatever.caro.core.navigator.entries.HomeEntry
+import com.whatever.caro.core.navigator.entries.LoginEntry
 import com.whatever.caro.feature.profile.create.mvi.CreateProfileIntent
 import com.whatever.caro.feature.profile.create.mvi.CreateProfileSideEffect
 
@@ -44,6 +45,6 @@ fun CreateProfileRoute(
 
 internal fun createProfileNavigationCommand(sideEffect: CreateProfileSideEffect): NavCommand =
     when (sideEffect) {
-        CreateProfileSideEffect.NavigateBack -> NavCommand.Back
+        CreateProfileSideEffect.NavigateLogin -> NavCommand.ResetTo(key = LoginEntry)
         CreateProfileSideEffect.NavigateHome -> NavCommand.ResetTo(key = HomeEntry)
     }

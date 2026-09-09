@@ -9,6 +9,7 @@ data class CreateProfileState(
     val validationResult: NicknameValidationResult = NicknameValidationResult.Empty,
     val isLoading: Boolean = false,
     val isRandomNicknameLoading: Boolean = false,
+    val isCancelDialogVisible: Boolean = false,
 ) : UiState {
     val characterCount: String
         get() = "${nickname.length}/${NicknameValidator.MAX_LENGTH}"

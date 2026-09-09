@@ -6,6 +6,7 @@ import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.whatever.caro.core.navigator.contract.NavCommand
 import com.whatever.caro.core.navigator.dispatcher.NavigationDispatcher
+import com.whatever.caro.core.navigator.entries.CreateProfileEntry
 import com.whatever.caro.core.navigator.entries.HomeEntry
 import com.whatever.caro.core.navigator.entries.LoginEntry
 import com.whatever.caro.feature.splash.SplashScreen
@@ -29,6 +30,10 @@ fun SplashRoute(
             when (sideEffect) {
                 SplashSideEffect.NavigateLogin -> {
                     navDispatcher.emit(command = NavCommand.ResetTo(key = LoginEntry))
+                }
+
+                SplashSideEffect.NavigateCreateProfile -> {
+                    navDispatcher.emit(command = NavCommand.ResetTo(key = CreateProfileEntry))
                 }
 
                 SplashSideEffect.NavigateHome -> {
