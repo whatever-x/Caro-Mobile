@@ -11,34 +11,32 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import platform.Foundation.NSData
-import platform.UIKit.UIApplication
-import platform.UIKit.registerForRemoteNotifications
 import platform.UserNotifications.UNNotification
 import platform.UserNotifications.UNNotificationPresentationOptionBanner
 import platform.UserNotifications.UNNotificationPresentationOptionList
 import platform.UserNotifications.UNNotificationPresentationOptionSound
 import platform.UserNotifications.UNNotificationPresentationOptions
 import platform.UserNotifications.UNNotificationResponse
+import platform.UserNotifications.UNPushNotificationTrigger
 import platform.UserNotifications.UNUserNotificationCenter
 import platform.UserNotifications.UNUserNotificationCenterDelegateProtocol
 import platform.darwin.NSObject
 
-private const val MESSAGE_VALUE_KEY = "anyValue"
-
 @OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
-internal class IosFirebaseMessagingClient : MessagingClient {
+internal class IosFirebaseMessagingClient(
+    private val handler: IncomingNotificationHandler,
+) : MessagingClient {
     private val mutableTokenFlow = MutableStateFlow("")
     private val mutableMessages = Channel<CloudMessage>(capacity = Channel.CONFLATED)
 
     override val tokenFlow: StateFlow<String> = mutableTokenFlow.asStateFlow()
     override val messages: ReceiveChannel<CloudMessage> = mutableMessages
 
-    private val delegate = MessagingDelegate(mutableTokenFlow, mutableMessages)
+    private val delegate = MessagingDelegate(mutableTokenFlow, mutableMessages, handler)
 
-    fun attach(application: UIApplication) {
+    fun attach() {
         FIRMessaging.messaging().delegate = delegate
         UNUserNotificationCenter.currentNotificationCenter().delegate = delegate
-        application.registerForRemoteNotifications()
     }
 
     fun applyApnsToken(deviceToken: NSData) {
@@ -50,6 +48,7 @@ internal class IosFirebaseMessagingClient : MessagingClient {
 private class MessagingDelegate(
     private val tokenFlow: MutableStateFlow<String>,
     private val messages: Channel<CloudMessage>,
+    private val handler: IncomingNotificationHandler,
 ) : NSObject(),
     FIRMessagingDelegateProtocol,
     UNUserNotificationCenterDelegateProtocol {
@@ -68,13 +67,19 @@ private class MessagingDelegate(
         willPresentNotification: UNNotification,
         withCompletionHandler: (UNNotificationPresentationOptions) -> Unit,
     ) {
-        val userInfo = willPresentNotification.request.content.userInfo
-        messages.trySend(CloudMessage(anyValue = userInfo[MESSAGE_VALUE_KEY]?.toString()))
-        withCompletionHandler(
-            UNNotificationPresentationOptionBanner or
-                UNNotificationPresentationOptionList or
-                UNNotificationPresentationOptionSound,
-        )
+        if (willPresentNotification.request.trigger is UNPushNotificationTrigger) {
+            handler.onReceived(
+                willPresentNotification.request.content.title,
+                willPresentNotification.request.content.body,
+            )
+            withCompletionHandler(0uL)
+        } else {
+            withCompletionHandler(
+                UNNotificationPresentationOptionBanner or
+                    UNNotificationPresentationOptionList or
+                    UNNotificationPresentationOptionSound,
+            )
+        }
     }
 
     // 백그라운드, 알림센터 등에서 푸쉬를 눌렀을 경우 액션
@@ -83,8 +88,6 @@ private class MessagingDelegate(
         didReceiveNotificationResponse: UNNotificationResponse,
         withCompletionHandler: () -> Unit,
     ) {
-        val userInfo = didReceiveNotificationResponse.notification.request.content.userInfo
-        messages.trySend(CloudMessage(anyValue = userInfo[MESSAGE_VALUE_KEY]?.toString()))
         withCompletionHandler()
     }
 }
