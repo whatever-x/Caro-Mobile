@@ -5,8 +5,6 @@ import FirebaseMessaging.FIRMessagingDelegateProtocol
 import io.github.aakira.napier.Napier
 import kotlinx.cinterop.BetaInteropApi
 import kotlinx.cinterop.ExperimentalForeignApi
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -27,12 +25,9 @@ internal class IosFirebaseMessagingClient(
     private val handler: IncomingNotificationHandler,
 ) : MessagingClient {
     private val mutableTokenFlow = MutableStateFlow("")
-    private val mutableMessages = Channel<CloudMessage>(capacity = Channel.CONFLATED)
-
     override val tokenFlow: StateFlow<String> = mutableTokenFlow.asStateFlow()
-    override val messages: ReceiveChannel<CloudMessage> = mutableMessages
 
-    private val delegate = MessagingDelegate(mutableTokenFlow, mutableMessages, handler)
+    private val delegate = MessagingDelegate(mutableTokenFlow, handler)
 
     fun attach() {
         FIRMessaging.messaging().delegate = delegate
@@ -47,7 +42,6 @@ internal class IosFirebaseMessagingClient(
 @OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
 private class MessagingDelegate(
     private val tokenFlow: MutableStateFlow<String>,
-    private val messages: Channel<CloudMessage>,
     private val handler: IncomingNotificationHandler,
 ) : NSObject(),
     FIRMessagingDelegateProtocol,
