@@ -16,6 +16,10 @@ def collect(platform: str, destination: Path) -> None:
     expected = sum(map(len, SCENARIOS.values()))
     if expected != 14:
         raise ValueError(f"Expected 14 scenarios, found {expected}")
+    destination = destination.resolve()
+    build_root = (ROOT / "build").resolve()
+    if destination == build_root or not destination.is_relative_to(build_root):
+        raise ValueError(f"Output must be a directory below {build_root}")
     if destination.exists():
         shutil.rmtree(destination)
     for module, ids in SCENARIOS.items():
