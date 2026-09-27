@@ -74,6 +74,9 @@ turbine = "1.2.1"
 mokkery = "3.3.0"
 kotest = "6.1.1"
 kover = "0.9.6"
+roborazzi = "1.75.0"
+robolectric = "4.17"
+junit-vintage = "5.13.4"
 
 # Lint
 spotless = "8.2.1"
@@ -181,6 +184,15 @@ kotest-extensions-koin = { group = "io.kotest", name = "kotest-extensions-koin",
 kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "kotlinx-coroutines" }
 koin-test = { group = "io.insert-koin", name = "koin-test", version.ref = "koin" }
 ktor-client-mock = { group = "io.ktor", name = "ktor-client-mock", version.ref = "ktor" }
+roborazzi = { module = "io.github.takahirom.roborazzi:roborazzi", version.ref = "roborazzi" }
+roborazzi-compose = { module = "io.github.takahirom.roborazzi:roborazzi-compose", version.ref = "roborazzi" }
+roborazzi-compose-ios = { module = "io.github.takahirom.roborazzi:roborazzi-compose-ios", version.ref = "roborazzi" }
+roborazzi-gradleplugin = { module = "io.github.takahirom.roborazzi:roborazzi-gradle-plugin", version.ref = "roborazzi" }
+robolectric = { module = "org.robolectric:robolectric", version.ref = "robolectric" }
+compose-ui-test = { module = "org.jetbrains.compose.ui:ui-test", version.ref = "compose-ui" }
+compose-ui-test-junit4 = { module = "org.jetbrains.compose.ui:ui-test-junit4", version.ref = "compose-ui" }
+compose-ui-test-manifest = { module = "androidx.compose.ui:ui-test-manifest", version = "1.11.2" }
+junit-vintage-engine = { module = "org.junit.vintage:junit-vintage-engine", version.ref = "junit-vintage" }
 
 # Gradle-Plugin
 kotlin-gradleplugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
@@ -199,6 +211,7 @@ android-google-id = { group = "com.google.android.libraries.identity.googleid", 
 [plugins]
 # Android
 android-application = { id = "com.android.application", version.ref = "agp" }
+roborazzi = { id = "io.github.takahirom.roborazzi", version.ref = "roborazzi" }
 room = { id = "androidx.room", version.ref = "androidx-room" }
 
 # KMP
