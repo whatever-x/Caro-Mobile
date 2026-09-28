@@ -7,7 +7,12 @@ class IncomingNotificationHandler(
         title: String?,
         body: String?,
     ) {
-        if (title.isNullOrBlank() && body.isNullOrBlank()) return
+        if (!shouldShowNotification(title, body)) return
         presenter.show(title.orEmpty(), body.orEmpty())
     }
 }
+
+internal fun shouldShowNotification(
+    title: String?,
+    body: String?,
+): Boolean = !title.isNullOrBlank() || !body.isNullOrBlank()

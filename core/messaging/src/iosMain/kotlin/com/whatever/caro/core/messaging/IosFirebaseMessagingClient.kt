@@ -21,13 +21,11 @@ import platform.UserNotifications.UNUserNotificationCenterDelegateProtocol
 import platform.darwin.NSObject
 
 @OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
-internal class IosFirebaseMessagingClient(
-    private val handler: IncomingNotificationHandler,
-) : MessagingClient {
+internal class IosFirebaseMessagingClient : MessagingClient {
     private val mutableTokenFlow = MutableStateFlow("")
     override val tokenFlow: StateFlow<String> = mutableTokenFlow.asStateFlow()
 
-    private val delegate = MessagingDelegate(mutableTokenFlow, handler)
+    private val delegate = MessagingDelegate(mutableTokenFlow)
 
     fun attach() {
         FIRMessaging.messaging().delegate = delegate
@@ -42,7 +40,6 @@ internal class IosFirebaseMessagingClient(
 @OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
 private class MessagingDelegate(
     private val tokenFlow: MutableStateFlow<String>,
-    private val handler: IncomingNotificationHandler,
 ) : NSObject(),
     FIRMessagingDelegateProtocol,
     UNUserNotificationCenterDelegateProtocol {
@@ -62,18 +59,17 @@ private class MessagingDelegate(
         withCompletionHandler: (UNNotificationPresentationOptions) -> Unit,
     ) {
         if (willPresentNotification.request.trigger is UNPushNotificationTrigger) {
-            handler.onReceived(
-                willPresentNotification.request.content.title,
-                willPresentNotification.request.content.body,
-            )
-            withCompletionHandler(0uL)
-        } else {
-            withCompletionHandler(
-                UNNotificationPresentationOptionBanner or
-                    UNNotificationPresentationOptionList or
-                    UNNotificationPresentationOptionSound,
-            )
+            val content = willPresentNotification.request.content
+            if (!shouldShowNotification(content.title, content.body)) {
+                withCompletionHandler(0uL)
+                return
+            }
         }
+        withCompletionHandler(
+            UNNotificationPresentationOptionBanner or
+                UNNotificationPresentationOptionList or
+                UNNotificationPresentationOptionSound,
+        )
     }
 
     // 백그라운드, 알림센터 등에서 푸쉬를 눌렀을 경우 액션
