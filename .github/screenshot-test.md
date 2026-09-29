@@ -24,6 +24,6 @@ python3 scripts/screenshot/collect.py iosSimulatorArm64 build/screenshot-ios
 
 ## Golden and PR rollout
 
-The `Screenshot Golden` workflow runs on `develop` pushes and uploads complete Android and iOS artifacts for 90 days. A failed capture or incomplete 14-image set prevents upload. The PR workflow resolves only a successful Golden run whose head SHA equals the PR base SHA. If none exists or its artifact expired, the PR job fails with a rebase or regeneration message.
+The `Screenshot Golden` workflow runs on `develop` pushes and uploads complete Android and iOS artifacts for 90 days. A failed capture or incomplete registered image set prevents upload. Each artifact also includes its scenario list. The PR workflow resolves only a successful Golden run whose head SHA equals the PR base SHA. If none exists or its artifact expired, the PR job fails with a rebase or regeneration message.
 
 The first PR introducing the Golden workflow cannot have a base artifact yet. Merge that PR into `develop`, wait for its first successful Golden run, and then enable PR comparison in a follow-up PR. Image differences are report-only; build, rendering, missing image, comparison, and Artifact failures remain CI failures.

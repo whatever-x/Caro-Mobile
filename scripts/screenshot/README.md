@@ -7,7 +7,7 @@
 | 파일 | 역할 |
 | --- | --- |
 | `scenarios.json` | 9개 feature 모듈의 14개 화면 시나리오 ID 목록. 수집 시 생성 PNG와 대조합니다. |
-| `collect.py` | 각 모듈의 PNG 이름이 `scenarios.json`과 정확히 일치하는지 확인하고, 14개 이미지를 하나의 Artifact 디렉터리로 복사합니다. 누락·추가 이미지가 있으면 실패합니다. |
+| `collect.py` | 각 모듈의 PNG 이름이 `scenarios.json`과 정확히 일치하는지 확인하고, 등록된 이미지와 시나리오 목록을 하나의 Artifact 디렉터리로 복사합니다. 누락·추가 이미지가 있으면 실패합니다. |
 
 ## 이미지가 이동하는 경로
 
@@ -42,4 +42,4 @@ python3 scripts/screenshot/collect.py iosSimulatorArm64 build/screenshot-golden-
 
 `collect.py`는 지정한 출력 디렉터리를 초기화하므로 플랫폼마다 별도 디렉터리를 사용합니다. CI에서는 Android와 iOS가 별도 러너에서 실행되므로 각각 `build/screenshot-golden`을 사용합니다.
 
-`collect.py`는 시나리오 목록과 실제 생성 PNG가 일치하지 않으면 실패합니다. `develop` Golden 워크플로의 실제 Artifact 생성 여부는 해당 워크플로 실행 결과에서 확인해야 합니다.
+`collect.py`는 등록된 시나리오 수를 자동으로 계산하고, 목록과 실제 생성 PNG가 일치하지 않으면 실패합니다. 수집한 `scenarios.json`은 이후 PR 비교에서 Golden에 없는 신규 상태를 구분하는 데 사용할 수 있습니다. `develop` Golden 워크플로의 실제 Artifact 생성 여부는 해당 워크플로 실행 결과에서 확인해야 합니다.
