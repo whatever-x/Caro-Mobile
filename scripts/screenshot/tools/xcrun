@@ -1,8 +1,0 @@
-#!/usr/bin/env bash
-set -euo pipefail
-
-if [[ "${1:-}" == --sdk && "${2:-}" == macosx && "${3:-}" == swift && "${4:-}" == build ]]; then
-  shift 4
-  exec /usr/bin/xcrun --sdk macosx swift build --build-system native "$@"
-fi
-exec /usr/bin/xcrun "$@"

@@ -8,7 +8,6 @@
 | --- | --- |
 | `scenarios.json` | 9개 feature 모듈의 14개 화면 시나리오 ID 목록. 수집 시 생성 PNG와 대조합니다. |
 | `collect.py` | 각 모듈의 PNG 이름이 `scenarios.json`과 정확히 일치하는지 확인하고, 14개 이미지를 하나의 Artifact 디렉터리로 복사합니다. 누락·추가 이미지가 있으면 실패합니다. |
-| `tools/xcrun` | 로컬 Xcode 27에서 필요한 SwiftPM `--build-system native` 옵션을 적용하는 래퍼입니다. CI는 Xcode 26.6을 사용하므로 호출하지 않습니다. |
 
 ## 이미지가 이동하는 경로
 
@@ -32,7 +31,7 @@ PR의 base SHA에 해당하는 Golden을 내려받아 Before/After/Diff를 생�
 ./gradlew compareRoborazziIosSimulatorArm64
 ```
 
-루트에서 작업 이름만 지정하면 해당 작업이 있는 feature 모듈들이 실행됩니다. 로컬 Xcode 27에서는 현재 SwiftPM 빌드 호환성 문제로 iOS 명령이 실패할 수 있습니다. 이 경우 `PATH="$PWD/scripts/screenshot/tools:$PATH" ./gradlew --no-daemon recordRoborazziIosSimulatorArm64`처럼 기존 `tools/xcrun` 우회를 적용합니다. CI는 Xcode 26.6을 선택합니다.
+루트에서 작업 이름만 지정하면 해당 작업이 있는 feature 모듈들이 실행됩니다. 현재 `spmForKmp` 호환성 문제로 로컬 Xcode 27에서는 iOS 명령이 실패할 수 있습니다. CI는 Xcode 26.6을 선택합니다.
 
 CI와 같은 전체 이미지 목록 검증·수집은 다음과 같이 실행할 수 있습니다.
 

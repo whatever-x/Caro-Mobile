@@ -13,7 +13,7 @@ Set the project's usual `local.properties` build values, then run:
 ./gradlew compareRoborazziIosSimulatorArm64
 ```
 
-Running a task by name from the root executes it in every feature module that has the task. On local Xcode 27, the iOS command may need `PATH="$PWD/scripts/screenshot/tools:$PATH" ./gradlew --no-daemon recordRoborazziIosSimulatorArm64` to keep the existing `spmForKmp` Google Sign-In interop build on SwiftPM's native layout. Use the same prefix for iOS compare. CI pins Xcode 26.6.
+Running a task by name from the root executes it in every feature module that has the task. Local iOS runs may fail on Xcode 27 due to the current `spmForKmp` compatibility issue. CI pins Xcode 26.6.
 
 PNG files under `feature/*/build/outputs/roborazzi` are ignored local output. Do not commit them. The `collect.py` command fails if any named scenario is missing or unexpected:
 
