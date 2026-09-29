@@ -21,9 +21,11 @@ jobs:
         include:
           - platform: android
             target: androidHostTest
+            task: recordRoborazziAndroidHostTest
             runner: ubuntu-24.04
           - platform: ios
             target: iosSimulatorArm64
+            task: recordRoborazziIosSimulatorArm64
             runner: macos-26
     steps:
       - uses: actions/checkout@v6
@@ -48,7 +50,7 @@ jobs:
           GOOGLE_WEB_CLIENT_ID=screenshot-test
           EOF
       - name: Record all scenarios
-        run: bash scripts/screenshot/run.sh '${{ matrix.platform }}'
+        run: ./gradlew '${{ matrix.task }}' --stacktrace
       - name: Validate and collect all 14 images
         run: python3 scripts/screenshot/collect.py '${{ matrix.target }}' build/screenshot-golden
       - uses: actions/upload-artifact@v6

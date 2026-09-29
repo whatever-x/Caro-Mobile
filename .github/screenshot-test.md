@@ -7,13 +7,13 @@
 Set the project's usual `local.properties` build values, then run:
 
 ```bash
-bash scripts/screenshot/run.sh android
-bash scripts/screenshot/run.sh ios
-bash scripts/screenshot/run.sh android compare
-bash scripts/screenshot/run.sh ios compare
+./gradlew recordRoborazziAndroidHostTest
+./gradlew recordRoborazziIosSimulatorArm64
+./gradlew compareRoborazziAndroidHostTest
+./gradlew compareRoborazziIosSimulatorArm64
 ```
 
-The iOS command uses the native SwiftPM build layout when local Xcode is 27 or newer. This keeps the existing `spmForKmp` Google Sign-In interop build working until that plugin supports SwiftPM's new output layout. CI pins Xcode 26.6.
+Running a task by name from the root executes it in every feature module that has the task. On local Xcode 27, the iOS command may need `PATH="$PWD/scripts/screenshot/tools:$PATH" ./gradlew --no-daemon recordRoborazziIosSimulatorArm64` to keep the existing `spmForKmp` Google Sign-In interop build on SwiftPM's native layout. Use the same prefix for iOS compare. CI pins Xcode 26.6.
 
 PNG files under `feature/*/build/outputs/roborazzi` are ignored local output. Do not commit them. The `collect.py` command fails if any named scenario is missing or unexpected:
 
