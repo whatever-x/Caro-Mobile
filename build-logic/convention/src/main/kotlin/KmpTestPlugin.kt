@@ -18,7 +18,9 @@ class KmpTestPlugin : Plugin<Project> {
 
             kotlin {
                 android {
-                    withHostTest { }
+                    withHostTest {
+                        isIncludeAndroidResources = true
+                    }
                 }
 
                 sourceSets.getByName("androidHostTest") {
