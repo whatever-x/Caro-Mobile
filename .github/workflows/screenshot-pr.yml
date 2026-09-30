@@ -1,0 +1,116 @@
+name: Screenshot PR
+
+on:
+  pull_request:
+    branches: [develop]
+
+concurrency:
+  group: screenshot-pr-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  compare:
+    name: Compare / ${{ matrix.platform }}
+    runs-on: ${{ matrix.runner }}
+    permissions:
+      contents: read
+      actions: read
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: android
+            target: androidHostTest
+            task: recordRoborazziAndroidHostTest
+            runner: ubuntu-24.04
+          - platform: ios
+            target: iosSimulatorArm64
+            task: recordRoborazziIosSimulatorArm64
+            runner: macos-26
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+      - uses: android-actions/setup-android@v4
+      - uses: gradle/actions/setup-gradle@v5
+      - name: Select Xcode 26.6
+        if: matrix.platform == 'ios'
+        run: sudo xcode-select --switch /Applications/Xcode_26.6.app
+      - name: Download Golden for exact PR base SHA
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          run_id=$(gh api --paginate "repos/$GITHUB_REPOSITORY/actions/workflows/screenshot-golden.yml/runs?branch=develop&status=success&per_page=100" \
+            --jq '.workflow_runs[] | [.head_sha, .id] | @tsv' | awk -v sha="$BASE_SHA" '$1 == sha && !found {print $2; found=1}')
+          if [[ -z "$run_id" ]]; then
+            echo "No successful develop Golden run for base SHA $BASE_SHA. Rebase onto a develop commit with a Golden run or regenerate the baseline." >&2
+            exit 1
+          fi
+          if ! gh run download "$run_id" --repo "$GITHUB_REPOSITORY" -n 'screenshot-golden-${{ matrix.platform }}' -D build/screenshot-baseline; then
+            echo "Golden artifact for base SHA $BASE_SHA is missing or expired. Rebase or regenerate the develop baseline." >&2
+            exit 1
+          fi
+      - name: Configure offline screenshot fixtures
+        run: |
+          cat > local.properties <<'EOF'
+          CARO_DEV_SERVER=https://example.invalid/
+          CARO_QA_SERVER=https://example.invalid/
+          CARO_PROD_SERVER=https://example.invalid/
+          GOOGLE_WEB_CLIENT_ID=screenshot-test
+          EOF
+      - name: Record PR screenshots
+        run: ./gradlew '${{ matrix.task }}' --stacktrace
+      - name: 등록된 스크린샷 검증 및 수집
+        run: python3 scripts/screenshot/collect.py '${{ matrix.target }}' build/screenshot-current
+      - name: Compare images (report only)
+        run: |
+          python3 -m pip install Pillow==11.3.0
+          python3 scripts/screenshot/compare.py '${{ matrix.platform }}' build/screenshot-baseline build/screenshot-current build/screenshot-report
+      - uses: actions/upload-artifact@v6
+        with:
+          name: screenshot-report-${{ matrix.platform }}
+          path: build/screenshot-report/
+          if-no-files-found: error
+          retention-days: 90
+
+  publish:
+    name: PR image report
+    needs: compare
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+      - uses: actions/download-artifact@v6
+        with:
+          name: screenshot-report-android
+          path: build/screenshot-publish/android
+      - uses: actions/download-artifact@v6
+        with:
+          name: screenshot-report-ios
+          path: build/screenshot-publish/ios
+      - name: Publish changed images and update PR comment
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          if [[ -f scripts/screenshot/publish.py ]]; then
+            python3 scripts/screenshot/publish.py build/screenshot-publish
+          else
+            echo 'PR publisher becomes active after this workflow is merged into develop. Compare artifacts are available on this run.'
+          fi
