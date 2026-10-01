@@ -1,0 +1,151 @@
+name: Screenshot PR
+
+on:
+  pull_request:
+    branches: [develop]
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: screenshot-pr-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  compare:
+    name: Compare / ${{ matrix.platform }}
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: android
+            target: androidHostTest
+            task: compareRoborazziAndroidHostTest
+            runner: ubuntu-24.04
+          - platform: ios
+            target: iosSimulatorArm64
+            task: compareRoborazziIosSimulatorArm64
+            runner: macos-26
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v4
+      - uses: gradle/actions/setup-gradle@v5
+      - name: Select Xcode 26.6
+        if: matrix.platform == 'ios'
+        run: sudo xcode-select --switch /Applications/Xcode_26.6.app
+      - name: Download Golden for exact PR base SHA
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          PLATFORM: ${{ matrix.platform }}
+        run: |
+          run_id=$(gh api --paginate "repos/$GITHUB_REPOSITORY/actions/workflows/screenshot-golden.yml/runs?branch=develop&status=success&per_page=100" \
+            --jq '.workflow_runs[] | [.head_sha, .id] | @tsv' | awk -v sha="$BASE_SHA" '$1 == sha && !found {print $2; found=1}')
+          if [[ -z "$run_id" ]]; then
+            echo "No successful develop Golden run for base SHA $BASE_SHA. Rebase or regenerate the baseline." >&2
+            exit 1
+          fi
+          if ! gh run download "$run_id" --repo "$GITHUB_REPOSITORY" -n "screenshot-golden-$PLATFORM" -D build/screenshot-baseline; then
+            echo "Golden artifact for base SHA $BASE_SHA is missing or expired. Rebase or regenerate the baseline." >&2
+            exit 1
+          fi
+      - name: Validate scenarios and restore Golden images
+        shell: bash
+        env:
+          TARGET: ${{ matrix.target }}
+        run: |
+          for manifest in build/screenshot-baseline/scenarios.json scripts/screenshot/scenarios.json; do
+            jq -e 'type == "object" and length > 0 and all(to_entries[];
+              (.key | test("^[A-Za-z0-9][A-Za-z0-9._-]*$")) and
+              (.value | type == "array" and length > 0 and length == (unique | length) and
+                all(.[]; type == "string" and test("^[A-Za-z0-9][A-Za-z0-9._-]*$") and
+                  (test("_(actual|compare)$") | not))))' "$manifest" > /dev/null
+          done
+          test -z "$(find build/screenshot-baseline -type l -print)"
+          diff -u <(jq -r 'to_entries[] | .key as $module | .value[] | $module + "/" + . + ".png"' build/screenshot-baseline/scenarios.json | sort) \
+            <(find build/screenshot-baseline -type f -name '*.png' | sed 's|^build/screenshot-baseline/||' | sort)
+          while IFS=$'\t' read -r module scenario; do
+            destination="feature/$module/build/outputs/roborazzi/$TARGET"
+            mkdir -p "$destination"
+            cp "build/screenshot-baseline/$module/$scenario.png" "$destination/"
+          done < <(jq -r 'to_entries[] | .key as $module | .value[] | [$module, .] | @tsv' build/screenshot-baseline/scenarios.json)
+      - name: Configure offline screenshot fixtures
+        run: |
+          cat > local.properties <<'EOF'
+          CARO_DEV_SERVER=https://example.invalid/
+          CARO_QA_SERVER=https://example.invalid/
+          CARO_PROD_SERVER=https://example.invalid/
+          GOOGLE_WEB_CLIENT_ID=screenshot-test
+          EOF
+      - name: Compare with Roborazzi (report only)
+        run: ./gradlew '${{ matrix.task }}' --stacktrace --rerun-tasks
+      - name: Validate Roborazzi results and collect changed images
+        shell: bash
+        env:
+          TARGET: ${{ matrix.target }}
+          PLATFORM: ${{ matrix.platform }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          mkdir -p build/screenshot-report
+          : > build/screenshot-results.jsonl
+          while IFS= read -r module; do
+            source="feature/$module/build/outputs/roborazzi/$TARGET"
+            results="feature/$module/build/test-results/roborazzi/$TARGET/results-summary.json"
+            ids=$(jq -c --arg module "$module" '.[$module]' scripts/screenshot/scenarios.json)
+            jq -e --argjson ids "$ids" '
+              (.results | type == "array") and
+              ([.results[].golden_file_path | split("/")[-1]] | sort) == ($ids | map(. + ".png") | sort) and
+              all(.results[]; .type == "changed" or .type == "added" or .type == "unchanged")' "$results" > /dev/null
+            while IFS=$'\t' read -r scenario kind; do
+              if jq -e --arg module "$module" --arg scenario "$scenario" '(.[$module] // []) | index($scenario) != null' \
+                build/screenshot-baseline/scenarios.json > /dev/null; then
+                test "$kind" != added
+              else
+                test "$kind" = added
+              fi
+              case "$kind" in
+                changed) image="${scenario}_compare.png" ;;
+                added) image="${scenario}_actual.png" ;;
+                unchanged) continue ;;
+              esac
+              test -f "$source/$image" && test ! -L "$source/$image"
+              mkdir -p "build/screenshot-report/$module"
+              cp "$source/$image" "build/screenshot-report/$module/"
+            done < <(jq -r '.results[] | [(.golden_file_path | split("/")[-1] | rtrimstr(".png")), .type] | @tsv' "$results")
+            jq -c --arg module "$module" '.results[] | {scenario: ($module + "/" + (.golden_file_path | split("/")[-1] | rtrimstr(".png"))), type}' \
+              "$results" >> build/screenshot-results.jsonl
+          done < <(jq -r 'keys[]' scripts/screenshot/scenarios.json)
+          removed=$(jq -n --slurpfile golden build/screenshot-baseline/scenarios.json --slurpfile current scripts/screenshot/scenarios.json '
+            def scenarios: to_entries[] | .key as $module | .value[] | $module + "/" + .;
+            [$golden[0] | scenarios] - [$current[0] | scenarios]')
+          jq -s --arg platform "$PLATFORM" --argjson pr_number "$PR_NUMBER" --arg base_sha "$BASE_SHA" --arg head_sha "$HEAD_SHA" --argjson removed "$removed" '
+            {platform: $platform, pr_number: $pr_number, base_sha: $base_sha, head_sha: $head_sha, total: length,
+             changed: [.[] | select(.type == "changed") | .scenario],
+             added: [.[] | select(.type == "added") | .scenario], removed: $removed}' \
+            build/screenshot-results.jsonl > build/screenshot-report/summary.json
+          cat build/screenshot-report/summary.json
+      - uses: actions/upload-artifact@v6
+        with:
+          name: screenshot-report-${{ matrix.platform }}
+          path: build/screenshot-report/
+          if-no-files-found: error
+          retention-days: 90
+      - name: Upload Roborazzi diagnostics
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: screenshot-diagnostics-${{ matrix.platform }}
+          path: |
+            feature/*/build/test-results/roborazzi/${{ matrix.target }}/
+            feature/*/build/reports/roborazzi/${{ matrix.target }}/
+          if-no-files-found: warn
+          retention-days: 90
