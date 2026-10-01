@@ -136,3 +136,42 @@ jobs:
           comment-id: ${{ steps.comment.outputs.comment-id }}
           body-path: build/screenshot-comment.md
           edit-mode: replace
+
+  slack-notify:
+    name: Slack Notify Screenshot Result
+    needs: [publish]
+    if: >-
+      always() &&
+      github.event.workflow_run.event == 'pull_request' &&
+      github.event.workflow_run.head_repository.full_name == github.repository
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      actions: read
+      contents: read
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - name: Build screenshot Slack payload
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_ID: ${{ github.event.workflow_run.id }}
+          RUN_HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
+          PUBLISH_RESULT: ${{ needs.publish.result }}
+        run: |
+          gh api --paginate --slurp "repos/$GITHUB_REPOSITORY/actions/runs/$RUN_ID/jobs?filter=all&per_page=100" > "$RUNNER_TEMP/screenshot-jobs.json"
+          gh api "repos/$GITHUB_REPOSITORY/commits/$RUN_HEAD_SHA/pulls?per_page=100" \
+            --jq '[.[] | select(.head.repo.full_name == env.GITHUB_REPOSITORY and .base.ref == "develop")]' > "$RUNNER_TEMP/screenshot-prs.json"
+          jq --slurpfile event "$GITHUB_EVENT_PATH" \
+            --slurpfile prs "$RUNNER_TEMP/screenshot-prs.json" \
+            --arg publish "$PUBLISH_RESULT" \
+            --arg publisher_url "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" \
+            -f scripts/screenshot/slack-payload.jq "$RUNNER_TEMP/screenshot-jobs.json" > "$RUNNER_TEMP/screenshot-slack.json"
+      - name: Send Slack notification
+        uses: slackapi/slack-github-action@v2.1.1
+        with:
+          webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
+          webhook-type: incoming-webhook
+          payload-file-path: ${{ runner.temp }}/screenshot-slack.json
+          errors: true
