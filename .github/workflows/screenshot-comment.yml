@@ -148,12 +148,9 @@ jobs:
     timeout-minutes: 5
     permissions:
       actions: read
-      contents: read
     steps:
-      - uses: actions/checkout@v6
-        with:
-          persist-credentials: false
-      - name: Build screenshot Slack payload
+      - name: Build screenshot Slack message
+        id: message
         env:
           GH_TOKEN: ${{ github.token }}
           RUN_ID: ${{ github.event.workflow_run.id }}
@@ -166,12 +163,109 @@ jobs:
           jq --slurpfile event "$GITHUB_EVENT_PATH" \
             --slurpfile prs "$RUNNER_TEMP/screenshot-prs.json" \
             --arg publish "$PUBLISH_RESULT" \
-            --arg publisher_url "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" \
-            -f scripts/screenshot/slack-payload.jq "$RUNNER_TEMP/screenshot-jobs.json" > "$RUNNER_TEMP/screenshot-slack.json"
+            --arg publisher_url "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" '
+          def status_label:
+            {success: "성공 ✅", failure: "실패 ❌", cancelled: "취소 ⏹️", skipped: "건너뜀 ⏭️",
+             timed_out: "시간 초과 ❌", action_required: "조치 필요 ⚠️"}[. // "unknown"] // "결과 확인 필요 ⚠️";
+          def escape: gsub("&"; "&amp;") | gsub("<"; "&lt;") | gsub(">"; "&gt;");
+
+          def message($run; $prs; $publish; $publisher_url):
+          # Failed-job reruns retain the earlier successful platform; ignore later attempts.
+          [.[].jobs[] | select(.run_attempt <= $run.run_attempt)] |
+          group_by(.name) | map(max_by([.run_attempt, .id])) as $jobs |
+          (if $run.conclusion != "success" then $run.conclusion
+           elif $publish == "cancelled" then "cancelled"
+           elif $publish == "success" and
+             all("android", "ios"; . as $platform |
+               any($jobs[]; .name == "Compare / " + $platform and .conclusion == "success")) then "success"
+           else "failure" end) as $result |
+          ($run.pull_requests[0] // $prs[0] // null) as $pr |
+          (if $pr then $pr.html_url // ($run.repository.html_url + "/pull/" + ($pr.number | tostring)) else null end) as $pr_url |
+          (if $pr then "PR #\($pr.number)" else ($run.head_branch[0:80] | escape) end) as $identity |
+          ($identity + " 스크린샷 CI " + ($result | status_label)) as $title |
+          (["android", "ios" | . as $platform |
+              ([$jobs[] | select(.name == "Compare / " + $platform)][0] // {}) as $job |
+              {name: (if $platform == "android" then "Android" else "iOS" end), job: $job}
+          ]) as $platforms |
+          ([$platforms[] | "• *\(.name)*: \(.job.conclusion | status_label)"] +
+           ["• *PR 이미지 리포트*: \($publish | status_label)"] | join("\n")) as $results |
+          ([$platforms[] | select(.job.conclusion != "success" and .job.conclusion != "cancelled" and .job.conclusion != "skipped") |
+            "*\(.name) — \(.job.conclusion | status_label)*\n" +
+            ([.job.steps[]? | select(.conclusion == "failure" or .conclusion == "timed_out") | .name | escape] |
+             if length > 0 then join("\n") else "실패 단계는 작업 로그에서 확인해 주세요." end)] +
+           [if $publish == "failure" then "*PR 이미지 리포트 게시 실패*" else empty end] | join("\n\n")) as $reasons |
+          ([$platforms[] | select(.job.html_url) | "<\(.job.html_url)|\(.name) 로그>"] +
+           ["<\($publisher_url)|리포트 게시 로그>", "<\($run.html_url)|전체 CI / 진단 아티팩트>"] | join(" · ")) as $links |
+          (if $result == "success" then "*완료 내용*\nAndroid/iOS 테스트와 PR 이미지 리포트 게시 완료"
+           elif $reasons != "" then "*실패 사유*\n" + $reasons
+           else "*완료 상태*\n" + ($result | status_label) end) as $details |
+          {title: $title, results: ("*플랫폼별 결과*\n" + $results), details: $details,
+           links: ("*바로 확인*\n" + $links),
+           button_text: (if $pr_url then $identity + " 바로가기 ↗" else "전체 CI 바로가기 ↗" end),
+           button_url: ($pr_url // $run.html_url),
+           fallback_text: ([$title, $results, $details, $links, $pr_url // empty] | join("\n"))};
+          # Small self-check stays with the workflow logic.
+          . as $pages |
+          {conclusion: "success", run_attempt: 2, head_branch: "build/test", html_url: "https://github.com/example/repo/actions/runs/1",
+           repository: {html_url: "https://github.com/example/repo"}, pull_requests: [{number: 123}]} as $sample |
+          [{jobs: [
+            {id: 1, run_attempt: 1, name: "Compare / android", conclusion: "success"},
+            {id: 2, run_attempt: 1, name: "Compare / ios", conclusion: "failure"},
+            {id: 3, run_attempt: 2, name: "Compare / ios", conclusion: "success"},
+            {id: 4, run_attempt: 3, name: "Compare / ios", conclusion: "failure"}
+          ]}] as $jobs |
+          if ($jobs | message($sample; []; "success"; "https://github.com/example/repo/actions/runs/2") |
+                (.title | contains("성공")) and .button_url == "https://github.com/example/repo/pull/123") and
+             ($jobs | message($sample; []; "failure"; "https://github.com/example/repo/actions/runs/2") |
+                (.title | contains("실패")) and (.details | contains("리포트 게시 실패"))) and
+             ($jobs | message($sample + {pull_requests: []}; []; "cancelled"; "https://github.com/example/repo/actions/runs/2") |
+                (.title | contains("취소")) and .button_text == "전체 CI 바로가기 ↗")
+          then $pages | message($event[0].workflow_run; $prs[0]; $publish; $publisher_url)
+          else error("Screenshot Slack message self-check failed") end
+          ' "$RUNNER_TEMP/screenshot-jobs.json" > "$RUNNER_TEMP/screenshot-message.json"
+          delimiter="slack-$(od -An -N16 -tx1 /dev/urandom | tr -d ' \n')"
+          jq -r --arg delimiter "$delimiter" 'to_entries[] | "\(.key)<<\($delimiter)\n\(.value)\n\($delimiter)"' \
+            "$RUNNER_TEMP/screenshot-message.json" >> "$GITHUB_OUTPUT"
       - name: Send Slack notification
-        uses: slackapi/slack-github-action@v2.1.1
+        uses: slackapi/slack-github-action@v4.0.0
         with:
           webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
           webhook-type: incoming-webhook
-          payload-file-path: ${{ runner.temp }}/screenshot-slack.json
           errors: true
+          payload: |
+            text: ${{ toJSON(steps.message.outputs.fallback_text) }}
+            blocks:
+              - type: header
+                text:
+                  type: plain_text
+                  text: ${{ toJSON(steps.message.outputs.title) }}
+                  emoji: true
+              - type: divider
+              - type: section
+                text:
+                  type: mrkdwn
+                  text: ${{ toJSON(steps.message.outputs.results) }}
+              - type: divider
+              - type: section
+                text:
+                  type: mrkdwn
+                  text: ${{ toJSON(steps.message.outputs.details) }}
+              - type: section
+                text:
+                  type: mrkdwn
+                  text: ${{ toJSON(steps.message.outputs.links) }}
+              - type: actions
+                elements:
+                  - type: button
+                    action_id: open_screenshot_pr
+                    text:
+                      type: plain_text
+                      text: ${{ toJSON(steps.message.outputs.button_text) }}
+                      emoji: true
+                    style: primary
+                    url: ${{ toJSON(steps.message.outputs.button_url) }}
+              - type: divider
+              - type: context
+                elements:
+                  - type: mrkdwn
+                    text: "이미지 차이는 report-only이며 테스트 실패와 별개입니다."
