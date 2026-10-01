@@ -33,6 +33,10 @@ class HomeViewModel(
 
     override suspend fun handleIntent(intent: HomeIntent) {
         when (intent) {
+            HomeIntent.ClickLibrary -> {
+                postSideEffect(HomeSideEffect.NavigateToLibrary)
+            }
+
             HomeIntent.Initialize -> {
                 initialize()
             }

@@ -226,4 +226,34 @@
 	<string name="card_detail_delete_cancel">Cancel</string>
 	<string name="card_detail_load_error">Failed to load the cards. Please try again.</string>
 	<string name="card_detail_delete_error">Failed to delete the card. Please try again.</string>
+
+	<!-- Deck library -->
+	<string name="library_title">덱 라이브러리</string>
+	<string name="library_home_description">무료 제공 덱 둘러보기</string>
+	<string name="library_preview_title">덱 미리보기</string>
+	<string name="library_free">무료</string>
+	<string name="library_card_count">%1$s개 카드</string>
+	<string name="library_cards_preview">카드 미리보기</string>
+	<string name="library_add">내 덱에 추가</string>
+	<string name="library_adding">추가 중…</string>
+	<string name="library_add_error_title">덱 추가 중 오류가 발생했어요</string>
+	<string name="library_confirm">확인</string>
+	<string name="library_retry_body">잠시 후 다시 시도해 주세요</string>
+	<string name="library_retry">다시 시도</string>
+	<string name="library_empty_title">제공 중인 덱이 없어요</string>
+	<string name="library_empty_body">새 덱이 게시되면 여기에서 볼 수 있어요</string>
+	<string name="library_check_again">다시 확인</string>
+	<string name="library_load_error">덱을 불러오지 못했어요</string>
+	<string name="library_preview_error">미리보기를 열지 못했어요</string>
+	<string name="library_refresh_error">새로고침에 실패했어요. 이전 목록을 보여드려요.</string>
+	<string name="library_login_title">로그인이 필요해요</string>
+	<string name="library_login_body">로그인 후 덱을 둘러볼 수 있어요</string>
+	<string name="library_login">로그인하기</string>
+	<string name="library_unavailable_title">이 덱을 찾을 수 없어요</string>
+	<string name="library_unavailable_body">목록에서 다른 덱을 선택해 주세요</string>
+	<string name="library_back_list">목록으로</string>
+	<string name="library_forbidden_title">접근 권한이 없어요</string>
+	<string name="library_forbidden_body">이 덱은 현재 계정에서 볼 수 없어요</string>
+	<string name="library_home">홈으로</string>
+	<string name="library_back">뒤로 가기</string>
 </resources>
