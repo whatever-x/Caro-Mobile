@@ -33,9 +33,6 @@ jobs:
         with:
           distribution: temurin
           java-version: '17'
-      - uses: actions/setup-python@v6
-        with:
-          python-version: '3.13'
       - uses: android-actions/setup-android@v4
       - uses: gradle/actions/setup-gradle@v5
       - name: Select Xcode 26.6
@@ -50,9 +47,30 @@ jobs:
           GOOGLE_WEB_CLIENT_ID=screenshot-test
           EOF
       - name: Record all scenarios
-        run: ./gradlew '${{ matrix.task }}' --stacktrace
+        run: ./gradlew '${{ matrix.task }}' --stacktrace --rerun-tasks
       - name: 등록된 스크린샷 검증 및 수집
-        run: python3 scripts/screenshot/collect.py '${{ matrix.target }}' build/screenshot-golden
+        shell: bash
+        env:
+          TARGET: ${{ matrix.target }}
+        run: |
+          jq -e 'type == "object" and length > 0 and all(to_entries[];
+            (.key | test("^[A-Za-z0-9][A-Za-z0-9._-]*$")) and
+            (.value | type == "array" and length > 0 and length == (unique | length) and
+              all(.[]; type == "string" and test("^[A-Za-z0-9][A-Za-z0-9._-]*$") and
+                (test("_(actual|compare)$") | not))))' scripts/screenshot/scenarios.json > /dev/null
+          mkdir -p build/screenshot-golden
+          while IFS= read -r module; do
+            source="feature/$module/build/outputs/roborazzi/$TARGET"
+            test -d "$source"
+            diff -u <(jq -r --arg module "$module" '.[$module][] + ".png"' scripts/screenshot/scenarios.json | sort) \
+              <(find "$source" -type f -name '*.png' -exec basename {} \; | sort)
+            mkdir -p "build/screenshot-golden/$module"
+            while IFS= read -r scenario; do
+              test -f "$source/$scenario.png" && test ! -L "$source/$scenario.png"
+              cp "$source/$scenario.png" "build/screenshot-golden/$module/"
+            done < <(jq -r --arg module "$module" '.[$module][]' scripts/screenshot/scenarios.json)
+          done < <(jq -r 'keys[]' scripts/screenshot/scenarios.json)
+          cp scripts/screenshot/scenarios.json build/screenshot-golden/
       - uses: actions/upload-artifact@v6
         with:
           name: screenshot-golden-${{ matrix.platform }}
