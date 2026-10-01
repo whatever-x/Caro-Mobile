@@ -33,4 +33,28 @@ class DeckDetailScreenshotIosTest {
             }
         }
     }
+
+    @OptIn(ExperimentalTestApi::class, ExperimentalRoborazziApi::class)
+    @Test
+    fun libraryCopy() {
+        val defaults = NSUserDefaults.standardUserDefaults
+        val previousLanguages = defaults.objectForKey("AppleLanguages")
+        defaults.setObject(listOf(DeckDetailScreenshotScenario.LOCALE), forKey = "AppleLanguages")
+
+        try {
+            runSkikoComposeUiTest(
+                size = Size(DeckDetailScreenshotScenario.WIDTH_DP.toFloat(), DeckDetailScreenshotScenario.HEIGHT_DP.toFloat()),
+            ) {
+                setContent { DeckDetailScreenshotScenario.LibraryCopy() }
+                waitForIdle()
+                onRoot().captureRoboImage(this, filePath = "deck_detail.library_copy.png")
+            }
+        } finally {
+            if (previousLanguages == null) {
+                defaults.removeObjectForKey("AppleLanguages")
+            } else {
+                defaults.setObject(previousLanguages, forKey = "AppleLanguages")
+            }
+        }
+    }
 }

@@ -1,8 +1,8 @@
 {
   "card": ["card.create.draft", "card.edit.existing", "card.delete.selected", "card.detail.front"],
   "deck": ["deck.create.initial", "deck.edit.existing"],
-  "deck-detail": ["deck_detail.detail.empty"],
-  "home": ["home.home.with_deck"],
+  "deck-detail": ["deck_detail.detail.empty", "deck_detail.library_copy"],
+  "home": ["home.home.with_deck", "library.preview.normal", "library.list.normal", "library.preview.narrow"],
   "learning": ["learning.learning.front"],
   "login": ["login.login.initial"],
   "profile": ["profile.create.initial", "profile.edit.existing"],
