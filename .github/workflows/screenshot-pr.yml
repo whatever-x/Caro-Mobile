@@ -23,10 +23,12 @@ jobs:
         include:
           - platform: android
             target: androidHostTest
+            test-task: testAndroidHostTest
             task: compareRoborazziAndroidHostTest
             runner: ubuntu-24.04
           - platform: ios
             target: iosSimulatorArm64
+            test-task: iosSimulatorArm64Test
             task: compareRoborazziIosSimulatorArm64
             runner: macos-26
     steps:
@@ -37,9 +39,21 @@ jobs:
           java-version: '17'
       - uses: android-actions/setup-android@v4
       - uses: gradle/actions/setup-gradle@v5
+        with:
+          cache-read-only: false
       - name: Select Xcode 26.6
         if: matrix.platform == 'ios'
-        run: sudo xcode-select --switch /Applications/Xcode_26.6.app
+        id: xcode
+        run: |
+          sudo xcode-select --switch /Applications/Xcode_26.6.app
+          echo "version=$(xcodebuild -version | shasum -a 256 | cut -d ' ' -f 1)" >> "$GITHUB_OUTPUT"
+      - name: Cache Kotlin/Native
+        if: matrix.platform == 'ios'
+        id: konan
+        uses: actions/cache@v4
+        with:
+          path: ~/.konan
+          key: konan-v1-${{ matrix.runner }}-${{ runner.os }}-${{ runner.arch }}-${{ steps.xcode.outputs.version }}-${{ hashFiles('gradle/libs.versions.toml') }}
       - name: Download Golden for exact PR base SHA
         env:
           GH_TOKEN: ${{ github.token }}
@@ -85,7 +99,13 @@ jobs:
           GOOGLE_WEB_CLIENT_ID=screenshot-test
           EOF
       - name: Compare with Roborazzi (report only)
-        run: ./gradlew '${{ matrix.task }}' --stacktrace --rerun-tasks
+        shell: bash
+        run: |
+          test_tasks=()
+          while IFS= read -r module; do
+            test_tasks+=(":feature:$module:${{ matrix.test-task }}" --rerun)
+          done < <(jq -r 'keys[]' scripts/screenshot/scenarios.json)
+          ./gradlew '${{ matrix.task }}' "${test_tasks[@]}" --stacktrace --profile --console=plain
       - name: Validate Roborazzi results and collect changed images
         shell: bash
         env:
@@ -149,3 +169,11 @@ jobs:
             feature/*/build/reports/roborazzi/${{ matrix.target }}/
           if-no-files-found: warn
           retention-days: 90
+      - name: Upload Gradle profile
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: screenshot-profile-${{ matrix.platform }}
+          path: build/reports/profile/
+          if-no-files-found: warn
+          retention-days: 14
