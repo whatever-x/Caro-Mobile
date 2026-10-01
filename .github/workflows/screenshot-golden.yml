@@ -47,7 +47,7 @@ jobs:
           GOOGLE_WEB_CLIENT_ID=screenshot-test
           EOF
       - name: Record all scenarios
-        run: ./gradlew '${{ matrix.task }}' --stacktrace --rerun-tasks
+        run: ./gradlew '${{ matrix.task }}' --stacktrace --rerun-tasks --profile --console=plain
       - name: 등록된 스크린샷 검증 및 수집
         shell: bash
         env:
@@ -77,3 +77,11 @@ jobs:
           path: build/screenshot-golden/
           if-no-files-found: error
           retention-days: 90
+      - name: Upload Gradle profile
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: screenshot-profile-${{ matrix.platform }}
+          path: build/reports/profile/
+          if-no-files-found: warn
+          retention-days: 14
