@@ -1,0 +1,271 @@
+name: Screenshot Comment
+
+on:
+  workflow_run:
+    workflows: [Screenshot PR]
+    types: [completed]
+
+permissions: {}
+
+concurrency:
+  group: screenshot-comment-${{ github.event.workflow_run.head_branch }}
+  cancel-in-progress: true
+
+jobs:
+  publish:
+    name: PR image report
+    if: >-
+      github.event.workflow_run.event == 'pull_request' &&
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.head_repository.full_name == github.repository
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      actions: read
+      contents: write
+      pull-requests: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      RUN_HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@v6
+        with:
+          name: screenshot-report-android
+          path: build/screenshot-publish/android
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ github.token }}
+      - uses: actions/download-artifact@v6
+        with:
+          name: screenshot-report-ios
+          path: build/screenshot-publish/ios
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ github.token }}
+      - name: Validate report files and PR identity
+        id: report
+        shell: bash
+        run: |
+          test -z "$(find build/screenshot-publish -type l -print)"
+          for platform in android ios; do
+            directory="build/screenshot-publish/$platform"
+            summary="$directory/summary.json"
+            jq -e --arg platform "$platform" --arg head "$RUN_HEAD_SHA" '
+              .platform == $platform and .head_sha == $head and
+              (.base_sha | type == "string" and test("^[a-f0-9]{40}$")) and
+              (.pr_number | type == "number" and . > 0 and . == floor) and
+              (.total | type == "number" and . > 0 and . == floor) and
+              all(.changed, .added, .removed; type == "array" and
+                all(.[]; type == "string" and test("^[A-Za-z0-9][A-Za-z0-9._-]*/[A-Za-z0-9][A-Za-z0-9._-]*$"))) and
+              ((.changed + .added + .removed) | length == (unique | length)) and
+              ((.changed + .added) | length) <= .total' "$summary" > /dev/null
+            diff -u <(jq -r '"summary.json", (.changed[] + "_compare.png"), (.added[] + "_actual.png")' "$summary" | sort) \
+              <(find "$directory" -type f | sed "s|^$directory/||" | sort)
+          done
+          jq -s -e '.[0].pr_number == .[1].pr_number and .[0].base_sha == .[1].base_sha and .[0].head_sha == .[1].head_sha' \
+            build/screenshot-publish/{android,ios}/summary.json > /dev/null
+          number=$(jq -r '.pr_number' build/screenshot-publish/android/summary.json)
+          base=$(jq -r '.base_sha' build/screenshot-publish/android/summary.json)
+          gh api "repos/$GITHUB_REPOSITORY/pulls/$number" > build/screenshot-pr.json
+          jq -e --arg head "$RUN_HEAD_SHA" --arg base "$base" --arg repo "$GITHUB_REPOSITORY" '
+            .state == "open" and .head.sha == $head and .base.sha == $base and
+            .head.repo.full_name == $repo and .base.ref == "develop"' build/screenshot-pr.json > /dev/null
+          images=$(find build/screenshot-publish -type f -name '*.png' | wc -l)
+          changes=$(jq -s '[.[] | .changed[], .added[], .removed[]] | length' build/screenshot-publish/{android,ios}/summary.json)
+          echo "number=$number" >> "$GITHUB_OUTPUT"
+          echo "base=$base" >> "$GITHUB_OUTPUT"
+          echo "has-images=$([[ "$images" -gt 0 ]] && echo true || echo false)" >> "$GITHUB_OUTPUT"
+          echo "has-changes=$([[ "$changes" -gt 0 ]] && echo true || echo false)" >> "$GITHUB_OUTPUT"
+      - name: Publish changed images to companion branch
+        if: steps.report.outputs.has-images == 'true'
+        id: images
+        env:
+          PR_NUMBER: ${{ steps.report.outputs.number }}
+        run: |
+          checkout=$(mktemp -d)
+          git init --initial-branch screenshot-report "$checkout"
+          git -C "$checkout" config user.name 'github-actions[bot]'
+          git -C "$checkout" config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git -C "$checkout" remote add origin "https://github.com/$GITHUB_REPOSITORY.git"
+          while IFS= read -r image; do
+            relative="${image#build/screenshot-publish/}"
+            mkdir -p "$checkout/$(dirname "$relative")"
+            cp "$image" "$checkout/$relative"
+          done < <(find build/screenshot-publish -type f -name '*.png' | sort)
+          git -C "$checkout" add .
+          git -C "$checkout" commit -m "chore: PR #$PR_NUMBER screenshot report"
+          gh auth setup-git
+          git -C "$checkout" push --force origin "HEAD:refs/heads/screenshots/pr-$PR_NUMBER"
+          echo "sha=$(git -C "$checkout" rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+      - name: Generate comment Markdown
+        env:
+          IMAGE_SHA: ${{ steps.images.outputs.sha }}
+          BASE_SHA: ${{ steps.report.outputs.base }}
+        run: |
+          {
+            echo '<!-- caro-screenshot-report -->'
+            echo '### Screenshot Test'
+            echo
+            printf 'Golden: `develop` `%s` · 이미지 차이는 report-only입니다.\n\n' "$BASE_SHA"
+            echo '| Platform / scenario | Result | Image |'
+            echo '| --- | --- | --- |'
+            for platform in android ios; do
+              jq -r --arg platform "$platform" --arg repo "$GITHUB_REPOSITORY" --arg sha "$IMAGE_SHA" '
+                (.changed[] | "| `\($platform)/\(.)` | Before / Diff / After | ![compare](https://raw.githubusercontent.com/\($repo)/\($sha)/\($platform)/\(.)_compare.png) |"),
+                (.added[] | "| `\($platform)/\(.)` | 신규 · After | ![after](https://raw.githubusercontent.com/\($repo)/\($sha)/\($platform)/\(.)_actual.png) |"),
+                (.removed[] | "| `\($platform)/\(.)` | 시나리오 제거 | — |")' "build/screenshot-publish/$platform/summary.json"
+            done
+            if [[ -z "$IMAGE_SHA" ]] && jq -s -e 'all(.[]; (.removed | length) == 0)' build/screenshot-publish/{android,ios}/summary.json > /dev/null; then
+              echo
+              echo '시각적 변경 없음'
+            fi
+          } > build/screenshot-comment.md
+      - name: Find screenshot comment
+        uses: peter-evans/find-comment@b30e6a3c0ed37e7c023ccd3f1db5c6c0b0c23aad # v4
+        id: comment
+        with:
+          issue-number: ${{ steps.report.outputs.number }}
+          comment-author: github-actions[bot]
+          body-includes: '<!-- caro-screenshot-report -->'
+      - name: Create or update screenshot comment
+        if: steps.report.outputs.has-changes == 'true' || steps.comment.outputs.comment-id != ''
+        uses: peter-evans/create-or-update-comment@71345be0265236311c031f5c7866368bd1eff043 # v4
+        with:
+          issue-number: ${{ steps.report.outputs.number }}
+          comment-id: ${{ steps.comment.outputs.comment-id }}
+          body-path: build/screenshot-comment.md
+          edit-mode: replace
+
+  slack-notify:
+    name: Slack Notify Screenshot Result
+    needs: [publish]
+    if: >-
+      always() &&
+      github.event.workflow_run.event == 'pull_request' &&
+      github.event.workflow_run.head_repository.full_name == github.repository
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      actions: read
+    steps:
+      - name: Build screenshot Slack message
+        id: message
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_ID: ${{ github.event.workflow_run.id }}
+          RUN_HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
+          PUBLISH_RESULT: ${{ needs.publish.result }}
+        run: |
+          gh api --paginate --slurp "repos/$GITHUB_REPOSITORY/actions/runs/$RUN_ID/jobs?filter=all&per_page=100" > "$RUNNER_TEMP/screenshot-jobs.json"
+          gh api "repos/$GITHUB_REPOSITORY/commits/$RUN_HEAD_SHA/pulls?per_page=100" \
+            --jq '[.[] | select(.head.repo.full_name == env.GITHUB_REPOSITORY and .base.ref == "develop")]' > "$RUNNER_TEMP/screenshot-prs.json"
+          jq --slurpfile event "$GITHUB_EVENT_PATH" \
+            --slurpfile prs "$RUNNER_TEMP/screenshot-prs.json" \
+            --arg publish "$PUBLISH_RESULT" \
+            --arg publisher_url "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" '
+          def status_label:
+            {success: "성공 ✅", failure: "실패 ❌", cancelled: "취소 ⏹️", skipped: "건너뜀 ⏭️",
+             timed_out: "시간 초과 ❌", action_required: "조치 필요 ⚠️"}[. // "unknown"] // "결과 확인 필요 ⚠️";
+          def escape: gsub("&"; "&amp;") | gsub("<"; "&lt;") | gsub(">"; "&gt;");
+
+          def message($run; $prs; $publish; $publisher_url):
+          # Failed-job reruns retain the earlier successful platform; ignore later attempts.
+          [.[].jobs[] | select(.run_attempt <= $run.run_attempt)] |
+          group_by(.name) | map(max_by([.run_attempt, .id])) as $jobs |
+          (if $run.conclusion != "success" then $run.conclusion
+           elif $publish == "cancelled" then "cancelled"
+           elif $publish == "success" and
+             all("android", "ios"; . as $platform |
+               any($jobs[]; .name == "Compare / " + $platform and .conclusion == "success")) then "success"
+           else "failure" end) as $result |
+          ($run.pull_requests[0] // $prs[0] // null) as $pr |
+          (if $pr then $pr.html_url // ($run.repository.html_url + "/pull/" + ($pr.number | tostring)) else null end) as $pr_url |
+          (if $pr then "PR #\($pr.number)" else ($run.head_branch[0:80] | escape) end) as $identity |
+          ($identity + " 스크린샷 CI " + ($result | status_label)) as $title |
+          (["android", "ios" | . as $platform |
+              ([$jobs[] | select(.name == "Compare / " + $platform)][0] // {}) as $job |
+              {name: (if $platform == "android" then "Android" else "iOS" end), job: $job}
+          ]) as $platforms |
+          ([$platforms[] | "• *\(.name)*: \(.job.conclusion | status_label)"] +
+           ["• *PR 이미지 리포트*: \($publish | status_label)"] | join("\n")) as $results |
+          ([$platforms[] | select(.job.conclusion != "success" and .job.conclusion != "cancelled" and .job.conclusion != "skipped") |
+            "*\(.name) — \(.job.conclusion | status_label)*\n" +
+            ([.job.steps[]? | select(.conclusion == "failure" or .conclusion == "timed_out") | .name | escape] |
+             if length > 0 then join("\n") else "실패 단계는 작업 로그에서 확인해 주세요." end)] +
+           [if $publish == "failure" then "*PR 이미지 리포트 게시 실패*" else empty end] | join("\n\n")) as $reasons |
+          ([$platforms[] | select(.job.html_url) | "<\(.job.html_url)|\(.name) 로그>"] +
+           ["<\($publisher_url)|리포트 게시 로그>", "<\($run.html_url)|전체 CI / 진단 아티팩트>"] | join(" · ")) as $links |
+          (if $result == "success" then "*완료 내용*\nAndroid/iOS 테스트와 PR 이미지 리포트 게시 완료"
+           elif $reasons != "" then "*실패 사유*\n" + $reasons
+           else "*완료 상태*\n" + ($result | status_label) end) as $details |
+          {title: $title, results: ("*플랫폼별 결과*\n" + $results), details: $details,
+           links: ("*바로 확인*\n" + $links),
+           button_text: (if $pr_url then $identity + " 바로가기 ↗" else "전체 CI 바로가기 ↗" end),
+           button_url: ($pr_url // $run.html_url),
+           fallback_text: ([$title, $results, $details, $links, $pr_url // empty] | join("\n"))};
+          # Small self-check stays with the workflow logic.
+          . as $pages |
+          {conclusion: "success", run_attempt: 2, head_branch: "build/test", html_url: "https://github.com/example/repo/actions/runs/1",
+           repository: {html_url: "https://github.com/example/repo"}, pull_requests: [{number: 123}]} as $sample |
+          [{jobs: [
+            {id: 1, run_attempt: 1, name: "Compare / android", conclusion: "success"},
+            {id: 2, run_attempt: 1, name: "Compare / ios", conclusion: "failure"},
+            {id: 3, run_attempt: 2, name: "Compare / ios", conclusion: "success"},
+            {id: 4, run_attempt: 3, name: "Compare / ios", conclusion: "failure"}
+          ]}] as $jobs |
+          if ($jobs | message($sample; []; "success"; "https://github.com/example/repo/actions/runs/2") |
+                (.title | contains("성공")) and .button_url == "https://github.com/example/repo/pull/123") and
+             ($jobs | message($sample; []; "failure"; "https://github.com/example/repo/actions/runs/2") |
+                (.title | contains("실패")) and (.details | contains("리포트 게시 실패"))) and
+             ($jobs | message($sample + {pull_requests: []}; []; "cancelled"; "https://github.com/example/repo/actions/runs/2") |
+                (.title | contains("취소")) and .button_text == "전체 CI 바로가기 ↗")
+          then $pages | message($event[0].workflow_run; $prs[0]; $publish; $publisher_url)
+          else error("Screenshot Slack message self-check failed") end
+          ' "$RUNNER_TEMP/screenshot-jobs.json" > "$RUNNER_TEMP/screenshot-message.json"
+          delimiter="slack-$(od -An -N16 -tx1 /dev/urandom | tr -d ' \n')"
+          jq -r --arg delimiter "$delimiter" 'to_entries[] | "\(.key)<<\($delimiter)\n\(.value)\n\($delimiter)"' \
+            "$RUNNER_TEMP/screenshot-message.json" >> "$GITHUB_OUTPUT"
+      - name: Send Slack notification
+        uses: slackapi/slack-github-action@v4.0.0
+        with:
+          webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
+          webhook-type: incoming-webhook
+          errors: true
+          payload: |
+            text: ${{ toJSON(steps.message.outputs.fallback_text) }}
+            blocks:
+              - type: header
+                text:
+                  type: plain_text
+                  text: ${{ toJSON(steps.message.outputs.title) }}
+                  emoji: true
+              - type: divider
+              - type: section
+                text:
+                  type: mrkdwn
+                  text: ${{ toJSON(steps.message.outputs.results) }}
+              - type: divider
+              - type: section
+                text:
+                  type: mrkdwn
+                  text: ${{ toJSON(steps.message.outputs.details) }}
+              - type: section
+                text:
+                  type: mrkdwn
+                  text: ${{ toJSON(steps.message.outputs.links) }}
+              - type: actions
+                elements:
+                  - type: button
+                    action_id: open_screenshot_pr
+                    text:
+                      type: plain_text
+                      text: ${{ toJSON(steps.message.outputs.button_text) }}
+                      emoji: true
+                    style: primary
+                    url: ${{ toJSON(steps.message.outputs.button_url) }}
+              - type: divider
+              - type: context
+                elements:
+                  - type: mrkdwn
+                    text: "이미지 차이는 report-only이며 테스트 실패와 별개입니다."

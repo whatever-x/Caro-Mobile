@@ -1,0 +1,11 @@
+{
+  "card": ["card.create.draft", "card.edit.existing", "card.delete.selected", "card.detail.front"],
+  "deck": ["deck.create.initial", "deck.edit.existing"],
+  "deck-detail": ["deck_detail.detail.empty"],
+  "home": ["home.home.with_deck"],
+  "learning": ["learning.learning.front"],
+  "login": ["login.login.initial"],
+  "profile": ["profile.create.initial", "profile.edit.existing"],
+  "setting": ["setting.setting.account"],
+  "splash": ["splash.splash.initial"]
+}
