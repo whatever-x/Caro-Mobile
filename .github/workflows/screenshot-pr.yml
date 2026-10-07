@@ -33,6 +33,47 @@ jobs:
             runner: macos-26
     steps:
       - uses: actions/checkout@v6
+      - name: Download Golden for exact PR base SHA
+        shell: bash
+        timeout-minutes: 12
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          PLATFORM: ${{ matrix.platform }}
+        run: |
+          deadline=$((SECONDS + 600))
+          while true; do
+            if ! golden=$(gh api "repos/$GITHUB_REPOSITORY/actions/workflows/screenshot-golden.yml/runs?branch=develop&head_sha=$BASE_SHA&per_page=1" \
+              --jq '.workflow_runs[0] // empty'); then
+              echo "::error::Golden lookup failed for base SHA $BASE_SHA. See the GitHub CLI error above."
+              exit 1
+            fi
+            if [[ -z "$golden" ]]; then
+              echo "::error::No Golden run exists for base SHA $BASE_SHA."
+              exit 1
+            fi
+            run_id=$(jq -r '.id' <<< "$golden")
+            status=$(jq -r '.status' <<< "$golden")
+            conclusion=$(jq -r '.conclusion // "none"' <<< "$golden")
+            run_url=$(jq -r '.html_url' <<< "$golden")
+            if [[ "$status" == completed ]]; then
+              if [[ "$conclusion" != success ]]; then
+                echo "::error::Golden ended with $conclusion for base SHA $BASE_SHA. See $run_url"
+                exit 1
+              fi
+              break
+            fi
+            if (( SECONDS >= deadline )); then
+              echo "::error::Golden did not complete within 10 minutes for base SHA $BASE_SHA. See $run_url"
+              exit 1
+            fi
+            echo "Golden status: $status. Check again in 30 seconds. $run_url"
+            sleep 30
+          done
+          if ! gh run download "$run_id" --repo "$GITHUB_REPOSITORY" -n "screenshot-golden-$PLATFORM" -D build/screenshot-baseline; then
+            echo "::error::Golden artifact for base SHA $BASE_SHA is missing, expired, or unavailable. See $run_url"
+            exit 1
+          fi
       - uses: actions/setup-java@v5
         with:
           distribution: temurin
@@ -47,29 +88,15 @@ jobs:
         run: |
           sudo xcode-select --switch /Applications/Xcode_26.6.app
           echo "version=$(xcodebuild -version | shasum -a 256 | cut -d ' ' -f 1)" >> "$GITHUB_OUTPUT"
+          dependency_hash=$(sed -E '/^version-(code|name)[[:space:]]*=/d' gradle/libs.versions.toml | shasum -a 256 | cut -d ' ' -f 1)
+          echo "dependency_hash=$dependency_hash" >> "$GITHUB_OUTPUT"
       - name: Cache Kotlin/Native
         if: matrix.platform == 'ios'
         id: konan
         uses: actions/cache@v4
         with:
           path: ~/.konan
-          key: konan-v1-${{ matrix.runner }}-${{ runner.os }}-${{ runner.arch }}-${{ steps.xcode.outputs.version }}-${{ hashFiles('gradle/libs.versions.toml') }}
-      - name: Download Golden for exact PR base SHA
-        env:
-          GH_TOKEN: ${{ github.token }}
-          BASE_SHA: ${{ github.event.pull_request.base.sha }}
-          PLATFORM: ${{ matrix.platform }}
-        run: |
-          run_id=$(gh api --paginate "repos/$GITHUB_REPOSITORY/actions/workflows/screenshot-golden.yml/runs?branch=develop&status=success&per_page=100" \
-            --jq '.workflow_runs[] | [.head_sha, .id] | @tsv' | awk -v sha="$BASE_SHA" '$1 == sha && !found {print $2; found=1}')
-          if [[ -z "$run_id" ]]; then
-            echo "No successful develop Golden run for base SHA $BASE_SHA. Rebase or regenerate the baseline." >&2
-            exit 1
-          fi
-          if ! gh run download "$run_id" --repo "$GITHUB_REPOSITORY" -n "screenshot-golden-$PLATFORM" -D build/screenshot-baseline; then
-            echo "Golden artifact for base SHA $BASE_SHA is missing or expired. Rebase or regenerate the baseline." >&2
-            exit 1
-          fi
+          key: konan-v2-${{ matrix.runner }}-${{ runner.os }}-${{ runner.arch }}-${{ steps.xcode.outputs.version }}-${{ steps.xcode.outputs.dependency_hash }}
       - name: Validate scenarios and restore Golden images
         shell: bash
         env:

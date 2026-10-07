@@ -45,13 +45,15 @@ jobs:
         run: |
           sudo xcode-select --switch /Applications/Xcode_26.6.app
           echo "version=$(xcodebuild -version | shasum -a 256 | cut -d ' ' -f 1)" >> "$GITHUB_OUTPUT"
+          dependency_hash=$(sed -E '/^version-(code|name)[[:space:]]*=/d' gradle/libs.versions.toml | shasum -a 256 | cut -d ' ' -f 1)
+          echo "dependency_hash=$dependency_hash" >> "$GITHUB_OUTPUT"
       - name: Cache Kotlin/Native
         if: matrix.platform == 'ios'
         id: konan
         uses: actions/cache@v4
         with:
           path: ~/.konan
-          key: konan-v1-${{ matrix.runner }}-${{ runner.os }}-${{ runner.arch }}-${{ steps.xcode.outputs.version }}-${{ hashFiles('gradle/libs.versions.toml') }}
+          key: konan-v2-${{ matrix.runner }}-${{ runner.os }}-${{ runner.arch }}-${{ steps.xcode.outputs.version }}-${{ steps.xcode.outputs.dependency_hash }}
       - name: Configure offline screenshot fixtures
         run: |
           cat > local.properties <<'EOF'
