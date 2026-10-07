@@ -142,7 +142,8 @@ jobs:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: |
-          mkdir -p build/screenshot-report
+          # Keep the legacy artifact compatible with the default-branch publisher until merge.
+          mkdir -p build/screenshot-report build/screenshot-before-after
           : > build/screenshot-results.jsonl
           while IFS= read -r module; do
             source="feature/$module/build/outputs/roborazzi/$TARGET"
@@ -167,6 +168,15 @@ jobs:
               test -f "$source/$image" && test ! -L "$source/$image"
               mkdir -p "build/screenshot-report/$module"
               cp "$source/$image" "build/screenshot-report/$module/"
+              mkdir -p "build/screenshot-before-after/$module"
+              actual="$source/${scenario}_actual.png"
+              test -f "$actual" && test ! -L "$actual"
+              cp "$actual" "build/screenshot-before-after/$module/"
+              if [[ "$kind" == changed ]]; then
+                before="build/screenshot-baseline/$module/$scenario.png"
+                test -f "$before" && test ! -L "$before"
+                cp "$before" "build/screenshot-before-after/$module/${scenario}_before.png"
+              fi
             done < <(jq -r '.results[] | [(.golden_file_path | split("/")[-1] | rtrimstr(".png")), .type] | @tsv' "$results")
             jq -c --arg module "$module" '.results[] | {scenario: ($module + "/" + (.golden_file_path | split("/")[-1] | rtrimstr(".png"))), type}' \
               "$results" >> build/screenshot-results.jsonl
@@ -180,10 +190,18 @@ jobs:
              added: [.[] | select(.type == "added") | .scenario], removed: $removed}' \
             build/screenshot-results.jsonl > build/screenshot-report/summary.json
           cat build/screenshot-report/summary.json
+          cp build/screenshot-report/summary.json build/screenshot-before-after/summary.json
       - uses: actions/upload-artifact@v6
         with:
           name: screenshot-report-${{ matrix.platform }}
           path: build/screenshot-report/
+          if-no-files-found: error
+          retention-days: 90
+      - name: Upload Before/After originals
+        uses: actions/upload-artifact@v6
+        with:
+          name: screenshot-before-after-${{ matrix.platform }}
+          path: build/screenshot-before-after/
           if-no-files-found: error
           retention-days: 90
       - name: Upload Roborazzi diagnostics
