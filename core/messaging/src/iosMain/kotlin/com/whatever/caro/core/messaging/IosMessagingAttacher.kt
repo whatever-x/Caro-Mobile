@@ -3,11 +3,10 @@ package com.whatever.caro.core.messaging
 import kotlinx.cinterop.ExperimentalForeignApi
 import org.koin.mp.KoinPlatform
 import platform.Foundation.NSData
-import platform.UIKit.UIApplication
 
 @OptIn(ExperimentalForeignApi::class)
-fun attachMessaging(application: UIApplication) {
-    KoinPlatform.getKoin().get<IosFirebaseMessagingClient>().attach(application)
+fun attachMessaging() {
+    KoinPlatform.getKoin().get<IosFirebaseMessagingClient>().attach()
 }
 
 @OptIn(ExperimentalForeignApi::class)
