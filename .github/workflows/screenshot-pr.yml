@@ -43,8 +43,11 @@ jobs:
         run: |
           deadline=$((SECONDS + 600))
           while true; do
-            golden=$(gh api "repos/$GITHUB_REPOSITORY/actions/workflows/screenshot-golden.yml/runs?branch=develop&head_sha=$BASE_SHA&per_page=1" \
-              --jq '.workflow_runs[0] // empty')
+            if ! golden=$(gh api "repos/$GITHUB_REPOSITORY/actions/workflows/screenshot-golden.yml/runs?branch=develop&head_sha=$BASE_SHA&per_page=1" \
+              --jq '.workflow_runs[0] // empty'); then
+              echo "::error::Golden lookup failed for base SHA $BASE_SHA. See the GitHub CLI error above."
+              exit 1
+            fi
             if [[ -z "$golden" ]]; then
               echo "::error::No Golden run exists for base SHA $BASE_SHA."
               exit 1

@@ -39,6 +39,7 @@ class WorkflowTests(unittest.TestCase):
                     (root / "count").write_text(str(count + 1))
                     state = states[min(count, len(states) - 1)]
                     if state == "api-error":
+                        print("gh: HTTP 403: Resource not accessible", file=sys.stderr)
                         sys.exit(1)
                     if state is not None:
                         run = {"id": 123, "head_sha": "base-sha", "status": state[0],
@@ -84,6 +85,13 @@ class WorkflowTests(unittest.TestCase):
             result, calls = self.run_download([state])
             self.assertNotEqual(result.returncode, 0)
             self.assertFalse(any(c[0] == "run" for c in calls))
+
+    def test_api_failure_reports_base_sha(self):
+        result, calls = self.run_download(["api-error"])
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("::error::Golden lookup failed for base SHA base-sha", result.stdout + result.stderr)
+        self.assertIn("gh: HTTP 403: Resource not accessible", result.stderr)
+        self.assertFalse(any(c[0] == "run" for c in calls))
 
     def test_wait_has_deadline(self):
         result, calls = self.run_download([("in_progress", None)])
