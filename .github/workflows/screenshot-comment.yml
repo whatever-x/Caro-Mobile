@@ -33,13 +33,13 @@ jobs:
           persist-credentials: false
       - uses: actions/download-artifact@v6
         with:
-          name: screenshot-report-android
+          name: screenshot-before-after-android
           path: build/screenshot-publish/android
           run-id: ${{ github.event.workflow_run.id }}
           github-token: ${{ github.token }}
       - uses: actions/download-artifact@v6
         with:
-          name: screenshot-report-ios
+          name: screenshot-before-after-ios
           path: build/screenshot-publish/ios
           run-id: ${{ github.event.workflow_run.id }}
           github-token: ${{ github.token }}
@@ -60,7 +60,7 @@ jobs:
                 all(.[]; type == "string" and test("^[A-Za-z0-9][A-Za-z0-9._-]*/[A-Za-z0-9][A-Za-z0-9._-]*$"))) and
               ((.changed + .added + .removed) | length == (unique | length)) and
               ((.changed + .added) | length) <= .total' "$summary" > /dev/null
-            diff -u <(jq -r '"summary.json", (.changed[] + "_compare.png"), (.added[] + "_actual.png")' "$summary" | sort) \
+            diff -u <(jq -r '"summary.json", (.changed[] | . + "_before.png", . + "_actual.png"), (.added[] + "_actual.png")' "$summary" | sort) \
               <(find "$directory" -type f | sed "s|^$directory/||" | sort)
           done
           jq -s -e '.[0].pr_number == .[1].pr_number and .[0].base_sha == .[1].base_sha and .[0].head_sha == .[1].head_sha' \
@@ -108,13 +108,13 @@ jobs:
             echo '### Screenshot Test'
             echo
             printf 'Golden: `develop` `%s` · 이미지 차이는 report-only입니다.\n\n' "$BASE_SHA"
-            echo '| Platform / scenario | Result | Image |'
-            echo '| --- | --- | --- |'
+            echo '| Platform / scenario | Result | Before | After |'
+            echo '| --- | --- | --- | --- |'
             for platform in android ios; do
               jq -r --arg platform "$platform" --arg repo "$GITHUB_REPOSITORY" --arg sha "$IMAGE_SHA" '
-                (.changed[] | "| `\($platform)/\(.)` | Before / Diff / After | ![compare](https://raw.githubusercontent.com/\($repo)/\($sha)/\($platform)/\(.)_compare.png) |"),
-                (.added[] | "| `\($platform)/\(.)` | 신규 · After | ![after](https://raw.githubusercontent.com/\($repo)/\($sha)/\($platform)/\(.)_actual.png) |"),
-                (.removed[] | "| `\($platform)/\(.)` | 시나리오 제거 | — |")' "build/screenshot-publish/$platform/summary.json"
+                (.changed[] | "| `\($platform)/\(.)` | 변경 | ![before](https://raw.githubusercontent.com/\($repo)/\($sha)/\($platform)/\(.)_before.png) | ![after](https://raw.githubusercontent.com/\($repo)/\($sha)/\($platform)/\(.)_actual.png) |"),
+                (.added[] | "| `\($platform)/\(.)` | 신규 · After | — | ![after](https://raw.githubusercontent.com/\($repo)/\($sha)/\($platform)/\(.)_actual.png) |"),
+                (.removed[] | "| `\($platform)/\(.)` | 시나리오 제거 | — | — |")' "build/screenshot-publish/$platform/summary.json"
             done
             if [[ -z "$IMAGE_SHA" ]] && jq -s -e 'all(.[]; (.removed | length) == 0)' build/screenshot-publish/{android,ios}/summary.json > /dev/null; then
               echo
