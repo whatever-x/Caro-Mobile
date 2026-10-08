@@ -30,10 +30,12 @@ The message aggregation step includes an inline self-check for partial reruns, p
 
 ## Report behavior
 
-- Existing scenario changed: show Roborazzi's generated `_compare.png` (Before/Diff/After in one image).
+- Existing scenario changed: show the exact PR-base Golden (`_before.png`) and Roborazzi's `_actual.png` in separate Before/After columns. The workflow copies the original files without cropping or recomposing images; no Diff image is published by the new publisher.
 - New scenario: show only its `_actual.png` (After).
 - Removed scenario: list its removal as text, using the Golden and PR registries.
 - No changes: skip branch publication and new comment creation; replace an existing screenshot comment with “시각적 변경 없음”.
+
+The comparison workflow uploads `screenshot-before-after-android/ios` for the new publisher. It also retains the existing `screenshot-report-android/ios` artifacts so the current default-branch publisher continues to work before this change is merged. These legacy artifacts and Roborazzi diagnostics may still contain `_compare.png`; the new publisher downloads only the Before/After artifacts. Both report formats retain the same summary and 90-day retention.
 
 Pixel differences are report-only. Build, rendering, missing/expired Golden, missing registered results/images, invalid reports and publication errors fail CI. A missing Golden must never be silently replaced by a different commit's images.
 
@@ -42,6 +44,8 @@ Companion branches contain only report images and have independent Git history. 
 ## Activation and permissions
 
 `workflow_run` workflows must exist on the repository's default branch. The comment workflow starts after this PR is merged into `develop`; this PR can validate comparison artifacts, while actual branch/comment publication requires a subsequent PR run after the workflow is installed.
+
+Before/After comments likewise require the updated publisher on the default branch and a subsequent comparison using the updated producer. Older PR branches must incorporate this workflow change before rerunning: a run without the Before/After artifacts fails publication rather than falling back to a Diff image. Before merge, this PR still uses the default branch's existing comment format.
 
 PR comparison has read permissions. The separate publisher has write permissions and runs the default-branch workflow, without executing code or scripts from the PR or downloaded artifacts. Publication is limited to same-repository PRs; fork PRs can compare and produce artifacts but do not publish images/comments.
 
