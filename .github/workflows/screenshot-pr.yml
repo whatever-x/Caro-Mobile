@@ -23,39 +23,80 @@ jobs:
         include:
           - platform: android
             target: androidHostTest
+            test-task: testAndroidHostTest
             task: compareRoborazziAndroidHostTest
             runner: ubuntu-24.04
           - platform: ios
             target: iosSimulatorArm64
+            test-task: iosSimulatorArm64Test
             task: compareRoborazziIosSimulatorArm64
             runner: macos-26
     steps:
       - uses: actions/checkout@v6
+      - name: Download Golden for exact PR base SHA
+        shell: bash
+        timeout-minutes: 12
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          PLATFORM: ${{ matrix.platform }}
+        run: |
+          deadline=$((SECONDS + 600))
+          while true; do
+            if ! golden=$(gh api "repos/$GITHUB_REPOSITORY/actions/workflows/screenshot-golden.yml/runs?branch=develop&head_sha=$BASE_SHA&per_page=1" \
+              --jq '.workflow_runs[0] // empty'); then
+              echo "::error::Golden lookup failed for base SHA $BASE_SHA. See the GitHub CLI error above."
+              exit 1
+            fi
+            if [[ -z "$golden" ]]; then
+              echo "::error::No Golden run exists for base SHA $BASE_SHA."
+              exit 1
+            fi
+            run_id=$(jq -r '.id' <<< "$golden")
+            status=$(jq -r '.status' <<< "$golden")
+            conclusion=$(jq -r '.conclusion // "none"' <<< "$golden")
+            run_url=$(jq -r '.html_url' <<< "$golden")
+            if [[ "$status" == completed ]]; then
+              if [[ "$conclusion" != success ]]; then
+                echo "::error::Golden ended with $conclusion for base SHA $BASE_SHA. See $run_url"
+                exit 1
+              fi
+              break
+            fi
+            if (( SECONDS >= deadline )); then
+              echo "::error::Golden did not complete within 10 minutes for base SHA $BASE_SHA. See $run_url"
+              exit 1
+            fi
+            echo "Golden status: $status. Check again in 30 seconds. $run_url"
+            sleep 30
+          done
+          if ! gh run download "$run_id" --repo "$GITHUB_REPOSITORY" -n "screenshot-golden-$PLATFORM" -D build/screenshot-baseline; then
+            echo "::error::Golden artifact for base SHA $BASE_SHA is missing, expired, or unavailable. See $run_url"
+            exit 1
+          fi
       - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: '17'
       - uses: android-actions/setup-android@v4
       - uses: gradle/actions/setup-gradle@v5
+        with:
+          cache-read-only: false
       - name: Select Xcode 26.6
         if: matrix.platform == 'ios'
-        run: sudo xcode-select --switch /Applications/Xcode_26.6.app
-      - name: Download Golden for exact PR base SHA
-        env:
-          GH_TOKEN: ${{ github.token }}
-          BASE_SHA: ${{ github.event.pull_request.base.sha }}
-          PLATFORM: ${{ matrix.platform }}
+        id: xcode
         run: |
-          run_id=$(gh api --paginate "repos/$GITHUB_REPOSITORY/actions/workflows/screenshot-golden.yml/runs?branch=develop&status=success&per_page=100" \
-            --jq '.workflow_runs[] | [.head_sha, .id] | @tsv' | awk -v sha="$BASE_SHA" '$1 == sha && !found {print $2; found=1}')
-          if [[ -z "$run_id" ]]; then
-            echo "No successful develop Golden run for base SHA $BASE_SHA. Rebase or regenerate the baseline." >&2
-            exit 1
-          fi
-          if ! gh run download "$run_id" --repo "$GITHUB_REPOSITORY" -n "screenshot-golden-$PLATFORM" -D build/screenshot-baseline; then
-            echo "Golden artifact for base SHA $BASE_SHA is missing or expired. Rebase or regenerate the baseline." >&2
-            exit 1
-          fi
+          sudo xcode-select --switch /Applications/Xcode_26.6.app
+          echo "version=$(xcodebuild -version | shasum -a 256 | cut -d ' ' -f 1)" >> "$GITHUB_OUTPUT"
+          dependency_hash=$(sed -E '/^version-(code|name)[[:space:]]*=/d' gradle/libs.versions.toml | shasum -a 256 | cut -d ' ' -f 1)
+          echo "dependency_hash=$dependency_hash" >> "$GITHUB_OUTPUT"
+      - name: Cache Kotlin/Native
+        if: matrix.platform == 'ios'
+        id: konan
+        uses: actions/cache@v4
+        with:
+          path: ~/.konan
+          key: konan-v2-${{ matrix.runner }}-${{ runner.os }}-${{ runner.arch }}-${{ steps.xcode.outputs.version }}-${{ steps.xcode.outputs.dependency_hash }}
       - name: Validate scenarios and restore Golden images
         shell: bash
         env:
@@ -85,7 +126,13 @@ jobs:
           GOOGLE_WEB_CLIENT_ID=screenshot-test
           EOF
       - name: Compare with Roborazzi (report only)
-        run: ./gradlew '${{ matrix.task }}' --stacktrace --rerun-tasks
+        shell: bash
+        run: |
+          test_tasks=()
+          while IFS= read -r module; do
+            test_tasks+=(":feature:$module:${{ matrix.test-task }}" --rerun)
+          done < <(jq -r 'keys[]' scripts/screenshot/scenarios.json)
+          ./gradlew '${{ matrix.task }}' "${test_tasks[@]}" --stacktrace --profile --console=plain
       - name: Validate Roborazzi results and collect changed images
         shell: bash
         env:
@@ -95,7 +142,8 @@ jobs:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: |
-          mkdir -p build/screenshot-report
+          # Keep the legacy artifact compatible with the default-branch publisher until merge.
+          mkdir -p build/screenshot-report build/screenshot-before-after
           : > build/screenshot-results.jsonl
           while IFS= read -r module; do
             source="feature/$module/build/outputs/roborazzi/$TARGET"
@@ -120,6 +168,15 @@ jobs:
               test -f "$source/$image" && test ! -L "$source/$image"
               mkdir -p "build/screenshot-report/$module"
               cp "$source/$image" "build/screenshot-report/$module/"
+              mkdir -p "build/screenshot-before-after/$module"
+              actual="$source/${scenario}_actual.png"
+              test -f "$actual" && test ! -L "$actual"
+              cp "$actual" "build/screenshot-before-after/$module/"
+              if [[ "$kind" == changed ]]; then
+                before="build/screenshot-baseline/$module/$scenario.png"
+                test -f "$before" && test ! -L "$before"
+                cp "$before" "build/screenshot-before-after/$module/${scenario}_before.png"
+              fi
             done < <(jq -r '.results[] | [(.golden_file_path | split("/")[-1] | rtrimstr(".png")), .type] | @tsv' "$results")
             jq -c --arg module "$module" '.results[] | {scenario: ($module + "/" + (.golden_file_path | split("/")[-1] | rtrimstr(".png"))), type}' \
               "$results" >> build/screenshot-results.jsonl
@@ -133,10 +190,18 @@ jobs:
              added: [.[] | select(.type == "added") | .scenario], removed: $removed}' \
             build/screenshot-results.jsonl > build/screenshot-report/summary.json
           cat build/screenshot-report/summary.json
+          cp build/screenshot-report/summary.json build/screenshot-before-after/summary.json
       - uses: actions/upload-artifact@v6
         with:
           name: screenshot-report-${{ matrix.platform }}
           path: build/screenshot-report/
+          if-no-files-found: error
+          retention-days: 90
+      - name: Upload Before/After originals
+        uses: actions/upload-artifact@v6
+        with:
+          name: screenshot-before-after-${{ matrix.platform }}
+          path: build/screenshot-before-after/
           if-no-files-found: error
           retention-days: 90
       - name: Upload Roborazzi diagnostics
@@ -149,3 +214,11 @@ jobs:
             feature/*/build/reports/roborazzi/${{ matrix.target }}/
           if-no-files-found: warn
           retention-days: 90
+      - name: Upload Gradle profile
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: screenshot-profile-${{ matrix.platform }}
+          path: build/reports/profile/
+          if-no-files-found: warn
+          retention-days: 14
