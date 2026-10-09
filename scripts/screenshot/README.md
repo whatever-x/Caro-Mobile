@@ -1,6 +1,6 @@
 # Screenshot Scenario 목록
 
-이 디렉터리의 `scenarios.json`은 Android/iOS 스크린샷 테스트 시나리오의 명시적 목록입니다. 현재 9개 feature 모듈의 14개 시나리오가 등록되어 있습니다. 각 모듈의 테스트가 생성한 PNG 이름과 Roborazzi 비교 결과를 이 목록으로 검증합니다.
+이 디렉터리의 `scenarios.json`은 Android/iOS 스크린샷 테스트 시나리오의 명시적 목록입니다. 현재 9개 feature 모듈의 18개 시나리오가 등록되어 있습니다. 각 모듈의 테스트가 생성한 PNG 이름과 Roborazzi 비교 결과를 이 목록으로 검증합니다.
 
 수집·비교·게시 로직은 별도 Python 스크립트 없이 GitHub Actions 워크플로에 있습니다.
 
