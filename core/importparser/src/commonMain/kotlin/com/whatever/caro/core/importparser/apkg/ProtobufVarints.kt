@@ -1,8 +1,8 @@
 package com.whatever.caro.core.importparser.apkg
 
 /**
- * protobuf 메시지에서 varint 필드만 꺼낸다. Anki의 `meta`와 노트 유형 `config`에서 필요한 값이 모두 varint라
- * 전체 protobuf 라이브러리를 들이지 않는다. 형식이 깨졌으면 그때까지 읽은 값만 돌려준다.
+ * Anki의 `meta`와 노트 유형 `config`에서 필요한 값이 모두 varint라 전체 protobuf 라이브러리를 들이지 않는다.
+ * 형식이 깨졌으면 그때까지 읽은 값만 돌려준다.
  */
 internal object ProtobufVarints {
     private const val WIRE_VARINT = 0

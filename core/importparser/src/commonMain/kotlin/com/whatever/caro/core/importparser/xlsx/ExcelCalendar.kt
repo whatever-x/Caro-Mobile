@@ -24,10 +24,7 @@ internal data class ExcelDate(
     }
 }
 
-/**
- * Excel 일련번호를 날짜로 바꾼다. 1900 기준은 Lotus 호환 때문에 없는 날짜인 1900-02-29(일련번호 60)가 있어
- * 60보다 작은 번호는 하루 늦게 센다.
- */
+/** 1900 기준은 Lotus 호환 때문에 없는 날짜인 1900-02-29(일련번호 60)가 있어 60보다 작은 번호는 하루 늦게 센다. */
 internal object ExcelCalendar {
     private const val FICTIONAL_LEAP_DAY_SERIAL = 60L
     private val EPOCH_1900_EARLY = daysFromCivil(1899, 12, 31)

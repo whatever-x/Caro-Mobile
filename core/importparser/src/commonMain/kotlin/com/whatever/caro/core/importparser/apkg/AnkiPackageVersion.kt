@@ -5,10 +5,7 @@ import com.whatever.caro.core.importparser.ImportParseException
 import com.whatever.caro.core.importparser.archive.ZipArchive
 import okio.use
 
-/**
- * Anki 패키지의 컬렉션 형식. 최신 패키지에는 안내 노트 1개만 든 더미 `collection.anki2`가 함께 있어
- * 파일 이름이 아니라 `meta`의 버전으로 읽을 컬렉션을 고른다.
- */
+/** 최신 패키지에는 안내 노트 1개만 든 더미 `collection.anki2`가 함께 있어 파일 이름이 아니라 `meta`의 버전으로 읽을 컬렉션을 고른다. */
 internal enum class AnkiPackageVersion(
     val collectionEntry: String,
     val zstdCompressed: Boolean,

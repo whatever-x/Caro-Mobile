@@ -18,7 +18,6 @@ internal sealed interface XlsxCell {
 /** 열 번호(0부터)별 셀. 값이 없는 칸과 병합 영역의 나머지 칸은 들어 있지 않다. */
 internal typealias XlsxRow = Map<Int, XlsxCell>
 
-/** 시트 XML을 한 번 훑어 값이 있는 행을 [maxRows]개까지 모은다. */
 internal class XlsxSheetReader(
     private val cellFormatIds: List<Int>,
     private val numberFormat: XlsxNumberFormat,

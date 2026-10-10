@@ -12,10 +12,7 @@ import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 
-/**
- * 연결을 적용해 저장할 카드와 미리보기 통계를 만든다. 서버는 글자 수와 빈 값을 검사하지 않으므로
- * 500자 자르기, 빈 면 문구, 양쪽이 빈 카드 제외는 여기서만 보장된다.
- */
+/** 서버는 글자 수와 빈 값을 검사하지 않으므로 500자 자르기, 빈 면 문구, 양쪽이 빈 카드 제외는 여기서만 보장된다. */
 internal class ImportPreviewBuilder {
     private class Side(
         val text: String,

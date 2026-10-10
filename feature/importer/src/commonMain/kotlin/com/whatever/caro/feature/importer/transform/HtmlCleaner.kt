@@ -4,8 +4,8 @@ import com.whatever.caro.core.importparser.HtmlSignal
 import com.whatever.caro.core.importparser.model.HtmlMode
 
 /**
- * 항목 값을 카드에 넣을 일반 텍스트로 정리한다. 지우는 태그는 파서의 HTML 신호 목록과 주석뿐이라
- * `x<y and y>z`나 목록 밖 태그는 글자로 남는다. 순서를 바꾸면 블록 태그 묶음과 `<br>`의 줄바꿈 수가 달라진다.
+ * 지우는 태그는 파서의 HTML 신호 목록과 주석뿐이라 `x<y and y>z`나 목록 밖 태그는 글자로 남는다.
+ * 정리 순서를 바꾸면 블록 태그 묶음과 `<br>`의 줄바꿈 수가 달라진다.
  */
 internal object HtmlCleaner {
     private val SOUND = Regex("\\[sound:[^\\]]*]")

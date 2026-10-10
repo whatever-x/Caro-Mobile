@@ -14,7 +14,6 @@ import com.whatever.caro.core.importparser.table.ColumnNames
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 
-/** 텍스트, CSV, 붙여넣기를 한 노트 유형의 표로 읽는다. */
 internal class TextTableReader(
     private val options: ParseOptions,
 ) {

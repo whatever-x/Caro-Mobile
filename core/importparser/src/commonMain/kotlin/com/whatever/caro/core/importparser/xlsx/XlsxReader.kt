@@ -16,7 +16,6 @@ import com.whatever.caro.core.importparser.table.ColumnNames
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 
-/** 엑셀 통합 문서에서 시트 하나를 한 노트 유형의 표로 읽는다. 다른 시트는 행 수만 센다. */
 internal class XlsxReader(
     private val archive: ZipArchive,
     private val options: ParseOptions,

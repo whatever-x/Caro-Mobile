@@ -1,8 +1,8 @@
 package com.whatever.caro.core.importparser.xlsx
 
 /**
- * 셀에 저장된 10진 문자열을 그대로 반올림하는 수. Double로 바꿔 계산하면 플랫폼마다 문자열 변환 결과가 달라질 수 있어
- * 기기와 서버가 같은 표시를 내도록 자릿수 문자열로 계산한다. 값은 `digits × 10^exponent`이다.
+ * 값은 `digits × 10^exponent`이다.
+ * Double로 바꿔 계산하면 플랫폼마다 문자열 변환 결과가 달라질 수 있어 기기와 서버가 같은 표시를 내도록 자릿수 문자열로 계산한다.
  */
 internal data class DecimalNumber(
     val negative: Boolean,

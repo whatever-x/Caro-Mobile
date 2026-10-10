@@ -14,9 +14,7 @@ import okio.Source
 import okio.buffer
 import okio.openZip
 
-/**
- * 고정 이름의 항목만 읽는 zip 보기. 항목 이름으로 파일을 만들지 않으므로 경로 탈출은 생기지 않는다.
- */
+/** 정해진 이름의 항목만 읽고 항목 이름으로 파일을 만들지 않으므로 경로 탈출은 생기지 않는다. */
 internal class ZipArchive private constructor(
     private val entries: FileSystem,
     private val entryByteLimit: Long,

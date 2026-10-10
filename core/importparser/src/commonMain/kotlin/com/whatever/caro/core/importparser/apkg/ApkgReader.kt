@@ -18,9 +18,7 @@ import okio.FileSystem
 import okio.Path
 import okio.use
 
-/**
- * Anki 패키지를 읽는다. 미디어 항목, `media` 목록, 복습 기록과 스케줄 열은 열지 않는다.
- */
+/** 미디어 항목, `media` 목록, 복습 기록과 스케줄 열은 가져오지 않으므로 열지도 않는다. 깨진 미디어가 있어도 카드를 가져올 수 있다. */
 internal class ApkgReader(
     private val fileSystem: FileSystem,
     private val archive: ZipArchive,
