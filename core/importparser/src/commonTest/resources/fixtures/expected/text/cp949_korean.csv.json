@@ -1,0 +1,149 @@
+{
+  "fixture": "text/cp949_korean.csv",
+  "purpose": "CP949 bytes (not valid UTF-8) with CP949-only extended hangul (똠, 햏) that EUC-KR cannot decode. UTF-8 strict check fails -> re-read as CP949.",
+  "acceptanceCriteria": [
+    "AC-03",
+    "AC-18"
+  ],
+  "designRefs": [
+    "Mobile 7.2 인코딩 2, 4, 5",
+    "Mobile 13.2 D-5"
+  ],
+  "generatedByDefault": true,
+  "expectedOutcome": "parsed",
+  "format": "TEXT",
+  "sourceName": "cp949_korean.csv",
+  "encoding": "CP949",
+  "utf8Bom": false,
+  "htmlMode": "PLAIN",
+  "htmlModeReason": "",
+  "separator": ",",
+  "separatorSource": "detected",
+  "hasHeaderRow": true,
+  "subdecks": [],
+  "sheets": [],
+  "noteTypes": [
+    {
+      "id": "text",
+      "name": "cp949_korean.csv",
+      "fieldNames": [
+        "단어",
+        "뜻"
+      ],
+      "isCloze": false,
+      "noteCount": 4
+    }
+  ],
+  "rowCount": 4,
+  "warnings": [
+    {
+      "code": "ENCODING_FALLBACK_CP949"
+    }
+  ],
+  "uncoveredByCanonicalCodes": [],
+  "rows": [
+    {
+      "index": 0,
+      "fieldValues": [
+        "사과",
+        "apple"
+      ]
+    },
+    {
+      "index": 1,
+      "fieldValues": [
+        "똠방각하",
+        "확장 한글 똠"
+      ]
+    },
+    {
+      "index": 2,
+      "fieldValues": [
+        "햏",
+        "확장 한글 햏"
+      ]
+    },
+    {
+      "index": 3,
+      "fieldValues": [
+        "읽기",
+        "따옴표, 쉼표"
+      ]
+    }
+  ],
+  "cards": {
+    "appLanguage": "ko",
+    "emptySideText": "빈 항목입니다",
+    "mapping": "default: first field -> front, remaining fields in order -> back, joined by \\n, blank fields skipped (AC-06, Mobile 7.7). TEXT rows whose front value has {{c<n>:: markup use the cloze transform (PO P10, Mobile 7.6)",
+    "coverage": "all rows",
+    "items": [
+      {
+        "rowIndex": 0,
+        "front": "사과",
+        "back": "apple",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "frontUtf16Length": 2,
+        "backUtf16Length": 5,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 1,
+        "front": "똠방각하",
+        "back": "확장 한글 똠",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "frontUtf16Length": 4,
+        "backUtf16Length": 7,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 2,
+        "front": "햏",
+        "back": "확장 한글 햏",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "frontUtf16Length": 1,
+        "backUtf16Length": 7,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 3,
+        "front": "읽기",
+        "back": "따옴표, 쉼표",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "frontUtf16Length": 2,
+        "backUtf16Length": 7,
+        "mediaRemoved": 0,
+        "excluded": false
+      }
+    ]
+  },
+  "previewStats": {
+    "cardCount": 4,
+    "excludedCount": 0,
+    "emptyReplacedCount": 0,
+    "truncatedCount": 0,
+    "mediaRemovedCount": 0
+  },
+  "limit": {
+    "maxCards": 10000,
+    "exceeded": false
+  },
+  "ambiguities": [],
+  "bytesAreValidUtf8": false,
+  "bytesDecodableAsEucKr": false,
+  "fileBytes": 82
+}

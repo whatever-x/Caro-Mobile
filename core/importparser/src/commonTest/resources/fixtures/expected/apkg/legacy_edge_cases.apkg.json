@@ -1,0 +1,230 @@
+{
+  "fixture": "apkg/legacy_edge_cases.apkg",
+  "purpose": "Legacy edge cases: flds with 3 parts for a 2-field type, flds with 1 part, a Cloze note without cloze markup (genanki creates no card -> subdeckId null), a note whose fields are only <br> and &nbsp; (empty after cleaning).",
+  "acceptanceCriteria": [
+    "AC-02",
+    "AC-05",
+    "AC-07",
+    "AC-09",
+    "AC-12"
+  ],
+  "designRefs": [
+    "Mobile 7.3 (APKG_FIELD_COUNT_MISMATCH, 카드가 없는 노트)",
+    "Backend 7.2 subdeckId 규칙",
+    "Mobile 7.5",
+    "Mobile 7.7",
+    "PO P12",
+    "Backend 7.1 subdeckIds"
+  ],
+  "generatedByDefault": true,
+  "expectedOutcome": "parsed",
+  "format": "APKG",
+  "htmlMode": "HTML",
+  "packageVersion": "Legacy1",
+  "collectionEntry": "collection.anki2",
+  "zipEntries": [
+    "collection.anki2",
+    "media"
+  ],
+  "subdecks": [
+    {
+      "id": "2059400010",
+      "path": "Edge",
+      "noteCount": 4
+    }
+  ],
+  "notesWithoutDeck": 1,
+  "noDeckGroup": {
+    "label": "덱 없음",
+    "noteCount": 1,
+    "position": "last in the subdeck list",
+    "selectedByDefault": false,
+    "designRef": "PO P12, Mobile 7.3"
+  },
+  "noteTypes": [
+    {
+      "id": "1700000001",
+      "name": "Basic",
+      "fieldNames": [
+        "Front",
+        "Back"
+      ],
+      "isCloze": false,
+      "noteCount": 4
+    },
+    {
+      "id": "1700000004",
+      "name": "Cloze",
+      "fieldNames": [
+        "Text",
+        "Back Extra"
+      ],
+      "isCloze": true,
+      "noteCount": 1
+    }
+  ],
+  "totalNotes": 5,
+  "warnings": [
+    {
+      "code": "APKG_FIELD_COUNT_MISMATCH",
+      "count": 2
+    }
+  ],
+  "uncoveredByCanonicalCodes": [],
+  "rows": [
+    {
+      "rowIndex": 0,
+      "guid": "caro-e01",
+      "subdeckPath": "Edge",
+      "fieldValues": [
+        "extra field",
+        "has 3 parts"
+      ],
+      "rawFlds": [
+        "extra field",
+        "has 3 parts",
+        "surplus"
+      ]
+    },
+    {
+      "rowIndex": 1,
+      "guid": "caro-e02",
+      "subdeckPath": "Edge",
+      "fieldValues": [
+        "missing back",
+        ""
+      ],
+      "rawFlds": [
+        "missing back"
+      ]
+    },
+    {
+      "rowIndex": 2,
+      "guid": "caro-e03",
+      "subdeckPath": null,
+      "fieldValues": [
+        "빈칸 표기가 없는 문장",
+        ""
+      ]
+    },
+    {
+      "rowIndex": 3,
+      "guid": "caro-e04",
+      "subdeckPath": "Edge",
+      "fieldValues": [
+        "<br>",
+        "&nbsp;"
+      ]
+    },
+    {
+      "rowIndex": 4,
+      "guid": "caro-e05",
+      "subdeckPath": "Edge",
+      "fieldValues": [
+        "정상 앞",
+        "정상 뒤"
+      ]
+    }
+  ],
+  "cards": {
+    "appLanguage": "ko",
+    "mapping": "default: first field -> front, remaining fields -> back (cloze: Text -> cloze sentence, Back Extra -> extra), joined by \\n, blank fields skipped (AC-06, AC-07, Mobile 4.6, 7.7)",
+    "coverage": "all rows",
+    "items": [
+      {
+        "rowIndex": 0,
+        "guid": "caro-e01",
+        "front": "extra field",
+        "back": "has 3 parts",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "frontUtf16Length": 11,
+        "backUtf16Length": 11,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 1,
+        "guid": "caro-e02",
+        "front": "missing back",
+        "back": "빈 항목입니다",
+        "frontReplaced": false,
+        "backReplaced": true,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "frontUtf16Length": 12,
+        "backUtf16Length": 7,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 2,
+        "guid": "caro-e03",
+        "includedByDefault": false,
+        "front": "빈칸 표기가 없는 문장",
+        "back": "빈칸 표기가 없는 문장",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "frontUtf16Length": 12,
+        "backUtf16Length": 12,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 3,
+        "guid": "caro-e04",
+        "excluded": true,
+        "reason": "both sides empty after cleaning",
+        "mediaRemoved": 0
+      },
+      {
+        "rowIndex": 4,
+        "guid": "caro-e05",
+        "front": "정상 앞",
+        "back": "정상 뒤",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "frontUtf16Length": 4,
+        "backUtf16Length": 4,
+        "mediaRemoved": 0,
+        "excluded": false
+      }
+    ]
+  },
+  "previewStats": {
+    "selection": "all subdecks (default); '덱 없음' not selected (PO P12)",
+    "cardCount": 3,
+    "excludedCount": 1,
+    "emptyReplacedCount": 1,
+    "truncatedCount": 0,
+    "mediaRemovedCount": 0
+  },
+  "selectionExamples": [
+    {
+      "selectedPaths": [
+        "Edge",
+        null
+      ],
+      "pathNote": "null = '덱 없음' group",
+      "cardCount": 4
+    },
+    {
+      "selectedPaths": [
+        null
+      ],
+      "pathNote": "null = '덱 없음' group",
+      "cardCount": 1
+    }
+  ],
+  "limit": {
+    "maxCards": 10000,
+    "exceeded": false
+  },
+  "ambiguities": []
+}

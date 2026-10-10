@@ -1,0 +1,76 @@
+{
+  "fixture": "xlsx/large_10000_rows.xlsx",
+  "purpose": "Title row + 10,000 data rows of synthetic filler; cap boundary.",
+  "acceptanceCriteria": [
+    "AC-13",
+    "AC-19"
+  ],
+  "designRefs": [
+    "Mobile 7.4 두 단계 읽기 (MAX_CARDS + 1행)",
+    "Mobile 7.7 상한 판정",
+    "Mobile 5 상한 초과",
+    "Mobile 13.2 D-24, D-25"
+  ],
+  "generatedByDefault": true,
+  "expectedOutcome": "parsed",
+  "format": "XLSX",
+  "sourceName": "large_10000_rows.xlsx",
+  "htmlMode": "PLAIN",
+  "date1904": false,
+  "sheets": [
+    {
+      "index": 0,
+      "name": "Sheet1",
+      "rowCount": 10001
+    }
+  ],
+  "defaultSheetIndex": 0,
+  "hasHeaderRow": true,
+  "fieldNames": [
+    "front",
+    "back"
+  ],
+  "noteTypes": [
+    {
+      "id": "xlsx",
+      "name": "Sheet1",
+      "fieldNames": [
+        "front",
+        "back"
+      ],
+      "isCloze": false,
+      "noteCount": 10000
+    }
+  ],
+  "dataRowCount": 10000,
+  "rows": [
+    {
+      "index": 0,
+      "fieldValues": [
+        "filler00001",
+        "채움00001"
+      ]
+    },
+    {
+      "index": 9999,
+      "fieldValues": [
+        "filler10000",
+        "채움10000"
+      ]
+    }
+  ],
+  "warnings": [],
+  "uncoveredByCanonicalCodes": [],
+  "limit": {
+    "maxCards": 10000,
+    "exceeded": false,
+    "nextButtonEnabled": true,
+    "saveBlocked": false,
+    "rowsKept": 10000,
+    "guidance": null
+  },
+  "previewStats": {
+    "cardCount": 10000
+  },
+  "ambiguities": []
+}

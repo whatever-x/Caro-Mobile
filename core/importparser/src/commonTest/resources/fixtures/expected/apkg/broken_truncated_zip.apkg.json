@@ -1,0 +1,22 @@
+{
+  "fixture": "apkg/broken_truncated_zip.apkg",
+  "purpose": "First half of legacy_anki2_genanki_main.apkg: local headers present, central directory missing.",
+  "acceptanceCriteria": [
+    "AC-02"
+  ],
+  "designRefs": [
+    "Mobile 5 지원하지 않는 형식, 손상 파일 (zip 손상)",
+    "Backend 7.6 IM003"
+  ],
+  "generatedByDefault": true,
+  "expectedOutcome": "error",
+  "error": {
+    "kind": "CORRUPT_FILE",
+    "reason": "zip damaged",
+    "userMessageKoExample": "Anki에서 다시 내보내 주세요"
+  },
+  "format": "APKG",
+  "warnings": [],
+  "uncoveredByCanonicalCodes": [],
+  "ambiguities": []
+}

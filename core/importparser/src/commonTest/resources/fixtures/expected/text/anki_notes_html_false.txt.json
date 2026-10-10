@@ -1,0 +1,168 @@
+{
+  "fixture": "text/anki_notes_html_false.txt",
+  "purpose": "Explicit #html:false wins over tag/&nbsp; detection: '<', '>', tags and entities stay as typed. [sound:] is still removed. Cloze markup in the front value is still transformed (PO P10); markup only in a back value stays literal.",
+  "acceptanceCriteria": [
+    "AC-03",
+    "AC-07",
+    "AC-08",
+    "AC-18"
+  ],
+  "designRefs": [
+    "Mobile 7.2 Anki 헤더",
+    "Mobile 7.5 적용 대상 표",
+    "Mobile 7.6 적용 대상",
+    "PO P1, P9, P10"
+  ],
+  "generatedByDefault": true,
+  "expectedOutcome": "parsed",
+  "format": "TEXT",
+  "sourceName": "anki_notes_html_false.txt",
+  "encoding": "UTF-8",
+  "utf8Bom": false,
+  "htmlMode": "PLAIN",
+  "htmlModeReason": "#html:false header (takes priority over <b>, <br> and &nbsp; signals)",
+  "separator": "\t",
+  "separatorSource": "header (#separator:tab)",
+  "hasHeaderRow": false,
+  "subdecks": [],
+  "sheets": [],
+  "noteTypes": [
+    {
+      "id": "text",
+      "name": "anki_notes_html_false.txt",
+      "fieldNames": [
+        "열 1",
+        "열 2"
+      ],
+      "isCloze": false,
+      "noteCount": 5
+    }
+  ],
+  "rowCount": 5,
+  "warnings": [],
+  "uncoveredByCanonicalCodes": [],
+  "rows": [
+    {
+      "index": 0,
+      "fieldValues": [
+        "x<y and y>z",
+        "a < b"
+      ]
+    },
+    {
+      "index": 1,
+      "fieldValues": [
+        "<b>굵게?</b> line1<br>line2",
+        "&amp; 그대로 &nbsp; 유지"
+      ]
+    },
+    {
+      "index": 2,
+      "fieldValues": [
+        "[sound:hello.mp3]hello",
+        "안녕"
+      ]
+    },
+    {
+      "index": 3,
+      "fieldValues": [
+        "{{c1::빈칸}} 변환",
+        "html:false여도 변환"
+      ]
+    },
+    {
+      "index": 4,
+      "fieldValues": [
+        "앞면 일반",
+        "{{c1::뒷면}} 표기는 그대로"
+      ]
+    }
+  ],
+  "cards": {
+    "appLanguage": "ko",
+    "emptySideText": "빈 항목입니다",
+    "mapping": "default: first field -> front, remaining fields in order -> back, joined by \\n, blank fields skipped (AC-06, Mobile 7.7). TEXT rows whose front value has {{c<n>:: markup use the cloze transform (PO P10, Mobile 7.6)",
+    "coverage": "all rows",
+    "items": [
+      {
+        "rowIndex": 0,
+        "front": "x<y and y>z",
+        "back": "a < b",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "frontUtf16Length": 11,
+        "backUtf16Length": 5,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 1,
+        "front": "<b>굵게?</b> line1<br>line2",
+        "back": "&amp; 그대로 &nbsp; 유지",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "frontUtf16Length": 25,
+        "backUtf16Length": 19,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 2,
+        "front": "hello",
+        "back": "안녕",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "frontUtf16Length": 5,
+        "backUtf16Length": 2,
+        "mediaRemoved": 1,
+        "excluded": false
+      },
+      {
+        "rowIndex": 3,
+        "front": "[...] 변환",
+        "back": "빈칸 변환\nhtml:false여도 변환",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "frontUtf16Length": 8,
+        "backUtf16Length": 21,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 4,
+        "front": "앞면 일반",
+        "back": "{{c1::뒷면}} 표기는 그대로",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "frontUtf16Length": 5,
+        "backUtf16Length": 18,
+        "mediaRemoved": 0,
+        "excluded": false
+      }
+    ]
+  },
+  "previewStats": {
+    "cardCount": 5,
+    "excludedCount": 0,
+    "emptyReplacedCount": 0,
+    "truncatedCount": 0,
+    "mediaRemovedCount": 1
+  },
+  "limit": {
+    "maxCards": 10000,
+    "exceeded": false
+  },
+  "ambiguities": [],
+  "headerLines": 2,
+  "fileBytes": 230
+}

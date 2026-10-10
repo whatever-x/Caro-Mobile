@@ -1,0 +1,27 @@
+{
+  "fixture": "text/oversize_over_100mb.tsv",
+  "purpose": "File of MAX_FILE_BYTES + 1 bytes (104,857,601); must be rejected by size before reading content. A file of exactly 104,857,600 bytes passes the size check.",
+  "acceptanceCriteria": [
+    "AC-13"
+  ],
+  "designRefs": [
+    "Mobile 5 파일 100MB 초과",
+    "Mobile 6.4",
+    "Mobile 8.1 MAX_FILE_BYTES",
+    "Mobile 13.2 D-26"
+  ],
+  "generatedByDefault": false,
+  "generateCommand": "uv run --no-project --python 3.12 python gen_text.py --oversize",
+  "expectedOutcome": "error",
+  "error": {
+    "kind": "FILE_TOO_LARGE",
+    "guidanceKo": "파일(또는 붙여넣을 내용)을 상한 이하 줄 수로 나누기",
+    "contentRead": false,
+    "maxFileBytes": 104857600,
+    "userFacingLimit": "100MB"
+  },
+  "fileBytes": 104857601,
+  "warnings": [],
+  "uncoveredByCanonicalCodes": [],
+  "ambiguities": []
+}

@@ -1,0 +1,674 @@
+{
+  "fixture": "apkg/legacy2_anki21_main.apkg",
+  "purpose": "Anki shared-deck style package: 1,217 notes, subdecks Lang::Vocab::N5/N4 and Lang::Grammar, note types Basic, Basic (and reversed card), 4-field Vocab, Cloze; HTML in fields; 2 images and 2 audio files referenced and included; cards moved so note id order differs from deck order.",
+  "acceptanceCriteria": [
+    "AC-02",
+    "AC-05",
+    "AC-06",
+    "AC-07",
+    "AC-08",
+    "AC-09",
+    "AC-12",
+    "AC-18"
+  ],
+  "designRefs": [
+    "Mobile 7.3",
+    "Mobile 7.5",
+    "Mobile 7.6",
+    "Mobile 7.7",
+    "Backend 7.2 subdeckId 규칙"
+  ],
+  "generatedByDefault": true,
+  "expectedOutcome": "parsed",
+  "format": "APKG",
+  "htmlMode": "HTML",
+  "htmlModeReason": "APKG is always HTML",
+  "packageVersion": "Legacy2",
+  "metaVersion": 2,
+  "collectionEntry": "collection.anki21",
+  "metaEntry": true,
+  "dummyCollectionEntry": "collection.anki2",
+  "zipEntries": [
+    "meta",
+    "collection.anki21",
+    "collection.anki2",
+    "media",
+    "0",
+    "1",
+    "2",
+    "3"
+  ],
+  "builtWith": "anki 26.09.3 export legacy=True (import of the genanki package)",
+  "subdecks": [
+    {
+      "id": null,
+      "path": "Lang::Grammar",
+      "noteCount": 310
+    },
+    {
+      "id": null,
+      "path": "Lang::Vocab::N4",
+      "noteCount": 403
+    },
+    {
+      "id": null,
+      "path": "Lang::Vocab::N5",
+      "noteCount": 504
+    }
+  ],
+  "notesWithoutDeck": 0,
+  "noteTypes": [
+    {
+      "id": "1700000001",
+      "name": "Basic",
+      "fieldNames": [
+        "Front",
+        "Back"
+      ],
+      "isCloze": false,
+      "noteCount": 303
+    },
+    {
+      "id": "1700000002",
+      "name": "Basic (and reversed card)",
+      "fieldNames": [
+        "Front",
+        "Back"
+      ],
+      "isCloze": false,
+      "noteCount": 102
+    },
+    {
+      "id": "1700000003",
+      "name": "Vocab",
+      "fieldNames": [
+        "Word",
+        "Meaning",
+        "Example",
+        "Reading"
+      ],
+      "isCloze": false,
+      "noteCount": 504
+    },
+    {
+      "id": "1700000004",
+      "name": "Cloze",
+      "fieldNames": [
+        "Text",
+        "Back Extra"
+      ],
+      "isCloze": true,
+      "noteCount": 308
+    }
+  ],
+  "totalNotes": 1217,
+  "warnings": [],
+  "uncoveredByCanonicalCodes": [],
+  "rows": [
+    {
+      "rowIndex": 0,
+      "guid": "caro-h01",
+      "noteTypeId": "1700000003",
+      "subdeckPath": "Lang::Vocab::N5",
+      "fieldValues": [
+        "食べる",
+        "먹다",
+        "<div>毎朝パンを<b>食べる</b>。</div>",
+        "たべる[sound:taberu.wav]"
+      ]
+    },
+    {
+      "rowIndex": 1,
+      "guid": "caro-h02",
+      "noteTypeId": "1700000001",
+      "subdeckPath": "Lang::Grammar",
+      "fieldValues": [
+        "<div>water</div>",
+        "<b>물</b><br><img src=\"water.png\">"
+      ]
+    },
+    {
+      "rowIndex": 2,
+      "guid": "caro-h03",
+      "noteTypeId": "1700000003",
+      "subdeckPath": "Lang::Vocab::N5",
+      "fieldValues": [
+        "水",
+        "물",
+        "",
+        "みず"
+      ]
+    },
+    {
+      "rowIndex": 3,
+      "guid": "caro-h04",
+      "noteTypeId": "1700000003",
+      "subdeckPath": "Lang::Vocab::N5",
+      "fieldValues": [
+        "&#54620;&#xAE00;",
+        "Korean alphabet",
+        "<ul><li>가</li><li>나</li></ul>",
+        "<span style=\"color:red\">hangeul</span>"
+      ]
+    },
+    {
+      "rowIndex": 4,
+      "guid": "caro-h05",
+      "noteTypeId": "1700000003",
+      "subdeckPath": "Lang::Vocab::N5",
+      "fieldValues": [
+        "",
+        "뜻만 있음",
+        "",
+        ""
+      ]
+    },
+    {
+      "rowIndex": 505,
+      "guid": "caro-h06",
+      "noteTypeId": "1700000001",
+      "subdeckPath": "Lang::Vocab::N4",
+      "fieldValues": [
+        "Q&amp;A &lt;tag&gt;",
+        "질문과 답변&nbsp;"
+      ]
+    },
+    {
+      "rowIndex": 506,
+      "guid": "caro-h07",
+      "noteTypeId": "1700000001",
+      "subdeckPath": "Lang::Vocab::N4",
+      "fieldValues": [
+        "<!-- hidden -->visible<style>.x{color:red}</style>",
+        "<script>alert(1)</script>보임"
+      ]
+    },
+    {
+      "rowIndex": 507,
+      "guid": "caro-h08",
+      "noteTypeId": "1700000002",
+      "subdeckPath": "Lang::Vocab::N4",
+      "fieldValues": [
+        "sun",
+        "해"
+      ]
+    },
+    {
+      "rowIndex": 508,
+      "guid": "caro-h09",
+      "noteTypeId": "1700000002",
+      "subdeckPath": "Lang::Grammar",
+      "fieldValues": [
+        "moon",
+        "달"
+      ]
+    },
+    {
+      "rowIndex": 909,
+      "guid": "caro-h10",
+      "noteTypeId": "1700000004",
+      "subdeckPath": "Lang::Grammar",
+      "fieldValues": [
+        "{{c1::Canberra}} is the capital of {{c2::Australia}}.",
+        ""
+      ]
+    },
+    {
+      "rowIndex": 910,
+      "guid": "caro-h11",
+      "noteTypeId": "1700000004",
+      "subdeckPath": "Lang::Grammar",
+      "fieldValues": [
+        "{{c1::Seoul::city}} is in {{c2::Korea::country}}.",
+        "수도"
+      ]
+    },
+    {
+      "rowIndex": 911,
+      "guid": "caro-h12",
+      "noteTypeId": "1700000004",
+      "subdeckPath": "Lang::Grammar",
+      "fieldValues": [
+        "시간 표기 {{c1::12::시::분}}",
+        ""
+      ]
+    },
+    {
+      "rowIndex": 912,
+      "guid": "caro-h13",
+      "noteTypeId": "1700000004",
+      "subdeckPath": "Lang::Grammar",
+      "fieldValues": [
+        "우리 {{c1::큰 {{c2::집}} 앞}} 정원",
+        ""
+      ]
+    },
+    {
+      "rowIndex": 913,
+      "guid": "caro-h14",
+      "noteTypeId": "1700000004",
+      "subdeckPath": "Lang::Grammar",
+      "fieldValues": [
+        "{{c1,2::서울}}은 {{c3::한국}}의 수도이다.",
+        ""
+      ]
+    },
+    {
+      "rowIndex": 914,
+      "guid": "caro-h15",
+      "noteTypeId": "1700000004",
+      "subdeckPath": "Lang::Grammar",
+      "fieldValues": [
+        "{{c1::닫힘}} 그리고 {{c2::열림",
+        ""
+      ]
+    },
+    {
+      "rowIndex": 915,
+      "guid": "caro-h16",
+      "noteTypeId": "1700000004",
+      "subdeckPath": "Lang::Grammar",
+      "fieldValues": [
+        "{{c1::<b>bold</b>}} answer<br><img src=\"cloze.png\">",
+        "<i>extra</i> [sound:extra.wav]"
+      ]
+    },
+    {
+      "rowIndex": 916,
+      "guid": "caro-h17",
+      "noteTypeId": "1700000004",
+      "subdeckPath": "Lang::Grammar",
+      "fieldValues": [
+        "{{c1::a {{c2::b}}::hint}}",
+        ""
+      ]
+    }
+  ],
+  "rowOrder": "note id ascending (= genanki write order); handwritten rowIndex values are fixed",
+  "cards": {
+    "appLanguage": "ko",
+    "mapping": "default: first field -> front, remaining fields -> back (cloze: Text -> cloze sentence, Back Extra -> extra), joined by \\n, blank fields skipped (AC-06, AC-07, Mobile 4.6, 7.7)",
+    "coverage": "handwritten notes + first filler of each type",
+    "items": [
+      {
+        "rowIndex": 0,
+        "guid": "caro-h01",
+        "subdeckPath": "Lang::Vocab::N5",
+        "front": "食べる",
+        "back": "먹다\n毎朝パンを食べる。\nたべる",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "frontUtf16Length": 3,
+        "backUtf16Length": 16,
+        "mediaRemoved": 1,
+        "excluded": false
+      },
+      {
+        "rowIndex": 1,
+        "guid": "caro-h02",
+        "subdeckPath": "Lang::Grammar",
+        "front": "water",
+        "back": "물",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "frontUtf16Length": 5,
+        "backUtf16Length": 1,
+        "mediaRemoved": 1,
+        "excluded": false
+      },
+      {
+        "rowIndex": 2,
+        "guid": "caro-h03",
+        "subdeckPath": "Lang::Vocab::N5",
+        "front": "水",
+        "back": "물\nみず",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "frontUtf16Length": 1,
+        "backUtf16Length": 4,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 3,
+        "guid": "caro-h04",
+        "subdeckPath": "Lang::Vocab::N5",
+        "front": "한글",
+        "back": "Korean alphabet\n가\n나\nhangeul",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "frontUtf16Length": 2,
+        "backUtf16Length": 27,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 4,
+        "guid": "caro-h05",
+        "subdeckPath": "Lang::Vocab::N5",
+        "front": "빈 항목입니다",
+        "back": "뜻만 있음",
+        "frontReplaced": true,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "frontUtf16Length": 7,
+        "backUtf16Length": 5,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 5,
+        "guid": "caro-vocab-0001",
+        "subdeckPath": "Lang::Vocab::N5",
+        "front": "vocab-n5-0001",
+        "back": "n5 뜻 0001\n例文 0001\n예문 0001\nよみ0001",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "frontUtf16Length": 13,
+        "backUtf16Length": 32,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 505,
+        "guid": "caro-h06",
+        "subdeckPath": "Lang::Vocab::N4",
+        "front": "Q&A <tag>",
+        "back": "질문과 답변",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "frontUtf16Length": 9,
+        "backUtf16Length": 6,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 506,
+        "guid": "caro-h07",
+        "subdeckPath": "Lang::Vocab::N4",
+        "front": "visible",
+        "back": "보임",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "frontUtf16Length": 7,
+        "backUtf16Length": 2,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 507,
+        "guid": "caro-h08",
+        "subdeckPath": "Lang::Vocab::N4",
+        "front": "sun",
+        "back": "해",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "frontUtf16Length": 3,
+        "backUtf16Length": 1,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 508,
+        "guid": "caro-h09",
+        "subdeckPath": "Lang::Grammar",
+        "front": "moon",
+        "back": "달",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "frontUtf16Length": 4,
+        "backUtf16Length": 1,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 509,
+        "guid": "caro-basic-0001",
+        "subdeckPath": "Lang::Vocab::N4",
+        "front": "basic-n4-0001",
+        "back": "뒷면 0001",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "frontUtf16Length": 13,
+        "backUtf16Length": 7,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 809,
+        "guid": "caro-reversed-0001",
+        "subdeckPath": "Lang::Vocab::N4",
+        "front": "pair-0001",
+        "back": "짝-0001",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "frontUtf16Length": 9,
+        "backUtf16Length": 6,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 909,
+        "guid": "caro-h10",
+        "subdeckPath": "Lang::Grammar",
+        "front": "[...] is the capital of [...].",
+        "back": "Canberra is the capital of Australia.",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "frontUtf16Length": 30,
+        "backUtf16Length": 37,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 910,
+        "guid": "caro-h11",
+        "subdeckPath": "Lang::Grammar",
+        "front": "[city] is in [country].",
+        "back": "Seoul is in Korea.\n수도",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "frontUtf16Length": 23,
+        "backUtf16Length": 21,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 911,
+        "guid": "caro-h12",
+        "subdeckPath": "Lang::Grammar",
+        "front": "시간 표기 [시::분]",
+        "back": "시간 표기 12",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "frontUtf16Length": 12,
+        "backUtf16Length": 8,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 912,
+        "guid": "caro-h13",
+        "subdeckPath": "Lang::Grammar",
+        "front": "우리 [...] 정원",
+        "back": "우리 큰 집 앞 정원",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "frontUtf16Length": 11,
+        "backUtf16Length": 11,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 913,
+        "guid": "caro-h14",
+        "subdeckPath": "Lang::Grammar",
+        "front": "[...]은 [...]의 수도이다.",
+        "back": "서울은 한국의 수도이다.",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "frontUtf16Length": 19,
+        "backUtf16Length": 13,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 914,
+        "guid": "caro-h15",
+        "subdeckPath": "Lang::Grammar",
+        "front": "[...] 그리고 {{c2::열림",
+        "back": "닫힘 그리고 {{c2::열림",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "frontUtf16Length": 18,
+        "backUtf16Length": 15,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 915,
+        "guid": "caro-h16",
+        "subdeckPath": "Lang::Grammar",
+        "front": "[...] answer",
+        "back": "bold answer\nextra",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "frontUtf16Length": 12,
+        "backUtf16Length": 17,
+        "mediaRemoved": 2,
+        "excluded": false
+      },
+      {
+        "rowIndex": 916,
+        "guid": "caro-h17",
+        "subdeckPath": "Lang::Grammar",
+        "front": "[hint]",
+        "back": "a b",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "frontUtf16Length": 6,
+        "backUtf16Length": 3,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 917,
+        "guid": "caro-cloze-0001",
+        "subdeckPath": "Lang::Grammar",
+        "front": "문장 [...] 끝",
+        "back": "문장 빈칸 0001 끝",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "frontUtf16Length": 10,
+        "backUtf16Length": 12,
+        "mediaRemoved": 0,
+        "excluded": false
+      }
+    ]
+  },
+  "previewStats": {
+    "selection": "all subdecks (default)",
+    "cardCount": 1217,
+    "excludedCount": 0,
+    "emptyReplacedCount": 1,
+    "truncatedCount": 0,
+    "mediaRemovedCount": 4
+  },
+  "mediaRule": "caro-h01 1 + caro-h02 1 + caro-h16 2 (cloze Text media counted once per note, Mobile 13.2 D-23)",
+  "selectionExamples": [
+    {
+      "selectedPaths": [
+        "Lang::Grammar"
+      ],
+      "noteCount": 310,
+      "firstRows": [
+        {
+          "rowIndex": 1,
+          "guid": "caro-h02"
+        },
+        {
+          "rowIndex": 508,
+          "guid": "caro-h09"
+        },
+        {
+          "rowIndex": 909,
+          "guid": "caro-h10"
+        },
+        {
+          "rowIndex": 910,
+          "guid": "caro-h11"
+        },
+        {
+          "rowIndex": 911,
+          "guid": "caro-h12"
+        }
+      ]
+    }
+  ],
+  "limit": {
+    "maxCards": 10000,
+    "exceeded": false
+  },
+  "parserNotes": [
+    "Media entries (0..3, media) and revlog must not be read (AC-02).",
+    "Note ids, guids and notetype ids are identical across legacy_anki2_genanki_main, legacy2_anki21_main and modern_anki21b_main; deck ids differ (Anki assigns new deck ids on import), compare subdecks by path.",
+    "The dummy collection.anki2 holds one note ('Please update to the latest Anki version...'); it must not appear in rows.",
+    "Empty parent decks (Default, Lang, Lang::Vocab) exist in the decks table and must not be listed."
+  ],
+  "ambiguities": [],
+  "resolvedObservations": [
+    {
+      "guid": "caro-h04",
+      "section": "Mobile 7.5 정리 순서 5 (D-27)",
+      "note": "<ul><li>가</li><li>나</li></ul> yields '가\\n나' (adjacent block tags give one newline)."
+    }
+  ],
+  "observations": [
+    {
+      "guid": "caro-h14",
+      "section": "Mobile 7.6",
+      "note": "genanki does not recognise {{c1,2::...}} when generating cards, so this note only has a card for c3; the parser reads notes, so the card set does not matter."
+    }
+  ]
+}

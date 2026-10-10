@@ -1,0 +1,70 @@
+{
+  "fixture": "text/large_10000_rows.tsv",
+  "purpose": "10,000 non-empty rows of synthetic filler ('filler00001' TAB '채움00001'); cap boundary.",
+  "acceptanceCriteria": [
+    "AC-13",
+    "AC-19"
+  ],
+  "designRefs": [
+    "Mobile 7.2 상한 보호",
+    "Mobile 8.1 MAX_CARDS",
+    "Mobile 5 상한 초과",
+    "Mobile 13.2 D-25"
+  ],
+  "generatedByDefault": true,
+  "expectedOutcome": "parsed",
+  "format": "TEXT",
+  "sourceName": "large_10000_rows.tsv",
+  "encoding": "UTF-8",
+  "utf8Bom": false,
+  "htmlMode": "PLAIN",
+  "separator": "\t",
+  "separatorSource": "detected",
+  "hasHeaderRow": false,
+  "noteTypes": [
+    {
+      "id": "text",
+      "name": "large_10000_rows.tsv",
+      "fieldNames": [
+        "열 1",
+        "열 2"
+      ],
+      "isCloze": false,
+      "noteCount": 10000
+    }
+  ],
+  "rowCount": 10000,
+  "warnings": [],
+  "uncoveredByCanonicalCodes": [],
+  "rows": [
+    {
+      "index": 0,
+      "fieldValues": [
+        "filler00001",
+        "채움00001"
+      ]
+    },
+    {
+      "index": 9999,
+      "fieldValues": [
+        "filler10000",
+        "채움10000"
+      ]
+    }
+  ],
+  "limit": {
+    "maxCards": 10000,
+    "exceeded": false,
+    "guidance": null,
+    "nextButtonEnabled": true,
+    "saveBlocked": false,
+    "parserStopsKeepingValuesAtRow": null,
+    "rowsKept": 10000
+  },
+  "previewStats": {
+    "cardCount": 10000
+  },
+  "previewNote": null,
+  "ambiguities": [],
+  "fileBytes": 240000
+}

@@ -1,0 +1,23 @@
+{
+  "fixture": "apkg/broken_not_a_zip.apkg",
+  "purpose": "Plain text bytes with an .apkg extension.",
+  "acceptanceCriteria": [
+    "AC-02"
+  ],
+  "designRefs": [
+    "Mobile 7.1 형식 판별 (P11)",
+    "Mobile 5 지원하지 않는 형식, 손상 파일",
+    "Backend 7.6 IM003"
+  ],
+  "generatedByDefault": true,
+  "expectedOutcome": "error",
+  "error": {
+    "kind": "CORRUPT_FILE",
+    "reason": "not a zip; an .apkg that is not a zip is a corrupt file and is not re-detected as TEXT by content (PO P11)",
+    "userMessageKoExample": "Anki에서 다시 내보내 주세요"
+  },
+  "format": "APKG",
+  "warnings": [],
+  "uncoveredByCanonicalCodes": [],
+  "ambiguities": []
+}

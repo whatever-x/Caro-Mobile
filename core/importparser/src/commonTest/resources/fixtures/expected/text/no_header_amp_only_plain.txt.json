@@ -1,0 +1,164 @@
+{
+  "fixture": "text/no_header_amp_only_plain.txt",
+  "purpose": "No headers; only &amp;, '</', non-tag '<' comparisons and a tag name outside the known list (<bold>) -> PLAIN, nothing is stripped or decoded.",
+  "acceptanceCriteria": [
+    "AC-03",
+    "AC-08",
+    "AC-18"
+  ],
+  "designRefs": [
+    "Mobile 7.5 HTML 신호 (신호가 아닌 것)",
+    "PO P1, P9"
+  ],
+  "generatedByDefault": true,
+  "expectedOutcome": "parsed",
+  "format": "TEXT",
+  "sourceName": "no_header_amp_only_plain.txt",
+  "encoding": "UTF-8",
+  "utf8Bom": false,
+  "htmlMode": "PLAIN",
+  "htmlModeReason": "no known tag and no &nbsp; (only &amp;, </, x<y and y>z, a < b, <bold>)",
+  "separator": "\t",
+  "separatorSource": "detected",
+  "hasHeaderRow": false,
+  "subdecks": [],
+  "sheets": [],
+  "noteTypes": [
+    {
+      "id": "text",
+      "name": "no_header_amp_only_plain.txt",
+      "fieldNames": [
+        "열 1",
+        "열 2"
+      ],
+      "isCloze": false,
+      "noteCount": 5
+    }
+  ],
+  "rowCount": 5,
+  "warnings": [],
+  "uncoveredByCanonicalCodes": [],
+  "rows": [
+    {
+      "index": 0,
+      "fieldValues": [
+        "Tom &amp; Jerry",
+        "톰과 제리"
+      ]
+    },
+    {
+      "index": 1,
+      "fieldValues": [
+        "a </ b",
+        "닫는 태그 모양"
+      ]
+    },
+    {
+      "index": 2,
+      "fieldValues": [
+        "x<y and y>z",
+        "부등호 그대로"
+      ]
+    },
+    {
+      "index": 3,
+      "fieldValues": [
+        "a < b",
+        "공백 있는 부등호"
+      ]
+    },
+    {
+      "index": 4,
+      "fieldValues": [
+        "<bold>목록 밖 이름</bold>",
+        "알려진 이름 b로 시작하지만 다른 이름"
+      ]
+    }
+  ],
+  "cards": {
+    "appLanguage": "ko",
+    "emptySideText": "빈 항목입니다",
+    "mapping": "default: first field -> front, remaining fields in order -> back, joined by \\n, blank fields skipped (AC-06, Mobile 7.7). TEXT rows whose front value has {{c<n>:: markup use the cloze transform (PO P10, Mobile 7.6)",
+    "coverage": "all rows",
+    "items": [
+      {
+        "rowIndex": 0,
+        "front": "Tom &amp; Jerry",
+        "back": "톰과 제리",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "frontUtf16Length": 15,
+        "backUtf16Length": 5,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 1,
+        "front": "a </ b",
+        "back": "닫는 태그 모양",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "frontUtf16Length": 6,
+        "backUtf16Length": 8,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 2,
+        "front": "x<y and y>z",
+        "back": "부등호 그대로",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "frontUtf16Length": 11,
+        "backUtf16Length": 7,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 3,
+        "front": "a < b",
+        "back": "공백 있는 부등호",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "frontUtf16Length": 5,
+        "backUtf16Length": 9,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 4,
+        "front": "<bold>목록 밖 이름</bold>",
+        "back": "알려진 이름 b로 시작하지만 다른 이름",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "frontUtf16Length": 20,
+        "backUtf16Length": 21,
+        "mediaRemoved": 0,
+        "excluded": false
+      }
+    ]
+  },
+  "previewStats": {
+    "cardCount": 5,
+    "excludedCount": 0,
+    "emptyReplacedCount": 0,
+    "truncatedCount": 0,
+    "mediaRemovedCount": 0
+  },
+  "limit": {
+    "maxCards": 10000,
+    "exceeded": false
+  },
+  "ambiguities": [],
+  "fileBytes": 203
+}

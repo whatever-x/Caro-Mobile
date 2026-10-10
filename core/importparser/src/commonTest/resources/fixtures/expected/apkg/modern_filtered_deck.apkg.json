@@ -1,0 +1,232 @@
+{
+  "fixture": "apkg/modern_filtered_deck.apkg",
+  "purpose": "Modern package exported with scheduling: 3 of 5 N5 cards sit in filtered deck 'Filtered Study' (cards.did = filtered deck, cards.odid = Lang::Vocab::N5).",
+  "acceptanceCriteria": [
+    "AC-02",
+    "AC-05"
+  ],
+  "designRefs": [
+    "Mobile 7.3 노트의 하위 덱 (odid)",
+    "Backend 7.2 subdeckId와 odid 규칙"
+  ],
+  "generatedByDefault": true,
+  "expectedOutcome": "parsed",
+  "format": "APKG",
+  "htmlMode": "HTML",
+  "packageVersion": "Latest",
+  "metaVersion": 3,
+  "collectionEntry": "collection.anki21b",
+  "builtWith": "anki 26.09.3, with_scheduling=True",
+  "subdecks": [
+    {
+      "id": null,
+      "path": "Lang::Vocab::N4",
+      "noteCount": 2
+    },
+    {
+      "id": null,
+      "path": "Lang::Vocab::N5",
+      "noteCount": 5
+    }
+  ],
+  "notesWithoutDeck": 0,
+  "filteredDecksNotListed": [
+    "Filtered Study"
+  ],
+  "cardsInFilteredDeck": 3,
+  "noteTypes": [
+    {
+      "id": null,
+      "name": "Basic",
+      "fieldNames": [
+        "Front",
+        "Back"
+      ],
+      "isCloze": false,
+      "noteCount": 7
+    }
+  ],
+  "totalNotes": 7,
+  "warnings": [],
+  "uncoveredByCanonicalCodes": [],
+  "rows": [
+    {
+      "rowIndex": 0,
+      "subdeckPath": "Lang::Vocab::N5",
+      "fieldValues": [
+        "filtered-1",
+        "필터 1"
+      ]
+    },
+    {
+      "rowIndex": 1,
+      "subdeckPath": "Lang::Vocab::N5",
+      "fieldValues": [
+        "filtered-2",
+        "필터 2"
+      ]
+    },
+    {
+      "rowIndex": 2,
+      "subdeckPath": "Lang::Vocab::N5",
+      "fieldValues": [
+        "filtered-3",
+        "필터 3"
+      ]
+    },
+    {
+      "rowIndex": 3,
+      "subdeckPath": "Lang::Vocab::N5",
+      "fieldValues": [
+        "filtered-4",
+        "필터 4"
+      ]
+    },
+    {
+      "rowIndex": 4,
+      "subdeckPath": "Lang::Vocab::N5",
+      "fieldValues": [
+        "filtered-5",
+        "필터 5"
+      ]
+    },
+    {
+      "rowIndex": 5,
+      "subdeckPath": "Lang::Vocab::N4",
+      "fieldValues": [
+        "stay-1",
+        "그대로 1"
+      ]
+    },
+    {
+      "rowIndex": 6,
+      "subdeckPath": "Lang::Vocab::N4",
+      "fieldValues": [
+        "stay-2",
+        "그대로 2"
+      ]
+    }
+  ],
+  "cards": {
+    "appLanguage": "ko",
+    "mapping": "default: first field -> front, remaining fields -> back (cloze: Text -> cloze sentence, Back Extra -> extra), joined by \\n, blank fields skipped (AC-06, AC-07, Mobile 4.6, 7.7)",
+    "coverage": "all rows",
+    "items": [
+      {
+        "rowIndex": 0,
+        "subdeckPath": "Lang::Vocab::N5",
+        "front": "filtered-1",
+        "back": "필터 1",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "frontUtf16Length": 10,
+        "backUtf16Length": 4,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 1,
+        "subdeckPath": "Lang::Vocab::N5",
+        "front": "filtered-2",
+        "back": "필터 2",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "frontUtf16Length": 10,
+        "backUtf16Length": 4,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 2,
+        "subdeckPath": "Lang::Vocab::N5",
+        "front": "filtered-3",
+        "back": "필터 3",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "frontUtf16Length": 10,
+        "backUtf16Length": 4,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 3,
+        "subdeckPath": "Lang::Vocab::N5",
+        "front": "filtered-4",
+        "back": "필터 4",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "frontUtf16Length": 10,
+        "backUtf16Length": 4,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 4,
+        "subdeckPath": "Lang::Vocab::N5",
+        "front": "filtered-5",
+        "back": "필터 5",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "frontUtf16Length": 10,
+        "backUtf16Length": 4,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 5,
+        "subdeckPath": "Lang::Vocab::N4",
+        "front": "stay-1",
+        "back": "그대로 1",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "frontUtf16Length": 6,
+        "backUtf16Length": 5,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 6,
+        "subdeckPath": "Lang::Vocab::N4",
+        "front": "stay-2",
+        "back": "그대로 2",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "frontUtf16Length": 6,
+        "backUtf16Length": 5,
+        "mediaRemoved": 0,
+        "excluded": false
+      }
+    ]
+  },
+  "previewStats": {
+    "selection": "all subdecks (default)",
+    "cardCount": 7,
+    "excludedCount": 0,
+    "emptyReplacedCount": 0,
+    "truncatedCount": 0,
+    "mediaRemovedCount": 0
+  },
+  "parserNotes": [
+    "Ids are assigned by Anki at build time; compare by path and Front text.",
+    "revlog/scheduling columns are present (with_scheduling=True) and must be ignored."
+  ],
+  "limit": {
+    "maxCards": 10000,
+    "exceeded": false
+  },
+  "ambiguities": []
+}

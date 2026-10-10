@@ -1,0 +1,143 @@
+{
+  "fixture": "text/no_header_tags_detect_html.txt",
+  "purpose": "No Anki headers; known tags (<br>, <span>, uppercase <DIV>) make the whole file HTML.",
+  "acceptanceCriteria": [
+    "AC-03",
+    "AC-08"
+  ],
+  "designRefs": [
+    "Mobile 7.5 HTML 신호 (PO P9, case-insensitive)",
+    "Mobile 7.2 구분자 추정"
+  ],
+  "generatedByDefault": true,
+  "expectedOutcome": "parsed",
+  "format": "TEXT",
+  "sourceName": "no_header_tags_detect_html.txt",
+  "encoding": "UTF-8",
+  "utf8Bom": false,
+  "htmlMode": "HTML",
+  "htmlModeReason": "known tags <br>, <span>, <DIV> found (PO P9, case-insensitive)",
+  "separator": "\t",
+  "separatorSource": "detected",
+  "hasHeaderRow": false,
+  "subdecks": [],
+  "sheets": [],
+  "noteTypes": [
+    {
+      "id": "text",
+      "name": "no_header_tags_detect_html.txt",
+      "fieldNames": [
+        "열 1",
+        "열 2"
+      ],
+      "isCloze": false,
+      "noteCount": 4
+    }
+  ],
+  "rowCount": 4,
+  "warnings": [],
+  "uncoveredByCanonicalCodes": [],
+  "rows": [
+    {
+      "index": 0,
+      "fieldValues": [
+        "dog",
+        "개<br>(동물)"
+      ]
+    },
+    {
+      "index": 1,
+      "fieldValues": [
+        "cat",
+        "<span>고양이</span>"
+      ]
+    },
+    {
+      "index": 2,
+      "fieldValues": [
+        "bird",
+        "새 &amp; 날개"
+      ]
+    },
+    {
+      "index": 3,
+      "fieldValues": [
+        "fish",
+        "<DIV>물고기</DIV>"
+      ]
+    }
+  ],
+  "cards": {
+    "appLanguage": "ko",
+    "emptySideText": "빈 항목입니다",
+    "mapping": "default: first field -> front, remaining fields in order -> back, joined by \\n, blank fields skipped (AC-06, Mobile 7.7). TEXT rows whose front value has {{c<n>:: markup use the cloze transform (PO P10, Mobile 7.6)",
+    "coverage": "all rows",
+    "items": [
+      {
+        "rowIndex": 0,
+        "front": "dog",
+        "back": "개\n(동물)",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "frontUtf16Length": 3,
+        "backUtf16Length": 6,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 1,
+        "front": "cat",
+        "back": "고양이",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "frontUtf16Length": 3,
+        "backUtf16Length": 3,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 2,
+        "front": "bird",
+        "back": "새 & 날개",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "frontUtf16Length": 4,
+        "backUtf16Length": 6,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 3,
+        "front": "fish",
+        "back": "물고기",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "frontUtf16Length": 4,
+        "backUtf16Length": 3,
+        "mediaRemoved": 0,
+        "excluded": false
+      }
+    ]
+  },
+  "previewStats": {
+    "cardCount": 4,
+    "excludedCount": 0,
+    "emptyReplacedCount": 0,
+    "truncatedCount": 0,
+    "mediaRemovedCount": 0
+  },
+  "limit": {
+    "maxCards": 10000,
+    "exceeded": false
+  },
+  "ambiguities": [],
+  "fileBytes": 95
+}

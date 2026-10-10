@@ -1,0 +1,23 @@
+{
+  "fixture": "xlsx/doctype_entity.xlsx",
+  "purpose": "Sheet XML contains <!DOCTYPE> with internal entities (small, 64 chars if expanded). Must be rejected as unsupported without expanding entities.",
+  "acceptanceCriteria": [
+    "AC-04"
+  ],
+  "designRefs": [
+    "Mobile 7.4 XML 보안",
+    "Mobile 5 지원하지 않는 형식, 손상 파일 (xlsx에 DOCTYPE 있음)",
+    "Mobile 11 AC-04 XlsxReaderTest"
+  ],
+  "generatedByDefault": true,
+  "expectedOutcome": "error",
+  "error": {
+    "kind": "UNSUPPORTED_FILE",
+    "reason": "<!DOCTYPE in xl/worksheets/sheet1.xml",
+    "designRef": "Mobile 7.4"
+  },
+  "format": "XLSX",
+  "warnings": [],
+  "uncoveredByCanonicalCodes": [],
+  "ambiguities": []
+}

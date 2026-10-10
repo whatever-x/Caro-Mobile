@@ -1,0 +1,123 @@
+{
+  "fixture": "text/no_header_b_p_class_detect_html.txt",
+  "purpose": "No headers; the only markup is <b> and <p class=ex> (with an attribute). Both are known tags, so the whole file is HTML and &amp; is decoded.",
+  "acceptanceCriteria": [
+    "AC-03",
+    "AC-08"
+  ],
+  "designRefs": [
+    "Mobile 7.5 HTML 신호 (PO P9)",
+    "Mobile 7.5 정리 순서"
+  ],
+  "generatedByDefault": true,
+  "expectedOutcome": "parsed",
+  "format": "TEXT",
+  "sourceName": "no_header_b_p_class_detect_html.txt",
+  "encoding": "UTF-8",
+  "utf8Bom": false,
+  "htmlMode": "HTML",
+  "htmlModeReason": "known tags <b> and <p class=ex> found (PO P9, attributes allowed)",
+  "separator": "\t",
+  "separatorSource": "detected",
+  "hasHeaderRow": false,
+  "subdecks": [],
+  "sheets": [],
+  "noteTypes": [
+    {
+      "id": "text",
+      "name": "no_header_b_p_class_detect_html.txt",
+      "fieldNames": [
+        "열 1",
+        "열 2"
+      ],
+      "isCloze": false,
+      "noteCount": 3
+    }
+  ],
+  "rowCount": 3,
+  "warnings": [],
+  "uncoveredByCanonicalCodes": [],
+  "rows": [
+    {
+      "index": 0,
+      "fieldValues": [
+        "<b>run</b>",
+        "달리다"
+      ]
+    },
+    {
+      "index": 1,
+      "fieldValues": [
+        "walk",
+        "<p class=ex>걷다</p>"
+      ]
+    },
+    {
+      "index": 2,
+      "fieldValues": [
+        "Tom &amp; Jerry",
+        "<b>톰</b>과 제리"
+      ]
+    }
+  ],
+  "cards": {
+    "appLanguage": "ko",
+    "emptySideText": "빈 항목입니다",
+    "mapping": "default: first field -> front, remaining fields in order -> back, joined by \\n, blank fields skipped (AC-06, Mobile 7.7). TEXT rows whose front value has {{c<n>:: markup use the cloze transform (PO P10, Mobile 7.6)",
+    "coverage": "all rows",
+    "items": [
+      {
+        "rowIndex": 0,
+        "front": "run",
+        "back": "달리다",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "frontUtf16Length": 3,
+        "backUtf16Length": 3,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 1,
+        "front": "walk",
+        "back": "걷다",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "frontUtf16Length": 4,
+        "backUtf16Length": 2,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 2,
+        "front": "Tom & Jerry",
+        "back": "톰과 제리",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "frontUtf16Length": 11,
+        "backUtf16Length": 5,
+        "mediaRemoved": 0,
+        "excluded": false
+      }
+    ]
+  },
+  "previewStats": {
+    "cardCount": 3,
+    "excludedCount": 0,
+    "emptyReplacedCount": 0,
+    "truncatedCount": 0,
+    "mediaRemovedCount": 0
+  },
+  "limit": {
+    "maxCards": 10000,
+    "exceeded": false
+  },
+  "ambiguities": [],
+  "fileBytes": 86
+}

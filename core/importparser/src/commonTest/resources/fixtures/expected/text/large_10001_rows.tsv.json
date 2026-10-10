@@ -1,0 +1,70 @@
+{
+  "fixture": "text/large_10001_rows.tsv",
+  "purpose": "10,001 non-empty rows of synthetic filler ('filler00001' TAB '채움00001'); cap boundary.",
+  "acceptanceCriteria": [
+    "AC-13",
+    "AC-19"
+  ],
+  "designRefs": [
+    "Mobile 7.2 상한 보호",
+    "Mobile 8.1 MAX_CARDS",
+    "Mobile 5 상한 초과",
+    "Mobile 13.2 D-25"
+  ],
+  "generatedByDefault": true,
+  "expectedOutcome": "parsed",
+  "format": "TEXT",
+  "sourceName": "large_10001_rows.tsv",
+  "encoding": "UTF-8",
+  "utf8Bom": false,
+  "htmlMode": "PLAIN",
+  "separator": "\t",
+  "separatorSource": "detected",
+  "hasHeaderRow": false,
+  "noteTypes": [
+    {
+      "id": "text",
+      "name": "large_10001_rows.tsv",
+      "fieldNames": [
+        "열 1",
+        "열 2"
+      ],
+      "isCloze": false,
+      "noteCount": 10001
+    }
+  ],
+  "rowCount": 10001,
+  "warnings": [],
+  "uncoveredByCanonicalCodes": [],
+  "rows": [
+    {
+      "index": 0,
+      "fieldValues": [
+        "filler00001",
+        "채움00001"
+      ]
+    },
+    {
+      "index": 10000,
+      "fieldValues": [
+        "filler10001",
+        "채움10001"
+      ]
+    }
+  ],
+  "limit": {
+    "maxCards": 10000,
+    "exceeded": true,
+    "guidance": "텍스트: 파일을 상한 이하 줄 수로 나누기 (Mobile 5 형식별 분할 안내)",
+    "nextButtonEnabled": false,
+    "saveBlocked": true,
+    "parserStopsKeepingValuesAtRow": 10001,
+    "rowsKept": 10001
+  },
+  "previewStats": {
+    "cardCount": 10001
+  },
+  "previewNote": "Over the cap the kept rows stay in ParsedTable.rows and the preview shows counts with the cap message; only saving is blocked (Mobile 13.2 D-25).",
+  "ambiguities": [],
+  "fileBytes": 240024
+}

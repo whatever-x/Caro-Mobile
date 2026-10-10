@@ -1,0 +1,7 @@
+#separator:tab
+#html:false
+x<y and y>z	a < b
+<b>굵게?</b> line1<br>line2	&amp; 그대로 &nbsp; 유지
+[sound:hello.mp3]hello	안녕
+{{c1::빈칸}} 변환	html:false여도 변환
+앞면 일반	{{c1::뒷면}} 표기는 그대로
