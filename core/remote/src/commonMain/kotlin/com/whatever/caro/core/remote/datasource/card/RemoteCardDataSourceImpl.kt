@@ -21,6 +21,17 @@ internal class RemoteCardDataSourceImpl(
             request = request,
         )
 
+    override suspend fun createCardChunk(
+        deckId: Long,
+        idempotencyKey: String,
+        request: CreateCardsRequest,
+    ): CreateCardsResponse =
+        cardApi.requestCreateCardChunk(
+            deckId = deckId,
+            idempotencyKey = idempotencyKey,
+            request = request,
+        )
+
     override suspend fun getCard(cardId: Long): CardResponse = cardApi.requestCard(id = cardId)
 
     override suspend fun updateCard(
