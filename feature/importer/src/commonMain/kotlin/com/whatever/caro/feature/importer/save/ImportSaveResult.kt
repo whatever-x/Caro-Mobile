@@ -31,7 +31,9 @@ internal sealed class ChunkFailure(
     data object KeyConflict : ChunkFailure(UserRetry.NONE)
 
     /** 서버는 저장했지만 만든 장수가 보낸 장수와 다르다. 같은 키는 같은 응답만 재생하고 새 키는 중복 저장을 만들 수 있다. */
-    data object ResponseCountMismatch : ChunkFailure(UserRetry.NONE)
+    data class ResponseCountMismatch(
+        val created: Int,
+    ) : ChunkFailure(UserRetry.NONE)
 
     data object DeckUnavailable : ChunkFailure(UserRetry.NONE)
 

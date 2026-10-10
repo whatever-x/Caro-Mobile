@@ -231,9 +231,48 @@ class ImportSaveCoordinatorTest : FunSpec() {
 
                 val outcome = coordinator.saveChunks(DECK_ID, coordinator.planChunks(List(3) { CardContent("a$it", "b") }))
 
-                outcome.failure shouldBe ChunkFailure.ResponseCountMismatch
+                outcome.failure shouldBe ChunkFailure.ResponseCountMismatch(created = 2)
                 outcome.failure.userRetry shouldBe UserRetry.NONE
                 cards.calls.size shouldBe 1
+            }
+        }
+
+        test("장수가 다르게 저장된 묶음도 서버가 만든 장수를 저장 장수에 더한다") {
+            runTest {
+                val cards = ScriptedCardRepository().apply { createdCount = { sent -> if (sent == 3) 2 else sent } }
+                val coordinator = coordinator(cards)
+
+                val outcome = coordinator.saveChunks(DECK_ID, coordinator.planChunks(List(1_003) { CardContent("a$it", "b") }))
+
+                outcome shouldBe
+                    ImportSaveOutcome.Stopped(chunkIndex = 1, savedCards = 1_002, failure = ChunkFailure.ResponseCountMismatch(created = 2))
+            }
+        }
+
+        test("키별 첫 전송 시각은 성공하거나 다시 보낼 수 없을 때 버리고 같은 키 재시도를 기다릴 때만 남긴다") {
+            runTest {
+                val cards = ScriptedCardRepository(CaroInvalidResponseException(debugMessage = "html"))
+                val coordinator = coordinator(cards)
+                val chunks = coordinator.planChunks(listOf(CardContent("a", "b")))
+
+                coordinator.saveChunks(DECK_ID, chunks)
+                coordinator.trackedKeyCount() shouldBe 1
+                coordinator.saveChunks(DECK_ID, chunks)
+                coordinator.trackedKeyCount() shouldBe 0
+            }
+        }
+
+        test("한 조정 객체의 저장 호출이 겹쳐도 묶음을 섞지 않고 차례로 보낸다") {
+            runTest {
+                val cards = ScriptedCardRepository().apply { callDelayMillis = 100 }
+                val coordinator = coordinator(cards)
+                val first = coordinator.planChunks(List(2_000) { CardContent("A$it", "b") })
+                val second = coordinator.planChunks(List(2_000) { CardContent("B$it", "b") })
+
+                val jobs = listOf(first, second).map { chunks -> launch { coordinator.saveChunks(DECK_ID, chunks) } }
+                jobs.forEach { it.join() }
+
+                cards.calls.map { it.cards.first().front } shouldBe listOf("A0", "A1000", "B0", "B1000")
             }
         }
 
@@ -303,6 +342,7 @@ class ImportSaveCoordinatorTest : FunSpec() {
         val calls = mutableListOf<ChunkCall>()
         var onCall: () -> Unit = {}
         var createdCount: (Int) -> Int = { sent -> sent }
+        var callDelayMillis = 0L
         private val script = ArrayDeque(outcomes.toList())
 
         override suspend fun createCardsChunk(
@@ -312,6 +352,7 @@ class ImportSaveCoordinatorTest : FunSpec() {
         ): Int {
             calls += ChunkCall(deckId, cards, idempotencyKey)
             onCall()
+            if (callDelayMillis > 0) delay(callDelayMillis)
             script.removeFirstOrNull()?.let { failure -> throw failure }
             return createdCount(cards.size)
         }
