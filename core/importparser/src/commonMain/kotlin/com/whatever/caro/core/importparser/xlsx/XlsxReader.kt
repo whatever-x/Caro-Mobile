@@ -20,33 +20,37 @@ internal class XlsxReader(
     private val archive: ZipArchive,
     private val options: ParseOptions,
 ) {
+    private class SheetRow(
+        val values: List<String>,
+        val formulaWithoutValue: Int,
+        val rawNumberFormat: Int,
+    )
+
     suspend fun read(sourceName: String): ParsedTable {
         val workbook = XlsxWorkbook.read(archive)
+        // 제목 행 1개 + 데이터 상한 행까지만 세면 상한 초과 여부를 보일 수 있다.
+        val countLimit = options.maxRows + 1
         val sheets =
             workbook.sheets.mapIndexed { index, sheet ->
                 currentCoroutineContext().ensureActive()
-                ParsedSheet(index, sheet.name, sheet.part?.takeIf(archive::contains)?.let { XlsxSheetReader.countRows(archive, it) } ?: 0)
+                val rowCount = sheet.part?.takeIf(archive::contains)?.let { XlsxSheetReader.countRows(archive, it, countLimit) } ?: 0
+                ParsedSheet(index, sheet.name, rowCount)
             }
         val selected =
             workbook.sheets.getOrNull(options.sheetIndex)
                 ?: throw ImportParseException(ImportParseErrorKind.UNSUPPORTED_FILE, "sheet ${options.sheetIndex} not found")
-        val values = selected.part?.takeIf(archive::contains)?.let { part -> readValues(workbook, part) } ?: SheetValues.EMPTY
-        return buildTable(sourceName, selected.name, sheets, values)
+        val rows =
+            selected.part
+                ?.takeIf(archive::contains)
+                ?.let { part -> readRows(workbook, part) }
+                .orEmpty()
+        return buildTable(sourceName, selected.name, sheets, rows)
     }
 
-    private class SheetValues(
-        val rows: List<List<String>>,
-        val cells: List<List<XlsxCell.Value>>,
-    ) {
-        companion object {
-            val EMPTY = SheetValues(emptyList(), emptyList())
-        }
-    }
-
-    private suspend fun readValues(
+    private suspend fun readRows(
         workbook: XlsxWorkbook,
         part: String,
-    ): SheetValues {
+    ): List<SheetRow> {
         val numberFormat = XlsxNumberFormat(workbook.date1904, options.dateStyle)
         val sheetReader = XlsxSheetReader(readCellFormatIds(archive, workbook.stylesPart), numberFormat)
         // 제목 행이 있으면 데이터 행을 maxRows개 남기려고 한 행을 더 읽는다.
@@ -54,21 +58,34 @@ internal class XlsxReader(
         currentCoroutineContext().ensureActive()
         val needed = rawRows.flatMapTo(HashSet()) { row -> row.values.filterIsInstance<XlsxCell.Shared>().map { it.index } }
         val sharedStrings = readSharedStrings(archive, workbook.sharedStringsPart, needed)
-        val cells =
-            rawRows
-                .map { row ->
-                    val width = (row.keys.maxOrNull() ?: -1) + 1
-                    List(width) { column -> resolve(row[column], sharedStrings) }
-                }.filter { row -> row.any { cell -> cell.text.isNotEmpty() } }
-        return SheetValues(cells.map { row -> row.map { it.text } }, cells)
+        return rawRows.mapNotNull { row -> toSheetRow(row, sharedStrings) }
+    }
+
+    /** 값이 있는 마지막 열까지만 칸을 만든다. 모든 칸이 비면 빈 행이라 건너뛴다. */
+    private fun toSheetRow(
+        row: XlsxRow,
+        sharedStrings: Map<Int, String>,
+    ): SheetRow? {
+        val cells = row.mapValues { (_, cell) -> resolve(cell, sharedStrings) }
+        val width =
+            cells
+                .filterValues { cell -> cell.text.isNotEmpty() }
+                .keys
+                .maxOrNull()
+                ?.plus(1) ?: return null
+        if (width > options.maxColumns) throw ImportParseException(ImportParseErrorKind.TOO_MANY_COLUMNS, "$width columns")
+        return SheetRow(
+            values = List(width) { column -> cells[column]?.text.orEmpty() },
+            formulaWithoutValue = cells.values.count { it.formulaWithoutValue },
+            rawNumberFormat = cells.values.count { it.rawNumberFormat },
+        )
     }
 
     private fun resolve(
-        cell: XlsxCell?,
+        cell: XlsxCell,
         sharedStrings: Map<Int, String>,
     ): XlsxCell.Value =
         when (cell) {
-            null -> XlsxCell.Value("")
             is XlsxCell.Value -> cell
             is XlsxCell.Shared -> XlsxCell.Value(sharedStrings[cell.index].orEmpty())
         }
@@ -77,27 +94,22 @@ internal class XlsxReader(
         sourceName: String,
         sheetName: String,
         sheets: List<ParsedSheet>,
-        values: SheetValues,
+        sheetRows: List<SheetRow>,
     ): ParsedTable {
-        val first = values.rows.firstOrNull()
+        val first = sheetRows.firstOrNull()?.values
         val hasHeaderRow = first != null && (options.hasHeaderRow ?: ColumnNames.looksLikeTitleRow(first))
-        val dataStart = if (hasHeaderRow) 1 else 0
-        val dataRows = values.rows.drop(dataStart).take(options.maxRows)
-        val dataCells =
-            values.cells
-                .drop(dataStart)
-                .take(options.maxRows)
-                .flatten()
-        val width = maxOf(if (hasHeaderRow) first.orEmpty().size else 0, dataRows.maxOfOrNull { it.size } ?: 0)
+        val dataRows = sheetRows.drop(if (hasHeaderRow) 1 else 0)
+        val kept = dataRows.take(options.maxRows)
+        val width = maxOf(if (hasHeaderRow) first.orEmpty().size else 0, kept.maxOfOrNull { it.values.size } ?: 0)
         val names = ColumnNames.fieldNames(if (hasHeaderRow) first else null, width)
         val rows =
-            dataRows.map { row ->
+            kept.map { row ->
                 ParsedRow(
                     noteTypeId = NOTE_TYPE_ID,
                     fields =
                         names.withIndex().associate { (index, name) ->
                             name to
-                                row.getOrElse(index) { "" }
+                                row.values.getOrElse(index) { "" }
                         },
                 )
             }
@@ -118,9 +130,10 @@ internal class XlsxReader(
             rows = rows,
             warnings =
                 listOfNotNull(
-                    countWarning(ParseWarningCode.XLSX_FORMULA_WITHOUT_VALUE, dataCells.count { it.formulaWithoutValue }),
-                    countWarning(ParseWarningCode.XLSX_NUMBER_FORMAT_RAW, dataCells.count { it.rawNumberFormat }),
+                    countWarning(ParseWarningCode.XLSX_FORMULA_WITHOUT_VALUE, kept.sumOf { it.formulaWithoutValue }),
+                    countWarning(ParseWarningCode.XLSX_NUMBER_FORMAT_RAW, kept.sumOf { it.rawNumberFormat }),
                 ),
+            rowLimitReached = dataRows.size >= options.maxRows,
         )
     }
 

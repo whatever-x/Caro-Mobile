@@ -125,7 +125,14 @@ internal class XlsxSheetReader(
         }
     }
 
-    private fun finishCell(state: CellState): XlsxCell? {
+    /** 값이 빈 셀은 열 수와 메모리에 넣지 않는다. 캐시 값이 없는 수식은 경고 수를 세려고 남긴다. */
+    private fun finishCell(state: CellState): XlsxCell? =
+        rawCell(state)?.takeUnless {
+            it is XlsxCell.Value && it.text.isEmpty() &&
+                !it.formulaWithoutValue
+        }
+
+    private fun rawCell(state: CellState): XlsxCell? {
         val stored = state.value?.toString()
         val missingFormulaValue = XlsxCell.Value("", formulaWithoutValue = true)
         return when (state.type) {
@@ -165,24 +172,29 @@ internal class XlsxSheetReader(
     companion object {
         private const val ALPHABET_SIZE = 26
 
-        /** `AB12` 같은 셀 주소의 열 문자를 0부터 시작하는 번호로 바꾼다. */
+        // Excel 열은 XFD(16,384번째)까지다. 그보다 긴 주소는 정상 파일에 없고 그대로 믿으면 열 목록이 수만 칸으로 늘어난다.
+        private const val MAX_COLUMN_LETTERS = 3
+        private const val MAX_COLUMN_INDEX = 16_383
+
+        /** `AB12` 같은 셀 주소의 열 문자를 0부터 시작하는 번호로 바꾼다. 범위 밖이면 null이라 순서대로 센 열을 쓴다. */
         fun columnIndex(reference: String): Int? {
-            var column = 0
-            var letters = 0
-            for (char in reference) {
-                if (char !in 'A'..'Z') break
-                column = column * ALPHABET_SIZE + (char - 'A' + 1)
-                letters++
-            }
-            return if (letters == 0) null else column - 1
+            val letters = reference.takeWhile { char -> char in 'A'..'Z' }
+            if (letters.isEmpty() || letters.length > MAX_COLUMN_LETTERS) return null
+            val column = letters.fold(0) { value, char -> value * ALPHABET_SIZE + (char - 'A' + 1) } - 1
+            return column.takeIf { it <= MAX_COLUMN_INDEX }
         }
 
+        /** 시트 목록 표시용이라 [limit]에서 세기를 멈춘다. 그 이상은 어차피 상한을 넘는 시트다. */
         fun countRows(
             archive: ZipArchive,
             part: String,
+            limit: Int,
         ): Int {
             var count = 0
-            archive.forEachEvent(part) { event -> if (event is XmlEvent.Start && event.name == "row") count++ }
+            archive.forEachEvent(part) { event ->
+                if (event is XmlEvent.Start && event.name == "row") count++
+                if (count >= limit) return limit
+            }
             return count
         }
     }

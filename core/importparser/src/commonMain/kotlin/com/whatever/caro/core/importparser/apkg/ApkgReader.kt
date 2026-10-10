@@ -28,6 +28,7 @@ internal class ApkgReader(
         val rows: List<ParsedRow>,
         val fieldCountMismatches: Int,
         val imageOcclusionNotes: Int,
+        val limitReached: Boolean,
     )
 
     suspend fun read(sourceName: String): ParsedTable {
@@ -80,6 +81,7 @@ internal class ApkgReader(
                     countWarning(ParseWarningCode.APKG_FIELD_COUNT_MISMATCH, scan.fieldCountMismatches),
                     countWarning(ParseWarningCode.APKG_IMAGE_OCCLUSION_EXCLUDED, scan.imageOcclusionNotes),
                 ),
+            rowLimitReached = scan.limitReached,
         )
     }
 
@@ -134,7 +136,7 @@ internal class ApkgReader(
         var mismatches = 0
         var imageOcclusion = 0
         database.query("SELECT id, mid, flds FROM notes ORDER BY id") { statement ->
-            while (statement.step()) {
+            while (rows.size < options.maxRows && statement.step()) {
                 val type = model.noteTypes[statement.getLong(1)] ?: continue
                 val subdeckId = noteDecks[statement.getLong(0)]?.toString()
                 if ((subdeckId ?: ParsedSubdeck.NO_DECK_ID) !in selection) continue
@@ -150,7 +152,8 @@ internal class ApkgReader(
                 if (rows.size % CANCEL_CHECK_INTERVAL == 0) currentCoroutineContext().ensureActive()
             }
         }
-        return RowScan(rows, mismatches, imageOcclusion)
+        // 선택한 노트가 상한 행을 넘으면 나머지는 읽지 않는다. 텍스트와 같이 상한 행에 닿으면 상한 초과로 본다.
+        return RowScan(rows, mismatches, imageOcclusion, limitReached = rows.size >= options.maxRows)
     }
 
     private companion object {

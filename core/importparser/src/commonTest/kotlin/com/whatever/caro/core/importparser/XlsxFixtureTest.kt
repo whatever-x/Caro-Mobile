@@ -57,6 +57,7 @@ class XlsxFixtureTest : FunSpec() {
         defaultTable.shouldMatchListedRows(expected.objects("rows"), indexKey = "index")
         expected.int("dataRowCount")?.let { count -> defaultTable.rows.size shouldBe count }
         expected.obj("limit")?.int("rowsKept")?.let { kept -> defaultTable.rows.size shouldBe kept }
+        expected.obj("limit")?.boolean("exceeded")?.let { exceeded -> defaultTable.rowLimitReached shouldBe exceeded }
 
         expected.objects("perSheet").forEach { sheet -> verifySheet(fixture, sheet) }
     }

@@ -42,7 +42,7 @@ internal class AnkiDatabase private constructor(
             if (rewriteModernSchema) rewriteSchema(driver, path)
             val connection = openReadOnly(driver, path)
             try {
-                connection.execSQL("PRAGMA trusted_schema=OFF")
+                applySafetyPragmas(connection)
                 if (verifyIntegrity) checkIntegrity(connection)
             } catch (exception: Exception) {
                 connection.close()
@@ -56,7 +56,7 @@ internal class AnkiDatabase private constructor(
             path: Path,
         ) {
             driver.open(path.toString()).use { connection ->
-                connection.execSQL("PRAGMA trusted_schema=OFF")
+                applySafetyPragmas(connection)
                 connection.execSQL("PRAGMA journal_mode=DELETE")
                 val declared =
                     connection.prepare("SELECT count(*) FROM sqlite_master $UNICASE_SCHEMA_FILTER").use {
@@ -83,6 +83,13 @@ internal class AnkiDatabase private constructor(
                 }
             }
             return driver.open(path.toString()).also { connection -> connection.execSQL("PRAGMA query_only=ON") }
+        }
+
+        /** 악성 DB의 셀 크기 조작은 읽기 중에 잡고, 메모리 매핑은 꺼서 손상 파일이 프로세스 메모리를 직접 건드리지 않게 한다. */
+        private fun applySafetyPragmas(connection: SQLiteConnection) {
+            connection.execSQL("PRAGMA trusted_schema=OFF")
+            connection.execSQL("PRAGMA cell_size_check=ON")
+            connection.execSQL("PRAGMA mmap_size=0")
         }
 
         private fun checkIntegrity(connection: SQLiteConnection) {

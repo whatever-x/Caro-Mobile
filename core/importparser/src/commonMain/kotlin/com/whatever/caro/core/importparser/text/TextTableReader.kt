@@ -1,6 +1,8 @@
 package com.whatever.caro.core.importparser.text
 
 import com.whatever.caro.core.importparser.HtmlSignal
+import com.whatever.caro.core.importparser.ImportParseErrorKind
+import com.whatever.caro.core.importparser.ImportParseException
 import com.whatever.caro.core.importparser.ParseOptions
 import com.whatever.caro.core.importparser.model.HtmlMode
 import com.whatever.caro.core.importparser.model.ImportFormat
@@ -33,7 +35,14 @@ internal class TextTableReader(
         val body = prefix.substring(bodyStart)
         val delimiter = options.delimiter ?: header.separator ?: DelimiterDetector.detect(body) ?: DEFAULT_DELIMITER
         val cursor = CharCursor((sequenceOf(body) + chunks.asSequence()).iterator())
-        val scan = scan(DelimitedRecordReader(cursor, delimiter), header, delimiter)
+        val reader =
+            DelimitedRecordReader(
+                cursor = cursor,
+                delimiter = delimiter,
+                maxFields = options.maxColumns + header.metaColumns.size,
+                maxFieldChars = options.maxFieldChars,
+            )
+        val scan = scan(reader, header, delimiter)
         val htmlMode =
             when (header.html ?: scan.htmlSignal) {
                 true -> HtmlMode.HTML
@@ -86,6 +95,7 @@ internal class TextTableReader(
         layout: ParsedTextLayout,
     ): ParsedTable {
         val width = maxOf(scan.titles?.size ?: 0, scan.rows.maxOfOrNull { row -> row.size } ?: 0)
+        if (width > options.maxColumns) throw ImportParseException(ImportParseErrorKind.TOO_MANY_COLUMNS, "$width columns")
         val names = ColumnNames.fieldNames(scan.titles, width)
         val rows =
             scan.rows.map { values ->
@@ -109,6 +119,8 @@ internal class TextTableReader(
             rows = rows,
             warnings = listOfNotNull(countWarning(ParseWarningCode.TEXT_INCONSISTENT_COLUMNS, padded)),
             textLayout = layout,
+            // 상한 행에서 읽기를 멈췄으므로 뒤에 행이 더 있을 수 있다. 제외 카드가 생겨도 상한 초과 판정을 유지한다.
+            rowLimitReached = scan.rows.size >= options.maxRows,
         )
     }
 

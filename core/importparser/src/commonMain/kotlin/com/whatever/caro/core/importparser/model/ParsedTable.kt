@@ -18,6 +18,7 @@ data class ParsedTable(
     val rows: List<ParsedRow>,
     val warnings: List<ParseWarning> = emptyList(),
     val textLayout: ParsedTextLayout? = null,
+    val rowLimitReached: Boolean = false,
 )
 
 @Serializable

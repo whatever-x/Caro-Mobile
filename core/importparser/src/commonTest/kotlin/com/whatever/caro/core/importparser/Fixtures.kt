@@ -45,9 +45,14 @@ internal object Fixtures {
         maxFileBytes: Long = MAX_FILE_BYTES,
         archiveLimits: ArchiveLimits = ArchiveLimits(),
         verifyIntegrity: Boolean = false,
+        maxRows: Int = MAX_ROWS,
+        maxColumns: Int = ParseOptions.DEFAULT_MAX_COLUMNS,
+        maxFieldChars: Int = ParseOptions.DEFAULT_MAX_FIELD_CHARS,
     ): ParseOptions =
         ParseOptions(
-            maxRows = MAX_ROWS,
+            maxRows = maxRows,
+            maxColumns = maxColumns,
+            maxFieldChars = maxFieldChars,
             maxFileBytes = maxFileBytes,
             tempDirectory = tempRoot,
             archiveLimits = archiveLimits,

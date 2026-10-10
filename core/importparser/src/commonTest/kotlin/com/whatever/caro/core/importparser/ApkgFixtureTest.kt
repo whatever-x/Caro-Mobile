@@ -62,7 +62,9 @@ class ApkgFixtureTest : FunSpec() {
         table: ParsedTable,
         example: JsonObject,
     ) {
-        val noteCount = example.int("noteCount") ?: return
+        val noteCount = example.int("noteCount")
+        val exceeded = example.boolean("exceeded")
+        if (noteCount == null && exceeded == null) return
         val ids =
             example
                 .strings("selectedPaths")
@@ -71,7 +73,10 @@ class ApkgFixtureTest : FunSpec() {
 
         val selected = Fixtures.parse(fixture, Fixtures.options(subdeckIds = ids))
 
-        withClue("selection ${example.strings("selectedPaths")}") { selected.rows.size shouldBe noteCount }
+        withClue("selection ${example.strings("selectedPaths")}") {
+            noteCount?.let { selected.rows.size shouldBe it }
+            exceeded?.let { selected.rowLimitReached shouldBe it }
+        }
     }
 
     private fun ParsedTable.allSelectionIds(): Set<String> = subdecks.map { it.id }.toSet() + ParsedSubdeck.NO_DECK_ID

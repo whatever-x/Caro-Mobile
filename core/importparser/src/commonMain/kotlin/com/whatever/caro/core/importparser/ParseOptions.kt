@@ -25,11 +25,20 @@ data class ParseOptions(
     val legacyKoreanDecoder: LegacyKoreanDecoder? = null,
     val sqliteDriver: SQLiteDriver = BundledSQLiteDriver(),
     val dateStyle: SpreadsheetDateStyle = SpreadsheetDateStyle.YEAR_MONTH_DAY,
+    val maxColumns: Int = DEFAULT_MAX_COLUMNS,
+    val maxFieldChars: Int = DEFAULT_MAX_FIELD_CHARS,
 ) {
     init {
         require(maxRows > 0) { "maxRows must be positive: $maxRows" }
         require(maxFileBytes > 0) { "maxFileBytes must be positive: $maxFileBytes" }
         require(sheetIndex >= 0) { "sheetIndex must not be negative: $sheetIndex" }
+        require(maxColumns > 0) { "maxColumns must be positive: $maxColumns" }
+        require(maxFieldChars > 0) { "maxFieldChars must be positive: $maxFieldChars" }
+    }
+
+    companion object {
+        const val DEFAULT_MAX_COLUMNS = 1_000
+        const val DEFAULT_MAX_FIELD_CHARS = 1_000_000
     }
 }
 
@@ -38,6 +47,7 @@ data class ArchiveLimits(
     val maxEntries: Int = DEFAULT_MAX_ENTRIES,
     val maxEntryBytes: Long = DEFAULT_MAX_ENTRY_BYTES,
     val maxCompressionRatio: Long = DEFAULT_MAX_COMPRESSION_RATIO,
+    val maxTotalBytes: Long = DEFAULT_MAX_TOTAL_BYTES,
 ) {
     init {
         require(maxEntries > 0) { "maxEntries must be positive: $maxEntries" }
@@ -49,6 +59,7 @@ data class ArchiveLimits(
         const val DEFAULT_MAX_ENTRIES = 100_000
         const val DEFAULT_MAX_ENTRY_BYTES = 512L * 1024 * 1024
         const val DEFAULT_MAX_COMPRESSION_RATIO = 100L
+        const val DEFAULT_MAX_TOTAL_BYTES = 1024L * 1024 * 1024
     }
 }
 

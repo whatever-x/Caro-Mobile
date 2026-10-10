@@ -54,12 +54,15 @@ internal data class DecimalNumber(
     companion object {
         private val PATTERN = Regex("^([+-])?(\\d*)(?:\\.(\\d*))?(?:[eE]([+-]?\\d+))?$")
         private const val GROUP_SIZE = 3
+        private const val MAX_EXPONENT = 400
 
         fun parse(text: String): DecimalNumber? {
             val match = PATTERN.matchEntire(text.trim()) ?: return null
             val (sign, integer, fraction, exponent) = match.destructured
             if (integer.isEmpty() && fraction.isEmpty()) return null
             val scale = exponent.ifEmpty { "0" }.toIntOrNull() ?: return null
+            // 지수만 큰 짧은 셀 값이 수억 자리 문자열을 만들지 않도록 Double 범위를 넘는 지수는 원래 값으로 둔다.
+            if (scale !in -MAX_EXPONENT..MAX_EXPONENT) return null
             return DecimalNumber(sign == "-", normalizeInteger(integer + fraction), scale - fraction.length)
         }
 

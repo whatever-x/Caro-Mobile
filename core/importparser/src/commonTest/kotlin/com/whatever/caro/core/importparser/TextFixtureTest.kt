@@ -80,6 +80,9 @@ class TextFixtureTest : FunSpec() {
         table.shouldMatchListedRows(expected.objects("rows"), indexKey = "index")
         expected.int("rowCount")?.let { count -> table.rows.size shouldBe count }
         expected.obj("limit")?.int("rowsKept")?.let { kept -> table.rows.size shouldBe kept }
+        expected.obj("limit")?.takeIf { "parserStopsKeepingValuesAtRow" in it }?.let { limit ->
+            table.rowLimitReached shouldBe (limit.int("parserStopsKeepingValuesAtRow") != null)
+        }
         expected.string("separator")?.let { separator -> table.textLayout?.delimiter shouldBe separator }
         expected.boolean("hasHeaderRow")?.let { header -> table.textLayout?.hasHeaderRow shouldBe header }
         table.subdecks shouldBe emptyList()

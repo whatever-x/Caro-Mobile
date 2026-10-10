@@ -21,7 +21,7 @@ internal class TextFileReader(
         sourceName: String,
     ): ParsedTable =
         try {
-            readWith(path, sourceName, ::decodeStrictUtf8)
+            readWith(path, sourceName, ::decodeStrictUtf8, splitInsideLine = true)
         } catch (_: InvalidTextEncodingException) {
             readAsLegacyKorean(path, sourceName)
         }
@@ -33,7 +33,7 @@ internal class TextFileReader(
         val decoder = options.legacyKoreanDecoder ?: throw encodingUndetermined("no CP949 decoder")
         val table =
             try {
-                readWith(path, sourceName, decoder::decodeOrNull)
+                readWith(path, sourceName, decoder::decodeOrNull, splitInsideLine = false)
             } catch (_: InvalidTextEncodingException) {
                 throw encodingUndetermined("invalid CP949 bytes")
             }
@@ -44,9 +44,10 @@ internal class TextFileReader(
         path: Path,
         sourceName: String,
         decode: (ByteArray) -> String?,
+        splitInsideLine: Boolean,
     ): ParsedTable =
         fileSystem.source(path).buffer().use { source ->
-            TextTableReader(options).read(EncodedTextChunks(source, decode), sourceName)
+            TextTableReader(options).read(EncodedTextChunks(source, decode, splitInsideLine), sourceName)
         }
 
     private fun encodingUndetermined(reason: String) = ImportParseException(ImportParseErrorKind.ENCODING_UNDETERMINED, reason)

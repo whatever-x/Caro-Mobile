@@ -1,5 +1,8 @@
 package com.whatever.caro.core.importparser.text
 
+import com.whatever.caro.core.importparser.ImportParseErrorKind
+import com.whatever.caro.core.importparser.ImportParseException
+
 /** 디코딩된 텍스트 조각을 이어서 한 글자씩 읽는다. 파일 전체를 한 문자열로 만들지 않기 위해서다. */
 internal class CharCursor(
     private val chunks: Iterator<String>,
@@ -32,6 +35,8 @@ internal class CharCursor(
 internal class DelimitedRecordReader(
     private val cursor: CharCursor,
     private val delimiter: Char,
+    private val maxFields: Int = Int.MAX_VALUE,
+    private val maxFieldChars: Int = Int.MAX_VALUE,
 ) {
     private enum class State { START_RECORD, START_FIELD, IN_FIELD, IN_QUOTED, QUOTE_IN_QUOTED }
 
@@ -94,15 +99,20 @@ internal class DelimitedRecordReader(
             else -> appendThen(char, State.IN_FIELD)
         }
 
+    // 닫히지 않은 따옴표 하나가 파일 나머지를 한 값으로 삼켜 메모리를 다 쓰지 않도록 값 길이와 열 수를 읽는 중에 막는다.
     private fun appendThen(
         char: Char,
         next: State,
     ): State {
+        if (field.length >= maxFieldChars) {
+            throw ImportParseException(ImportParseErrorKind.CONTENT_TOO_LONG, "field over $maxFieldChars chars")
+        }
         field.append(char)
         return next
     }
 
     private fun saveThen(next: State?): State? {
+        if (fields.size >= maxFields) throw ImportParseException(ImportParseErrorKind.TOO_MANY_COLUMNS, "record over $maxFields fields")
         fields += field.toString()
         field.clear()
         return next
