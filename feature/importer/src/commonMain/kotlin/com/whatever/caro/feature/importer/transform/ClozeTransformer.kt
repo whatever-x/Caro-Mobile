@@ -11,6 +11,9 @@ internal object ClozeTransformer {
     private const val HINT_SEPARATOR = "::"
     private const val HIDDEN_WITHOUT_HINT = "..."
 
+    // 중첩마다 렌더링이 재귀하므로 악성 값의 깊은 중첩이 스택을 넘기지 않게 이 깊이 밖의 여는 표기는 글자로 둔다.
+    private const val MAX_DEPTH = 32
+
     private sealed interface Node {
         data class Text(
             val value: String,
@@ -20,7 +23,7 @@ internal object ClozeTransformer {
             val open: String,
         ) : Node {
             val children = mutableListOf<Node>()
-            var hint: String? = null
+            var hint: StringBuilder? = null
         }
     }
 
@@ -37,15 +40,16 @@ internal object ClozeTransformer {
         val stack = ArrayDeque<Node.Cloze>()
         tokens(value).forEach { token ->
             when {
-                token.startsWith("{{c") -> stack.addLast(Node.Cloze(token))
+                token.startsWith("{{c") && stack.size < MAX_DEPTH -> stack.addLast(Node.Cloze(token))
+                token.startsWith("{{c") -> appendLiteral(stack.last(), token)
                 token == CLOSE -> close(stack, output)
                 stack.isNotEmpty() -> appendInside(stack.last(), token)
                 else -> output += Node.Text(token)
             }
         }
         while (stack.isNotEmpty()) {
-            val unclosed = stack.removeLast()
-            (stack.lastOrNull()?.children ?: output) += Node.Text(literal(unclosed))
+            val unclosed = literal(stack.removeLast())
+            stack.lastOrNull()?.let { parent -> appendLiteral(parent, unclosed) } ?: output.add(Node.Text(unclosed))
         }
         return output
     }
@@ -55,25 +59,39 @@ internal object ClozeTransformer {
         output: MutableList<Node>,
     ) {
         val closed = stack.removeLastOrNull()
-        if (closed == null) {
-            output += Node.Text(CLOSE)
-        } else {
-            (stack.lastOrNull()?.children ?: output) += closed
+        val parent = stack.lastOrNull()
+        when {
+            closed == null -> output += Node.Text(CLOSE)
+            parent?.hint != null -> parent.hint?.append(literal(closed) + CLOSE)
+            parent != null -> parent.children += closed
+            else -> output += closed
         }
     }
 
-    /** 본문 뒤 첫 `::` 이후 전체가 힌트다(Anki와 같다). */
+    /** 본문 뒤 첫 `::` 이후 전체가 힌트다(Anki와 같다). 힌트가 시작된 뒤의 글자와 중첩 빈칸은 순서대로 힌트에 붙는다. */
     private fun appendInside(
         cloze: Node.Cloze,
         token: String,
     ) {
         val separator = token.indexOf(HINT_SEPARATOR)
-        if (separator < 0) {
-            cloze.children += Node.Text(token)
-        } else {
-            cloze.hint = token.substring(separator + HINT_SEPARATOR.length)
-            cloze.children += Node.Text(token.substring(0, separator))
+        when {
+            cloze.hint != null || separator < 0 -> {
+                appendLiteral(cloze, token)
+            }
+
+            else -> {
+                cloze.children += Node.Text(token.substring(0, separator))
+                cloze.hint = StringBuilder(token.substring(separator + HINT_SEPARATOR.length))
+            }
         }
+    }
+
+    private fun appendLiteral(
+        cloze: Node.Cloze,
+        token: String,
+    ) {
+        val hint = cloze.hint
+        if (hint != null) hint.append(token) else cloze.children += Node.Text(token)
     }
 
     private fun tokens(value: String): List<String> {

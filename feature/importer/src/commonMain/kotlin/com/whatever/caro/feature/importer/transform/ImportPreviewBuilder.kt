@@ -45,7 +45,9 @@ internal class ImportPreviewBuilder {
                 truncatedCount = cards.sumOf { card -> card.frontTruncated.toCount() + card.backTruncated.toCount() },
                 mediaRemovedCount = cards.sumOf { card -> card.mediaRemoved },
             )
-        return ImportPreview(cards.toImmutableList(), stats, table.warnings, limitExceeded = cards.size > maxCards)
+        // 파서가 행 상한에서 읽기를 멈췄으면 읽지 않은 행이 있으므로 제외 카드로 장수가 줄어도 상한 초과로 본다.
+        val limitExceeded = table.rowLimitReached || cards.size > maxCards
+        return ImportPreview(cards.toImmutableList(), stats, table.warnings, limitExceeded)
     }
 
     private fun buildCard(

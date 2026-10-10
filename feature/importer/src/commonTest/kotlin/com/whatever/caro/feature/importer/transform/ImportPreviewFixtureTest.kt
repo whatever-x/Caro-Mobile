@@ -1,12 +1,10 @@
 package com.whatever.caro.feature.importer.transform
 
 import com.whatever.caro.core.importparser.SpreadsheetDateStyle
-import com.whatever.caro.core.importparser.model.ParsedSubdeck
 import com.whatever.caro.core.importparser.model.ParsedTable
 import com.whatever.caro.feature.importer.ImportFixtures
 import com.whatever.caro.feature.importer.boolean
 import com.whatever.caro.feature.importer.int
-import com.whatever.caro.feature.importer.nativeArchiveLibrariesLoadable
 import com.whatever.caro.feature.importer.obj
 import com.whatever.caro.feature.importer.objects
 import com.whatever.caro.feature.importer.string
@@ -29,7 +27,7 @@ class ImportPreviewFixtureTest : FunSpec() {
                 if (expected.obj("error") != null || !ImportFixtures.exists(fixture)) return@forEach
                 if (!hasPreviewExpectation(expected)) return@forEach
 
-                test("$fixture 카드 예시와 미리보기 통계가 기대값과 같다").config(enabled = directory != "apkg" || nativeArchiveLibrariesLoadable) {
+                test("$fixture 카드 예시와 미리보기 통계가 기대값과 같다") {
                     when (directory) {
                         "text" -> verifyTable(ImportFixtures.parse(fixture), expected)
                         "xlsx" -> verifyWorkbook(fixture, expected)
@@ -83,22 +81,17 @@ class ImportPreviewFixtureTest : FunSpec() {
         fixture: String,
         expected: JsonObject,
     ) {
-        val defaultTable = ImportFixtures.parse(fixture)
-        val allNotes = ImportFixtures.parse(fixture, subdeckIds = defaultTable.subdecks.map { it.id }.toSet() + ParsedSubdeck.NO_DECK_ID)
+        val defaultTable = ImportFixtures.snapshot(fixture, "default")
+        val allNotes = ImportFixtures.snapshot(fixture, "all")
         expected.obj("cards")?.objects("items")?.let { items ->
             builder.build(allNotes, defaultFieldMappings(allNotes), ImportFixtures.EMPTY_SIDE_KO).shouldMatchItems(items)
         }
         val defaultPreview = builder.build(defaultTable, defaultFieldMappings(defaultTable), ImportFixtures.EMPTY_SIDE_KO)
         expected.obj("previewStats")?.let { stats -> defaultPreview.stats.shouldMatch(stats) }
         expected.obj("limit")?.boolean("exceededWithDefaultSelection")?.let { exceeded -> defaultPreview.limitExceeded shouldBe exceeded }
-        expected.objects("selectionExamples").filter { "cardCount" in it }.forEach { example ->
-            val ids =
-                example
-                    .strings("selectedPaths")
-                    .map { selected ->
-                        selected?.let { defaultTable.subdecks.first { it.path == selected }.id } ?: ParsedSubdeck.NO_DECK_ID
-                    }.toSet()
-            val table = ImportFixtures.parse(fixture, subdeckIds = ids)
+        expected.objects("selectionExamples").forEachIndexed { index, example ->
+            if ("cardCount" !in example) return@forEachIndexed
+            val table = ImportFixtures.snapshot(fixture, "selection-$index")
             val preview = builder.build(table, defaultFieldMappings(table), ImportFixtures.EMPTY_SIDE_KO)
             withClue("selection ${example.strings("selectedPaths")}") {
                 preview.stats.cardCount shouldBe example.int("cardCount")

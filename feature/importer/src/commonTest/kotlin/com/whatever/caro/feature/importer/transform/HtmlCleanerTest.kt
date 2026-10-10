@@ -3,6 +3,7 @@ package com.whatever.caro.feature.importer.transform
 import com.whatever.caro.core.importparser.model.HtmlMode
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
+import kotlin.time.Duration.Companion.minutes
 
 class HtmlCleanerTest : FunSpec() {
     init {
@@ -32,6 +33,21 @@ class HtmlCleanerTest : FunSpec() {
             val cleaned = HtmlCleaner.clean("&lt;b&gt; &amp; &#54620;&#xAE00; &eacute;&nbsp;끝", HtmlMode.HTML)
 
             cleaned.text shouldBe "<b> & 한글 é 끝"
+        }
+
+        test("닫히지 않은 주석·style·script·[sound: 여는 표기가 많아도 한 번 훑고 글자로 남긴다").config(timeout = 2.minutes) {
+            val count = 20_000
+            val raw = "<!--a".repeat(count) + "<style>b".repeat(count) + "<script>c".repeat(count) + "[sound:d".repeat(count)
+
+            HtmlCleaner.clean(raw, HtmlMode.HTML) shouldBe CleanedField(raw, 0)
+            HtmlCleaner.clean(raw, HtmlMode.PLAIN) shouldBe CleanedField(raw, 0)
+        }
+
+        test("주석·style·script는 가장 앞에서 시작하는 것부터 지우고 대소문자를 가리지 않는다") {
+            HtmlCleaner.clean("<style> <!-- </style> -->", HtmlMode.HTML).text shouldBe "-->"
+            HtmlCleaner.clean("<!-- <style> -->x</style>", HtmlMode.HTML).text shouldBe "x</style>"
+            HtmlCleaner.clean("앞<STYLE type=\"a\">.x{}</Style >뒤<styles>남음", HtmlMode.HTML).text shouldBe "앞뒤<styles>남음"
+            HtmlCleaner.clean("[sound:a.mp3][sound:b", HtmlMode.PLAIN) shouldBe CleanedField("[sound:b", 1)
         }
 
         test("원문 줄바꿈은 공백 하나가 되고 3개 이상 이어진 줄바꿈은 2개로 줄인다") {

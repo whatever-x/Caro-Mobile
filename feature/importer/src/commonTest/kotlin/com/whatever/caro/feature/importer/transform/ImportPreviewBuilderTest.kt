@@ -54,7 +54,7 @@ class ImportPreviewBuilderTest : FunSpec() {
         }
 
         test("500자를 넘는 면은 500에서 자르고 서로게이트 쌍 가운데면 한 칸 앞에서 자른다") {
-            val pair = "😀"
+            val pair = "\uD83D\uDE00"
             val long = "a".repeat(499) + pair + "b"
             val table = textTable(listOf("a", "b"), listOf(long, "x".repeat(501)))
 
@@ -105,6 +105,16 @@ class ImportPreviewBuilderTest : FunSpec() {
             preview.stats.cardCount shouldBe 4
             preview.limitExceeded shouldBe true
             builder.build(table, defaultFieldMappings(table), EMPTY, maxCards = 4).limitExceeded shouldBe false
+        }
+
+        test("파서가 행 상한에 닿았으면 제외 카드로 장수가 상한 아래여도 상한 초과다") {
+            val rows = List(4) { index -> listOf("앞$index", "뒤$index") } + listOf(listOf("", ""))
+            val table = textTable(listOf("a", "b"), *rows.toTypedArray()).copy(rowLimitReached = true)
+
+            val preview = builder.build(table, defaultFieldMappings(table), EMPTY, maxCards = 4)
+
+            preview.stats.cardCount shouldBe 4
+            preview.limitExceeded shouldBe true
         }
 
         test("파싱 경고를 미리보기 경고로 그대로 넘긴다") {

@@ -32,8 +32,8 @@ class ImportChunkerTest : FunSpec() {
         }
 
         test("따옴표, 역슬래시, 제어 문자, 서로게이트 쌍은 실제 JSON 바이트보다 작게 추정하지 않는다") {
-            val card = CardContent("\"\\\n\u0001", "😀한a")
-            val json = "{\"items\":[{\"fields\":{\"front\":\"\\\"\\\\\\n\\u0001\",\"back\":\"😀한a\"},\"cardType\":\"BASIC\"}]}"
+            val card = CardContent("\"\\\n\u0001", "\uD83D\uDE00한a")
+            val json = "{\"items\":[{\"fields\":{\"front\":\"\\\"\\\\\\n\\u0001\",\"back\":\"\uD83D\uDE00한a\"},\"cardType\":\"BASIC\"}]}"
 
             json.encodeToByteArray().size.toLong() shouldBeLessThanOrEqual ImportChunker.estimatedRequestBytes(listOf(card))
         }

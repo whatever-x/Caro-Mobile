@@ -8,12 +8,8 @@ import com.whatever.caro.core.importparser.model.HtmlMode
  * 정리 순서를 바꾸면 블록 태그 묶음과 `<br>`의 줄바꿈 수가 달라진다.
  */
 internal object HtmlCleaner {
-    private val SOUND = Regex("\\[sound:[^\\]]*]")
-    private val COMMENTS_AND_SCRIPTS =
-        Regex(
-            "<!--[\\s\\S]*?-->|<style\\b[^<>]*>[\\s\\S]*?</style\\s*>|<script\\b[^<>]*>[\\s\\S]*?</script\\s*>",
-            RegexOption.IGNORE_CASE,
-        )
+    private const val SOUND_OPEN = "[sound:"
+    private const val SOUND_CLOSE = ']'
     private val MEDIA_TAG = Regex("<(/?)(${HtmlSignal.MEDIA_TAG_NAMES})(?=[\\s/>])([^<>]*)>", RegexOption.IGNORE_CASE)
     private val MEDIA_CONTAINERS = setOf("audio", "video", "object", "iframe")
 
@@ -27,16 +23,15 @@ internal object HtmlCleaner {
     private val BR_TAG = Regex("</?br(?=[\\s/>])[^<>]*>", RegexOption.IGNORE_CASE)
     private val RAW_NEWLINE = Regex("\\r\\n|\\r|\\n")
     private val EXTRA_BLANK_LINES = Regex("\\n{3,}")
-    private const val NO_BREAK_SPACE = ' '
+    private const val NO_BREAK_SPACE = '\u00A0'
 
     fun clean(
         value: String,
         htmlMode: HtmlMode,
     ): CleanedField {
-        val sounds = SOUND.findAll(value).count()
-        val withoutSound = SOUND.replace(value, "")
+        val (withoutSound, sounds) = stripSounds(value)
         if (htmlMode == HtmlMode.PLAIN) return CleanedField(withoutSound, sounds)
-        val (withoutMedia, media) = stripMedia(COMMENTS_AND_SCRIPTS.replace(withoutSound, ""))
+        val (withoutMedia, media) = stripMedia(HtmlBlockStripper.strip(withoutSound))
         val lines =
             rubyToText(withoutMedia)
                 .let { text -> RAW_NEWLINE.replace(text, " ") }
@@ -48,6 +43,23 @@ internal object HtmlCleaner {
                 .split('\n')
                 .joinToString("\n") { line -> line.trimEnd() }
         return CleanedField(EXTRA_BLANK_LINES.replace(lines, "\n\n").trim(), sounds + media)
+    }
+
+    /** 닫는 `]`가 더 없으면 뒤의 `[sound:`도 닫힐 수 없으므로 거기서 멈춰 한 번만 훑는다. */
+    private fun stripSounds(value: String): Pair<String, Int> {
+        val out = StringBuilder(value.length)
+        var position = 0
+        var count = 0
+        while (true) {
+            val start = value.indexOf(SOUND_OPEN, position)
+            val end = if (start < 0) -1 else value.indexOf(SOUND_CLOSE, start + SOUND_OPEN.length)
+            if (end < 0) break
+            out.append(value, position, start)
+            position = end + 1
+            count++
+        }
+        out.append(value, position, value.length)
+        return out.toString() to count
     }
 
     /** 다른 미디어 요소 안에 있지 않은 미디어 시작 태그만 1개로 센다. `<video><source></video>`는 1개다. */
