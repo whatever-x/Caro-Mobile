@@ -68,20 +68,24 @@ internal object TestZip {
     fun xlsx(
         path: Path,
         sheetXml: String,
+        sharedStrings: String? = null,
     ) = write(
         path,
-        listOf(
+        listOfNotNull(
             "xl/workbook.xml" to WORKBOOK.encodeToByteArray(),
-            "xl/_rels/workbook.xml.rels" to RELATIONS.encodeToByteArray(),
+            "xl/_rels/workbook.xml.rels" to (if (sharedStrings == null) RELATIONS else RELATIONS_WITH_STRINGS).encodeToByteArray(),
             "xl/worksheets/sheet1.xml" to sheetXml.encodeToByteArray(),
+            sharedStrings?.let { "xl/sharedStrings.xml" to "<sst>$it</sst>".encodeToByteArray() },
         ),
     )
 
     fun sheet(rows: String): String = "<worksheet><sheetData>$rows</sheetData></worksheet>"
 
     private const val WORKBOOK = "<workbook><sheets><sheet name=\"S\" sheetId=\"1\" r:id=\"rId1\"/></sheets></workbook>"
-    private const val RELATIONS =
-        "<Relationships><Relationship Id=\"rId1\" Type=\"worksheet\" Target=\"worksheets/sheet1.xml\"/></Relationships>"
+    private const val SHEET_RELATION = "<Relationship Id=\"rId1\" Type=\"worksheet\" Target=\"worksheets/sheet1.xml\"/>"
+    private const val STRINGS_RELATION = "<Relationship Id=\"rId2\" Type=\"x/sharedStrings\" Target=\"sharedStrings.xml\"/>"
+    private const val RELATIONS = "<Relationships>$SHEET_RELATION</Relationships>"
+    private const val RELATIONS_WITH_STRINGS = "<Relationships>$SHEET_RELATION$STRINGS_RELATION</Relationships>"
 
     private const val CRC_POLYNOMIAL = 0xEDB88320.toInt()
     private const val BYTE_MASK = 0xFF

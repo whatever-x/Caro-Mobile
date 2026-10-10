@@ -57,11 +57,15 @@ internal class TextTableReader(
         delimiter: Char,
     ): Scan {
         var htmlSignal = false
+        var cells = 0
 
         fun take(): List<String>? =
             reader.nextRecord()?.let { raw ->
                 if (!htmlSignal) htmlSignal = raw.any(HtmlSignal::containsSignal)
-                raw.filterIndexed { index, _ -> index !in header.metaColumns }
+                raw.filterIndexed { index, _ -> index !in header.metaColumns }.also { values ->
+                    cells += values.count { it.isNotEmpty() }
+                    if (cells > options.maxCells) throw contentTooLong("table over ${options.maxCells} cells")
+                }
             }
 
         val first = take() ?: return Scan(null, emptyList(), hasHeaderRow = false, htmlSignal = false)
@@ -94,8 +98,9 @@ internal class TextTableReader(
         htmlMode: HtmlMode,
         layout: ParsedTextLayout,
     ): ParsedTable {
-        val width = maxOf(scan.titles?.size ?: 0, scan.rows.maxOfOrNull { row -> row.size } ?: 0)
+        val width = tableWidth(scan)
         if (width > options.maxColumns) throw ImportParseException(ImportParseErrorKind.TOO_MANY_COLUMNS, "$width columns")
+        if (width.toLong() * scan.rows.size > options.maxCells) throw contentTooLong("table over ${options.maxCells} cells")
         val names = ColumnNames.fieldNames(scan.titles, width)
         val rows =
             scan.rows.map { values ->
@@ -123,6 +128,18 @@ internal class TextTableReader(
             rowLimitReached = scan.rows.size >= options.maxRows,
         )
     }
+
+    /**
+     * 행 값 맵은 행마다 항목 수만큼 칸을 만든다. 원래 열 수로 칸 예산을 넘으면 모든 행에서 빈 끝 열을 빼고 다시 잰다.
+     * 빈 끝 열에는 값이 없으므로 잃는 글자가 없다.
+     */
+    private fun tableWidth(scan: Scan): Int {
+        val rawWidth = maxOf(scan.titles?.size ?: 0, scan.rows.maxOfOrNull { row -> row.size } ?: 0)
+        if (rawWidth.toLong() * scan.rows.size <= options.maxCells) return rawWidth
+        return (listOfNotNull(scan.titles) + scan.rows).maxOfOrNull { values -> values.indexOfLast { it.isNotEmpty() } + 1 } ?: 0
+    }
+
+    private fun contentTooLong(reason: String) = ImportParseException(ImportParseErrorKind.CONTENT_TOO_LONG, reason)
 
     private fun takePrefix(chunks: Iterator<String>): String {
         val prefix = StringBuilder()

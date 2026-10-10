@@ -25,16 +25,12 @@ internal inline fun <T> withTempWorkspace(
     val directory = parent / "$WORKSPACE_PREFIX${Random.nextLong().toULong().toString(radix = 16)}"
     fileSystem.createDirectories(directory)
     deleteStaleWorkspaces(fileSystem, parent, directory, nowMillis)
-    val result =
-        try {
-            block(directory)
-        } catch (failure: Throwable) {
-            // 정리 실패가 원래 실패 원인을 가리지 않도록 정리 오류는 버린다.
-            deleteQuietly(fileSystem, directory)
-            throw failure
-        }
-    deleteQuietly(fileSystem, directory)
-    return result
+    // 블록 안에서 바깥 함수로 바로 돌아가도 지워지도록 finally에 둔다. 정리 오류는 원래 실패 원인을 가리지 않도록 삼킨다.
+    try {
+        return block(directory)
+    } finally {
+        deleteQuietly(fileSystem, directory)
+    }
 }
 
 internal fun deleteStaleWorkspaces(

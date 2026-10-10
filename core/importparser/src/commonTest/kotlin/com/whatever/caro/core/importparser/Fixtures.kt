@@ -48,11 +48,13 @@ internal object Fixtures {
         maxRows: Int = MAX_ROWS,
         maxColumns: Int = ParseOptions.DEFAULT_MAX_COLUMNS,
         maxFieldChars: Int = ParseOptions.DEFAULT_MAX_FIELD_CHARS,
+        maxCells: Int = ParseOptions.DEFAULT_MAX_CELLS,
     ): ParseOptions =
         ParseOptions(
             maxRows = maxRows,
             maxColumns = maxColumns,
             maxFieldChars = maxFieldChars,
+            maxCells = maxCells,
             maxFileBytes = maxFileBytes,
             tempDirectory = tempRoot,
             archiveLimits = archiveLimits,

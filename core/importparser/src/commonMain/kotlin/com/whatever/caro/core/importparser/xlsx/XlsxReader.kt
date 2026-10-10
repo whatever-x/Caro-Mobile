@@ -26,6 +26,12 @@ internal class XlsxReader(
         val rawNumberFormat: Int,
     )
 
+    /** [readLimitReached]는 빈 행을 걸러내기 전에 읽기를 멈췄는지 여부다. 멈췄으면 읽지 않은 행이 있을 수 있다. */
+    private class SheetRows(
+        val rows: List<SheetRow>,
+        val readLimitReached: Boolean,
+    )
+
     suspend fun read(sourceName: String): ParsedTable {
         val workbook = XlsxWorkbook.read(archive)
         // 제목 행 1개 + 데이터 상한 행까지만 세면 상한 초과 여부를 보일 수 있다.
@@ -43,22 +49,24 @@ internal class XlsxReader(
             selected.part
                 ?.takeIf(archive::contains)
                 ?.let { part -> readRows(workbook, part) }
-                .orEmpty()
+                ?: SheetRows(emptyList(), readLimitReached = false)
         return buildTable(sourceName, selected.name, sheets, rows)
     }
 
     private suspend fun readRows(
         workbook: XlsxWorkbook,
         part: String,
-    ): List<SheetRow> {
+    ): SheetRows {
         val numberFormat = XlsxNumberFormat(workbook.date1904, options.dateStyle)
-        val sheetReader = XlsxSheetReader(readCellFormatIds(archive, workbook.stylesPart), numberFormat)
+        val sheetReader =
+            XlsxSheetReader(readCellFormatIds(archive, workbook.stylesPart), numberFormat, options.maxColumns, options.maxCells)
         // 제목 행이 있으면 데이터 행을 maxRows개 남기려고 한 행을 더 읽는다.
-        val rawRows = sheetReader.readRows(archive, part, options.maxRows + 1)
+        val rawRows = sheetReader.readRows(archive, part, limit = options.maxRows + 1)
         currentCoroutineContext().ensureActive()
         val needed = rawRows.flatMapTo(HashSet()) { row -> row.values.filterIsInstance<XlsxCell.Shared>().map { it.index } }
         val sharedStrings = readSharedStrings(archive, workbook.sharedStringsPart, needed)
-        return rawRows.mapNotNull { row -> toSheetRow(row, sharedStrings) }
+        val readLimit = options.maxRows + 1
+        return SheetRows(rawRows.mapNotNull { row -> toSheetRow(row, sharedStrings) }, readLimitReached = rawRows.size >= readLimit)
     }
 
     /** 값이 있는 마지막 열까지만 칸을 만든다. 모든 칸이 비면 빈 행이라 건너뛴다. */
@@ -73,7 +81,6 @@ internal class XlsxReader(
                 .keys
                 .maxOrNull()
                 ?.plus(1) ?: return null
-        if (width > options.maxColumns) throw ImportParseException(ImportParseErrorKind.TOO_MANY_COLUMNS, "$width columns")
         return SheetRow(
             values = List(width) { column -> cells[column]?.text.orEmpty() },
             formulaWithoutValue = cells.values.count { it.formulaWithoutValue },
@@ -94,13 +101,16 @@ internal class XlsxReader(
         sourceName: String,
         sheetName: String,
         sheets: List<ParsedSheet>,
-        sheetRows: List<SheetRow>,
+        sheetRows: SheetRows,
     ): ParsedTable {
-        val first = sheetRows.firstOrNull()?.values
+        val first = sheetRows.rows.firstOrNull()?.values
         val hasHeaderRow = first != null && (options.hasHeaderRow ?: ColumnNames.looksLikeTitleRow(first))
-        val dataRows = sheetRows.drop(if (hasHeaderRow) 1 else 0)
+        val dataRows = sheetRows.rows.drop(if (hasHeaderRow) 1 else 0)
         val kept = dataRows.take(options.maxRows)
         val width = maxOf(if (hasHeaderRow) first.orEmpty().size else 0, kept.maxOfOrNull { it.values.size } ?: 0)
+        if (width.toLong() * kept.size > options.maxCells) {
+            throw ImportParseException(ImportParseErrorKind.CONTENT_TOO_LONG, "table over ${options.maxCells} cells")
+        }
         val names = ColumnNames.fieldNames(if (hasHeaderRow) first else null, width)
         val rows =
             kept.map { row ->
@@ -133,7 +143,7 @@ internal class XlsxReader(
                     countWarning(ParseWarningCode.XLSX_FORMULA_WITHOUT_VALUE, kept.sumOf { it.formulaWithoutValue }),
                     countWarning(ParseWarningCode.XLSX_NUMBER_FORMAT_RAW, kept.sumOf { it.rawNumberFormat }),
                 ),
-            rowLimitReached = dataRows.size >= options.maxRows,
+            rowLimitReached = sheetRows.readLimitReached || dataRows.size >= options.maxRows,
         )
     }
 

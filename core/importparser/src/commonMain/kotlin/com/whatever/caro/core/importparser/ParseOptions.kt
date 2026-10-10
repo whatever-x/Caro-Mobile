@@ -27,6 +27,7 @@ data class ParseOptions(
     val dateStyle: SpreadsheetDateStyle = SpreadsheetDateStyle.YEAR_MONTH_DAY,
     val maxColumns: Int = DEFAULT_MAX_COLUMNS,
     val maxFieldChars: Int = DEFAULT_MAX_FIELD_CHARS,
+    val maxCells: Int = DEFAULT_MAX_CELLS,
 ) {
     init {
         require(maxRows > 0) { "maxRows must be positive: $maxRows" }
@@ -34,11 +35,15 @@ data class ParseOptions(
         require(sheetIndex >= 0) { "sheetIndex must not be negative: $sheetIndex" }
         require(maxColumns > 0) { "maxColumns must be positive: $maxColumns" }
         require(maxFieldChars > 0) { "maxFieldChars must be positive: $maxFieldChars" }
+        require(maxCells > 0) { "maxCells must be positive: $maxCells" }
     }
 
     companion object {
         const val DEFAULT_MAX_COLUMNS = 1_000
         const val DEFAULT_MAX_FIELD_CHARS = 1_000_000
+
+        /** 저사양 기기 메모리를 지키려고 표 하나가 만들 행 값 칸 수를 제한한다. 10,001행이면 행마다 약 200칸까지다. */
+        const val DEFAULT_MAX_CELLS = 2_000_000
     }
 }
 

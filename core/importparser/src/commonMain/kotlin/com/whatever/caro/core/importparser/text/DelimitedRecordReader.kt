@@ -43,6 +43,9 @@ internal class DelimitedRecordReader(
     private val fields = mutableListOf<String>()
     private val field = StringBuilder()
 
+    // 빈 값은 다음에 값이 나올 때까지 개수만 세어 둔다. 끝에만 빈 구분자가 수천 개 이어진 행이 열 상한에 걸리지 않게 하기 위해서다.
+    private var pendingEmpty = 0
+
     /** 빈 줄은 건너뛰고 다음 레코드를 돌려준다. 끝이면 null이다. */
     fun nextRecord(): List<String>? {
         while (cursor.peek() != CharCursor.END) {
@@ -55,6 +58,7 @@ internal class DelimitedRecordReader(
     private fun readRecord(): List<String> {
         fields.clear()
         field.clear()
+        pendingEmpty = 0
         var state = State.START_RECORD
         while (true) {
             val code = cursor.next()
@@ -112,20 +116,35 @@ internal class DelimitedRecordReader(
     }
 
     private fun saveThen(next: State?): State? {
-        if (fields.size >= maxFields) throw ImportParseException(ImportParseErrorKind.TOO_MANY_COLUMNS, "record over $maxFields fields")
-        fields += field.toString()
+        if (field.isEmpty()) {
+            pendingEmpty++
+        } else {
+            if (fields.size + pendingEmpty >= maxFields) {
+                throw ImportParseException(ImportParseErrorKind.TOO_MANY_COLUMNS, "record over $maxFields fields")
+            }
+            repeat(pendingEmpty) { fields += "" }
+            pendingEmpty = 0
+            fields += field.toString()
+        }
         field.clear()
         return next
     }
 
+    /** 끝의 빈 값은 원래 열 수가 상한 안일 때만 남겨, 일반 파일의 열 수와 열 맞춤 경고 수는 그대로 둔다. */
+    private fun completeRecord(): List<String> {
+        if (fields.size + pendingEmpty <= maxFields) repeat(pendingEmpty) { fields += "" }
+        pendingEmpty = 0
+        return fields.toList()
+    }
+
     private fun endRecord(char: Char): List<String> {
         if (char == CR && cursor.peek() == LF.code) cursor.next()
-        return fields.toList()
+        return completeRecord()
     }
 
     private fun finishAtEnd(state: State): List<String> {
         if (state != State.START_RECORD) saveThen(null)
-        return fields.toList()
+        return completeRecord()
     }
 
     private fun isNewline(char: Char): Boolean = char == LF || char == CR

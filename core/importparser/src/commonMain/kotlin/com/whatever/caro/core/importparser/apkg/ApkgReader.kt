@@ -1,6 +1,8 @@
 package com.whatever.caro.core.importparser.apkg
 
 import com.squareup.zstd.okio.zstdDecompress
+import com.whatever.caro.core.importparser.ImportParseErrorKind
+import com.whatever.caro.core.importparser.ImportParseException
 import com.whatever.caro.core.importparser.ParseOptions
 import com.whatever.caro.core.importparser.archive.ZipArchive
 import com.whatever.caro.core.importparser.archive.withTempWorkspace
@@ -61,9 +63,9 @@ internal class ApkgReader(
             if (version ==
                 AnkiPackageVersion.LATEST
             ) {
-                AnkiCollectionModel.readModern(database)
+                AnkiCollectionModel.readModern(database, options.maxColumns)
             } else {
-                AnkiCollectionModel.readLegacy(database)
+                AnkiCollectionModel.readLegacy(database, options.maxColumns)
             }
         val noteDecks = readNoteDecks(database, model)
         val subdecks = subdecksOf(noteDecks, model)
@@ -135,7 +137,8 @@ internal class ApkgReader(
         val rows = mutableListOf<ParsedRow>()
         var mismatches = 0
         var imageOcclusion = 0
-        database.query("SELECT id, mid, flds FROM notes ORDER BY id") { statement ->
+        var cells = 0
+        database.query("SELECT id, mid, flds, length(flds) FROM notes ORDER BY id") { statement ->
             while (rows.size < options.maxRows && statement.step()) {
                 val type = model.noteTypes[statement.getLong(1)] ?: continue
                 val subdeckId = noteDecks[statement.getLong(0)]?.toString()
@@ -145,6 +148,10 @@ internal class ApkgReader(
                     imageOcclusion++
                     continue
                 }
+                // 값 문자열을 만들기 전에 길이로 거른다. 한 노트가 수백 MB면 읽는 순간 메모리가 넘친다.
+                if (statement.getLong(3) > options.maxFieldChars) throw contentTooLong("note over ${options.maxFieldChars} chars")
+                cells += type.fieldNames.size
+                if (cells > options.maxCells) throw contentTooLong("table over ${options.maxCells} cells")
                 val values = statement.getText(2).split(FIELD_SEPARATOR)
                 if (values.size != type.fieldNames.size) mismatches++
                 val fields = type.fieldNames.withIndex().associate { (index, name) -> name to values.getOrElse(index) { "" } }
@@ -155,6 +162,8 @@ internal class ApkgReader(
         // 선택한 노트가 상한 행을 넘으면 나머지는 읽지 않는다. 텍스트와 같이 상한 행에 닿으면 상한 초과로 본다.
         return RowScan(rows, mismatches, imageOcclusion, limitReached = rows.size >= options.maxRows)
     }
+
+    private fun contentTooLong(reason: String) = ImportParseException(ImportParseErrorKind.CONTENT_TOO_LONG, reason)
 
     private companion object {
         const val COLLECTION_FILE = "collection.sqlite"

@@ -1,5 +1,7 @@
 package com.whatever.caro.core.importparser.xlsx
 
+import com.whatever.caro.core.importparser.ImportParseErrorKind
+import com.whatever.caro.core.importparser.ImportParseException
 import com.whatever.caro.core.importparser.archive.ZipArchive
 
 internal sealed interface XlsxCell {
@@ -21,6 +23,8 @@ internal typealias XlsxRow = Map<Int, XlsxCell>
 internal class XlsxSheetReader(
     private val cellFormatIds: List<Int>,
     private val numberFormat: XlsxNumberFormat,
+    private val maxColumns: Int,
+    private val maxCells: Int,
 ) {
     private class CellState(
         val column: Int,
@@ -39,6 +43,7 @@ internal class XlsxSheetReader(
         private var row: MutableMap<Int, XlsxCell>? = null
         private var cell: CellState? = null
         private var nextColumn = 0
+        private var cellCount = 0
 
         fun accept(event: XmlEvent) {
             when (event) {
@@ -73,8 +78,17 @@ internal class XlsxSheetReader(
             }
         }
 
+        // 열과 칸 수는 셀을 닫는 즉시 확인해 상한을 넘는 시트의 나머지를 읽거나 쌓지 않는다.
         private fun closeCell(state: CellState) {
-            finishCell(state)?.let { value -> row?.put(state.column, value) }
+            finishCell(state)?.let { value ->
+                if (state.column >=
+                    maxColumns
+                ) {
+                    throw ImportParseException(ImportParseErrorKind.TOO_MANY_COLUMNS, "column ${state.column + 1}")
+                }
+                if (++cellCount > maxCells) throw ImportParseException(ImportParseErrorKind.CONTENT_TOO_LONG, "sheet over $maxCells cells")
+                row?.put(state.column, value)
+            }
             nextColumn = state.column + 1
             cell = null
         }
@@ -83,11 +97,11 @@ internal class XlsxSheetReader(
     fun readRows(
         archive: ZipArchive,
         part: String,
-        maxRows: Int,
+        limit: Int,
     ): List<XlsxRow> {
         val collector = RowCollector()
         archive.forEachEvent(part) { event ->
-            if (collector.rows.size >= maxRows) return collector.rows
+            if (collector.rows.size >= limit) return collector.rows
             collector.accept(event)
         }
         return collector.rows

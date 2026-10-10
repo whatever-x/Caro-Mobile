@@ -1,5 +1,7 @@
 package com.whatever.caro.core.importparser.apkg
 
+import com.whatever.caro.core.importparser.ImportParseErrorKind
+import com.whatever.caro.core.importparser.ImportParseException
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
@@ -29,11 +31,19 @@ internal data class AnkiCollectionModel(
         private const val DECK_PATH_SEPARATOR = "::"
         private const val MODERN_DECK_SEPARATOR = '\u001f'
 
-        fun readModern(database: AnkiDatabase): AnkiCollectionModel {
+        /** 항목 수가 [maxColumns]를 넘는 노트 유형이 있으면 노트마다 그만큼의 값 맵이 생기므로 읽는 중에 멈춘다. */
+        fun readModern(
+            database: AnkiDatabase,
+            maxColumns: Int,
+        ): AnkiCollectionModel {
             val fieldNames = HashMap<Long, MutableList<String>>()
             // 내보내기가 없는 노트 유형의 fields 행을 남기므로 노트 유형 id로 묶는다.
             database.query("SELECT ntid, name FROM fields ORDER BY ntid, ord") { statement ->
-                while (statement.step()) fieldNames.getOrPut(statement.getLong(0)) { mutableListOf() } += statement.getText(1)
+                while (statement.step()) {
+                    val names = fieldNames.getOrPut(statement.getLong(0)) { mutableListOf() }
+                    if (names.size >= maxColumns) throw tooManyFields(maxColumns)
+                    names += statement.getText(1)
+                }
             }
             val noteTypes = HashMap<Long, AnkiNoteType>()
             database.query("SELECT id, name, config FROM notetypes") { statement ->
@@ -58,7 +68,10 @@ internal data class AnkiCollectionModel(
             return AnkiCollectionModel(noteTypes, deckPaths)
         }
 
-        fun readLegacy(database: AnkiDatabase): AnkiCollectionModel {
+        fun readLegacy(
+            database: AnkiDatabase,
+            maxColumns: Int,
+        ): AnkiCollectionModel {
             val (models, decks) =
                 database.query("SELECT models, decks FROM col") { statement ->
                     if (!statement.step()) error("col row missing")
@@ -66,7 +79,7 @@ internal data class AnkiCollectionModel(
                 }
             val noteTypes =
                 Json.parseToJsonElement(models).jsonObject.entries.associate { (id, model) ->
-                    id.toLong() to legacyNoteType(model.jsonObject)
+                    id.toLong() to legacyNoteType(model.jsonObject, maxColumns)
                 }
             val deckPaths =
                 Json.parseToJsonElement(decks).jsonObject.entries.associate { (id, deck) ->
@@ -75,10 +88,14 @@ internal data class AnkiCollectionModel(
             return AnkiCollectionModel(noteTypes, deckPaths)
         }
 
-        private fun legacyNoteType(model: JsonObject): AnkiNoteType {
+        private fun legacyNoteType(
+            model: JsonObject,
+            maxColumns: Int,
+        ): AnkiNoteType {
+            val declared = model["flds"]?.jsonArray
+            if ((declared?.size ?: 0) > maxColumns) throw tooManyFields(maxColumns)
             val fields =
-                model["flds"]
-                    ?.jsonArray
+                declared
                     ?.map { it.jsonObject }
                     ?.sortedBy { field -> field.number("ord") }
                     ?.map { field -> field.text("name") }
@@ -90,6 +107,9 @@ internal data class AnkiCollectionModel(
                 isImageOcclusion = model.number("originalStockKind") == STOCK_KIND_IMAGE_OCCLUSION.toInt(),
             )
         }
+
+        private fun tooManyFields(maxColumns: Int) =
+            ImportParseException(ImportParseErrorKind.TOO_MANY_COLUMNS, "note type over $maxColumns fields")
 
         private fun JsonObject.text(key: String): String = (this[key] as? JsonPrimitive)?.contentOrNull.orEmpty()
 

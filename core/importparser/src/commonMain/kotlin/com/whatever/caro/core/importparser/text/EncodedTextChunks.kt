@@ -72,7 +72,9 @@ internal class EncodedTextChunks(
     /** 끝 문자가 다 들어 있으면 전체 길이를, 잘린 다중 바이트 문자가 있으면 그 문자 앞까지의 길이를 돌려준다. */
     private fun utf8Boundary(): Long {
         var start = pending.size - 1
-        while (start > 0 && isContinuation(pending[start])) start--
+        // UTF-8 문자는 이어지는 바이트가 3개를 넘지 않으므로 그 이상 거슬러 올라가지 않는다. 더 많으면 잘못된 바이트라 디코딩이 실패한다.
+        val earliest = maxOf(0L, pending.size - UTF8_MAX_BYTES)
+        while (start > earliest && isContinuation(pending[start])) start--
         return if (start + utf8Length(pending[start]) <= pending.size) pending.size else maxOf(start, 1L)
     }
 
@@ -106,6 +108,7 @@ internal class EncodedTextChunks(
         const val UTF8_TWO_BYTE_LEAD = 0xC0
         const val UTF8_THREE_BYTE_LEAD = 0xE0
         const val UTF8_FOUR_BYTE_LEAD = 0xF0
+        const val UTF8_MAX_BYTES = 4L
         val UTF8_BOM = "efbbbf".decodeHex()
     }
 }
