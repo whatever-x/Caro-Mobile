@@ -17,6 +17,7 @@ import dev.mokkery.verifySuspend
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
+import kotlinx.serialization.json.Json
 
 class CardRepositoryImplChunkTest : FunSpec() {
     init {
@@ -46,16 +47,25 @@ class CardRepositoryImplChunkTest : FunSpec() {
             }
         }
 
-        test("createCardsChunk 는 응답 항목 수가 요청 장수와 다르면 유효하지 않은 응답으로 처리한다") {
+        test("createCardsChunk 는 응답 항목 수가 요청 장수와 달라도 서버가 만든 장수를 그대로 돌려준다") {
             val cardDataSource =
                 mock<CardDataSource> {
                     everySuspend { createCardChunk(any(), any(), any()) } returns created(1)
                 }
             val repository = CardRepositoryImpl(cardDataSource = cardDataSource)
 
-            shouldThrow<CaroInvalidResponseException> {
-                repository.createCardsChunk(deckId = 42L, cards = cards, idempotencyKey = KEY)
-            }
+            repository.createCardsChunk(deckId = 42L, cards = cards, idempotencyKey = KEY) shouldBe 1
+        }
+
+        test("같은 카드 목록을 두 번 저장하면 저장소 매핑을 거친 요청 본문 바이트가 같다") {
+            val requests = mutableListOf<CreateCardsRequest>()
+            val repository = CardRepositoryImpl(cardDataSource = CapturingCardDataSource(requests))
+            val sameList = listOf(CardContent(front = "사과\n\"따옴표\"", back = "apple"), CardContent(front = "가", back = ""))
+
+            repeat(2) { repository.createCardsChunk(deckId = 42L, cards = sameList, idempotencyKey = KEY) }
+
+            val bodies = requests.map { request -> Json.encodeToString(CreateCardsRequest.serializer(), request).encodeToByteArray() }
+            bodies[0].contentEquals(bodies[1]) shouldBe true
         }
 
         test("createCardsChunk 는 응답 항목이 없으면 유효하지 않은 응답으로 처리한다") {
@@ -68,6 +78,27 @@ class CardRepositoryImplChunkTest : FunSpec() {
             shouldThrow<CaroInvalidResponseException> {
                 repository.createCardsChunk(deckId = 42L, cards = cards, idempotencyKey = KEY)
             }
+        }
+    }
+
+    private class CapturingCardDataSource(
+        private val requests: MutableList<CreateCardsRequest>,
+    ) : CardDataSource by mock() {
+        override suspend fun createCardChunk(
+            deckId: Long,
+            idempotencyKey: String,
+            request: CreateCardsRequest,
+        ): CreateCardsResponse {
+            requests += request
+            return CreateCardsResponse(
+                items =
+                    request.items.mapIndexed {
+                        index,
+                        _,
+                        ->
+                        CardResponse(cardId = index.toLong(), fields = null)
+                    },
+            )
         }
     }
 

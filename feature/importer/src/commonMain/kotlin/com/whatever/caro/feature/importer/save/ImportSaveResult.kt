@@ -30,6 +30,9 @@ internal sealed class ChunkFailure(
     /** 같은 키로 다른 본문을 보낸 앱 결함. 새 키로 보내면 이미 저장된 다른 내용과 겹칠 수 있어 다시 시도를 막는다. */
     data object KeyConflict : ChunkFailure(UserRetry.NONE)
 
+    /** 서버는 저장했지만 만든 장수가 보낸 장수와 다르다. 같은 키는 같은 응답만 재생하고 새 키는 중복 저장을 만들 수 있다. */
+    data object ResponseCountMismatch : ChunkFailure(UserRetry.NONE)
+
     data object DeckUnavailable : ChunkFailure(UserRetry.NONE)
 
     data object StoppedByUser : ChunkFailure(UserRetry.NONE)

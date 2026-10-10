@@ -21,6 +21,8 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.collections.shouldBeUnique
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeSameInstanceAs
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.currentTime
 import kotlinx.coroutines.test.runTest
@@ -180,6 +182,61 @@ class ImportSaveCoordinatorTest : FunSpec() {
             }
         }
 
+        test("자동 재시도 횟수는 재시도 간격 목록 길이에서 나온다") {
+            ImportSaveLimits.AUTO_RETRY_COUNT shouldBe ImportSaveLimits.RETRY_BACKOFF.size
+        }
+
+        test("재시도 간격을 기다리는 중에 멈추기를 요청하면 다시 보내지 않는다") {
+            runTest {
+                var stopRequested = false
+                val cards = ScriptedCardRepository(networkTimeout())
+                val coordinator = coordinator(cards)
+                launch {
+                    delay(1_000)
+                    stopRequested = true
+                }
+
+                val outcome =
+                    coordinator.saveChunks(
+                        DECK_ID,
+                        coordinator.planChunks(listOf(CardContent("a", "b"))),
+                        stopRequested = { stopRequested },
+                    )
+
+                outcome.failure shouldBe ChunkFailure.StoppedByUser
+                cards.calls.size shouldBe 1
+            }
+        }
+
+        test("같은 키로 다시 시도해도 C010 대기 상한은 그 키의 첫 전송부터 센다") {
+            runTest {
+                val cards =
+                    ScriptedCardRepository(processing(), CaroInvalidResponseException(debugMessage = "html"), *Array(30) { processing() })
+                val coordinator = coordinator(cards)
+                val chunks = coordinator.planChunks(listOf(CardContent("a", "b")))
+
+                coordinator.saveChunks(DECK_ID, chunks).failure shouldBe ChunkFailure.InvalidResponse
+                delay(10_000)
+                val retried = coordinator.saveChunks(DECK_ID, chunks)
+
+                retried.failure shouldBe ChunkFailure.ProcessingTimeout
+                (currentTime <= 25_000L) shouldBe true
+            }
+        }
+
+        test("서버가 만든 장수가 보낸 장수와 다르면 다시 시도 없이 멈춘다") {
+            runTest {
+                val cards = ScriptedCardRepository().apply { createdCount = { sent -> sent - 1 } }
+                val coordinator = coordinator(cards)
+
+                val outcome = coordinator.saveChunks(DECK_ID, coordinator.planChunks(List(3) { CardContent("a$it", "b") }))
+
+                outcome.failure shouldBe ChunkFailure.ResponseCountMismatch
+                outcome.failure.userRetry shouldBe UserRetry.NONE
+                cards.calls.size shouldBe 1
+            }
+        }
+
         test("인증 만료는 화면 오류로 바꾸지 않고 그대로 전파한다") {
             runTest {
                 val coordinator = coordinator(ScriptedCardRepository(CaroAuthException.TokenExpired(debugMessage = "expired")))
@@ -245,6 +302,7 @@ class ImportSaveCoordinatorTest : FunSpec() {
     ) : CardRepository {
         val calls = mutableListOf<ChunkCall>()
         var onCall: () -> Unit = {}
+        var createdCount: (Int) -> Int = { sent -> sent }
         private val script = ArrayDeque(outcomes.toList())
 
         override suspend fun createCardsChunk(
@@ -255,7 +313,7 @@ class ImportSaveCoordinatorTest : FunSpec() {
             calls += ChunkCall(deckId, cards, idempotencyKey)
             onCall()
             script.removeFirstOrNull()?.let { failure -> throw failure }
-            return cards.size
+            return createdCount(cards.size)
         }
 
         override suspend fun createCards(

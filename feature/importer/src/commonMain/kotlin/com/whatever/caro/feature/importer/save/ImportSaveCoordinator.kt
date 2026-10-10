@@ -10,6 +10,7 @@ import com.whatever.caro.core.model.exception.NetworkException
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
 import kotlin.time.Duration
+import kotlin.time.TimeMark
 import kotlin.time.TimeSource
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
@@ -24,6 +25,9 @@ internal class ImportSaveCoordinator(
     private val timeSource: TimeSource = TimeSource.Monotonic,
     private val newKey: () -> String = ::randomIdempotencyKey,
 ) {
+    // 사용자 재시도나 자동 재시도로 다시 보내도 C010 대기 상한은 그 키를 처음 보낸 때부터 센다. 서버의 처리 중 표시도 그때부터 흐른다.
+    private val firstSentAt = HashMap<String, TimeMark>()
+
     private sealed interface Attempt {
         data object Saved : Attempt
 
@@ -73,7 +77,7 @@ internal class ImportSaveCoordinator(
             if (stopRequested()) return ImportSaveOutcome.Stopped(index, saved, ChunkFailure.StoppedByUser)
             val failure = saveChunk(deckId, chunks[index], stopRequested, onProgress)
             if (failure != null) return ImportSaveOutcome.Stopped(index, saved, failure)
-            // 저장소가 응답 장수를 요청 장수와 대조하므로 성공하면 묶음 장수만큼 저장된 것이다.
+            // 서버가 만든 장수가 보낸 장수와 같을 때만 성공으로 보므로 묶음 장수만큼 저장된 것이다.
             saved += chunks[index].cards.size
             onProgress(ImportSaveProgress.ChunkSaved(index, chunks[index].cards.size))
         }
@@ -87,7 +91,7 @@ internal class ImportSaveCoordinator(
         stopRequested: () -> Boolean,
         onProgress: (ImportSaveProgress) -> Unit,
     ): ChunkFailure? {
-        val firstSentAt = timeSource.markNow()
+        val firstSent = firstSentAt.getOrPut(chunk.idempotencyKey) { timeSource.markNow() }
         var failures = 0
         while (true) {
             when (val attempt = send(deckId, chunk)) {
@@ -100,7 +104,7 @@ internal class ImportSaveCoordinator(
                 }
 
                 Attempt.Processing -> {
-                    val remaining = ImportSaveLimits.PROCESSING_WAIT_LIMIT - firstSentAt.elapsedNow()
+                    val remaining = ImportSaveLimits.PROCESSING_WAIT_LIMIT - firstSent.elapsedNow()
                     if (remaining <= Duration.ZERO) return ChunkFailure.ProcessingTimeout
                     onProgress(ImportSaveProgress.WaitingForServer(chunk.index))
                     delay(minOf(ImportSaveLimits.PROCESSING_RETRY_DELAY, remaining))
@@ -112,6 +116,7 @@ internal class ImportSaveCoordinator(
                     if (failures > ImportSaveLimits.AUTO_RETRY_COUNT) return ChunkFailure.RetryExhausted
                     onProgress(ImportSaveProgress.Retrying(chunk.index, failures, ImportSaveLimits.AUTO_RETRY_COUNT))
                     delay(ImportSaveLimits.RETRY_BACKOFF[failures - 1])
+                    if (stopRequested()) return ChunkFailure.StoppedByUser
                 }
             }
         }
@@ -122,8 +127,8 @@ internal class ImportSaveCoordinator(
         chunk: ImportChunk,
     ): Attempt =
         try {
-            cardRepository.createCardsChunk(deckId, chunk.cards, chunk.idempotencyKey)
-            Attempt.Saved
+            val created = cardRepository.createCardsChunk(deckId, chunk.cards, chunk.idempotencyKey)
+            if (created == chunk.cards.size) Attempt.Saved else Attempt.Stop(ChunkFailure.ResponseCountMismatch)
         } catch (exception: CancellationException) {
             throw exception
         } catch (exception: CaroAuthException) {

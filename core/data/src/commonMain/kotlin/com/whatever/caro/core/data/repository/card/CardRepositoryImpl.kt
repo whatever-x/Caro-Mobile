@@ -29,15 +29,8 @@ internal class CardRepositoryImpl(
                 idempotencyKey = idempotencyKey,
                 request = cards.toCreateCardsRequest(),
             )
-        val createdCount =
-            response.items?.size
-                ?: throw CaroInvalidResponseException(debugMessage = "CreateCardsResponse.items is null")
-        if (createdCount != cards.size) {
-            throw CaroInvalidResponseException(
-                debugMessage = "Created card count does not match request: requested=${cards.size}, created=$createdCount",
-            )
-        }
-        return createdCount
+        return response.items?.size
+            ?: throw CaroInvalidResponseException(debugMessage = "CreateCardsResponse.items is null")
     }
 
     override suspend fun updateCard(

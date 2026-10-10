@@ -11,8 +11,8 @@ internal object ImportSaveLimits {
     /** 최악 1,000장(양면 500자 한글)은 약 3MB라 프록시 본문 한도에 걸린다. 프록시 한도가 확인되면 그 80% 이하로 맞춘다. */
     const val CHUNK_MAX_BYTES = 2L * 1024 * 1024
 
-    const val AUTO_RETRY_COUNT = 3
     val RETRY_BACKOFF: List<Duration> = listOf(2.seconds, 4.seconds, 8.seconds)
+    val AUTO_RETRY_COUNT: Int = RETRY_BACKOFF.size
 
     /** 서버의 처리 중 표시는 30초 뒤 사라져 같은 키 재시도가 다시 실행될 수 있으므로 그보다 짧게 끊는다. */
     val PROCESSING_WAIT_LIMIT: Duration = 25.seconds
