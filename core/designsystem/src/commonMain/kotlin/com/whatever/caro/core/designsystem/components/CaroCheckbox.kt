@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.selection.triStateToggleable
 import androidx.compose.material3.Icon
+import androidx.compose.material3.minimumInteractiveComponentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -27,12 +28,17 @@ import org.jetbrains.compose.resources.stringResource
 private val CheckboxSize = 22.dp
 private val BorderThickness = 1.dp
 
-/** [onClick]이 null이면 장식용이고, 일부 선택 상태 설명은 semantics를 병합하는 부모 줄이 있어야 읽힌다. */
+/**
+ * [onClick]이 null이면 장식용이라 상태 semantics를 주지 않는다.
+ * 부모 줄이 triStateToggleable이나 toggleable로 상태를 노출해야 하고, 일부 선택 설명만 병합되어 읽힌다.
+ * [onClick]이 있으면 보이는 모양은 22dp로 두고 누르는 영역만 최소 48dp로 넓힌다.
+ */
 @Composable
 fun CaroCheckbox(
     state: ToggleableState,
-    onClick: (() -> Unit)? = null,
     modifier: Modifier = Modifier,
+    onClick: (() -> Unit)? = null,
+    enabled: Boolean = true,
 ) {
     val isChecked = state != ToggleableState.Off
     val backgroundColor = if (isChecked) CaroTheme.color.surface.brand else Color.Transparent
@@ -50,13 +56,15 @@ fun CaroCheckbox(
             modifier
                 .then(
                     if (onClick != null) {
-                        Modifier.triStateToggleable(
-                            state = state,
-                            interactionSource = null,
-                            indication = null,
-                            role = Role.Checkbox,
-                            onClick = onClick,
-                        )
+                        Modifier
+                            .triStateToggleable(
+                                state = state,
+                                enabled = enabled,
+                                interactionSource = null,
+                                indication = null,
+                                role = Role.Checkbox,
+                                onClick = onClick,
+                            ).minimumInteractiveComponentSize()
                     } else {
                         Modifier
                     },
@@ -64,23 +72,30 @@ fun CaroCheckbox(
                     if (state == ToggleableState.Indeterminate) {
                         stateDescription = partiallySelectedDescription
                     }
-                }.size(CheckboxSize)
-                .clip(CaroTheme.shape.xs)
-                .background(backgroundColor)
-                .border(
-                    width = BorderThickness,
-                    color = borderColor,
-                    shape = CaroTheme.shape.xs,
-                ),
+                },
         contentAlignment = Alignment.Center,
     ) {
-        glyph?.let {
-            Icon(
-                modifier = Modifier.size(CaroTheme.spacing.l),
-                painter = painterResource(it),
-                contentDescription = null,
-                tint = CaroTheme.color.icon.inverse,
-            )
+        Box(
+            modifier =
+                Modifier
+                    .size(CheckboxSize)
+                    .clip(CaroTheme.shape.xs)
+                    .background(backgroundColor)
+                    .border(
+                        width = BorderThickness,
+                        color = borderColor,
+                        shape = CaroTheme.shape.xs,
+                    ),
+            contentAlignment = Alignment.Center,
+        ) {
+            glyph?.let {
+                Icon(
+                    modifier = Modifier.size(CaroTheme.spacing.l),
+                    painter = painterResource(it),
+                    contentDescription = null,
+                    tint = CaroTheme.color.icon.inverse,
+                )
+            }
         }
     }
 }

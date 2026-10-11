@@ -26,7 +26,7 @@ class RememberDelayedVisibleTest {
 
     private var active by mutableStateOf(false)
 
-    // 자동 시계를 끄지 않으면 가상 시간이 제멋대로 흘러 200ms 경계를 확인할 수 없다.
+    // 자동 시계를 켜 두면 프레임마다 가상 시간이 진행되어 200ms 경계를 확인할 수 없다.
     private fun show(initialActive: Boolean) {
         active = initialActive
         composeRule.mainClock.autoAdvance = false

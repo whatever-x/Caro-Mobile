@@ -26,7 +26,7 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import org.robolectric.annotation.GraphicsMode
 
-// 지연 상수를 공용 helper와 나눠 쓰는 리팩터 전후로 CaroLoadingOverlayBox의 입력 차단과 semantics 비우기가 같아야 한다.
+// CaroLoadingOverlayBox는 로딩 중 입력을 막고 내용 semantics를 비워야 한다.
 @RunWith(RobolectricTestRunner::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
 @Config(sdk = [35], qualifiers = "ko-rKR-w393dp-h852dp-xxhdpi")

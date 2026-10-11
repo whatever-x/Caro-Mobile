@@ -3,9 +3,12 @@ package com.whatever.caro.core.designsystem.components
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.width
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertWidthIsEqualTo
 import androidx.compose.ui.test.getUnclippedBoundsInRoot
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.unit.dp
 import com.whatever.caro.core.designsystem.themes.CaroTheme
@@ -72,7 +75,31 @@ class CaroFieldHeaderTest {
         counterRight.value shouldBe (ROW_WIDTH_DP.toFloat() plusOrMinus RIGHT_TOLERANCE_DP)
     }
 
+    @Test
+    fun `필수 머리글은 전달한 modifier를 적용한다`() {
+        composeRule.setContent {
+            CaroTheme {
+                CaroRequiredFieldHeader(label = LABEL, modifier = Modifier.width(MODIFIER_WIDTH_DP.dp).testTag(TAG))
+            }
+        }
+
+        composeRule.onNodeWithTag(TAG).assertWidthIsEqualTo(MODIFIER_WIDTH_DP.dp)
+    }
+
+    @Test
+    fun `글자 수 표시는 전달한 modifier를 적용한다`() {
+        composeRule.setContent {
+            CaroTheme {
+                CaroFieldCounter(count = COUNT, modifier = Modifier.width(MODIFIER_WIDTH_DP.dp).testTag(TAG))
+            }
+        }
+
+        composeRule.onNodeWithTag(TAG).assertWidthIsEqualTo(MODIFIER_WIDTH_DP.dp)
+    }
+
     private companion object {
+        const val TAG = "field-header"
+        const val MODIFIER_WIDTH_DP = 200
         const val LABEL = "덱 이름"
         const val REQUIRED_MARK = "*"
         const val COUNT = "3/50"

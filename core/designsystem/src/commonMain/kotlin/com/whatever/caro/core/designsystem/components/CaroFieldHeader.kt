@@ -15,8 +15,12 @@ import com.whatever.caro.core.designsystem.themes.CaroTheme
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
-fun CaroRequiredFieldHeader(label: String) {
+fun CaroRequiredFieldHeader(
+    label: String,
+    modifier: Modifier = Modifier,
+) {
     Row(
+        modifier = modifier,
         horizontalArrangement = Arrangement.spacedBy(CaroTheme.spacing.xxs),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -34,9 +38,12 @@ fun CaroRequiredFieldHeader(label: String) {
 }
 
 @Composable
-fun CaroFieldCounter(count: String) {
+fun CaroFieldCounter(
+    count: String,
+    modifier: Modifier = Modifier,
+) {
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Spacer(modifier = Modifier.weight(1f))

@@ -73,6 +73,32 @@ class CaroCtaButtonTest {
     }
 
     @Test
+    fun `enabled를 생략하면 활성 버튼이다`() {
+        var clicks = 0
+        composeRule.setContent {
+            CaroTheme { CaroCtaButton(text = LABEL, onClick = { clicks += 1 }) }
+        }
+        composeRule.waitForIdle()
+
+        button().assertIsEnabled()
+        button().performClick()
+        clicks shouldBe 1
+    }
+
+    @Test
+    fun `문구, onClick, modifier 순서의 위치 인자로 부를 수 있다`() {
+        var clicks = 0
+        composeRule.setContent {
+            CaroTheme { CaroCtaButton(LABEL, { clicks += 1 }, Modifier.fillMaxWidth()) }
+        }
+        composeRule.waitForIdle()
+
+        button().performClick()
+
+        clicks shouldBe 1
+    }
+
+    @Test
     fun `활성 버튼은 Role Button으로 노출된다`() {
         showButton(enabled = true)
 

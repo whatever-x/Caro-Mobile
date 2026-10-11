@@ -35,6 +35,7 @@ data class CaroFullTextSection(
     val body: String,
 )
 
+/** [sections]는 인스턴스 동일성으로 비교되므로 호출부가 remember로 같은 목록을 유지한다. */
 @Composable
 fun CaroFullTextDialog(
     sections: List<CaroFullTextSection>,
@@ -76,7 +77,6 @@ fun CaroFullTextDialog(
 @Composable
 private fun FullTextSections(sections: List<CaroFullTextSection>) {
     val focusRequester = remember { FocusRequester() }
-    val focusTargetIndex = sections.indexOfFirst { it.title != null }.coerceAtLeast(0)
 
     // 포커스 대상이 Dialog 창 안에 붙으므로 requestFocus도 Dialog content의 composition에서 호출해야 한다.
     LaunchedEffect(Unit) {
@@ -95,9 +95,10 @@ private fun FullTextSections(sections: List<CaroFullTextSection>) {
         sections.forEachIndexed { index, section ->
             if (index > 0) Spacer(Modifier.height(CaroTheme.spacing.xl))
 
+            // 스크린 리더가 위쪽 내용을 건너뛰지 않도록 제목 유무와 관계없이 첫 구역에서 시작한다.
             val anchorModifier =
                 Modifier
-                    .then(if (index == focusTargetIndex) Modifier.focusRequester(focusRequester) else Modifier)
+                    .then(if (index == 0) Modifier.focusRequester(focusRequester) else Modifier)
                     .focusable()
 
             if (section.title != null) {

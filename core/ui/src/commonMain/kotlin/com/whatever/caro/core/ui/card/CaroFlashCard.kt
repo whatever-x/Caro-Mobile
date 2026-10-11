@@ -102,8 +102,9 @@ fun CaroFlashCard(
     }
 
     expandedText?.let { text ->
+        val sections = remember(text) { listOf(CaroFullTextSection(title = null, body = text)) }
         CaroFullTextDialog(
-            sections = listOf(CaroFullTextSection(title = null, body = text)),
+            sections = sections,
             onDismiss = { expandedText = null },
         )
     }

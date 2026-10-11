@@ -147,7 +147,7 @@ internal fun CreateDeckScreen(
             }
 
             CaroCtaButton(
-                enabled = state.isConfirmEnabled,
+                text = stringResource(Res.string.deck_button_create),
                 onClick = { onIntent(CreateDeckIntent.ClickConfirm) },
                 modifier =
                     Modifier
@@ -157,7 +157,7 @@ internal fun CreateDeckScreen(
                             horizontal = CaroPageHorizontalPadding,
                             vertical = CaroTheme.spacing.l,
                         ),
-                text = stringResource(Res.string.deck_button_create),
+                enabled = state.isConfirmEnabled,
             )
         }
     }

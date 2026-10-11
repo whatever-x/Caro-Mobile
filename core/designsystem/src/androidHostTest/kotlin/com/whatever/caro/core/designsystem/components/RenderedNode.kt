@@ -31,6 +31,15 @@ internal class RenderedNode(
             (bounds.left.toInt() until bounds.right.toInt()).count { x -> pixels[x, y] == color }
         }
 
+    // 노드 왼쪽 끝에서 leftWidthPx 안의 열에 color가 있는 행(루트 좌표)을 위에서 아래로 돌려준다.
+    fun rowsWithColor(
+        color: Color,
+        leftWidthPx: Int,
+    ): List<Int> =
+        (bounds.top.toInt() until bounds.bottom.toInt()).filter { y ->
+            (bounds.left.toInt() until bounds.left.toInt() + leftWidthPx).any { x -> pixels[x, y] == color }
+        }
+
     fun sameImageAs(other: RenderedNode): Boolean {
         val width = bounds.width.toInt()
         val height = bounds.height.toInt()

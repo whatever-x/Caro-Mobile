@@ -150,6 +150,19 @@ class CaroFullTextDialogTest {
     }
 
     @Test
+    fun `첫 구역에 제목이 없으면 뒤 구역에 제목이 있어도 첫 구역 본문에 포커스를 둔다`() {
+        showDialog(
+            listOf(
+                CaroFullTextSection(title = null, body = BODY_ONLY),
+                CaroFullTextSection(title = BACK_TITLE, body = BACK_BODY),
+            ),
+        )
+
+        composeRule.onNodeWithText(BODY_ONLY).assertIsFocused()
+        composeRule.onNodeWithText(BACK_TITLE).assertIsNotFocused()
+    }
+
+    @Test
     fun `다이얼로그 밖을 누르면 onDismiss를 한 번 호출한다`() {
         var dismissCount = 0
         showFrontAndBack(onDismiss = { dismissCount += 1 })

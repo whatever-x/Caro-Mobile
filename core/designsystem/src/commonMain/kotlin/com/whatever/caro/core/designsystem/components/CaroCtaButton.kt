@@ -25,10 +25,10 @@ enum class CaroCtaButtonStyle {
 /** [disabledReason]은 화면에 그리지 않고, 비활성일 때 접근성 stateDescription으로만 읽힌다. */
 @Composable
 fun CaroCtaButton(
-    enabled: Boolean,
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
     style: CaroCtaButtonStyle = CaroCtaButtonStyle.Brand,
     disabledReason: String? = null,
 ) {

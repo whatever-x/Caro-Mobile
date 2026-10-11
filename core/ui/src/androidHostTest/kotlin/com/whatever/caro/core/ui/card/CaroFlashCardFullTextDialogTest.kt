@@ -31,7 +31,7 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import org.robolectric.annotation.GraphicsMode
 
-// 전체 보기 다이얼로그를 구역 컴포넌트로 분리해도 CaroFlashCard의 모양과 동작이 그대로인지 지킨다.
+// CaroFlashCard 전체 보기 다이얼로그의 크기, 닫기, 스크롤 동작을 고정한다.
 @RunWith(RobolectricTestRunner::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
 @Config(sdk = [35], qualifiers = "ko-rKR-w393dp-h852dp-xxhdpi")

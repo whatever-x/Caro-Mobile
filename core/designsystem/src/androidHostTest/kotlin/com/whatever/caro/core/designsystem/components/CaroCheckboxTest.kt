@@ -17,6 +17,10 @@ import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertHeightIsEqualTo
+import androidx.compose.ui.test.assertIsEnabled
+import androidx.compose.ui.test.assertIsNotEnabled
+import androidx.compose.ui.test.assertTouchHeightIsEqualTo
+import androidx.compose.ui.test.assertTouchWidthIsEqualTo
 import androidx.compose.ui.test.assertWidthIsEqualTo
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -44,8 +48,21 @@ class CaroCheckboxTest {
     private fun showCheckbox(
         state: ToggleableState,
         onClick: (() -> Unit)? = {},
+        enabled: Boolean = true,
     ) {
-        composeRule.setContent { CaroTheme { CaroCheckbox(state = state, onClick = onClick) } }
+        composeRule.setContent { CaroTheme { CaroCheckbox(state = state, onClick = onClick, enabled = enabled) } }
+        composeRule.waitForIdle()
+    }
+
+    private fun showDecorativeAndInteractive(state: ToggleableState) {
+        composeRule.setContent {
+            CaroTheme {
+                Column {
+                    Box(modifier = Modifier.testTag(DECORATIVE_TAG)) { CaroCheckbox(state = state, onClick = null) }
+                    Box(modifier = Modifier.testTag(INTERACTIVE_TAG)) { CaroCheckbox(state = state, onClick = {}) }
+                }
+            }
+        }
         composeRule.waitForIdle()
     }
 
@@ -190,6 +207,71 @@ class CaroCheckboxTest {
     }
 
     @Test
+    fun `누를 수 있으면 누르는 영역은 48dp 정사각형이다`() {
+        showCheckbox(ToggleableState.On)
+
+        checkbox().assertWidthIsEqualTo(48.dp)
+        checkbox().assertHeightIsEqualTo(48.dp)
+        checkbox().assertTouchWidthIsEqualTo(48.dp)
+        checkbox().assertTouchHeightIsEqualTo(48.dp)
+    }
+
+    @Test
+    fun `누를 수 있어도 보이는 선택 모양은 장식용과 같은 크기다`() {
+        showDecorativeAndInteractive(ToggleableState.On)
+
+        val decorative = composeRule.onNodeWithTag(DECORATIVE_TAG).renderPixels()
+        val interactive = composeRule.onNodeWithTag(INTERACTIVE_TAG).renderPixels()
+
+        interactive.countPixels(BRAND_SURFACE) shouldBe decorative.countPixels(BRAND_SURFACE)
+        interactive.countPixels(INVERSE_ICON) shouldBe decorative.countPixels(INVERSE_ICON)
+    }
+
+    @Test
+    fun `누를 수 있어도 보이는 해제 테두리는 장식용과 같은 크기다`() {
+        showDecorativeAndInteractive(ToggleableState.Off)
+
+        val decorative = composeRule.onNodeWithTag(DECORATIVE_TAG).renderPixels()
+        val interactive = composeRule.onNodeWithTag(INTERACTIVE_TAG).renderPixels()
+
+        interactive.countPixels(BORDER_PRIMARY) shouldBe decorative.countPixels(BORDER_PRIMARY)
+    }
+
+    @Test
+    fun `enabled 기본값은 true다`() {
+        showCheckbox(ToggleableState.Off)
+
+        checkbox().assertIsEnabled()
+    }
+
+    @Test
+    fun `enabled가 false이면 비활성 상태로 노출된다`() {
+        showCheckbox(ToggleableState.Off, enabled = false)
+
+        checkbox().assertIsNotEnabled()
+    }
+
+    @Test
+    fun `enabled가 false이면 눌러도 onClick을 호출하지 않는다`() {
+        var clicks = 0
+        showCheckbox(ToggleableState.Off, onClick = { clicks += 1 }, enabled = false)
+
+        checkbox().performClick()
+
+        clicks shouldBe 0
+    }
+
+    @Test
+    fun `modifier는 상태 바로 다음 인자이고 장식용 크기에 적용된다`() {
+        composeRule.setContent {
+            CaroTheme { CaroCheckbox(ToggleableState.On, Modifier.testTag(TAG)) }
+        }
+        composeRule.waitForIdle()
+
+        composeRule.onNodeWithTag(TAG).assertWidthIsEqualTo(22.dp)
+    }
+
+    @Test
     fun `선택 상태는 brand 면 위에 inverse 체크를 그린다`() {
         showAllStates()
 
@@ -240,6 +322,8 @@ class CaroCheckboxTest {
 
     private companion object {
         const val TAG = "checkbox"
+        const val DECORATIVE_TAG = "checkbox-decorative"
+        const val INTERACTIVE_TAG = "checkbox-interactive"
         const val ROW_LABEL = "전체 선택"
         const val PARTIAL_KO = "일부 선택됨"
         const val PARTIAL_EN = "Partially selected"

@@ -33,23 +33,24 @@ private fun com.whatever.caro.core.designsystem.animation.animatedSlideOffsetY(a
     - onAnimationFinish: STABLE (function type)
 
 @Composable
-public fun com.whatever.caro.core.designsystem.components.CaroCheckbox(state: androidx.compose.ui.state.ToggleableState, onClick: kotlin.Function0<kotlin.Unit>?, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+public fun com.whatever.caro.core.designsystem.components.CaroCheckbox(state: androidx.compose.ui.state.ToggleableState, modifier: androidx.compose.ui.Modifier, onClick: kotlin.Function0<kotlin.Unit>?, enabled: kotlin.Boolean): kotlin.Unit
   skippable: true
   restartable: true
   params:
     - state: STABLE (class with no mutable properties)
-    - onClick: STABLE (function type)
     - modifier: STABLE (marked @Stable or @Immutable)
+    - onClick: STABLE (function type)
+    - enabled: STABLE (primitive type)
 
 @Composable
-public fun com.whatever.caro.core.designsystem.components.CaroCtaButton(enabled: kotlin.Boolean, text: kotlin.String, onClick: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier, style: com.whatever.caro.core.designsystem.components.CaroCtaButtonStyle, disabledReason: kotlin.String?): kotlin.Unit
+public fun com.whatever.caro.core.designsystem.components.CaroCtaButton(text: kotlin.String, onClick: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier, enabled: kotlin.Boolean, style: com.whatever.caro.core.designsystem.components.CaroCtaButtonStyle, disabledReason: kotlin.String?): kotlin.Unit
   skippable: true
   restartable: true
   params:
-    - enabled: STABLE (primitive type)
     - text: STABLE (String is immutable)
     - onClick: STABLE (function type)
     - modifier: STABLE (marked @Stable or @Immutable)
+    - enabled: STABLE (primitive type)
     - style: STABLE (class with no mutable properties)
     - disabledReason: STABLE (class with no mutable properties)
 
@@ -88,18 +89,20 @@ private fun com.whatever.caro.core.designsystem.components.CaroDialogContent(mod
     - content: STABLE (composable function type)
 
 @Composable
-public fun com.whatever.caro.core.designsystem.components.CaroFieldCounter(count: kotlin.String): kotlin.Unit
+public fun com.whatever.caro.core.designsystem.components.CaroFieldCounter(count: kotlin.String, modifier: androidx.compose.ui.Modifier): kotlin.Unit
   skippable: true
   restartable: true
   params:
     - count: STABLE (String is immutable)
+    - modifier: STABLE (marked @Stable or @Immutable)
 
 @Composable
-public fun com.whatever.caro.core.designsystem.components.CaroRequiredFieldHeader(label: kotlin.String): kotlin.Unit
+public fun com.whatever.caro.core.designsystem.components.CaroRequiredFieldHeader(label: kotlin.String, modifier: androidx.compose.ui.Modifier): kotlin.Unit
   skippable: true
   restartable: true
   params:
     - label: STABLE (String is immutable)
+    - modifier: STABLE (marked @Stable or @Immutable)
 
 @Composable
 public fun com.whatever.caro.core.designsystem.components.CaroSnackBarHost(modifier: androidx.compose.ui.Modifier, hostState: androidx.compose.material3.SnackbarHostState, snackbar: @[Composable] androidx.compose.runtime.internal.ComposableFunction1<androidx.compose.material3.SnackbarData, kotlin.Unit>): kotlin.Unit

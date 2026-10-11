@@ -42,7 +42,8 @@ import com.whatever.caro.core.designsystem.themes.CaroTheme
 /**
  * Large 사이즈 Text Field Box.
  * 내부 Input Box 의 고정 높이(기본 90dp) 만큼 상단 정렬되어 멀티라인 입력을 받는다.
- * fillHeight가 true이면 maxHeight는 무시하고 남은 높이를 채우므로, 호출자가 weight 등으로 높이를 한정해야 한다.
+ * fillHeight가 true이면 minHeight와 maxHeight를 모두 쓰지 않고 부모가 정한 높이를 채운다.
+ * 높이는 호출자가 weight 등으로 한정해야 하고, 스크롤 부모 안에서는 높이가 0이 된다.
  * Figma: node-id 2582-4870 (대기), 2582-4874 (입력 중), 2582-4882 (완료)
  */
 @Composable
@@ -185,7 +186,7 @@ private fun TextAreaBox(
                         .fillMaxWidth()
                         .then(
                             if (fillHeight) {
-                                Modifier.fillMaxHeight().heightIn(min = minHeight)
+                                Modifier.fillMaxHeight()
                             } else {
                                 Modifier.heightIn(min = minHeight, max = maxHeight)
                             },
