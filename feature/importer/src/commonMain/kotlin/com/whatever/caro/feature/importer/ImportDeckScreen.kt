@@ -18,6 +18,7 @@ import caromobile.core.designsystem.generated.resources.import_title_sheet
 import caromobile.core.designsystem.generated.resources.import_title_source
 import caromobile.core.designsystem.generated.resources.import_title_subdeck
 import caromobile.core.designsystem.generated.resources.import_title_text_check
+import caromobile.core.designsystem.generated.resources.import_value_empty_field
 import caromobile.core.designsystem.generated.resources.import_value_paste_deck_name
 import com.whatever.caro.core.designsystem.themes.CaroTheme
 import com.whatever.caro.core.model.importing.ImportLimits
@@ -31,6 +32,7 @@ import com.whatever.caro.feature.importer.mvi.ImportDeckIntent
 import com.whatever.caro.feature.importer.mvi.ImportDeckState
 import com.whatever.caro.feature.importer.mvi.ImportLoading
 import com.whatever.caro.feature.importer.mvi.ImportStep
+import com.whatever.caro.feature.importer.step.MappingStep
 import com.whatever.caro.feature.importer.step.PasteStep
 import com.whatever.caro.feature.importer.step.SheetStep
 import com.whatever.caro.feature.importer.step.SourceStep
@@ -49,6 +51,7 @@ internal fun ImportDeckScreen(
     val tableKey = rememberInputKey(state.table)
     val previewKey = rememberInputKey(state.preview)
     val pasteSourceName = stringResource(Res.string.import_value_paste_deck_name)
+    val emptySideText = stringResource(Res.string.import_value_empty_field)
     val dateStyle = spreadsheetDateStyleFor(Locale.current.language)
 
     ImportCreatingDeckOverlay(isCreating = state.step == ImportStep.CreatingDeck) {
@@ -132,7 +135,21 @@ internal fun ImportDeckScreen(
                         }
 
                         ImportStep.Mapping -> {
-                            Unit
+                            state.table?.let { table ->
+                                MappingStep(
+                                    table = table,
+                                    mappings = state.mappings,
+                                    onToggleNoteType = { id -> onIntent(ImportDeckIntent.ToggleNoteType(id)) },
+                                    onToggleField = {
+                                        id,
+                                        target,
+                                        fieldName,
+                                        ->
+                                        onIntent(ImportDeckIntent.ToggleField(id, target, fieldName))
+                                    },
+                                    onNext = { onIntent(ImportDeckIntent.ClickMappingNext(emptySideText = emptySideText)) },
+                                )
+                            }
                         }
 
                         ImportStep.Preview -> {

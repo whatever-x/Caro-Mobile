@@ -96,6 +96,14 @@ class ImportDisplayTextTest : FunSpec() {
                 truncateSheetName("s".repeat(101)) shouldBe "s".repeat(99) + "…"
             }
 
+            test("노트 유형 이름은 100자까지 그대로 둔다") {
+                truncateNoteTypeName("n".repeat(100)) shouldBe "n".repeat(100)
+            }
+
+            test("노트 유형 이름이 101자면 99자 뒤에 ...을 붙여 100자로 만든다") {
+                truncateNoteTypeName("n".repeat(101)) shouldBe "n".repeat(99) + "…"
+            }
+
             test("빈 문자열은 그대로 둔다") {
                 truncateCell("") shouldBe ""
             }

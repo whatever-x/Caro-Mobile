@@ -13,6 +13,20 @@ internal fun com.whatever.caro.feature.importer.ImportDeckScreen(state: com.what
     - onIntent: STABLE (function type)
 
 @Composable
+internal fun com.whatever.caro.feature.importer.component.FieldPickerSheet(title: kotlin.String, sideLabel: kotlin.String, otherSideLabel: kotlin.String, rows: kotlinx.collections.immutable.ImmutableList<com.whatever.caro.feature.importer.logic.PickerRow>, onToggleField: kotlin.Function1<kotlin.String, kotlin.Unit>, onDismiss: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier, frame: @[Composable] androidx.compose.runtime.internal.ComposableFunction2<@[ParameterName(name = \): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - title: STABLE (String is immutable)
+    - sideLabel: STABLE (String is immutable)
+    - otherSideLabel: STABLE (String is immutable)
+    - rows: STABLE (known stable type)
+    - onToggleField: STABLE (function type)
+    - onDismiss: STABLE (function type)
+    - modifier: STABLE (marked @Stable or @Immutable)
+    - frame: STABLE (composable function type)
+
+@Composable
 private fun com.whatever.caro.feature.importer.component.ImportBlockingBox(isBlocking: kotlin.Boolean, modifier: androidx.compose.ui.Modifier, card: @[Composable] androidx.compose.runtime.internal.ComposableFunction0<kotlin.Unit>, content: @[Composable] androidx.compose.runtime.internal.ComposableFunction0<kotlin.Unit>): kotlin.Unit
   skippable: true
   restartable: true
@@ -117,6 +131,24 @@ internal fun com.whatever.caro.feature.importer.component.ImportTopBar(title: ko
     - modifier: STABLE (marked @Stable or @Immutable)
 
 @Composable
+private fun com.whatever.caro.feature.importer.component.PickerRowItem(row: com.whatever.caro.feature.importer.logic.PickerRow, sideLabel: kotlin.String, otherSideLabel: kotlin.String, onClick: kotlin.Function0<kotlin.Unit>): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - row: STABLE (class with no mutable properties)
+    - sideLabel: STABLE (String is immutable)
+    - otherSideLabel: STABLE (String is immutable)
+    - onClick: STABLE (function type)
+
+@Composable
+private fun com.whatever.caro.feature.importer.component.PickerSheetHeader(title: kotlin.String, movedMessage: kotlin.String?): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - title: STABLE (String is immutable)
+    - movedMessage: STABLE (class with no mutable properties)
+
+@Composable
 private fun com.whatever.caro.feature.importer.component.backgroundColor(): androidx.compose.ui.graphics.Color
   skippable: true
   restartable: true
@@ -193,6 +225,12 @@ private fun com.whatever.caro.feature.importer.step.CellText(text: kotlin.String
     - color: STABLE (marked @Stable or @Immutable)
 
 @Composable
+private fun com.whatever.caro.feature.importer.step.ClozeBanner(): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+
+@Composable
 private fun com.whatever.caro.feature.importer.step.DelimiterChipButton(chip: com.whatever.caro.feature.importer.logic.DelimiterChip, onSelect: kotlin.Function1<kotlin.Char, kotlin.Unit>): kotlin.Unit
   skippable: true
   restartable: true
@@ -209,6 +247,51 @@ private fun com.whatever.caro.feature.importer.step.DelimiterSetting(chips: kotl
     - onSelect: STABLE (function type)
 
 @Composable
+private fun com.whatever.caro.feature.importer.step.FieldChip(name: kotlin.String, order: kotlin.Int?, sideName: kotlin.String, isEnabled: kotlin.Boolean, onClick: kotlin.Function0<kotlin.Unit>): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - name: STABLE (String is immutable)
+    - order: STABLE (class with no mutable properties)
+    - sideName: STABLE (String is immutable)
+    - isEnabled: STABLE (primitive type)
+    - onClick: STABLE (function type)
+
+@Composable
+private fun com.whatever.caro.feature.importer.step.FieldChips(type: com.whatever.caro.core.importparser.model.ParsedNoteType, chosen: kotlin.collections.List<kotlin.String>, side: com.whatever.caro.feature.importer.step.FieldSideSpec, isEnabled: kotlin.Boolean, onToggleField: kotlin.Function3<@[ParameterName(name = \): kotlin.Unit
+  skippable: false
+  restartable: true
+  params:
+    - type: UNSTABLE (has mutable properties or unstable members)
+    - chosen: RUNTIME (requires runtime check)
+    - side: STABLE (class with no mutable properties)
+    - isEnabled: STABLE (primitive type)
+    - onToggleField: STABLE (function type)
+
+@Composable
+private fun com.whatever.caro.feature.importer.step.FieldPickerControl(type: com.whatever.caro.core.importparser.model.ParsedNoteType, mapping: com.whatever.caro.core.model.importing.FieldMapping, side: com.whatever.caro.feature.importer.step.FieldSideSpec, isEnabled: kotlin.Boolean, onToggleField: kotlin.Function3<@[ParameterName(name = \): kotlin.Unit
+  skippable: false
+  restartable: true
+  params:
+    - type: UNSTABLE (has mutable properties or unstable members)
+    - mapping: STABLE (marked @Stable or @Immutable)
+    - side: STABLE (class with no mutable properties)
+    - isEnabled: STABLE (primitive type)
+    - onToggleField: STABLE (function type)
+
+@Composable
+internal fun com.whatever.caro.feature.importer.step.FieldSide(type: com.whatever.caro.core.importparser.model.ParsedNoteType, mapping: com.whatever.caro.core.model.importing.FieldMapping, side: com.whatever.caro.feature.importer.step.FieldSideSpec, isEnabled: kotlin.Boolean, onToggleField: kotlin.Function3<@[ParameterName(name = \, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+  skippable: false
+  restartable: true
+  params:
+    - type: UNSTABLE (has mutable properties or unstable members)
+    - mapping: STABLE (marked @Stable or @Immutable)
+    - side: STABLE (class with no mutable properties)
+    - isEnabled: STABLE (primitive type)
+    - onToggleField: STABLE (function type)
+    - modifier: STABLE (marked @Stable or @Immutable)
+
+@Composable
 internal fun com.whatever.caro.feature.importer.step.HeaderRowToggle(checked: kotlin.Boolean, onCheckedChange: kotlin.Function1<kotlin.Boolean, kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
   skippable: true
   restartable: true
@@ -216,6 +299,82 @@ internal fun com.whatever.caro.feature.importer.step.HeaderRowToggle(checked: ko
     - checked: STABLE (primitive type)
     - onCheckedChange: STABLE (function type)
     - modifier: STABLE (marked @Stable or @Immutable)
+
+@Composable
+internal fun com.whatever.caro.feature.importer.step.ImageOcclusionCard(type: com.whatever.caro.core.importparser.model.ParsedNoteType, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+  skippable: false
+  restartable: true
+  params:
+    - type: UNSTABLE (has mutable properties or unstable members)
+    - modifier: STABLE (marked @Stable or @Immutable)
+
+@Composable
+private fun com.whatever.caro.feature.importer.step.ImportToggle(isEnabled: kotlin.Boolean, onClick: kotlin.Function0<kotlin.Unit>): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - isEnabled: STABLE (primitive type)
+    - onClick: STABLE (function type)
+
+@Composable
+private fun com.whatever.caro.feature.importer.step.MappingHeader(): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+
+@Composable
+internal fun com.whatever.caro.feature.importer.step.MappingStep(table: com.whatever.caro.core.importparser.model.ParsedTable, mappings: kotlinx.collections.immutable.PersistentMap<kotlin.String, com.whatever.caro.core.model.importing.FieldMapping>, onToggleNoteType: kotlin.Function1<kotlin.String, kotlin.Unit>, onToggleField: kotlin.Function3<@[ParameterName(name = \, onNext: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+  skippable: false
+  restartable: true
+  params:
+    - table: UNSTABLE (has mutable properties or unstable members)
+    - mappings: STABLE (known stable type)
+    - onToggleNoteType: STABLE (function type)
+    - onToggleField: STABLE (function type)
+    - onNext: STABLE (function type)
+    - modifier: STABLE (marked @Stable or @Immutable)
+
+@Composable
+internal fun com.whatever.caro.feature.importer.step.NoteTypeCard(type: com.whatever.caro.core.importparser.model.ParsedNoteType, mapping: com.whatever.caro.core.model.importing.FieldMapping, onToggleNoteType: kotlin.Function1<kotlin.String, kotlin.Unit>, onToggleField: kotlin.Function3<@[ParameterName(name = \, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+  skippable: false
+  restartable: true
+  params:
+    - type: UNSTABLE (has mutable properties or unstable members)
+    - mapping: STABLE (marked @Stable or @Immutable)
+    - onToggleNoteType: STABLE (function type)
+    - onToggleField: STABLE (function type)
+    - modifier: STABLE (marked @Stable or @Immutable)
+
+@Composable
+private fun com.whatever.caro.feature.importer.step.NoteTypeHeader(type: com.whatever.caro.core.importparser.model.ParsedNoteType, isEnabled: kotlin.Boolean, onToggleNoteType: kotlin.Function1<kotlin.String, kotlin.Unit>): kotlin.Unit
+  skippable: false
+  restartable: true
+  params:
+    - type: UNSTABLE (has mutable properties or unstable members)
+    - isEnabled: STABLE (primitive type)
+    - onToggleNoteType: STABLE (function type)
+
+@Composable
+private fun com.whatever.caro.feature.importer.step.NoteTypeInfo(type: com.whatever.caro.core.importparser.model.ParsedNoteType, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+  skippable: false
+  restartable: true
+  params:
+    - type: UNSTABLE (has mutable properties or unstable members)
+    - modifier: STABLE (marked @Stable or @Immutable)
+
+@Composable
+private fun com.whatever.caro.feature.importer.step.NoteTypeName(text: kotlin.String): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - text: STABLE (String is immutable)
+
+@Composable
+private fun com.whatever.caro.feature.importer.step.OrderBadge(order: kotlin.Int): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - order: STABLE (primitive type)
 
 @Composable
 private fun com.whatever.caro.feature.importer.step.PasteGuideLine(text: kotlin.String): kotlin.Unit
@@ -233,6 +392,17 @@ internal fun com.whatever.caro.feature.importer.step.PasteStep(text: kotlin.Stri
     - maxPasteChars: STABLE (primitive type)
     - onTextChange: STABLE (function type)
     - onNext: STABLE (function type)
+    - modifier: STABLE (marked @Stable or @Immutable)
+
+@Composable
+private fun com.whatever.caro.feature.importer.step.PickerButton(text: kotlin.String, description: kotlin.String, isEnabled: kotlin.Boolean, onClick: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - text: STABLE (String is immutable)
+    - description: STABLE (String is immutable)
+    - isEnabled: STABLE (primitive type)
+    - onClick: STABLE (function type)
     - modifier: STABLE (marked @Stable or @Immutable)
 
 @Composable
@@ -433,6 +603,14 @@ private fun com.whatever.caro.feature.importer.step.SummaryLimit(text: kotlin.St
     - text: STABLE (String is immutable)
 
 @Composable
+private fun com.whatever.caro.feature.importer.step.SummaryText(text: kotlin.String, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - text: STABLE (String is immutable)
+    - modifier: STABLE (marked @Stable or @Immutable)
+
+@Composable
 private fun com.whatever.caro.feature.importer.step.SupportedFormatList(): kotlin.Unit
   skippable: true
   restartable: true
@@ -499,6 +677,21 @@ internal fun com.whatever.caro.feature.importer.step.TextCheckStep(table: com.wh
     - onChangeHeaderRow: STABLE (function type)
     - onNext: STABLE (function type)
     - modifier: STABLE (marked @Stable or @Immutable)
+
+@Composable
+private fun com.whatever.caro.feature.importer.step.cardSurface(fill: androidx.compose.ui.graphics.Color, line: androidx.compose.ui.graphics.Color): androidx.compose.ui.Modifier
+  skippable: true
+  restartable: true
+  params:
+    - fill: STABLE (marked @Stable or @Immutable)
+    - line: STABLE (marked @Stable or @Immutable)
+
+@Composable
+private fun com.whatever.caro.feature.importer.step.chosenSummaryText(chosen: kotlin.collections.List<kotlin.String>): kotlin.String
+  skippable: false
+  restartable: true
+  params:
+    - chosen: RUNTIME (requires runtime check)
 
 @Composable
 private fun com.whatever.caro.feature.importer.step.infoText(info: com.whatever.caro.feature.importer.logic.TextCheckInfo): kotlin.String

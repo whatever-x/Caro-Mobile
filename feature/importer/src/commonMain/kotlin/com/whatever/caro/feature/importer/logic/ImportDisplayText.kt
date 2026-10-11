@@ -6,6 +6,7 @@ private const val CELL_MAX = 200
 private const val CHIP_MAX = 80
 private const val PATH_MAX = 200
 private const val SHEET_NAME_MAX = 100
+private const val NOTE_TYPE_NAME_MAX = 100
 
 /** 이름 부분만 줄이고 확장자는 남긴다. 전체 길이가 한도를 넘지 않는다. */
 internal fun truncateFileName(fileName: String): String {
@@ -31,6 +32,8 @@ internal fun truncateChip(text: String): String = truncate(text, CHIP_MAX)
 internal fun truncatePath(text: String): String = truncate(text, PATH_MAX)
 
 internal fun truncateSheetName(text: String): String = truncate(text, SHEET_NAME_MAX)
+
+internal fun truncateNoteTypeName(text: String): String = truncate(text, NOTE_TYPE_NAME_MAX)
 
 internal fun fileNameWithoutExtension(fileName: String): String = fileName.substring(0, extensionStart(fileName))
 
