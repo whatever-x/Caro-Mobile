@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -34,12 +35,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.whatever.caro.core.designsystem.themes.CaroTheme
 
 /**
  * Large 사이즈 Text Field Box.
  * 내부 Input Box 의 고정 높이(기본 90dp) 만큼 상단 정렬되어 멀티라인 입력을 받는다.
+ * fillHeight가 true이면 maxHeight는 무시하고 남은 높이를 채우므로, 호출자가 weight 등으로 높이를 한정해야 한다.
  * Figma: node-id 2582-4870 (대기), 2582-4874 (입력 중), 2582-4882 (완료)
  */
 @Composable
@@ -56,6 +59,9 @@ fun CaroTextArea(
     keyboardActions: KeyboardActions = KeyboardActions.Default,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     focusRequester: FocusRequester? = null,
+    minHeight: Dp = InputBoxMinHeight,
+    maxHeight: Dp = InputBoxMaxHeight,
+    fillHeight: Boolean = false,
 ) {
     Column(
         modifier = modifier.fillMaxWidth(),
@@ -63,10 +69,14 @@ fun CaroTextArea(
     ) {
         header?.invoke()
         Column(
-            modifier = Modifier.fillMaxWidth(),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .then(if (fillHeight) Modifier.weight(1f) else Modifier),
             verticalArrangement = Arrangement.spacedBy(CaroTheme.spacing.xs),
         ) {
             TextAreaBox(
+                modifier = if (fillHeight) Modifier.weight(1f) else Modifier,
                 value = value,
                 onValueChange = onValueChange,
                 placeholder = placeholder,
@@ -76,6 +86,9 @@ fun CaroTextArea(
                 keyboardActions = keyboardActions,
                 interactionSource = interactionSource,
                 focusRequester = focusRequester,
+                minHeight = minHeight,
+                maxHeight = maxHeight,
+                fillHeight = fillHeight,
             )
 
             footer?.invoke()
@@ -85,6 +98,7 @@ fun CaroTextArea(
 
 @Composable
 private fun TextAreaBox(
+    modifier: Modifier,
     value: String,
     onValueChange: (String) -> Unit,
     placeholder: String?,
@@ -94,6 +108,9 @@ private fun TextAreaBox(
     keyboardActions: KeyboardActions,
     interactionSource: MutableInteractionSource,
     focusRequester: FocusRequester?,
+    minHeight: Dp,
+    maxHeight: Dp,
+    fillHeight: Boolean,
 ) {
     val isFocused by interactionSource.collectIsFocusedAsState()
     val isPressed by interactionSource.collectIsPressedAsState()
@@ -130,7 +147,7 @@ private fun TextAreaBox(
     CompositionLocalProvider(LocalTextSelectionColors provides selectionColors) {
         Box(
             modifier =
-                Modifier
+                modifier
                     .fillMaxWidth()
                     .clip(CaroTheme.shape.m)
                     .background(color = surfaceColor, shape = CaroTheme.shape.m)
@@ -166,8 +183,13 @@ private fun TextAreaBox(
                 modifier =
                     Modifier
                         .fillMaxWidth()
-                        .heightIn(min = InputBoxMinHeight, max = InputBoxMaxHeight)
                         .then(
+                            if (fillHeight) {
+                                Modifier.fillMaxHeight().heightIn(min = minHeight)
+                            } else {
+                                Modifier.heightIn(min = minHeight, max = maxHeight)
+                            },
+                        ).then(
                             focusRequester?.let { Modifier.focusRequester(it) } ?: Modifier,
                         ),
                 enabled = enabled,
