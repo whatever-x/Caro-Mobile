@@ -1,6 +1,7 @@
 package com.whatever.caro.core.data.repository.auth
 
 import com.whatever.caro.core.data.mapper.toAuthSession
+import com.whatever.caro.core.data.repository.fcm.FcmTokenRepository
 import com.whatever.caro.core.data.util.suspendRunCatching
 import com.whatever.caro.core.datastore.datasource.LocalAuthDataSource
 import com.whatever.caro.core.model.auth.AuthSession
@@ -17,6 +18,7 @@ internal class AuthRepositoryImpl(
     private val remoteAuthDataSource: AuthDataSource,
     private val remoteNonAuthDataSource: NonAuthDataSource,
     private val localAuthDataSource: LocalAuthDataSource,
+    private val fcmTokenRepository: FcmTokenRepository,
 ) : AuthRepository {
     override suspend fun loginWithSocial(
         provider: SocialLoginType,
@@ -41,6 +43,11 @@ internal class AuthRepositoryImpl(
      * 실패로 처리하면 사용자가 로그아웃하지 못한 채 유효한 토큰을 들고 앱에 남는다.
      */
     override suspend fun logout() {
+        suspendRunCatching {
+            fcmTokenRepository.unregisterToken()
+        }.onFailure {
+            Napier.w { "FCM token removal failed; continuing logout" }
+        }
         suspendRunCatching {
             remoteAuthDataSource.logout()
         }.onFailure { throwable ->

@@ -4,4 +4,6 @@ import kotlinx.coroutines.flow.Flow
 
 interface FcmTokenRepository {
     suspend fun syncTokens(tokens: Flow<String>)
+
+    suspend fun unregisterToken()
 }

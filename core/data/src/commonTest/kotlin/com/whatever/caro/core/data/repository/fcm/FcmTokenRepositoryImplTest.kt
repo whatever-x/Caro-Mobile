@@ -4,17 +4,21 @@ import com.whatever.caro.core.datastore.datasource.LocalAuthDataSource
 import com.whatever.caro.core.remote.datasource.notification.NotificationDataSource
 import com.whatever.caro.core.remote.dto.notification.request.RegisterDeviceTokenRequest
 import com.whatever.caro.core.remote.dto.notification.response.TestPushResponse
+import dev.mokkery.answering.calls
 import dev.mokkery.answering.returns
 import dev.mokkery.every
+import dev.mokkery.everySuspend
 import dev.mokkery.mock
 import io.kotest.assertions.throwables.shouldNotThrowAny
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
@@ -24,6 +28,94 @@ import kotlinx.coroutines.test.runTest
 @OptIn(ExperimentalCoroutinesApi::class)
 class FcmTokenRepositoryImplTest : FunSpec() {
     init {
+        test("토큰 갱신 응답이 실패해도 기존 토큰과 새 토큰 모두 삭제한다") {
+            runTest {
+                val tokens = MutableStateFlow("first")
+                val requests = mutableListOf<RegisterDeviceTokenRequest>()
+                val deleted = mutableListOf<String>()
+                var fail = false
+                val repository =
+                    repository(MutableStateFlow<String?>("access"), requests, deleted = deleted) {
+                        if (fail) error("response lost")
+                    }
+                backgroundScope.launch { repository.syncTokens(tokens) }
+                runCurrent()
+                fail = true
+                tokens.value = "second"
+                runCurrent()
+                repository.unregisterToken()
+                deleted shouldBe listOf("first", "second")
+            }
+        }
+
+        test("진행 중인 등록이 끝난 뒤 삭제하고 로그아웃 중 토큰 갱신을 막는다") {
+            runTest {
+                val session = MutableStateFlow<String?>("access")
+                val tokens = MutableStateFlow("first")
+                val requests = mutableListOf<RegisterDeviceTokenRequest>()
+                val deleted = mutableListOf<String>()
+                val registered = CompletableDeferred<Unit>()
+                val repository = repository(session, requests, deleted = deleted) { registered.await() }
+                backgroundScope.launch { repository.syncTokens(tokens) }
+                runCurrent()
+                val logout = launch { repository.unregisterToken() }
+                runCurrent()
+                deleted shouldBe emptyList()
+                registered.complete(Unit)
+                logout.join()
+                deleted shouldBe listOf("first")
+                tokens.value = "second"
+                session.value = "refreshed"
+                runCurrent()
+                requests.map { it.token } shouldBe listOf("first")
+            }
+        }
+
+        test("삭제 실패 후에도 로그아웃 중 재등록하지 않는다") {
+            runTest {
+                val session = MutableStateFlow<String?>("access")
+                val tokens = MutableStateFlow("first")
+                val requests = mutableListOf<RegisterDeviceTokenRequest>()
+                val repository = repository(session, requests, beforeDelete = { error("offline") })
+                backgroundScope.launch { repository.syncTokens(tokens) }
+                runCurrent()
+                shouldThrow<IllegalStateException> { repository.unregisterToken() }
+                tokens.value = "second"
+                runCurrent()
+                requests.map { it.token } shouldBe listOf("first")
+            }
+        }
+
+        test("로그아웃은 서버에 등록한 토큰을 삭제하고 세션이 끝날 때까지 재등록을 막는다") {
+            runTest {
+                val session = MutableStateFlow<String?>("access")
+                val tokens = MutableStateFlow("first")
+                val requests = mutableListOf<RegisterDeviceTokenRequest>()
+                val deleted = mutableListOf<String>()
+                val repository = repository(session, requests, deleted = deleted)
+                backgroundScope.launch { repository.syncTokens(tokens) }
+                runCurrent()
+                repository.unregisterToken()
+                deleted shouldBe listOf("first")
+                tokens.value = "second"
+                runCurrent()
+                requests.map { it.token } shouldBe listOf("first")
+                session.value = null
+                runCurrent()
+                session.value = "new-access"
+                runCurrent()
+                requests.map { it.token } shouldBe listOf("first", "second")
+            }
+        }
+
+        test("등록된 토큰이 없으면 서버 삭제를 호출하지 않는다") {
+            runTest {
+                val deleted = mutableListOf<String>()
+                repository(MutableStateFlow<String?>("access"), mutableListOf(), deleted = deleted).unregisterToken()
+                deleted.size shouldBe 0
+            }
+        }
+
         test("만료된 인증 토큰이 갱신되면 같은 FCM 토큰을 재등록한다") {
             runTest {
                 val session = MutableStateFlow<String?>("expired")
@@ -157,11 +249,14 @@ class FcmTokenRepositoryImplTest : FunSpec() {
     private fun repository(
         session: Flow<String?>,
         requests: MutableList<RegisterDeviceTokenRequest>,
-        beforeRegister: () -> Unit = {},
+        deleted: MutableList<String> = mutableListOf(),
+        beforeDelete: suspend () -> Unit = {},
+        beforeRegister: suspend () -> Unit = {},
     ): FcmTokenRepositoryImpl {
         val local =
             mock<LocalAuthDataSource> {
                 every { observeRegisteredAccessToken() } returns session
+                everySuspend { fetchAccessToken() } calls { (session as? StateFlow<String?>)?.value }
             }
         val remote =
             object : NotificationDataSource {
@@ -170,7 +265,10 @@ class FcmTokenRepositoryImplTest : FunSpec() {
                     requests.add(request)
                 }
 
-                override suspend fun unregisterToken(token: String) = Unit
+                override suspend fun unregisterToken(token: String) {
+                    beforeDelete()
+                    deleted.add(token)
+                }
 
                 override suspend fun sendTestPush(): TestPushResponse = error("unused")
             }
