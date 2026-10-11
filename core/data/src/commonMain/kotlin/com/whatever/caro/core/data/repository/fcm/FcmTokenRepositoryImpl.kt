@@ -29,6 +29,7 @@ internal class FcmTokenRepositoryImpl(
             var failure: Throwable? = null
             listOfNotNull(registeredToken, latestToken).distinct().forEach { token ->
                 suspendRunCatching { notificationDataSource.unregisterToken(token) }
+                    .onSuccess { Napier.d { "FCM token removal succeeded" } }
                     .onFailure { if (failure == null) failure = it }
             }
             failure?.let { throw it }
@@ -64,6 +65,7 @@ internal class FcmTokenRepositoryImpl(
                                 RegisterDeviceTokenRequest(token = registration.first, platform = notificationPlatform()),
                             )
                             registeredToken = registration.first
+                            Napier.d { "FCM token registration succeeded" }
                         }
                     }.onFailure {
                         Napier.w { "FCM token registration failed; retry on next app start or token change" }
