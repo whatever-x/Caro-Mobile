@@ -27,6 +27,7 @@ object HttpClientFactory {
     private const val CLIENT_TIMEZONE_HEADER = "Client-Timezone"
     private const val ACCEPT_LANGUAGE_HEADER = "Accept-Language"
     private const val CLIENT_DEVICE_ID_HEADER = "Device-Id"
+    private const val NOTIFICATION_DEVICE_PATH = "/notifications/devices"
 
     fun createCaroClient(
         engine: HttpClientEngine,
@@ -63,6 +64,13 @@ object HttpClientFactory {
             install(Logging) {
                 logger = Logger.SIMPLE
                 level = if (CaroNetworkConfig.isDebug) LogLevel.ALL else LogLevel.NONE
+                // Device tokens must not appear in request bodies or query logs.
+                filter {
+                    !it.url
+                        .build()
+                        .encodedPath
+                        .endsWith(NOTIFICATION_DEVICE_PATH)
+                }
             }
 
             install(HttpCallValidator) {
@@ -72,6 +80,13 @@ object HttpClientFactory {
             if (authTokenProvider != null) {
                 install(AuthInterceptorPlugin) {
                     tokenProvider = authTokenProvider
+                    // Background token synchronization must not expire the user's session.
+                    refreshOnUnauthorized = {
+                        !it.url
+                            .build()
+                            .encodedPath
+                            .endsWith(NOTIFICATION_DEVICE_PATH)
+                    }
                 }
             }
 
