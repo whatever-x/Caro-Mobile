@@ -29,6 +29,17 @@ val generateFixtureRoot =
         }
     }
 
+// 공통 규칙(50%)은 그대로 두고 importer의 LINE 기준만 더 높게 잡는다. 보고서에는 caro.kover가 고른 ViewModel 클래스만 들어간다.
+kover {
+    reports {
+        verify {
+            rule("ImportDeckViewModel") {
+                minBound(80)
+            }
+        }
+    }
+}
+
 kotlin {
     android {
         namespace = "com.whatever.caro.feature.importer"

@@ -70,6 +70,8 @@ internal object ImportViewModelFactory {
         deckRepository: DeckRepository = mock<DeckRepository>(),
         cardRepository: CardRepository = mock<CardRepository>(),
         defaultDispatcher: CoroutineDispatcher = dispatcher,
+        saveCoordinatorFactory: ImportSaveCoordinatorFactory? = null,
+        exceptionFilter: ExceptionFilter = ExceptionFilter.None,
     ): ImportViewModelHarness =
         ImportViewModelHarness(
             viewModel =
@@ -79,8 +81,9 @@ internal object ImportViewModelFactory {
                     fileCopy = tempStorage.fileCopy,
                     limits = limits,
                     dispatchers = ImportDispatchers(io = dispatcher, default = defaultDispatcher),
-                    saveCoordinatorFactory = ImportSaveCoordinatorFactory { ImportSaveCoordinator(deckRepository, cardRepository) },
-                    exceptionFilter = ExceptionFilter.None,
+                    saveCoordinatorFactory =
+                        saveCoordinatorFactory ?: ImportSaveCoordinatorFactory { ImportSaveCoordinator(deckRepository, cardRepository) },
+                    exceptionFilter = exceptionFilter,
                 ),
             reader = reader,
             tempStorage = tempStorage,
@@ -114,9 +117,21 @@ internal class ImportViewModelRig {
         deckRepository: DeckRepository = mock<DeckRepository>(),
         cardRepository: CardRepository = mock<CardRepository>(),
         defaultDispatcher: CoroutineDispatcher = dispatcher,
+        saveCoordinatorFactory: ImportSaveCoordinatorFactory? = null,
+        exceptionFilter: ExceptionFilter = ExceptionFilter.None,
     ): ImportViewModelHarness {
         sandboxes += tempStorage
-        return ImportViewModelFactory.create(dispatcher, reader, tempStorage, limits, deckRepository, cardRepository, defaultDispatcher)
+        return ImportViewModelFactory.create(
+            dispatcher,
+            reader,
+            tempStorage,
+            limits,
+            deckRepository,
+            cardRepository,
+            defaultDispatcher,
+            saveCoordinatorFactory,
+            exceptionFilter,
+        )
     }
 
     /** 텍스트와 xlsx를 실제 파서로 읽는 리더다. Android 호스트에는 Anki용 네이티브가 없어 apkg는 이 리더로 읽지 않는다. */

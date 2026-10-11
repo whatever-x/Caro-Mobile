@@ -9,6 +9,7 @@ import com.whatever.caro.core.model.exception.CaroAuthException
 import com.whatever.caro.core.model.exception.CaroInvalidResponseException
 import com.whatever.caro.core.model.exception.CaroServerException
 import com.whatever.caro.core.model.exception.NetworkException
+import com.whatever.caro.feature.importer.support.ScriptedCardRepository
 import dev.mokkery.answering.returns
 import dev.mokkery.answering.throws
 import dev.mokkery.everySuspend
@@ -328,47 +329,6 @@ class ImportSaveCoordinatorTest : FunSpec() {
         cardRepository = cards,
         timeSource = scope.testScheduler.timeSource,
     )
-
-    private class ChunkCall(
-        val deckId: Long,
-        val cards: List<CardContent>,
-        val key: String,
-    )
-
-    /** 호출마다 미리 정한 결과를 차례로 돌려준다. 결과가 떨어지면 성공으로 본다. */
-    private class ScriptedCardRepository(
-        vararg outcomes: Throwable?,
-    ) : CardRepository {
-        val calls = mutableListOf<ChunkCall>()
-        var onCall: () -> Unit = {}
-        var createdCount: (Int) -> Int = { sent -> sent }
-        var callDelayMillis = 0L
-        private val script = ArrayDeque(outcomes.toList())
-
-        override suspend fun createCardsChunk(
-            deckId: Long,
-            cards: List<CardContent>,
-            idempotencyKey: String,
-        ): Int {
-            calls += ChunkCall(deckId, cards, idempotencyKey)
-            onCall()
-            if (callDelayMillis > 0) delay(callDelayMillis)
-            script.removeFirstOrNull()?.let { failure -> throw failure }
-            return createdCount(cards.size)
-        }
-
-        override suspend fun createCards(
-            deckId: Long,
-            cards: List<CardContent>,
-        ) = error("not used")
-
-        override suspend fun updateCard(
-            cardId: Long,
-            content: CardContent,
-        ) = error("not used")
-
-        override suspend fun deleteCards(cardIds: List<Long>) = error("not used")
-    }
 
     private companion object {
         const val DECK_ID = 7L

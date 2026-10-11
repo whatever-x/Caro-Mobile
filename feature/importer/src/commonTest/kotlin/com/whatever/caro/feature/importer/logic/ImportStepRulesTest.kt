@@ -8,6 +8,8 @@ import com.whatever.caro.feature.importer.mvi.ImportDeckIntent
 import com.whatever.caro.feature.importer.mvi.ImportDeckState
 import com.whatever.caro.feature.importer.mvi.ImportDialog
 import com.whatever.caro.feature.importer.mvi.ImportLoading
+import com.whatever.caro.feature.importer.mvi.ImportStep
+import com.whatever.caro.feature.importer.mvi.SavingProgress
 import com.whatever.caro.feature.importer.platform.PickResult
 import com.whatever.caro.feature.importer.support.ImportTestTables
 import io.kotest.core.spec.style.FunSpec
@@ -26,6 +28,15 @@ class ImportStepRulesTest : FunSpec() {
                     ImportDeckIntent.ClickBack,
                     ImportDeckIntent.DismissDialog,
                     ImportDeckIntent.FilePicked(PickResult.Cancelled, SpreadsheetDateStyle.YEAR_MONTH_DAY),
+                )
+
+            val saveChoices =
+                listOf(
+                    ImportDeckIntent.ClickStop,
+                    ImportDeckIntent.ConfirmStop,
+                    ImportDeckIntent.RetrySave,
+                    ImportDeckIntent.ClickViewDeck,
+                    ImportDeckIntent.ClickGoHome,
                 )
 
             test("바쁘지 않으면 아무 입력도 무시하지 않는다") {
@@ -48,6 +59,19 @@ class ImportStepRulesTest : FunSpec() {
 
                 isIgnoredWhileBusy(reparsing, ImportDeckIntent.SelectDelimiter(',')) shouldBe true
                 isIgnoredWhileBusy(reparsing, ImportDeckIntent.ChangeHeaderRow(true)) shouldBe true
+            }
+
+            test("저장 중에는 멈춤과 실패 대화상자의 선택도 받는다") {
+                val saving = ImportDeckState(step = ImportStep.Saving, saving = SavingProgress(deckName = "deck", totalCards = 3))
+
+                saveChoices.forEach { intent -> isIgnoredWhileBusy(saving, intent) shouldBe false }
+                isIgnoredWhileBusy(saving, ImportDeckIntent.ClickCreateDeck) shouldBe true
+            }
+
+            test("덱을 만드는 중에는 저장 선택을 무시한다") {
+                val creating = ImportDeckState(step = ImportStep.CreatingDeck)
+
+                saveChoices.forEach { intent -> isIgnoredWhileBusy(creating, intent) shouldBe true }
             }
 
             test("텍스트를 다시 나누는 중에는 구분자와 제목 행 변경만 이어서 받는다") {

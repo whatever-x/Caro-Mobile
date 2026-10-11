@@ -41,14 +41,17 @@ internal sealed class ChunkFailure(
 }
 
 internal sealed interface ImportSaveOutcome {
+    /** 이번 호출에서 저장한 장수다. */
+    val savedCards: Int
+
     data class Completed(
-        val savedCards: Int,
+        override val savedCards: Int,
     ) : ImportSaveOutcome
 
-    /** [savedCards]는 이번 호출에서 저장한 장수다. [chunkIndex] 묶음부터는 저장되지 않았다. */
+    /** [chunkIndex] 묶음부터는 저장되지 않았다. */
     data class Stopped(
         val chunkIndex: Int,
-        val savedCards: Int,
+        override val savedCards: Int,
         val failure: ChunkFailure,
     ) : ImportSaveOutcome
 }

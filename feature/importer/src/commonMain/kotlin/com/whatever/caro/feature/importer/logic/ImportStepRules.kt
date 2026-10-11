@@ -14,7 +14,7 @@ import com.whatever.caro.feature.importer.mvi.ImportStep
 import kotlinx.collections.immutable.PersistentSet
 
 /**
- * 읽기 중, 선택기가 열린 중, 덱 생성 중, 저장 중에는 뒤로 가기, 대화상자 닫기, 선택기 결과만 받는다.
+ * 읽기 중, 선택기가 열린 중, 덱 생성 중, 저장 중에는 뒤로 가기, 대화상자 닫기, 선택기 결과만 받는다. 저장 중에는 멈춤과 실패 대화상자의 선택도 받는다.
  * 텍스트를 다시 나누는 중에는 구분자와 제목 행을 이어서 바꿀 수 있다. 앞선 읽기를 취소하고 마지막 선택만 남기기 위해서다.
  */
 internal fun isIgnoredWhileBusy(
@@ -24,7 +24,16 @@ internal fun isIgnoredWhileBusy(
     if (!state.isBusy) return false
     return when (intent) {
         ImportDeckIntent.ClickBack, ImportDeckIntent.DismissDialog, is ImportDeckIntent.FilePicked -> false
+
+        ImportDeckIntent.ClickStop,
+        ImportDeckIntent.ConfirmStop,
+        ImportDeckIntent.RetrySave,
+        ImportDeckIntent.ClickViewDeck,
+        ImportDeckIntent.ClickGoHome,
+        -> state.saving == null
+
         is ImportDeckIntent.SelectDelimiter, is ImportDeckIntent.ChangeHeaderRow -> state.loading != ImportLoading.TextReparsing
+
         else -> true
     }
 }
