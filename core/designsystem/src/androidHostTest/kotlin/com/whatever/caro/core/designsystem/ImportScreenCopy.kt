@@ -1,0 +1,157 @@
+package com.whatever.caro.core.designsystem
+
+private val importSourceCopy: Map<String, String> =
+    mapOf(
+        "import_title_source" to "자료 가져오기",
+        "import_subtitle_source" to "가져올 자료를 골라 주세요",
+        "import_label_source_file" to "파일에서 가져오기",
+        "import_hint_source_file" to ".apkg, .txt, .csv, .tsv, .xlsx 파일을 골라요",
+        "import_label_source_paste" to "텍스트 붙여넣기",
+        "import_hint_source_paste" to "Quizlet 등에서 복사한 내용을 붙여 넣어요",
+        "import_label_supported_formats" to "지원하는 자료",
+        "import_hint_format_apkg" to "Anki 덱 패키지(.apkg)",
+        "import_hint_format_anki_text" to "Anki 텍스트 내보내기(.txt)",
+        "import_hint_format_quizlet" to "Quizlet 내보내기 텍스트(.txt, 붙여넣기)",
+        "import_hint_format_xlsx" to "엑셀 단어장(.xlsx)",
+        "import_tip_max_cards" to "한 번에 최대 %1\$s장까지 가져올 수 있어요.",
+        "import_tip_max_file_size" to "파일은 100MB까지 고를 수 있어요.",
+        "import_tip_no_media" to "이미지, 음성, 영상은 가져오지 않아요.",
+        "import_tip_no_study_history" to "Anki 학습 기록은 가져오지 않아 모든 카드를 처음부터 학습해요.",
+        "import_title_paste" to "텍스트 붙여넣기",
+        "import_subtitle_paste" to "복사한 내용을 붙여 넣어 주세요",
+        "import_hint_paste_row" to "한 줄이 카드 한 장이 돼요.",
+        "import_hint_paste_separator" to "칸은 탭, 쉼표, 세미콜론으로 나눠 주세요.",
+        "import_hint_paste_mapping" to "어느 칸을 앞뒷면에 넣을지는 뒤에서 골라요.",
+        "import_reason_paste_too_long" to "한 번에 %1\$s자까지 붙여 넣을 수 있어요. 나눠서 가져와 주세요.",
+        "import_button_next" to "다음",
+        "import_loading_file" to "파일을 읽고 있어요",
+        "import_loading_paste" to "내용을 읽고 있어요",
+        "import_loading_resplit" to "다시 나누고 있어요",
+        "import_loading_preview" to "미리보기를 만들고 있어요",
+        "import_loading_creating_deck" to "덱을 만들고 있어요",
+        "import_label_card_count" to "%1\$s장",
+        "import_label_item_count" to "%1\$s개",
+    )
+
+private val importSelectStepCopy: Map<String, String> =
+    mapOf(
+        "import_title_subdeck" to "하위 덱 선택",
+        "import_label_select_all" to "전체 선택",
+        "import_label_no_deck" to "덱 없음",
+        "import_summary_selected_label" to "선택한 카드",
+        "import_summary_over_limit" to "%1\$s장 (초과) / 최대 %2\$s장",
+        "import_reason_subdeck_over_limit" to "고른 하위 덱을 줄이거나 Anki에서 하위 덱별로 나눠 내보내 주세요.",
+        "import_hint_subdeck_note_count" to "노트 1개가 카드 1장이 되어 Anki 카드 수와 다를 수 있어요.",
+        "import_hint_subdeck_empty_notes" to "앞뒤가 모두 빈 노트는 미리보기에서 빠져요.",
+        "import_title_sheet" to "시트 선택",
+        "import_label_row_count" to "%1\$s행",
+        "import_label_sheet_empty" to "비어 있음",
+        "import_label_row_over_limit" to "%1\$s행 넘음",
+        "import_label_header_row" to "첫 줄은 제목",
+        "import_hint_sheet_only_selected" to "다른 시트는 가져오지 않아요.",
+        "import_reason_sheet_empty" to "비어 있는 시트예요. 다른 시트를 골라 주세요.",
+        "import_title_text_check" to "텍스트 확인",
+        "import_subtitle_text_check" to "텍스트가 어떻게 나뉘었는지 확인해 주세요",
+        "import_hint_text_check_auto" to "자동으로 고른 설정이에요. 다르게 나뉘었다면 바꿔 주세요.",
+        "import_label_delimiter" to "구분자",
+        "import_chip_delimiter_tab" to "탭",
+        "import_chip_delimiter_comma" to "쉼표",
+        "import_chip_delimiter_semicolon" to "세미콜론",
+        "import_chip_delimiter_pipe" to "세로선 |",
+        "import_chip_delimiter_space" to "공백",
+        "import_chip_delimiter_colon" to "콜론 :",
+        "import_label_header_from_file" to "머리말의 항목 이름을 써요",
+        "import_label_split_result" to "나뉜 결과",
+        "import_label_table_info" to "열 %1\$s개 · %2\$s줄 중 처음 %3\$s줄",
+        "import_label_table_info_truncated" to "열 %1\$s개 중 %2\$s개 · %3\$s줄 중 처음 %4\$s줄",
+        "import_hint_table_more_columns" to "나머지 열은 항목 연결에서 고를 수 있어요.",
+        "import_label_column" to "열 %1\$s",
+    )
+
+private val importMappingCopy: Map<String, String> =
+    mapOf(
+        "import_title_mapping" to "항목 연결",
+        "import_subtitle_mapping" to "앞뒷면에 넣을 항목을 골라 주세요",
+        "import_hint_mapping_merge" to "한 면에 여러 항목을 고르면 고른 순서대로 줄을 바꿔 합쳐요.",
+        "import_label_import_toggle" to "가져오기",
+        "import_label_note_type_summary" to "노트 유형 · %1\$s장 · 항목 %2\$s개",
+        "import_label_front_fields" to "앞면에 넣을 항목",
+        "import_label_back_fields" to "뒷면에 넣을 항목",
+        "import_label_cloze_banner" to "빈칸 카드로 자동으로 만들어요",
+        "import_hint_cloze_banner" to "앞면은 빈칸을 [...]로 가린 문장, 뒷면은 빈칸을 채운 문장과 추가 설명이에요.",
+        "import_label_cloze_fields" to "빈칸 문장에 넣을 항목",
+        "import_label_cloze_extra_fields" to "추가 설명에 넣을 항목",
+        "import_button_pick_fields" to "항목 고르기 (%1\$s개 중 %2\$s개)",
+        "import_button_done" to "완료",
+        "import_button_preview" to "미리보기",
+        "import_reason_mapping_no_type" to "가져올 노트 유형을 하나 이상 골라 주세요.",
+        "import_reason_mapping_no_field" to "앞면이나 뒷면에 넣을 항목을 하나 이상 골라 주세요.",
+        "import_reason_mapping_nothing_importable" to "가져올 수 있는 노트 유형이 없어요.",
+        "import_hint_image_occlusion" to "이미지 가리기 카드는 가져올 수 없어요.",
+    )
+
+private val importPreviewCopy: Map<String, String> =
+    mapOf(
+        "import_title_preview" to "미리보기",
+        "import_summary_importable" to "가져올 카드 %1\$s장",
+        "import_summary_importable_over_limit" to "가져올 카드 %1\$s장 넘음",
+        "import_label_stat_excluded" to "제외 (앞뒤가 모두 빈 카드)",
+        "import_label_stat_empty_filled" to "빈 면 채움",
+        "import_label_stat_truncated" to "잘린 내용 (500자 초과)",
+        "import_label_stat_media_removed" to "미디어 제거",
+        "import_hint_preview_edit_later" to "카드는 덱을 만든 뒤 덱 상세에서 고칠 수 있어요.",
+        "import_title_card_list" to "카드 목록",
+        "import_chip_filter_all" to "전체",
+        "import_chip_filter_empty_filled" to "빈 면 채움",
+        "import_chip_filter_truncated" to "잘린 내용",
+        "import_chip_filter_media_removed" to "미디어 제거",
+        "import_label_change_empty_front" to "빈 면 채움 · 앞면",
+        "import_label_change_empty_back" to "빈 면 채움 · 뒷면",
+        "import_label_change_truncated_front" to "잘린 내용 · 앞면",
+        "import_label_change_truncated_back" to "잘린 내용 · 뒷면",
+        "import_label_change_truncated_both" to "잘린 내용 · 앞뒷면",
+        "import_label_change_media_removed" to "미디어 제거",
+        "import_hint_preview_empty_list" to "가져올 카드가 없어요.",
+        "import_reason_preview_empty" to "가져올 카드가 없어요. 항목 연결에서 내용이 있는 항목을 골라 주세요.",
+        "import_reason_preview_over_limit_xlsx" to
+            "한 번에 %1\$s장까지 가져올 수 있어요. 시트나 행을 나눠 여러 파일로 저장해 주세요.",
+        "import_reason_preview_over_limit_text" to
+            "한 번에 %1\$s장까지 가져올 수 있어요. 파일을 %1\$s줄 이하로 나눠 다시 골라 주세요.",
+        "import_reason_preview_over_limit_paste" to
+            "한 번에 %1\$s장까지 가져올 수 있어요. %1\$s줄 이하로 나눠 붙여 넣어 주세요.",
+        "import_warning_encoding_cp949" to
+            "한국어(CP949) 파일로 읽었어요. 글자가 깨졌다면 UTF-8로 저장해 다시 골라 주세요.",
+        "import_warning_inconsistent_columns" to "칸 수가 다른 줄 %1\$s개는 빈 칸을 채워 맞췄어요.",
+        "import_warning_xlsx_formula" to "계산 결과가 저장되지 않은 수식 %1\$s개는 빈 칸으로 가져와요.",
+        "import_warning_xlsx_number_format" to "숫자 서식 일부는 원래 값으로 가져와요.",
+        "import_warning_apkg_field_mismatch" to "항목 수가 맞지 않는 노트 %1\$s개는 빈 항목으로 맞췄어요.",
+        "import_warning_apkg_image_occlusion" to "이미지 가리기 카드 %1\$s장은 가져오지 않아요.",
+    )
+
+private val importDeckInfoCopy: Map<String, String> =
+    mapOf(
+        "import_title_deck_info" to "덱 정보",
+        "import_hint_deck_info_summary" to "카드 %1\$s장으로 새 덱을 만들어요.",
+        "import_button_import" to "가져오기",
+        "import_value_empty_field" to "빈 항목입니다",
+        "import_value_paste_deck_name" to "붙여 넣은 카드",
+        "import_value_paste_description" to "붙여 넣은 내용으로 만들었어요",
+        "import_value_file_description" to "%1\$s에서 가져왔어요",
+        "import_title_saving" to "카드 저장",
+        "import_subtitle_saving" to "카드를 저장하고 있어요",
+        "import_hint_saving_stop_warning" to "멈추거나 앱을 닫으면 저장한 카드까지만 덱에 남아요.",
+        "import_button_stop_import" to "가져오기 멈추기",
+        "import_label_saving_progress" to "%1\$s / %2\$s장",
+        "import_state_retrying" to "연결이 끊겨 다시 시도하고 있어요",
+        "import_state_finishing" to "저장을 마무리하고 있어요",
+        "import_state_stopping" to "멈추는 중 · %1\$s장 저장됨",
+    )
+
+// 위쪽 표들을 모으는 값이라 맨 아래에 둔다. 앞에 두면 초기화 전 null을 읽는다.
+// 장수 상한과 붙여넣기 글자 수 상한은 상한 값이 바뀌어도 문구가 따라가도록 인자로 받는다.
+internal val importScreenCopy: Map<String, String> =
+    importSourceCopy +
+        importSelectStepCopy +
+        importMappingCopy +
+        importPreviewCopy +
+        importDeckInfoCopy
