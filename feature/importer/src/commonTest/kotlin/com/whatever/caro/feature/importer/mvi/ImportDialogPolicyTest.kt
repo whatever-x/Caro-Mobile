@@ -24,6 +24,14 @@ class ImportDialogPolicyTest : FunSpec() {
             ImportDialog.EmptyResult(isPaste = false).dismissPolicy shouldBe ImportDismissPolicy.Confirm
         }
 
+        test("미리보기 계산 실패 팝업은 확인 정책이라 바깥 탭과 뒤로 가기가 확인과 같다") {
+            val policy = ImportDialog.PreviewFailed.dismissPolicy
+
+            policy shouldBe ImportDismissPolicy.Confirm
+            policy.dismissOnBackPress shouldBe true
+            policy.dismissOnClickOutside shouldBe true
+        }
+
         test("가져온 내용을 버릴지 묻는 팝업은 취소 정책이다") {
             ImportDialog.DiscardConfirm.dismissPolicy shouldBe ImportDismissPolicy.Cancel
         }

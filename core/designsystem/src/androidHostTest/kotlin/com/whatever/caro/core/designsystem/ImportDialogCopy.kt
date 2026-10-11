@@ -29,6 +29,8 @@ private val importParseErrorDialogCopy: Map<String, String> =
 
 private val importFlowDialogCopy: Map<String, String> =
     mapOf(
+        "import_dialog_preview_failed_title" to "미리보기를 만들지 못했어요",
+        "import_dialog_preview_failed_body" to "잠시 뒤 다시 시도해 주세요.",
         "import_dialog_discard_title" to "가져온 내용을 버릴까요?",
         "import_dialog_discard_body" to "자료 가져오기로 돌아가면 읽은 내용이 사라져요.",
         "import_dialog_deck_create_failed_title" to "덱을 만들지 못했어요",

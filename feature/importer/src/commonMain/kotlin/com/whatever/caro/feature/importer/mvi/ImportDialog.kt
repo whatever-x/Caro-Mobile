@@ -47,6 +47,9 @@ sealed class ImportDialog(
         val isPaste: Boolean,
     ) : ImportDialog(ImportDismissPolicy.Confirm)
 
+    /** 읽은 내용을 유지한 채 항목 연결에 머문다. 읽기 실패 대화상자와 달리 닫아도 처음 단계로 돌아가지 않는다. */
+    data object PreviewFailed : ImportDialog(ImportDismissPolicy.Confirm)
+
     data object DiscardConfirm : ImportDialog(ImportDismissPolicy.Cancel)
 
     data object DeckCreateFailed : ImportDialog(ImportDismissPolicy.Cancel)

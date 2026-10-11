@@ -490,7 +490,7 @@ class ImportDeckViewModel internal constructor(
                 } catch (error: Exception) {
                     // 오버레이가 남으면 뒤로 가기를 뺀 모든 입력이 막힌다. 연결 단계에 머물러 다시 누를 수 있게 한다.
                     Napier.e(throwable = error) { "import preview build failed" }
-                    if (ticket == generation) reduce { copy(loading = null) }
+                    if (ticket == generation) reduce { copy(loading = null, dialog = ImportDialog.PreviewFailed) }
                 }
             }
     }

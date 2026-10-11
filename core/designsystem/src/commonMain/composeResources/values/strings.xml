@@ -236,10 +236,14 @@
 	<string name="import_label_source_paste">Paste text</string>
 	<string name="import_hint_source_paste">Paste text copied from Quizlet or elsewhere</string>
 	<string name="import_label_supported_formats">Supported formats</string>
-	<string name="import_hint_format_apkg">Anki deck package (.apkg)</string>
-	<string name="import_hint_format_anki_text">Anki text export (.txt)</string>
-	<string name="import_hint_format_quizlet">Quizlet export text (.txt, paste)</string>
-	<string name="import_hint_format_xlsx">Excel vocabulary list (.xlsx)</string>
+	<string name="import_label_format_apkg">Anki deck package</string>
+	<string name="import_chip_format_apkg">.apkg</string>
+	<string name="import_label_format_anki_text">Anki text export</string>
+	<string name="import_chip_format_anki_text">.txt</string>
+	<string name="import_label_format_quizlet">Quizlet export text</string>
+	<string name="import_chip_format_quizlet">.txt · Paste</string>
+	<string name="import_label_format_xlsx">Excel vocabulary list</string>
+	<string name="import_chip_format_xlsx">.xlsx</string>
 	<string name="import_tip_max_cards">You can import up to %1$s cards at a time.</string>
 	<string name="import_tip_max_file_size">Files can be up to 100MB.</string>
 	<string name="import_tip_no_media">Images, audio and video are not imported.</string>
@@ -247,8 +251,7 @@
 	<string name="import_title_paste">Paste text</string>
 	<string name="import_subtitle_paste">Paste the text you copied</string>
 	<string name="import_hint_paste_row">Each line becomes one card.</string>
-	<string name="import_hint_paste_separator">Separate columns with tabs, commas or semicolons.</string>
-	<string name="import_hint_paste_mapping">You will choose which columns go on the front and back later.</string>
+	<string name="import_hint_paste_columns">Separate columns with tabs, commas or semicolons. You will choose which columns go on the front and back later.</string>
 	<string name="import_reason_paste_too_long">You can paste up to %1$s characters at a time. Please import in smaller parts.</string>
 	<string name="import_button_next">Next</string>
 	<string name="import_loading_file">Reading the file</string>
@@ -260,14 +263,19 @@
 	<string name="import_label_item_count">%1$s items</string>
 	<!-- import select -->
 	<string name="import_title_subdeck">Choose subdecks</string>
+	<string name="import_subtitle_subdeck">Choose the subdecks to import</string>
+	<string name="import_hint_subdeck_merge">The subdecks you choose are combined into one deck.</string>
 	<string name="import_label_select_all">Select all</string>
 	<string name="import_label_no_deck">No deck</string>
+	<string name="import_hint_subdeck_no_deck_notes">Notes without cards</string>
 	<string name="import_summary_selected_label">Selected cards</string>
-	<string name="import_summary_over_limit">%1$s cards (over limit) / max %2$s cards</string>
+	<string name="import_summary_over">%1$s cards (over limit)</string>
+	<string name="import_summary_limit">/ max %1$s cards</string>
 	<string name="import_reason_subdeck_over_limit">Select fewer subdecks, or export from Anki one subdeck at a time.</string>
 	<string name="import_hint_subdeck_note_count">One note becomes one card, so the count may differ from the card count in Anki.</string>
 	<string name="import_hint_subdeck_empty_notes">Notes with both sides empty are left out of the preview.</string>
 	<string name="import_title_sheet">Choose a sheet</string>
+	<string name="import_subtitle_sheet">Choose the sheet to import</string>
 	<string name="import_label_row_count">%1$s rows</string>
 	<string name="import_label_sheet_empty">Empty</string>
 	<string name="import_label_row_over_limit">%1$s rows over</string>
@@ -296,6 +304,7 @@
 	<string name="import_hint_mapping_merge">If you choose several items for one side, they are joined with line breaks in the order you chose.</string>
 	<string name="import_label_import_toggle">Import</string>
 	<string name="import_label_note_type_summary">Note type · %1$s cards · %2$s items</string>
+	<string name="import_label_note_type_count">Note type · %1$s cards</string>
 	<string name="import_label_front_fields">Items for the front</string>
 	<string name="import_label_back_fields">Items for the back</string>
 	<string name="import_label_cloze_banner">Cloze cards are created automatically</string>
@@ -303,6 +312,14 @@
 	<string name="import_label_cloze_fields">Items for the cloze sentence</string>
 	<string name="import_label_cloze_extra_fields">Items for the extra notes</string>
 	<string name="import_button_pick_fields">Choose items (%2$s of %1$s)</string>
+	<string name="import_label_fields_more">%1$s and %2$s more</string>
+	<string name="import_hint_pick_order">They are joined with line breaks in the order you chose.</string>
+	<string name="import_label_order">No. %1$s</string>
+	<string name="import_label_side_front">Front</string>
+	<string name="import_label_side_back">Back</string>
+	<string name="import_label_side_cloze">Cloze sentence</string>
+	<string name="import_label_side_extra">Extra notes</string>
+	<string name="import_label_in_side">Already in %1$s</string>
 	<string name="import_button_done">Done</string>
 	<string name="import_button_preview">Preview</string>
 	<string name="import_reason_mapping_no_type">Choose at least one note type to import.</string>
@@ -311,8 +328,8 @@
 	<string name="import_hint_image_occlusion">Image occlusion cards cannot be imported.</string>
 	<!-- import preview -->
 	<string name="import_title_preview">Preview</string>
-	<string name="import_summary_importable">%1$s cards to import</string>
-	<string name="import_summary_importable_over_limit">%1$s cards to import, over the limit</string>
+	<string name="import_summary_importable_label">Cards to import</string>
+	<string name="import_summary_importable_over_limit">Over %1$s cards</string>
 	<string name="import_label_stat_excluded">Excluded (both sides empty)</string>
 	<string name="import_label_stat_empty_filled">Empty side filled</string>
 	<string name="import_label_stat_truncated">Truncated (over 500 characters)</string>
@@ -330,6 +347,7 @@
 	<string name="import_label_change_truncated_both">Truncated · Front and back</string>
 	<string name="import_label_change_media_removed">Media removed</string>
 	<string name="import_hint_preview_empty_list">There are no cards to import.</string>
+	<string name="import_button_close">Close</string>
 	<string name="import_reason_preview_empty">There are no cards to import. Choose items that have content when mapping items.</string>
 	<string name="import_reason_preview_over_limit_xlsx">You can import up to %1$s cards at a time. Split the sheets or rows and save them as several files.</string>
 	<string name="import_reason_preview_over_limit_text">You can import up to %1$s cards at a time. Split the file into parts of %1$s lines or fewer and choose it again.</string>
@@ -381,6 +399,8 @@
 	<string name="import_dialog_empty_result_title">There are no cards to import</string>
 	<string name="import_dialog_empty_result_body">Check that there is content to turn into cards.</string>
 	<!-- import flow dialog -->
+	<string name="import_dialog_preview_failed_title">The preview couldn’t be created</string>
+	<string name="import_dialog_preview_failed_body">Please try again in a moment.</string>
 	<string name="import_dialog_discard_title">Discard the imported content?</string>
 	<string name="import_dialog_discard_body">If you go back to Import cards, the content that was read will be lost.</string>
 	<string name="import_dialog_deck_create_failed_title">The deck couldn’t be created</string>

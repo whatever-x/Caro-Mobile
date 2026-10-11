@@ -3,6 +3,7 @@ package com.whatever.caro.core.designsystem
 import io.kotest.assertions.withClue
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.collections.shouldBeEmpty
+import io.kotest.matchers.shouldBe
 
 class ImportStringsContractTest :
     FunSpec({
@@ -49,6 +50,19 @@ class ImportStringsContractTest :
             gapped.map { it.label }.shouldBeEmpty()
         }
 
+        test("ko 파일의 import_* 키는 문구 목록과 같은 집합이다") {
+            ImportStringsXml.importEntries(StringsLocale.Ko).keys shouldBe importKoCopy.keys
+        }
+
+        test("Figma 문구로 대체한 옛 키는 두 파일에 남지 않는다") {
+            val remaining =
+                StringsLocale.entries.flatMap { locale ->
+                    OBSOLETE_KEYS.filter { key -> key in ImportStringsXml.importEntries(locale).keys }.map { key -> "${locale.name}:$key" }
+                }
+
+            remaining.shouldBeEmpty()
+        }
+
         test("값에 실제 줄바꿈이 없다") {
             val multiline = localizedValues().filter { '\n' in it.value || '\r' in it.value }
 
@@ -80,6 +94,19 @@ class ImportStringsContractTest :
             untranslated.map { it.label }.shouldBeEmpty()
         }
     })
+
+// Figma 구성에 맞춰 다른 키로 대체한 것들이다. 남아 있으면 쓰이지 않는 문구가 파일에 쌓인다.
+private val OBSOLETE_KEYS =
+    listOf(
+        "import_hint_format_apkg",
+        "import_hint_format_anki_text",
+        "import_hint_format_quizlet",
+        "import_hint_format_xlsx",
+        "import_hint_paste_separator",
+        "import_hint_paste_mapping",
+        "import_summary_over_limit",
+        "import_summary_importable",
+    )
 
 private val LIMIT_NUMBER = Regex("""(?<![\d,])(10,?000|5,?000|1,?000,?000)(?![\d,])""")
 private val KEY_FORMAT = Regex("""import_[a-z0-9]+(_[a-z0-9]+)+""")
