@@ -1,5 +1,6 @@
 package com.whatever.caro.core.importparser
 
+import androidx.sqlite.driver.bundled.BundledSQLiteDriver
 import com.whatever.caro.core.importparser.archive.withTempWorkspace
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
@@ -26,12 +27,44 @@ class ParserBudgetTest : FunSpec() {
                     ImportParseErrorKind.TOO_MANY_COLUMNS
             }
 
-            test("노트 값 전체 길이가 값 길이 상한을 넘으면 값을 만들기 전에 멈춘다").config(enabled = nativeArchiveLibrariesLoadable) {
+            test("노트 값 전체 길이가 값 길이 상한을 넘으면 멈춘다").config(enabled = nativeArchiveLibrariesLoadable) {
                 val path = temp("long-flds.apkg")
                 TestAnki.legacy(path, fieldCount = 2, notes = listOf("x".repeat(50) + "\u001fy"))
 
                 shouldThrow<ImportParseException> { parse(path, Fixtures.options(maxFieldChars = 20)) }.kind shouldBe
                     ImportParseErrorKind.CONTENT_TOO_LONG
+            }
+
+            test("값이 NUL로 시작해 SQLite length()가 0이어도 바이트 길이가 상한의 3배를 넘으면 멈춘다")
+                .config(enabled = nativeArchiveLibrariesLoadable) {
+                    val path = temp("nul-flds-bytes.apkg")
+                    TestAnki.legacy(path, fieldCount = 1, notes = emptyList(), notesAndCardsSql = nulNotesSql(1_000))
+
+                    shouldThrow<ImportParseException> { parse(path, Fixtures.options(maxFieldChars = 100)) }.kind shouldBe
+                        ImportParseErrorKind.CONTENT_TOO_LONG
+                }
+
+            test("값이 NUL로 시작하고 바이트 길이가 상한의 3배 안이어도 읽은 글자 수가 상한을 넘으면 멈춘다")
+                .config(enabled = nativeArchiveLibrariesLoadable && keepsEmbeddedNul()) {
+                    val path = temp("nul-flds-chars.apkg")
+                    TestAnki.legacy(path, fieldCount = 1, notes = emptyList(), notesAndCardsSql = nulNotesSql(200))
+
+                    shouldThrow<ImportParseException> { parse(path, Fixtures.options(maxFieldChars = 100)) }.kind shouldBe
+                        ImportParseErrorKind.CONTENT_TOO_LONG
+                }
+
+            test("글자당 바이트가 큰 한글 노트도 글자 수가 상한과 같으면 읽는다").config(enabled = nativeArchiveLibrariesLoadable) {
+                val path = temp("korean-flds.apkg")
+                TestAnki.legacy(path, fieldCount = 1, notes = listOf("가".repeat(100)))
+
+                parse(path, Fixtures.options(maxFieldChars = 100)).rows.size shouldBe 1
+            }
+
+            test("최신 노트 유형 config가 크기 상한을 넘으면 멈춘다").config(enabled = nativeArchiveLibrariesLoadable) {
+                val path = temp("huge-config.apkg")
+                TestAnki.modern(path, fieldCount = 1, notes = listOf("a"), noteTypeConfigSql = "zeroblob(${9 * 1024 * 1024})")
+
+                shouldThrow<ImportParseException> { parse(path, Fixtures.options()) }.kind shouldBe ImportParseErrorKind.CONTENT_TOO_LONG
             }
         }
 
@@ -166,6 +199,15 @@ class ParserBudgetTest : FunSpec() {
                     ImportParseErrorKind.CONTENT_TOO_LONG
             }
 
+            test("NUL이 든 Anki 노트도 읽은 글자 수 합계가 예산을 넘으면 멈춘다").config(enabled = nativeArchiveLibrariesLoadable && keepsEmbeddedNul()) {
+                val path = temp("nul-chars.apkg")
+                TestAnki.legacy(path, fieldCount = 1, notes = emptyList(), notesAndCardsSql = nulNotesSql(9, 9, 9))
+
+                parse(path, Fixtures.options(maxTotalChars = 30)).rows.size shouldBe 3
+                shouldThrow<ImportParseException> { parse(path, Fixtures.options(maxTotalChars = 29)) }.kind shouldBe
+                    ImportParseErrorKind.CONTENT_TOO_LONG
+            }
+
             test("Anki 노트 글자 수 합계가 예산을 넘으면 멈춘다").config(enabled = nativeArchiveLibrariesLoadable) {
                 val path = temp("chars.apkg")
                 TestAnki.legacy(path, fieldCount = 2, notes = List(3) { "xxxxxxxxxx\u001fy" })
@@ -224,6 +266,28 @@ class ParserBudgetTest : FunSpec() {
     private fun returnFromWorkspace(parent: Path): Path {
         withTempWorkspace(Fixtures.fileSystem, parent) { directory -> return directory }
     }
+
+    // iOS 드라이버는 getText가 첫 NUL에서 끊긴 문자열을 돌려주므로, 읽은 글자 수는 NUL이 값에 남는 플랫폼에서만 시험한다.
+    private fun keepsEmbeddedNul(): Boolean =
+        BundledSQLiteDriver().open(":memory:").use { connection ->
+            connection.prepare("SELECT CAST(x'610062' AS TEXT)").use { statement ->
+                statement.step()
+                statement.getText(0).length == 3
+            }
+        }
+
+    // 값 앞에 내장 NUL(1글자)을 붙이고 길이를 [lengths]로 정한 노트를 만든다. SQLite length()는 NUL 앞까지만 세어 0이 된다.
+    private fun nulNotesSql(vararg lengths: Int): List<String> =
+        listOf(
+            "CREATE TABLE notes (id INTEGER, mid INTEGER, flds TEXT)",
+            "CREATE TABLE cards (nid INTEGER, did INTEGER, odid INTEGER, ord INTEGER)",
+        ) +
+            lengths.flatMapIndexed { index, length ->
+                listOf(
+                    "INSERT INTO notes VALUES (${index + 1}, 1, CAST(x'00' AS TEXT) || printf('%.*c', $length, 'x'))",
+                    "INSERT INTO cards VALUES (${index + 1}, 1, 0, 0)",
+                )
+            }
 
     private fun inlineCell(
         reference: String,

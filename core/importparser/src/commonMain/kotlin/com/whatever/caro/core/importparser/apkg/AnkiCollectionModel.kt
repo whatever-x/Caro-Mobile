@@ -30,6 +30,7 @@ internal data class AnkiCollectionModel(
         private const val STOCK_KIND_IMAGE_OCCLUSION = 6L
         private const val DECK_PATH_SEPARATOR = "::"
         private const val MODERN_DECK_SEPARATOR = '\u001f'
+        private const val MAX_NOTE_TYPE_CONFIG_BYTES = 8L * 1024 * 1024
 
         /** 항목 수가 [maxColumns]를 넘는 노트 유형이 있으면 노트마다 그만큼의 값 맵이 생기므로 읽는 중에 멈춘다. */
         fun readModern(
@@ -46,9 +47,16 @@ internal data class AnkiCollectionModel(
                 }
             }
             val noteTypes = HashMap<Long, AnkiNoteType>()
-            database.query("SELECT id, name, config FROM notetypes") { statement ->
+            database.query("SELECT id, name, config, octet_length(config) FROM notetypes") { statement ->
                 while (statement.step()) {
                     val id = statement.getLong(0)
+                    // getBlob은 값 전체를 힙에 올리므로 올리기 전에 크기로 거른다.
+                    if (statement.getLong(3) > MAX_NOTE_TYPE_CONFIG_BYTES) {
+                        throw ImportParseException(
+                            ImportParseErrorKind.CONTENT_TOO_LONG,
+                            "note type config over $MAX_NOTE_TYPE_CONFIG_BYTES bytes",
+                        )
+                    }
                     val config = ProtobufVarints.read(if (statement.isNull(2)) ByteArray(0) else statement.getBlob(2))
                     noteTypes[id] =
                         AnkiNoteType(

@@ -167,7 +167,8 @@ internal class ApkgReader(
         var imageOcclusion = 0
         var cells = 0
         var chars = 0L
-        database.query("SELECT id, mid, flds, length(flds) FROM notes ORDER BY id") { statement ->
+        val maxNoteBytes = options.maxFieldChars.toLong() * MAX_UTF8_BYTES_PER_CHAR
+        database.query("SELECT id, mid, flds, octet_length(flds) FROM notes ORDER BY id") { statement ->
             while (rows.size < options.maxRows && statement.step()) {
                 // 선택에서 빠지는 노트가 계속 이어져도 취소를 알아차리도록 행마다 확인한다.
                 archive.ensureActive()
@@ -179,14 +180,16 @@ internal class ApkgReader(
                     imageOcclusion++
                     continue
                 }
-                // 값 문자열을 만들기 전에 길이로 거른다. 한 노트가 수백 MB면 읽는 순간 메모리가 넘친다.
-                val noteChars = statement.getLong(3)
-                if (noteChars > options.maxFieldChars) throw contentTooLong("note over ${options.maxFieldChars} chars")
-                chars += noteChars
-                if (chars > options.maxTotalChars) throw contentTooLong("table over ${options.maxTotalChars} chars")
+                // 값 문자열을 만들기 전에 바이트 길이로 거른다. 한 노트가 수백 MB면 읽는 순간 메모리가 넘친다.
+                // length()는 내장 NUL에서 세기를 멈춰 값 앞에 NUL을 두면 0이 되므로 쓰지 않는다.
+                if (statement.getLong(3) > maxNoteBytes) throw contentTooLong("note over ${options.maxFieldChars} chars")
                 cells += type.fieldNames.size
                 if (cells > options.maxCells) throw contentTooLong("table over ${options.maxCells} cells")
-                val values = statement.getText(2).split(FIELD_SEPARATOR)
+                val text = statement.getText(2)
+                if (text.length > options.maxFieldChars) throw contentTooLong("note over ${options.maxFieldChars} chars")
+                chars += text.length
+                if (chars > options.maxTotalChars) throw contentTooLong("table over ${options.maxTotalChars} chars")
+                val values = text.split(FIELD_SEPARATOR)
                 if (values.size != type.fieldNames.size) mismatches++
                 val fields = type.fieldNames.withIndex().associate { (index, name) -> name to values.getOrElse(index) { "" } }
                 rows += ParsedRow(statement.getLong(1).toString(), subdeckId, fields)
@@ -201,5 +204,8 @@ internal class ApkgReader(
     private companion object {
         const val COLLECTION_FILE = "collection.sqlite"
         const val FIELD_SEPARATOR = '\u001f'
+
+        // UTF-8은 UTF-16 글자 하나를 최대 3바이트로 인코딩한다.
+        const val MAX_UTF8_BYTES_PER_CHAR = 3
     }
 }

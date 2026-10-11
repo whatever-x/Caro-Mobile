@@ -12,6 +12,7 @@ import okio.use
 /**
  * 노트 유형 항목 수와 노트 값 길이를 마음대로 정한 작은 Anki 패키지를 만든다. 실제 Anki 내보내기에 없는 악성 구조를 재현하려고 쓴다.
  * [notesAndCardsSql]을 주면 notes와 cards를 만드는 기본 문장 대신 그 문장을 순서대로 실행한다.
+ * 최신 형식은 [noteTypeConfigSql]로 노트 유형 `config` 열의 값 식을 바꿀 수 있다.
  */
 internal object TestAnki {
     private const val NOTE_TYPE_ID = 1L
@@ -43,13 +44,14 @@ internal object TestAnki {
         fieldCount: Int,
         notes: List<String>,
         notesAndCardsSql: List<String>? = null,
+        noteTypeConfigSql: String = "x''",
     ) {
         val database =
             buildDatabase(path) { connection ->
                 connection.execSQL("CREATE TABLE notetypes (id INTEGER, name TEXT, config BLOB)")
                 connection.execSQL("CREATE TABLE fields (ntid INTEGER, ord INTEGER, name TEXT)")
                 connection.execSQL("CREATE TABLE decks (id INTEGER, name TEXT)")
-                connection.execSQL("INSERT INTO notetypes VALUES ($NOTE_TYPE_ID, 'T', x'')")
+                connection.execSQL("INSERT INTO notetypes VALUES ($NOTE_TYPE_ID, 'T', $noteTypeConfigSql)")
                 connection.execSQL("INSERT INTO decks VALUES ($DECK_ID, 'D')")
                 repeat(fieldCount) { index -> connection.execSQL("INSERT INTO fields VALUES ($NOTE_TYPE_ID, $index, 'f$index')") }
                 insertNotesAndCards(connection, notes, notesAndCardsSql)
