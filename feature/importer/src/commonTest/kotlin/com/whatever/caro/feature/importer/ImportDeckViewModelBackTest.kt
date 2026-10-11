@@ -13,6 +13,7 @@ import com.whatever.caro.feature.importer.mvi.ImportStep
 import com.whatever.caro.feature.importer.support.FakeImportSourceReader
 import com.whatever.caro.feature.importer.support.FakeImportTempStorage
 import com.whatever.caro.feature.importer.support.FakePickedImportFile
+import com.whatever.caro.feature.importer.support.GatedDispatcher
 import com.whatever.caro.feature.importer.support.ImportTestTables
 import com.whatever.caro.feature.importer.support.ImportViewModelHarness
 import com.whatever.caro.feature.importer.support.ImportViewModelRig
@@ -22,6 +23,7 @@ import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 
 /** 선택 단계의 뒤로 가기와 버림 확인, 중복 입력 무시, 임시 파일 정리 시점을 확인한다. */
@@ -152,28 +154,58 @@ class ImportDeckViewModelBackTest : FunSpec() {
             }
         }
 
-        test("ViewModel을 만들 때 caro-import에 남은 파일을 비운다") {
+        test("ViewModel을 만들 때 이전 실행이 남긴 다른 화면의 임시 디렉터리를 비운다") {
             runTest(rig.dispatcher) {
                 val tempStorage = FakeImportTempStorage.create()
-                tempStorage.plantLeftover()
+                val previous = tempStorage.plantPreviousSession()
 
                 rig.create(tempStorage = tempStorage)
                 advanceUntilIdle()
 
-                tempStorage.regularFiles().shouldBeEmpty()
+                tempStorage.exists(previous) shouldBe false
             }
         }
 
-        test("ViewModelStore를 비우면 onCleared가 caro-import를 비운다") {
+        test("ViewModel을 만드는 호출에서는 디스크 정리를 하지 않고 io 디스패처가 일할 때 한다") {
             runTest(rig.dispatcher) {
-                val harness = rig.create()
+                val io = GatedDispatcher(rig.dispatcher)
+                io.hold()
+                val tempStorage = FakeImportTempStorage.create()
+                val previous = tempStorage.plantPreviousSession()
+
+                rig.create(tempStorage = tempStorage, ioDispatcher = io)
+                runCurrent()
+
+                tempStorage.exists(previous) shouldBe true
+
+                io.release()
+                advanceUntilIdle()
+
+                tempStorage.exists(previous) shouldBe false
+            }
+        }
+
+        test("ViewModelStore를 비우면 onCleared가 io 디스패처에서 이 화면의 디렉터리만 비운다") {
+            runTest(rig.dispatcher) {
+                val io = GatedDispatcher(rig.dispatcher)
+                val harness = rig.create(ioDispatcher = io)
                 val store = ViewModelStore()
                 ViewModelProvider.create(store, viewModelFactory { initializer { harness.viewModel } })[ImportDeckViewModel::class]
+                advanceUntilIdle()
                 harness.tempStorage.plantLeftover()
+                val otherScreen = harness.tempStorage.plantPreviousSession()
+                io.hold()
 
                 store.clear()
+                runCurrent()
+
+                harness.tempStorage.regularFiles().isEmpty() shouldBe false
+
+                io.release()
+                advanceUntilIdle()
 
                 harness.tempStorage.regularFiles().shouldBeEmpty()
+                harness.tempStorage.exists(otherScreen) shouldBe true
             }
         }
     }

@@ -36,6 +36,14 @@ class ParseOptionsFactoryTest : FunSpec() {
             generateSequence(tempDirectory) { path -> path.parent }.contains(root) shouldBe true
         }
 
+        test("임시 디렉터리를 넘기면 그 디렉터리를 그대로 쓴다") {
+            val sessionDirectory = FileSystem.SYSTEM_TEMPORARY_DIRECTORY / "caro-import" / "session-1a2b"
+
+            val options = buildParseOptions(limits = ImportLimitsConfig(), dateStyle = DATE_STYLE, tempDirectory = sessionDirectory)
+
+            options.tempDirectory shouldBe sessionDirectory
+        }
+
         test("CP949 디코더를 넣어 UTF-8이 아닌 한국어 파일이 인코딩 오류로 멈추지 않게 한다") {
             val options = buildParseOptions(limits = ImportLimitsConfig(), dateStyle = DATE_STYLE)
 

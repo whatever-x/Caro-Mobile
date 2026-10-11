@@ -3,6 +3,7 @@ package com.whatever.caro.feature.importer.source
 import io.kotest.assertions.throwables.shouldNotThrowAny
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
 import okio.FileSystem
 import okio.Path
 import kotlin.random.Random
@@ -99,13 +100,72 @@ class ImportTempStorageTest : FunSpec() {
             }
         }
 
-        test("기본 위치는 시스템 임시 디렉터리의 caro-import다") {
-            val storage = ImportTempStorage()
-            val path = storage.newFile()
+        test("기본 위치는 시스템 임시 디렉터리의 caro-import 아래 화면마다 다른 디렉터리다") {
+            val first = ImportTempStorage()
+            val second = ImportTempStorage()
+            val firstPath = first.newFile()
+            val secondPath = second.newFile()
             try {
-                path.parent shouldBe FileSystem.SYSTEM_TEMPORARY_DIRECTORY / "caro-import"
+                val base = FileSystem.SYSTEM_TEMPORARY_DIRECTORY / "caro-import"
+                firstPath.parent?.parent shouldBe base
+                secondPath.parent?.parent shouldBe base
+                firstPath.parent shouldNotBe secondPath.parent
             } finally {
-                storage.delete(path)
+                first.clearAll()
+                second.clearAll()
+            }
+        }
+
+        test("clearAll은 같은 caro-import 아래 다른 화면의 디렉터리를 건드리지 않는다") {
+            withSandbox { sandbox ->
+                val base = sandbox / "caro-import"
+                val mine = ImportTempStorage(fileSystem, base / "session-mine")
+                val other = ImportTempStorage(fileSystem, base / "session-other")
+                val minePath = mine.newFile().also { path -> fileSystem.write(path) { writeUtf8("a") } }
+                val otherPath = other.newFile().also { path -> fileSystem.write(path) { writeUtf8("b") } }
+
+                mine.clearAll()
+
+                fileSystem.exists(minePath) shouldBe false
+                fileSystem.exists(otherPath) shouldBe true
+            }
+        }
+
+        test("clearStale은 오래된 다른 화면의 디렉터리만 지우고 자기 디렉터리와 이름이 다른 형제는 남긴다") {
+            withSandbox { sandbox ->
+                val base = sandbox / "caro-import"
+                val storage = ImportTempStorage(fileSystem, base / "session-mine", staleAfterMillis = 0L)
+                fileSystem.createDirectories(base / "session-old")
+                fileSystem.write(base / "session-old" / "copy-1") { writeUtf8("old") }
+                fileSystem.write(base / "unrelated.txt") { writeUtf8("keep") }
+                val own = storage.newFile().also { path -> fileSystem.write(path) { writeUtf8("own") } }
+
+                storage.clearStale()
+
+                fileSystem.exists(base / "session-old") shouldBe false
+                fileSystem.exists(own) shouldBe true
+                fileSystem.exists(base / "unrelated.txt") shouldBe true
+            }
+        }
+
+        test("clearStale은 기준 시간보다 새로 만든 다른 화면의 디렉터리를 남긴다") {
+            withSandbox { sandbox ->
+                val base = sandbox / "caro-import"
+                val storage = ImportTempStorage(fileSystem, base / "session-mine", staleAfterMillis = 60L * 60 * 1000)
+                fileSystem.createDirectories(base / "session-fresh")
+                fileSystem.write(base / "session-fresh" / "copy-1") { writeUtf8("live") }
+
+                storage.clearStale()
+
+                fileSystem.exists(base / "session-fresh" / "copy-1") shouldBe true
+            }
+        }
+
+        test("clearStale은 디렉터리가 아직 없어도 던지지 않는다") {
+            withSandbox { sandbox ->
+                val storage = ImportTempStorage(fileSystem, sandbox / "caro-import" / "session-mine")
+
+                shouldNotThrowAny { storage.clearStale() }
             }
         }
     }

@@ -43,7 +43,17 @@ internal class ParserImportSourceReader(
         parser.parseFile(
             path = path,
             sourceName = sourceName,
-            options = buildParseOptions(limits, dateStyle, subdeckIds, sheetIndex, delimiter, hasHeaderRow),
+            // 사본이 있는 화면 전용 디렉터리에 파서 작업 파일을 둬야 화면 정리와 함께 지워진다.
+            options =
+                buildParseOptions(
+                    limits,
+                    dateStyle,
+                    subdeckIds,
+                    sheetIndex,
+                    delimiter,
+                    hasHeaderRow,
+                    path.parent ?: ImportTempStorage.DEFAULT_ROOT,
+                ),
         )
 
     override suspend fun readText(

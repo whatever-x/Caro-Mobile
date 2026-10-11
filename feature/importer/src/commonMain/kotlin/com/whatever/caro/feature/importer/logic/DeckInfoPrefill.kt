@@ -15,7 +15,7 @@ internal data class DeckInfoPrefill(
 
 /**
  * 붙여넣기는 이름과 설명 어디에도 붙여 넣은 내용을 쓰지 않는다. sourceName은 앱 언어 문구로 정해 넘어온 값이다.
- * [fileDescriptionTemplate]의 `{file}` 자리에는 확장자를 포함한 파일 이름이 들어간다.
+ * [fileDescriptionTemplate]의 `{file}` 자리에는 확장자를 포함하고 120자로 줄인 파일 이름이 들어간다. 줄이지 않으면 템플릿 뒷부분이 500자 제한에 잘린다.
  */
 internal fun deckInfoPrefill(
     table: ParsedTable,
@@ -25,7 +25,15 @@ internal fun deckInfoPrefill(
     pasteDescription: String,
 ): DeckInfoPrefill {
     val name = if (isPaste) table.sourceName else fileDeckName(table, selection)
-    val description = if (isPaste) pasteDescription else fileDescriptionTemplate.replace(FILE_PLACEHOLDER, table.sourceName)
+    val description =
+        if (isPaste) {
+            pasteDescription
+        } else {
+            fileDescriptionTemplate.replace(
+                FILE_PLACEHOLDER,
+                truncateFileName(table.sourceName),
+            )
+        }
     return DeckInfoPrefill(
         name = name.takeWithoutSplittingSurrogate(DeckInputLimits.NAME_MAX),
         description = description.takeWithoutSplittingSurrogate(DeckInputLimits.DESC_MAX),

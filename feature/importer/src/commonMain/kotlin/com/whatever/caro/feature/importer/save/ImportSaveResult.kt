@@ -41,7 +41,7 @@ internal sealed class ChunkFailure(
 }
 
 internal sealed interface ImportSaveOutcome {
-    /** 이번 호출에서 저장한 장수다. */
+    /** 이번 호출에서 저장한 장수다. 이전 호출 몫은 호출자가 더해 쓰고, 장수가 다른 묶음에서 만들어진 장수는 이미 더해져 있다. */
     val savedCards: Int
 
     data class Completed(

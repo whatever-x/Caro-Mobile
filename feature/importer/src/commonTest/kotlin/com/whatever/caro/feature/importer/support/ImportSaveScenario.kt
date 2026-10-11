@@ -15,6 +15,7 @@ import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
 import dev.mokkery.mock
 import io.kotest.matchers.shouldBe
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -58,6 +59,7 @@ internal fun TestScope.saveScenario(
     total: Int = 3,
     coordinatorFactory: ImportSaveCoordinatorFactory? = null,
     exceptionFilter: ExceptionFilter = ExceptionFilter.None,
+    defaultDispatcher: CoroutineDispatcher = rig.dispatcher,
 ): SaveScenario {
     val deckRepository = savedDeckRepository()
     val harness =
@@ -69,6 +71,7 @@ internal fun TestScope.saveScenario(
                 coordinatorFactory
                     ?: ImportSaveCoordinatorFactory { ImportSaveCoordinator(deckRepository, cards, timeSource = testScheduler.timeSource) },
             exceptionFilter = exceptionFilter,
+            defaultDispatcher = defaultDispatcher,
         )
     openMappingFromFile(harness, "words.txt")
     openPreview(harness)

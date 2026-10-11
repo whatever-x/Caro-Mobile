@@ -9,6 +9,7 @@ import kotlinx.collections.immutable.persistentMapOf
 
 /**
  * [table]은 단계가 공유하는 큰 파싱 결과라 rememberSaveable에 넣지 않는다.
+ * [pendingSelection]은 다시 읽는 동안 사용자가 고른 값이다. 읽는 중에 이어서 바꾸는 선택이 먼저 고른 값을 잃지 않으려면 이 값에서 시작해야 한다.
  * [mappings]는 미리보기 계산이 받는 모양대로 noteTypeId를 키로 둔다.
  */
 data class ImportDeckState(
@@ -19,6 +20,7 @@ data class ImportDeckState(
     val pasteText: String = "",
     val table: ParsedTable? = null,
     val selection: ImportSelection = ImportSelection(),
+    val pendingSelection: ImportSelection? = null,
     val mappings: PersistentMap<String, FieldMapping> = persistentMapOf(),
     val preview: ImportPreview? = null,
     val previewFilter: ImportPreviewFilter = ImportPreviewFilter.All,
@@ -27,7 +29,6 @@ data class ImportDeckState(
     val saving: SavingProgress? = null,
     val dialog: ImportDialog? = null,
 ) : UiState {
-    /** 읽는 중, 선택기가 열린 중, 덱 생성 중, 저장 중에는 실행 버튼을 다시 누를 수 없다. */
     val isBusy: Boolean
         get() = loading != null || isPickerOpen || saving != null || step == ImportStep.CreatingDeck
 

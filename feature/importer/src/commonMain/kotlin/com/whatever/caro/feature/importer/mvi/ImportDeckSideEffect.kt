@@ -18,7 +18,6 @@ sealed interface ImportDeckSideEffect : UiSideEffect {
         val completed: Boolean,
     ) : ImportDeckSideEffect
 
-    /** 서버가 이름이나 설명 값을 거절했다. */
     data object ShowDeckInputError : ImportDeckSideEffect
 
     data object ShowDeckCreateError : ImportDeckSideEffect

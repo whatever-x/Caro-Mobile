@@ -119,10 +119,11 @@ internal class ImportViewModelRig {
         defaultDispatcher: CoroutineDispatcher = dispatcher,
         saveCoordinatorFactory: ImportSaveCoordinatorFactory? = null,
         exceptionFilter: ExceptionFilter = ExceptionFilter.None,
+        ioDispatcher: CoroutineDispatcher = dispatcher,
     ): ImportViewModelHarness {
         sandboxes += tempStorage
         return ImportViewModelFactory.create(
-            dispatcher,
+            ioDispatcher,
             reader,
             tempStorage,
             limits,

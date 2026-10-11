@@ -1,13 +1,14 @@
 package com.whatever.caro.feature.importer
 
+import com.whatever.caro.core.importparser.ImportParseException
 import com.whatever.caro.core.importparser.SpreadsheetDateStyle
 import com.whatever.caro.core.importparser.model.ImportFormat
 import com.whatever.caro.core.importparser.model.ParsedTable
 import com.whatever.caro.core.model.deck.Deck
 import com.whatever.caro.core.model.deck.DeckInputLimits
+import com.whatever.caro.core.model.importing.FieldMapping
 import com.whatever.caro.core.viewmodel.BaseViewModel
 import com.whatever.caro.core.viewmodel.ExceptionFilter
-import com.whatever.caro.feature.importer.logic.SaveOutcomeAction
 import com.whatever.caro.feature.importer.logic.classifyPick
 import com.whatever.caro.feature.importer.logic.deckInfoPrefill
 import com.whatever.caro.feature.importer.logic.importableNoteTypes
@@ -21,7 +22,6 @@ import com.whatever.caro.feature.importer.logic.pasteBlockReason
 import com.whatever.caro.feature.importer.logic.pickFailedDialog
 import com.whatever.caro.feature.importer.logic.previewBlockReason
 import com.whatever.caro.feature.importer.logic.readFailureDialog
-import com.whatever.caro.feature.importer.logic.resolveSaveOutcome
 import com.whatever.caro.feature.importer.logic.selectionStep
 import com.whatever.caro.feature.importer.logic.summarizeSubdeckSelection
 import com.whatever.caro.feature.importer.logic.takeWithoutSplittingSurrogate
@@ -37,17 +37,11 @@ import com.whatever.caro.feature.importer.mvi.ImportPreviewFilter
 import com.whatever.caro.feature.importer.mvi.ImportSelection
 import com.whatever.caro.feature.importer.mvi.ImportStep
 import com.whatever.caro.feature.importer.mvi.SavingProgress
-import com.whatever.caro.feature.importer.mvi.SavingStatus
 import com.whatever.caro.feature.importer.platform.PickResult
 import com.whatever.caro.feature.importer.platform.PickedImportFile
-import com.whatever.caro.feature.importer.save.ChunkFailure
 import com.whatever.caro.feature.importer.save.DeckCreationResult
-import com.whatever.caro.feature.importer.save.ImportChunk
 import com.whatever.caro.feature.importer.save.ImportSaveCoordinator
 import com.whatever.caro.feature.importer.save.ImportSaveCoordinatorFactory
-import com.whatever.caro.feature.importer.save.ImportSaveOutcome
-import com.whatever.caro.feature.importer.save.ImportSaveProgress
-import com.whatever.caro.feature.importer.save.UserRetry
 import com.whatever.caro.feature.importer.source.ImportCopyResult
 import com.whatever.caro.feature.importer.source.ImportDispatchers
 import com.whatever.caro.feature.importer.source.ImportFileCopy
@@ -59,17 +53,23 @@ import com.whatever.caro.feature.importer.transform.ImportCard
 import com.whatever.caro.feature.importer.transform.ImportPreviewBuilder
 import com.whatever.caro.feature.importer.transform.defaultFieldMappings
 import com.whatever.caro.feature.importer.transform.toCardContent
+import io.github.aakira.napier.Napier
+import kotlinx.collections.immutable.persistentMapOf
 import kotlinx.collections.immutable.toPersistentMap
 import kotlinx.collections.immutable.toPersistentSet
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 private const val APKG_EXTENSION = "apkg"
 
 // 이름이나 설명 값을 거절한 서버 코드. 그 밖의 거절은 입력을 고쳐도 소용없어 안내 문구가 다르다.
 private val DECK_INPUT_ERROR_CODES = setOf("C001", "C002")
+
+private val MAPPING_TARGETS = setOf(FieldMapping.FRONT, FieldMapping.BACK)
 
 class ImportDeckViewModel internal constructor(
     private val sourceReader: ImportSourceReader,
@@ -88,24 +88,28 @@ class ImportDeckViewModel internal constructor(
     // 선택 단계에서 돌아왔을 때 고친 연결을 이어 쓸지 가리는 기준이다. 연결을 만든 시점의 노트 유형별 항목 이름을 둔다.
     private var mappedFieldNames: Map<String, List<String>> = emptyMap()
 
-    // 덱 정보 미리 채움은 읽은 원본마다 한 번이다. 새로 읽으면 다시 채워야 하므로 읽기 성공 시점에 내린다.
+    // 덱 정보 미리 채움은 이름이 달라질 수 있는 읽기(첫 읽기, 하위 덱 행 읽기, 시트 변경)가 성공했을 때만 내린다.
+    // 구분자와 제목 행 변경은 이름이 같으므로 내리지 않아야 사용자가 고친 이름이 남는다.
     private var isDeckInfoPrefilled = false
 
-    // 저장 흐름 하나(덱 만들기부터 이동까지)가 쓰는 값이다. 묶음 목록과 키는 화면에 보이지 않으므로 상태에 넣지 않는다.
-    private var saveCoordinator: ImportSaveCoordinator? = null
-    private var savedDeck: Deck? = null
-    private var chunks: List<ImportChunk> = emptyList()
+    private var saveSession: ImportSaveSession? = null
 
-    // 이전 저장 호출들이 덱에 저장한 장수다. 다시 시도한 호출의 결과에는 이 값을 더해 쓴다.
-    private var savedCards = 0
-    private var stopRequested = false
+    private val saveHost =
+        object : ImportSaveHost {
+            override val state: ImportDeckState get() = currentState
 
-    // 실패 대화상자를 띄운 채 사용자 선택을 기다리는 중인 저장. 이동하거나 다시 시도하면 비워 같은 선택이 두 번 처리되지 않게 한다.
-    private var stalledSave: StalledSave? = null
+            override fun reduce(transform: ImportDeckState.() -> ImportDeckState) = this@ImportDeckViewModel.reduce(transform)
+
+            override fun postSideEffect(effect: ImportDeckSideEffect) = this@ImportDeckViewModel.postSideEffect(effect)
+
+            override fun launch(block: suspend () -> Unit) {
+                this@ImportDeckViewModel.launch { block() }
+            }
+        }
 
     init {
-        // 비동기로 지우면 첫 복사와 겹칠 수 있어, 생성 시점에 이전 실행이 남긴 파일을 동기로 지운다.
-        tempStorage.clearAll()
+        // 이 화면의 디렉터리는 건드리지 않으므로 첫 복사와 겹치지 않는다. 디스크 작업이라 main에서 하지 않는다.
+        launch(dispatchers.io) { tempStorage.clearStale() }
     }
 
     override suspend fun handleIntent(intent: ImportDeckIntent) {
@@ -134,35 +138,42 @@ class ImportDeckViewModel internal constructor(
             ImportDeckIntent.ClickCreateDeck -> onClickCreateDeck()
             ImportDeckIntent.RetryCreateDeck -> onRetryCreateDeck()
             ImportDeckIntent.ConfirmDiscard -> onConfirmDiscard()
-            ImportDeckIntent.ClickStop -> requestStop()
-            ImportDeckIntent.ConfirmStop -> onConfirmStop()
-            ImportDeckIntent.RetrySave -> onRetrySave()
-            ImportDeckIntent.ClickViewDeck -> onClickViewDeck()
-            ImportDeckIntent.ClickGoHome -> onClickGoHome()
-            else -> Unit
+            ImportDeckIntent.ClickStop -> saveSession?.requestStop()
+            ImportDeckIntent.ConfirmStop -> saveSession?.confirmStop()
+            ImportDeckIntent.RetrySave -> saveSession?.retry()
+            ImportDeckIntent.ClickViewDeck -> saveSession?.viewDeck()
+            ImportDeckIntent.ClickGoHome -> saveSession?.goHome()
+            is ImportDeckIntent.ClickCard -> onClickCard(intent.card)
         }
     }
 
     override fun onCleared() {
-        tempStorage.clearAll()
+        // viewModelScope는 이미 취소됐고, 디스크 작업을 main에서 하지 않으려고 별도 scope에서 지운다.
+        CoroutineScope(dispatchers.io).launch { tempStorage.clearAll() }
         super.onCleared()
     }
 
     private fun onClickBack() {
         val state = currentState
+        // 대화상자의 닫기 규칙을 거쳐야 닫을 수 없는 대화상자가 뒤로 가기에 닫히지 않는다.
+        if (state.dialog != null) {
+            onDismissDialog()
+            return
+        }
         when (state.loading) {
             is ImportLoading.Parsing -> {
                 abortFirstRead()
             }
 
+            // 선택한 파일의 이름과 크기를 읽는 동안에는 아직 loading이 없어, 그대로 두면 읽기를 취소하지 않고 화면을 나간다.
             null -> {
-                goBackFromStep(state)
+                if (state.step == ImportStep.Source && readJob?.isActive == true) abortFirstRead() else goBackFromStep(state)
             }
 
             // 다시 읽기는 취소해도 선택을 확정하기 전이라 바꾸기 전 선택이 그대로 남는다.
             else -> {
                 cancelRead()
-                reduce { copy(loading = null) }
+                reduce { copy(loading = null, pendingSelection = null) }
             }
         }
     }
@@ -176,7 +187,7 @@ class ImportDeckViewModel internal constructor(
             ImportStep.Mapping -> state.table?.let { table -> reduce { copy(step = selectionStep(table.format)) } }
             ImportStep.Preview -> reduce { copy(step = ImportStep.Mapping, preview = null, previewFilter = ImportPreviewFilter.All) }
             ImportStep.DeckInfo -> reduce { copy(step = ImportStep.Preview) }
-            ImportStep.Saving -> requestStop()
+            ImportStep.Saving -> saveSession?.requestStop()
             else -> Unit
         }
     }
@@ -225,7 +236,12 @@ class ImportDeckViewModel internal constructor(
         reduce { copy(pasteText = text) }
     }
 
-    private fun onFilePicked(intent: ImportDeckIntent.FilePicked) {
+    private suspend fun onFilePicked(intent: ImportDeckIntent.FilePicked) {
+        // 프로세스가 죽은 뒤 다시 전달된 결과도 받아야 하므로 isPickerOpen이 아니라 단계로 거른다.
+        if (currentState.step != ImportStep.Source) {
+            (intent.result as? PickResult.Picked)?.let { picked -> withContext(NonCancellable + dispatchers.io) { picked.file.discard() } }
+            return
+        }
         when (val result = intent.result) {
             PickResult.Cancelled -> {
                 reduce { copy(isPickerOpen = false) }
@@ -238,6 +254,7 @@ class ImportDeckViewModel internal constructor(
             }
 
             is PickResult.Failed -> {
+                Napier.w(throwable = result.cause) { "import file pick failed" }
                 reduce { copy(isPickerOpen = false, dialog = pickFailedDialog(extension = "")) }
             }
 
@@ -299,6 +316,7 @@ class ImportDeckViewModel internal constructor(
     }
 
     private fun onFirstRead(table: ParsedTable) {
+        isDeckInfoPrefilled = false
         if (isEmptyImport(table)) {
             failRead(ImportDialog.EmptyResult(currentState.isPaste))
             return
@@ -348,13 +366,13 @@ class ImportDeckViewModel internal constructor(
     private fun onSelectDelimiter(delimiter: Char) {
         val state = currentState
         if (state.step != ImportStep.TextCheck) return
-        rereadSelection(state.selection.copy(delimiter = delimiter))
+        rereadSelection((state.pendingSelection ?: state.selection).copy(delimiter = delimiter))
     }
 
     private fun onChangeHeaderRow(hasHeaderRow: Boolean) {
         val state = currentState
         if (state.step != ImportStep.SheetSelect && state.step != ImportStep.TextCheck) return
-        rereadSelection(state.selection.copy(hasHeaderRow = hasHeaderRow))
+        rereadSelection((state.pendingSelection ?: state.selection).copy(hasHeaderRow = hasHeaderRow))
     }
 
     private fun onClickSelectionNext() {
@@ -378,18 +396,21 @@ class ImportDeckViewModel internal constructor(
         reduce { copy(loading = ImportLoading.Reparsing(read.name)) }
         startRead(
             read = { read.read(sourceReader, dispatchers, subdeckIds = selection.subdeckIds) },
-            onRead = ::enterMapping,
+            onRead = { reread ->
+                isDeckInfoPrefilled = false
+                enterMapping(reread)
+            },
         )
     }
 
-    /** [candidate]는 읽기가 성공했을 때만 [ImportDeckState.selection]이 된다. [confirm]은 읽은 표로 확정할 값을 고친다. */
+    /** [candidate]는 읽기가 성공했을 때만 [ImportDeckState.selection]이 되고 그때까지 [ImportDeckState.pendingSelection]에 둔다. [confirm]은 읽은 표로 확정할 값을 고친다. */
     private fun rereadSelection(
         candidate: ImportSelection,
         confirm: ImportSelection.(ParsedTable) -> ImportSelection = { this },
     ) {
         val read = source ?: return
         val loading = if (currentState.step == ImportStep.TextCheck) ImportLoading.TextReparsing else ImportLoading.Reparsing(read.name)
-        reduce { copy(loading = loading) }
+        reduce { copy(loading = loading, pendingSelection = candidate) }
         startRead(
             read = {
                 read.read(
@@ -400,7 +421,11 @@ class ImportDeckViewModel internal constructor(
                     hasHeaderRow = candidate.hasHeaderRow,
                 )
             },
-            onRead = { reread -> reduce { copy(loading = null, table = reread, selection = candidate.confirm(reread)) } },
+            onRead = { reread ->
+                // 시트 이름이 덱 이름에 들어가므로 시트가 바뀐 경우에만 덱 정보를 다시 채운다.
+                if (candidate.sheetIndex != currentState.selection.sheetIndex) isDeckInfoPrefilled = false
+                reduce { copy(loading = null, table = reread, selection = candidate.confirm(reread), pendingSelection = null) }
+            },
         )
     }
 
@@ -428,8 +453,11 @@ class ImportDeckViewModel internal constructor(
 
     private fun onToggleField(intent: ImportDeckIntent.ToggleField) {
         val state = currentState
+        val table = state.table ?: return
         val mapping = state.mappings[intent.noteTypeId]
-        if (state.step != ImportStep.Mapping || mapping == null) return
+        val type = importableNoteTypes(table).firstOrNull { candidate -> candidate.id == intent.noteTypeId }
+        if (state.step != ImportStep.Mapping || mapping == null || type == null) return
+        if (intent.target !in MAPPING_TARGETS || intent.fieldName !in type.fieldNames) return
         val toggled = toggleField(mapping, intent.target, intent.fieldName).mapping
         reduce { copy(mappings = mappings.put(intent.noteTypeId, toggled)) }
     }
@@ -442,12 +470,27 @@ class ImportDeckViewModel internal constructor(
         val ticket = nextTicket()
         readJob =
             launch {
-                val preview =
-                    withContext(dispatchers.default) {
-                        previewBuilder.build(table, state.mappings, emptySideText, limits.maxCards)
+                try {
+                    val preview =
+                        withContext(dispatchers.default) {
+                            previewBuilder.build(table, state.mappings, emptySideText, limits.maxCards)
+                        }
+                    if (ticket == generation) {
+                        reduce {
+                            copy(
+                                loading = null,
+                                step = ImportStep.Preview,
+                                preview = preview,
+                                previewFilter = ImportPreviewFilter.All,
+                            )
+                        }
                     }
-                if (ticket == generation) {
-                    reduce { copy(loading = null, step = ImportStep.Preview, preview = preview, previewFilter = ImportPreviewFilter.All) }
+                } catch (cancellation: CancellationException) {
+                    throw cancellation
+                } catch (error: Exception) {
+                    // 오버레이가 남으면 뒤로 가기를 뺀 모든 입력이 막힌다. 연결 단계에 머물러 다시 누를 수 있게 한다.
+                    Napier.e(throwable = error) { "import preview build failed" }
+                    if (ticket == generation) reduce { copy(loading = null) }
                 }
             }
     }
@@ -455,6 +498,12 @@ class ImportDeckViewModel internal constructor(
     private fun onSelectPreviewFilter(filter: ImportPreviewFilter) {
         if (currentState.step != ImportStep.Preview) return
         reduce { copy(previewFilter = filter) }
+    }
+
+    private fun onClickCard(card: ImportCard) {
+        val state = currentState
+        if (state.step != ImportStep.Preview || state.dialog != null) return
+        reduce { copy(dialog = ImportDialog.CardDetail(card)) }
     }
 
     private fun onClickPreviewNext(intent: ImportDeckIntent.ClickPreviewNext) {
@@ -505,6 +554,7 @@ class ImportDeckViewModel internal constructor(
             }
 
             is DeckCreationResult.Failed -> {
+                Napier.w(throwable = result.cause) { "import deck creation failed" }
                 reduce { copy(step = ImportStep.DeckInfo, dialog = ImportDialog.DeckCreateFailed) }
             }
 
@@ -515,126 +565,27 @@ class ImportDeckViewModel internal constructor(
         }
     }
 
-    private fun startSaving(
+    private suspend fun startSaving(
         coordinator: ImportSaveCoordinator,
         deck: Deck,
         deckName: String,
         cards: List<ImportCard>,
     ) {
-        saveCoordinator = coordinator
-        savedDeck = deck
-        chunks = coordinator.planChunks(cards.map(ImportCard::toCardContent))
-        savedCards = 0
-        stopRequested = false
-        stalledSave = null
-        reduce { copy(step = ImportStep.Saving, saving = SavingProgress(deckName = deckName, totalCards = cards.size)) }
-        runSave(fromIndex = 0)
-    }
-
-    private fun runSave(fromIndex: Int) {
-        val coordinator = saveCoordinator ?: return
-        val deck = savedDeck ?: return
-        val alreadySaved = savedCards
-        var savedInRun = 0
-        launch {
-            val outcome =
-                coordinator.saveChunks(
-                    deckId = deck.id,
-                    chunks = chunks,
-                    fromIndex = fromIndex,
-                    stopRequested = { stopRequested },
-                    onProgress = { progress ->
-                        when (progress) {
-                            is ImportSaveProgress.ChunkSaved -> {
-                                savedInRun += progress.cardCount
-                                reduce { withSavingStatus(SavingStatus.Saving, alreadySaved + savedInRun) }
-                            }
-
-                            is ImportSaveProgress.Retrying -> {
-                                reduce { withSavingStatus(SavingStatus.Retrying) }
-                            }
-
-                            is ImportSaveProgress.WaitingForServer -> {
-                                reduce { withSavingStatus(SavingStatus.WaitingForServer) }
-                            }
-                        }
-                    },
-                )
-            onSaveOutcome(outcome, alreadySaved)
+        // 변환과 묶음 나누기가 최대 1만 장의 모든 글자를 훑으므로 main에서 하지 않는다.
+        val chunks = withContext(dispatchers.default) { coordinator.planChunks(cards.map(ImportCard::toCardContent)) }
+        // 저장을 시작하면 이전 단계로 돌아갈 수 없으므로, 네트워크를 쓰는 동안 읽은 표와 미리보기, 원본 사본을 들고 있지 않는다.
+        source = null
+        clearTempAsync()
+        reduce {
+            copy(
+                step = ImportStep.Saving,
+                table = null,
+                preview = null,
+                mappings = persistentMapOf(),
+                saving = SavingProgress(deckName = deckName, totalCards = cards.size),
+            )
         }
-    }
-
-    /** 결과의 장수는 이번 호출 몫이다. 조정 객체가 장수 불일치 묶음의 만들어진 장수도 이미 더했으므로 따로 더하지 않는다. */
-    private fun onSaveOutcome(
-        outcome: ImportSaveOutcome,
-        alreadySaved: Int,
-    ) {
-        savedCards = alreadySaved + outcome.savedCards
-        when (val action = resolveSaveOutcome(outcome, alreadySaved, isStopping = stopRequested)) {
-            is SaveOutcomeAction.NavigateToDeckDetail -> {
-                navigateToDeckDetail(action.saved, action.completed)
-            }
-
-            is SaveOutcomeAction.ShowDialog -> {
-                stalledSave = (outcome as? ImportSaveOutcome.Stopped)?.let { stopped -> StalledSave(stopped.chunkIndex, stopped.failure) }
-                reduce { copy(dialog = action.dialog).withSavingStatus(SavingStatus.Saving, savedCards) }
-            }
-        }
-    }
-
-    private fun navigateToDeckDetail(
-        saved: Int,
-        completed: Boolean,
-    ) {
-        val deck = savedDeck ?: return
-        stalledSave = null
-        postSideEffect(
-            ImportDeckSideEffect.NavigateToDeckDetail(
-                deck = deck.copy(cardTotalCount = saved),
-                saved = saved,
-                total = chunks.sumOf { chunk -> chunk.cards.size },
-                completed = completed,
-            ),
-        )
-    }
-
-    /** 멈추는 중이거나 다른 대화상자가 떠 있으면 확인을 다시 열지 않는다. */
-    private fun requestStop() {
-        val state = currentState
-        val progress = state.saving ?: return
-        if (progress.status == SavingStatus.Stopping || state.dialog != null) return
-        reduce { copy(dialog = ImportDialog.StopConfirm) }
-    }
-
-    private fun onConfirmStop() {
-        if (currentState.dialog != ImportDialog.StopConfirm) return
-        stopRequested = true
-        reduce { copy(dialog = null).withSavingStatus(SavingStatus.Stopping) }
-    }
-
-    /** 새 키가 필요한 실패는 멈춘 묶음만 키를 바꾸고, 같은 키로 보낼 실패는 묶음을 그대로 다시 보낸다. 같은 조정 객체를 써야 첫 전송 시각이 이어진다. */
-    private fun onRetrySave() {
-        val stalled = stalledSave ?: return
-        val coordinator = saveCoordinator ?: return
-        val index = stalled.chunkIndex
-        val userRetry = stalled.failure.userRetry
-        if (userRetry == UserRetry.NONE) return
-        if (userRetry == UserRetry.NEW_KEY) chunks = chunks.take(index) + coordinator.renewKey(chunks[index]) + chunks.drop(index + 1)
-        stalledSave = null
-        reduce { copy(dialog = null).withSavingStatus(SavingStatus.Saving) }
-        runSave(fromIndex = index)
-    }
-
-    private fun onClickViewDeck() {
-        val stalled = stalledSave ?: return
-        if (stalled.failure is ChunkFailure.DeckUnavailable) return
-        navigateToDeckDetail(savedCards, completed = false)
-    }
-
-    private fun onClickGoHome() {
-        if (stalledSave?.failure !is ChunkFailure.DeckUnavailable) return
-        stalledSave = null
-        postSideEffect(ImportDeckSideEffect.NavigateHome)
+        ImportSaveSession(coordinator, deck, chunks, saveHost).also { session -> saveSession = session }.start()
     }
 
     /**
@@ -650,14 +601,21 @@ class ImportDeckViewModel internal constructor(
             launch {
                 try {
                     val table = read() ?: return@launch
-                    if (ticket == generation) {
-                        isDeckInfoPrefilled = false
-                        onRead(table)
-                    }
+                    if (ticket == generation) onRead(table)
                 } catch (cancellation: CancellationException) {
                     throw cancellation
                 } catch (error: Exception) {
-                    if (ticket == generation) failRead(readFailureDialog(error, source?.extension.orEmpty(), currentState.isPaste))
+                    if (ticket == generation) {
+                        val extension = source?.extension.orEmpty()
+                        val isPaste = currentState.isPaste
+                        // 파서가 알려 준 오류는 사용자 안내로 충분하다. 그 밖의 원인은 기록하되 파일과 붙여 넣은 내용은 남기지 않는다.
+                        if (error !is ImportParseException) {
+                            Napier.w(
+                                throwable = error,
+                            ) { "import read failed ext=$extension paste=$isPaste" }
+                        }
+                        failRead(readFailureDialog(error, extension, isPaste))
+                    }
                 }
             }
     }
@@ -677,34 +635,13 @@ class ImportDeckViewModel internal constructor(
     private fun failRead(dialog: ImportDialog) {
         source = null
         clearTempAsync()
-        reduce { copy(loading = null, isPickerOpen = false, dialog = dialog) }
+        reduce { copy(loading = null, isPickerOpen = false, pendingSelection = null, dialog = dialog) }
     }
 
     private fun clearTempAsync() {
         launch(dispatchers.io) { tempStorage.clearAll() }
     }
 }
-
-/** [chunkIndex] 묶음부터 저장하지 못했다. */
-private class StalledSave(
-    val chunkIndex: Int,
-    val failure: ChunkFailure,
-)
-
-/** 멈추는 중에는 진행 이벤트가 상태를 덮어쓰지 않는다. [savedCards]가 null이면 저장한 장수는 그대로 둔다. */
-private fun ImportDeckState.withSavingStatus(
-    status: SavingStatus,
-    savedCards: Int? = null,
-): ImportDeckState =
-    copy(
-        saving =
-            saving?.let { progress ->
-                progress.copy(
-                    savedCards = savedCards ?: progress.savedCards,
-                    status = if (progress.status == SavingStatus.Stopping) progress.status else status,
-                )
-            },
-    )
 
 private fun rejectionSideEffect(code: String): ImportDeckSideEffect =
     if (code in DECK_INPUT_ERROR_CODES) ImportDeckSideEffect.ShowDeckInputError else ImportDeckSideEffect.ShowDeckCreateError

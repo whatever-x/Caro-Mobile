@@ -161,6 +161,12 @@ class DeckInfoPrefillTest : FunSpec() {
 
                 prefill(textTable("a.txt"), fileTemplate = template).description shouldBe "y".repeat(495) + "a.txt"
             }
+
+            test("설명에 넣는 파일 이름은 120자로 줄이고 확장자를 남겨 템플릿 뒷부분이 잘리지 않게 한다") {
+                val table = textTable("a".repeat(600) + ".txt")
+
+                prefill(table).description shouldBe "a".repeat(115) + "….txt" + "에서 가져왔어요"
+            }
         }
     }
 

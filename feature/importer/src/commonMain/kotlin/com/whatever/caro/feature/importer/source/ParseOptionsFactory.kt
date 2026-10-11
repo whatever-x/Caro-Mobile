@@ -3,6 +3,7 @@ package com.whatever.caro.feature.importer.source
 import com.whatever.caro.core.importparser.ParseOptions
 import com.whatever.caro.core.importparser.SpreadsheetDateStyle
 import com.whatever.caro.feature.importer.platform.platformLegacyKoreanDecoder
+import okio.Path
 
 /**
  * 상한을 넘었는지 알아볼 수 있도록 maxRows는 장수 상한보다 1 크게 넣는다.
@@ -15,11 +16,12 @@ internal fun buildParseOptions(
     sheetIndex: Int = 0,
     delimiter: Char? = null,
     hasHeaderRow: Boolean? = null,
+    tempDirectory: Path = ImportTempStorage.DEFAULT_ROOT,
 ): ParseOptions =
     ParseOptions(
         maxRows = limits.maxCards + 1,
         maxFileBytes = limits.maxFileBytes,
-        tempDirectory = ImportTempStorage.DEFAULT_ROOT,
+        tempDirectory = tempDirectory,
         subdeckIds = subdeckIds,
         sheetIndex = sheetIndex,
         delimiter = delimiter,

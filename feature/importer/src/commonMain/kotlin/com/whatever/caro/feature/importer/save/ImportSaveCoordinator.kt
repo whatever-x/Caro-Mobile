@@ -20,7 +20,6 @@ import kotlin.uuid.Uuid
 /**
  * 가져오기 저장을 조정한다. 덱 생성(1.0)과 카드 묶음 저장(1.1, 멱등 키)을 함께 다루므로 화면별 저장소 호출과 분리한다.
  * 묶음은 앞 묶음이 성공한 뒤에만 보내 서버의 생성 순서가 원본 순서와 같게 유지된다.
- * 키별 첫 전송 시각을 기억하므로 가져오기 저장 흐름 하나(화면 하나)마다 새로 만들어 쓴다.
  */
 internal class ImportSaveCoordinator(
     private val deckRepository: DeckRepository,

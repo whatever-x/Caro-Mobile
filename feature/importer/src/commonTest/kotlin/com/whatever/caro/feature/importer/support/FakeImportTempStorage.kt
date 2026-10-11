@@ -9,13 +9,15 @@ import kotlin.random.Random
 /**
  * ImportTempStorage가 final 클래스라 대역 대신 테스트마다 따로 만든 샌드박스 디렉터리를 가리키게 한다.
  * 실제 caro-import를 건드리지 않고 지운 파일과 남은 파일을 눈으로 확인할 수 있다.
+ * 오래됨 기준을 0으로 두어, 다른 화면의 디렉터리는 만들어 둔 즉시 오래된 것으로 본다.
  */
 internal class FakeImportTempStorage private constructor(
     private val fileSystem: FileSystem,
     private val sandbox: Path,
 ) {
-    val root: Path = sandbox / "caro-import"
-    val storage: ImportTempStorage = ImportTempStorage(fileSystem, root)
+    private val base: Path = sandbox / "caro-import"
+    val root: Path = base / "session-own"
+    val storage: ImportTempStorage = ImportTempStorage(fileSystem, root, staleAfterMillis = 0L)
     val fileCopy: ImportFileCopy = ImportFileCopy(fileSystem)
 
     fun regularFiles(): List<Path> =
@@ -24,6 +26,14 @@ internal class FakeImportTempStorage private constructor(
         } else {
             emptyList()
         }
+
+    fun exists(path: Path): Boolean = fileSystem.exists(path)
+
+    /** 이전 실행이 정리하지 못하고 남긴 다른 화면의 디렉터리. 안에 든 파일의 경로를 돌려준다. */
+    fun plantPreviousSession(name: String = "session-previous"): Path {
+        fileSystem.createDirectories(base / name)
+        return (base / name / "copy-old").also { path -> fileSystem.write(path) { writeUtf8("stale") } }
+    }
 
     fun plantLeftover(name: String = "stale-copy"): Path {
         fileSystem.createDirectories(root)

@@ -35,10 +35,7 @@ internal data class SaveDialogBody(
     val causeLine: CauseLine,
 )
 
-/**
- * [alreadySaved]는 이전 호출에서 저장한 장수이고 결과의 장수는 이번 호출 몫이라 더해서 쓴다.
- * 멈추는 중에는 멈춤을 이미 확인했으므로 진행 중 묶음이 실패해도 대화상자 없이 부분 저장 덱으로 간다. 덱을 찾을 수 없는 경우만 예외다.
- */
+/** 멈추는 중에는 멈춤을 이미 확인했으므로 진행 중 묶음이 실패해도 대화상자 없이 부분 저장 덱으로 간다. 덱을 찾을 수 없는 경우만 예외다. */
 internal fun resolveSaveOutcome(
     outcome: ImportSaveOutcome,
     alreadySaved: Int,

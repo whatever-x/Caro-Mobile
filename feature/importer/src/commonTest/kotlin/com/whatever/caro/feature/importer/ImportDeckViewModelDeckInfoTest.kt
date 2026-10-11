@@ -118,6 +118,16 @@ class ImportDeckViewModelDeckInfoTest : FunSpec() {
                 }
             }
 
+            test("설명의 파일 이름은 120자로 줄여 템플릿 뒷부분이 잘리지 않게 한다") {
+                runTest(rig.dispatcher) {
+                    val longName = "a".repeat(600) + ".txt"
+
+                    val harness = fileDeckInfo(longName, ImportTestTables.text(sourceName = longName))
+
+                    harness.state.deckDescription shouldBe "a".repeat(115) + "….txt" + "에서 가져왔어요"
+                }
+            }
+
             test("긴 설명 템플릿은 설명을 500자에서 자른다") {
                 runTest(rig.dispatcher) {
                     val harness = rig.create(reader = FakeImportSourceReader().returns(ImportTestTables.text()))
@@ -194,6 +204,94 @@ class ImportDeckViewModelDeckInfoTest : FunSpec() {
                     openDeckInfo(harness)
 
                     harness.state.deckName shouldBe PASTE_NAME
+                }
+            }
+        }
+
+        context("이름에 영향을 주지 않는 다시 읽기") {
+            listOf<ImportDeckIntent>(
+                ImportDeckIntent.ChangeHeaderRow(hasHeaderRow = true),
+                ImportDeckIntent.SelectDelimiter(','),
+            ).forEach { reselect ->
+                test("텍스트 확인에서 ${reselect::class.simpleName}로 다시 읽어도 고친 이름과 설명이 남는다") {
+                    runTest(rig.dispatcher) {
+                        val reader =
+                            FakeImportSourceReader()
+                                .returns(ImportTestTables.text())
+                                .returns(ImportTestTables.text(delimiter = ",", hasHeaderRow = true))
+                        val harness = rig.create(reader = reader)
+                        openMappingFromFile(harness, "words.txt")
+                        openPreview(harness)
+                        openDeckInfo(harness)
+                        harness.send(ImportDeckIntent.UpdateDeckName("내가 고친 이름"))
+                        harness.send(ImportDeckIntent.UpdateDeckDescription("내가 고친 설명"))
+                        repeat(3) { harness.send(ImportDeckIntent.ClickBack) }
+                        advanceUntilIdle()
+                        harness.state.step shouldBe ImportStep.TextCheck
+
+                        harness.send(reselect)
+                        advanceUntilIdle()
+                        harness.send(ImportDeckIntent.ClickSelectionNext)
+                        advanceUntilIdle()
+                        openPreview(harness)
+                        openDeckInfo(harness)
+
+                        harness.state.deckName shouldBe "내가 고친 이름"
+                        harness.state.deckDescription shouldBe "내가 고친 설명"
+                    }
+                }
+            }
+        }
+
+        context("이름이 달라질 수 있는 다시 읽기") {
+            test("시트를 바꿔 다시 읽으면 고친 이름이 사라지고 고른 시트 이름으로 다시 채운다") {
+                runTest(rig.dispatcher) {
+                    val reader =
+                        FakeImportSourceReader()
+                            .returns(ImportTestTables.xlsx())
+                            .returns(ImportTestTables.xlsx(selectedSheet = 1))
+                    val harness = rig.create(reader = reader)
+                    openMappingFromFile(harness, "book.xlsx")
+                    openPreview(harness)
+                    openDeckInfo(harness)
+                    harness.state.deckName shouldBe "book - 시트1"
+                    harness.send(ImportDeckIntent.UpdateDeckName("내가 고친 이름"))
+                    repeat(3) { harness.send(ImportDeckIntent.ClickBack) }
+                    advanceUntilIdle()
+                    harness.state.step shouldBe ImportStep.SheetSelect
+
+                    harness.send(ImportDeckIntent.SelectSheet(1))
+                    advanceUntilIdle()
+                    harness.send(ImportDeckIntent.ClickSelectionNext)
+                    advanceUntilIdle()
+                    openPreview(harness)
+                    openDeckInfo(harness)
+
+                    harness.state.deckName shouldBe "book - 시트2"
+                }
+            }
+
+            test("하위 덱 행을 다시 읽으면 고친 이름이 사라지고 고른 하위 덱 기준으로 다시 채운다") {
+                runTest(rig.dispatcher) {
+                    val table = ImportMappingTables.deckTable("My Decks.apkg", "Japanese::N5", "Korean::TOPIK")
+                    val reader = FakeImportSourceReader().returns(ImportMappingTables.summaryOf(table)).returns(table).returns(table)
+                    val harness = rig.create(reader = reader)
+                    openMappingFromFile(harness, "My Decks.apkg")
+                    openPreview(harness)
+                    openDeckInfo(harness)
+                    harness.state.deckName shouldBe "My Decks"
+                    harness.send(ImportDeckIntent.UpdateDeckName("내가 고친 이름"))
+                    repeat(3) { harness.send(ImportDeckIntent.ClickBack) }
+                    advanceUntilIdle()
+                    harness.state.step shouldBe ImportStep.SubdeckSelect
+
+                    harness.send(ImportDeckIntent.ToggleSubdeck("d2"))
+                    harness.send(ImportDeckIntent.ClickSelectionNext)
+                    advanceUntilIdle()
+                    openPreview(harness)
+                    openDeckInfo(harness)
+
+                    harness.state.deckName shouldBe "Japanese"
                 }
             }
         }
