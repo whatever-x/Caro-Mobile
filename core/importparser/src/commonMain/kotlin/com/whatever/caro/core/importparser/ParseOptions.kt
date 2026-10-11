@@ -44,11 +44,11 @@ data class ParseOptions(
         const val DEFAULT_MAX_COLUMNS = 1_000
         const val DEFAULT_MAX_FIELD_CHARS = 1_000_000
 
-        /** 저사양 기기 메모리를 지키려고 표 하나가 만들 행 값 칸 수를 제한한다. 10,001행이면 행마다 약 200칸까지다. */
-        const val DEFAULT_MAX_CELLS = 2_000_000
+        /** 저사양 기기 메모리를 지키려고 표 하나가 만들 행 값 칸 수를 제한한다. 10,001행이면 행마다 약 25칸까지다. */
+        const val DEFAULT_MAX_CELLS = 250_000
 
         /** 값 하나는 [DEFAULT_MAX_FIELD_CHARS]로 막혀도 값 수만큼 곱해지므로, 표 하나가 보관할 글자 수의 합계를 따로 제한한다. */
-        const val DEFAULT_MAX_TOTAL_CHARS = 20_000_000L
+        const val DEFAULT_MAX_TOTAL_CHARS = 10_000_000L
     }
 }
 

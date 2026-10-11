@@ -61,10 +61,16 @@ class ParseOptionsFactoryTest : FunSpec() {
             limits.maxTotalBytes shouldBeLessThan ArchiveLimits.DEFAULT_MAX_TOTAL_BYTES
         }
 
-        test("표 하나가 보관할 글자 수 합계 상한을 2천만 자로 둔다") {
+        test("표 하나가 보관할 글자 수 합계 상한을 1천만 자로 둔다") {
             val options = buildParseOptions(limits = ImportLimitsConfig(), dateStyle = DATE_STYLE)
 
-            options.maxTotalChars shouldBe 20_000_000L
+            options.maxTotalChars shouldBe 10_000_000L
+        }
+
+        test("표 하나가 보관할 값 있는 칸 수 상한을 25만 칸으로 둔다") {
+            val options = buildParseOptions(limits = ImportLimitsConfig(), dateStyle = DATE_STYLE)
+
+            options.maxCells shouldBe 250_000
         }
 
         test("dateStyle은 넘긴 앱 언어 값을 따른다") {

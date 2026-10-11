@@ -65,6 +65,27 @@ class ParserBudgetTest : FunSpec() {
                     ImportParseErrorKind.CONTENT_TOO_LONG
             }
 
+            test("텍스트의 값 있는 칸이 예산과 같으면 읽는다") {
+                val table = parseText("a\tb\nc\td\ne\tf", Fixtures.options(maxCells = 6, hasHeaderRow = false))
+
+                table.rows.size shouldBe 3
+            }
+
+            test("엑셀의 값 있는 칸이 예산과 같으면 읽는다") {
+                val path = temp("cells-at-budget.xlsx")
+                val rows = (1..3).joinToString("") { row -> "<row r=\"$row\">${inlineCell("A$row", "a")}${inlineCell("B$row", "b")}</row>" }
+                TestZip.xlsx(path, TestZip.sheet(rows))
+
+                parse(path, Fixtures.options(maxCells = 6, hasHeaderRow = false)).rows.size shouldBe 3
+            }
+
+            test("Anki 행 값 칸이 예산과 같으면 읽는다").config(enabled = nativeArchiveLibrariesLoadable) {
+                val path = temp("cells-at-budget.apkg")
+                TestAnki.legacy(path, fieldCount = 2, notes = List(3) { "a\u001fb" })
+
+                parse(path, Fixtures.options(maxCells = 6)).rows.size shouldBe 3
+            }
+
             test("엑셀은 상한 밖 열의 셀을 만나는 즉시 멈춰 뒤의 셀을 쌓지 않는다") {
                 val path = temp("far-then-many.xlsx")
                 val many =
