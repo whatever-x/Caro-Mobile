@@ -6,7 +6,9 @@ package com.whatever.caro.feature.importer.transform
  */
 internal object ClozeTransformer {
     private val CLOZE_MARK = Regex("\\{\\{c\\d+(?:,\\d+)*::")
-    private val CLOZE_TOKEN = Regex("\\{\\{c\\d+(?:,\\d+)*::|}}")
+
+    // Android ICU는 이스케이프되지 않은 `}`를 문법 오류로 보고 object 초기화가 Error로 실패하므로 닫는 중괄호도 이스케이프한다.
+    private val CLOZE_TOKEN = Regex("\\{\\{c\\d+(?:,\\d+)*::|\\}\\}")
     private const val CLOSE = "}}"
     private const val HINT_SEPARATOR = "::"
     private const val HIDDEN_WITHOUT_HINT = "..."
