@@ -28,6 +28,7 @@ internal fun ImportBottomBar(
     enabled: Boolean = true,
     reason: String? = null,
     style: CaroCtaButtonStyle = CaroCtaButtonStyle.Brand,
+    summary: (@Composable () -> Unit)? = null,
 ) {
     Column(
         modifier =
@@ -40,6 +41,7 @@ internal fun ImportBottomBar(
                 ),
         verticalArrangement = Arrangement.spacedBy(CaroTheme.spacing.s),
     ) {
+        summary?.invoke()
         if (reason != null) {
             Text(
                 modifier =

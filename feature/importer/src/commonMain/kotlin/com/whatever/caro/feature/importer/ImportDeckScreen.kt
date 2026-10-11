@@ -30,7 +30,9 @@ import com.whatever.caro.feature.importer.mvi.ImportDeckIntent
 import com.whatever.caro.feature.importer.mvi.ImportDeckState
 import com.whatever.caro.feature.importer.mvi.ImportStep
 import com.whatever.caro.feature.importer.step.PasteStep
+import com.whatever.caro.feature.importer.step.SheetStep
 import com.whatever.caro.feature.importer.step.SourceStep
+import com.whatever.caro.feature.importer.step.SubdeckStep
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 import kotlin.random.Random
@@ -82,11 +84,32 @@ internal fun ImportDeckScreen(
                         }
 
                         ImportStep.SubdeckSelect -> {
-                            Unit
+                            state.table?.let { table ->
+                                SubdeckStep(
+                                    table = table,
+                                    selectedIds = state.selection.subdeckIds,
+                                    maxCards = ImportLimits.MAX_CARDS,
+                                    onToggleSubdeck = { id -> onIntent(ImportDeckIntent.ToggleSubdeck(id)) },
+                                    onToggleAll = { onIntent(ImportDeckIntent.ToggleAllSubdecks) },
+                                    onNext = { onIntent(ImportDeckIntent.ClickSelectionNext) },
+                                )
+                            }
                         }
 
                         ImportStep.SheetSelect -> {
-                            Unit
+                            state.table?.let { table ->
+                                // 다시 읽는 동안 selection은 바꾸기 전 값이라 고른 시트가 바로 보이려면 pendingSelection이 먼저다.
+                                val selection = state.pendingSelection ?: state.selection
+                                SheetStep(
+                                    table = table,
+                                    sheetIndex = selection.sheetIndex,
+                                    hasHeaderRow = selection.hasHeaderRow ?: table.layout?.hasHeaderRow ?: false,
+                                    maxCards = ImportLimits.MAX_CARDS,
+                                    onSelectSheet = { index -> onIntent(ImportDeckIntent.SelectSheet(index)) },
+                                    onChangeHeaderRow = { checked -> onIntent(ImportDeckIntent.ChangeHeaderRow(checked)) },
+                                    onNext = { onIntent(ImportDeckIntent.ClickSelectionNext) },
+                                )
+                            }
                         }
 
                         ImportStep.TextCheck -> {
