@@ -82,6 +82,28 @@ class ApkgSchemaGuardTest : FunSpec() {
                 shouldThrow<ImportParseException> { parse(path) }.kind shouldBe ImportParseErrorKind.CORRUPT_FILE
             }
 
+            listOf("CREATE  VIRTUAL TABLE", "CREATE /**/ VIRTUAL TABLE").forEach { spelling ->
+                test("저장된 SQL 글자를 '$spelling'로 바꿔 숨긴 가상 테이블 notes도 손상 파일로 멈춘다")
+                    .config(enabled = nativeArchiveLibrariesLoadable) {
+                        val path = temp("disguised-virtual-${spelling.hashCode()}.apkg")
+                        TestAnki.legacy(
+                            path,
+                            fieldCount = 1,
+                            notes = emptyList(),
+                            notesAndCardsSql =
+                                listOf(
+                                    "CREATE VIRTUAL TABLE notes USING fts5(id, mid, flds)",
+                                    "INSERT INTO notes VALUES (1, 1, 'a')",
+                                    "PRAGMA writable_schema=ON",
+                                    "UPDATE sqlite_master SET sql = replace(sql, 'CREATE VIRTUAL TABLE', '$spelling') WHERE name = 'notes'",
+                                    "PRAGMA writable_schema=OFF",
+                                ) + CARDS_TABLE,
+                        )
+
+                        shouldThrow<ImportParseException> { parse(path) }.kind shouldBe ImportParseErrorKind.CORRUPT_FILE
+                    }
+            }
+
             test("일반 테이블만 있는 컬렉션은 그대로 읽는다").config(enabled = nativeArchiveLibrariesLoadable) {
                 val path = temp("plain.apkg")
                 TestAnki.legacy(path, fieldCount = 2, notes = listOf("a\u001fb"))

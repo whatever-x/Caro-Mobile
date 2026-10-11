@@ -28,8 +28,11 @@ internal class AnkiDatabase private constructor(
     companion object {
         private const val UNICASE_SCHEMA_FILTER = "WHERE sql LIKE '%COLLATE unicase%'"
         private const val URI_SAFE_CHARACTERS = "/-._~"
+
+        // 가상 테이블은 sqlite_master.type이 table이고 저장된 SQL 글자는 바꿀 수 있으므로, 글자 대신 SQLite가 해석한 type으로 거른다.
         private const val EXECUTABLE_SCHEMA_QUERY =
-            "SELECT count(*) FROM sqlite_master WHERE type IN ('view', 'trigger') OR sql LIKE 'CREATE VIRTUAL%'"
+            "SELECT (SELECT count(*) FROM sqlite_master WHERE type IN ('view', 'trigger')) + " +
+                "(SELECT count(*) FROM pragma_table_list WHERE type = 'virtual')"
         private const val GENERATED_COLUMN_QUERY = "SELECT count(*) FROM pragma_table_xinfo(?) WHERE hidden IN (2, 3)"
         private val QUERIED_TABLES = listOf("col", "notes", "cards", "notetypes", "fields", "decks")
 
