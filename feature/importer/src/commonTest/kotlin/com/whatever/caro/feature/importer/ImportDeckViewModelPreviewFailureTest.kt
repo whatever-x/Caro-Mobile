@@ -7,6 +7,7 @@ import com.whatever.caro.feature.importer.mvi.ImportDialog
 import com.whatever.caro.feature.importer.mvi.ImportStep
 import com.whatever.caro.feature.importer.support.EMPTY_SIDE_TEXT
 import com.whatever.caro.feature.importer.support.FakeImportSourceReader
+import com.whatever.caro.feature.importer.support.ForcedError
 import com.whatever.caro.feature.importer.support.ImportTestTables
 import com.whatever.caro.feature.importer.support.ImportViewModelHarness
 import com.whatever.caro.feature.importer.support.ImportViewModelRig
@@ -27,10 +28,12 @@ class ImportDeckViewModelPreviewFailureTest : FunSpec() {
     private val rig = ImportViewModelRig()
 
     /** 행을 훑는 순간 던지는 목록이다. 연결 단계까지는 행을 읽지 않으므로 [다음]을 누른 계산에서만 실패한다. */
-    private class ExplodingRows : AbstractList<ParsedRow>() {
+    private class ExplodingRows(
+        private val failure: Throwable = IllegalStateException("forced"),
+    ) : AbstractList<ParsedRow>() {
         override val size: Int = 1
 
-        override fun get(index: Int): ParsedRow = throw IllegalStateException("forced")
+        override fun get(index: Int): ParsedRow = throw failure
     }
 
     init {
@@ -47,6 +50,23 @@ class ImportDeckViewModelPreviewFailureTest : FunSpec() {
                     harness.state.dialog shouldBe ImportDialog.PreviewFailed
                     harness.state.loading.shouldBeNull()
                     harness.state.preview.shouldBeNull()
+                }
+            }
+
+            test("Exception이 아닌 오류로 실패해도 미리보기 실패 대화상자를 띄우고 오버레이를 걷는다") {
+                runTest(rig.dispatcher) {
+                    captureNapier { logs ->
+                        val harness = failingMapping(failure = ForcedError())
+
+                        harness.send(ImportDeckIntent.ClickMappingNext(EMPTY_SIDE_TEXT))
+                        advanceUntilIdle()
+
+                        harness.state.dialog shouldBe ImportDialog.PreviewFailed
+                        harness.state.loading.shouldBeNull()
+                        harness.state.step shouldBe ImportStep.Mapping
+                        logs.single { entry -> entry.message.orEmpty().startsWith("import preview build failed") }.level shouldBe
+                            LogLevel.ERROR
+                    }
                 }
             }
 
@@ -130,8 +150,8 @@ class ImportDeckViewModelPreviewFailureTest : FunSpec() {
         }
     }
 
-    private fun TestScope.failingMapping(): ImportViewModelHarness {
-        val table = ImportTestTables.text().copy(rows = ExplodingRows())
+    private fun TestScope.failingMapping(failure: Throwable = IllegalStateException("forced")): ImportViewModelHarness {
+        val table = ImportTestTables.text().copy(rows = ExplodingRows(failure))
         val harness = rig.create(reader = FakeImportSourceReader().returns(table))
         openMappingFromFile(harness, "words.txt")
         return harness

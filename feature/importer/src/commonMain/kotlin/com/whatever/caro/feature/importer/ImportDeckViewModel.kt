@@ -535,8 +535,9 @@ class ImportDeckViewModel internal constructor(
                     }
                 } catch (cancellation: CancellationException) {
                     throw cancellation
-                } catch (error: Exception) {
-                    // 오버레이가 남으면 뒤로 가기를 뺀 모든 입력이 막힌다. 연결 단계에 머물러 다시 누를 수 있게 한다.
+                } catch (error: Throwable) {
+                    // OutOfMemoryError 같은 Error도 받아야 한다. 코루틴 예외 처리기는 로그만 남겨 오버레이가 걷히지 않고, 뒤로 가기를 뺀 모든 입력이 막힌다.
+                    // 연결 단계에 머물러 다시 누를 수 있게 한다.
                     Napier.e(throwable = error) { "import preview build failed" }
                     if (ticket == generation) reduce { copy(loading = null, dialog = ImportDialog.PreviewFailed) }
                 }
@@ -655,15 +656,15 @@ class ImportDeckViewModel internal constructor(
                     if (ticket == generation) onRead(table)
                 } catch (cancellation: CancellationException) {
                     throw cancellation
-                } catch (error: Exception) {
+                } catch (error: Throwable) {
+                    // OutOfMemoryError 같은 Error도 받아야 한다. 코루틴 예외 처리기는 로그만 남겨 읽기 오버레이가 걷히지 않는다.
                     if (ticket == generation) {
                         val extension = source?.extension.orEmpty()
                         val isPaste = currentState.isPaste
                         // 파서가 알려 준 오류는 사용자 안내로 충분하다. 그 밖의 원인은 기록하되 파일과 붙여 넣은 내용은 남기지 않는다.
                         if (error !is ImportParseException) {
-                            Napier.w(
-                                throwable = error,
-                            ) { "import read failed ext=$extension paste=$isPaste" }
+                            val message = "import read failed ext=$extension paste=$isPaste"
+                            if (error is Exception) Napier.w(throwable = error) { message } else Napier.e(throwable = error) { message }
                         }
                         failRead(readFailureDialog(error, extension, isPaste))
                     }

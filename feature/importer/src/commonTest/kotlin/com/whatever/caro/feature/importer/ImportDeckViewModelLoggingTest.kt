@@ -9,6 +9,7 @@ import com.whatever.caro.feature.importer.platform.PickResult
 import com.whatever.caro.feature.importer.support.CapturedLog
 import com.whatever.caro.feature.importer.support.FakeImportSourceReader
 import com.whatever.caro.feature.importer.support.FakePickedImportFile
+import com.whatever.caro.feature.importer.support.ForcedError
 import com.whatever.caro.feature.importer.support.ImportTestTables
 import com.whatever.caro.feature.importer.support.ImportViewModelRig
 import com.whatever.caro.feature.importer.support.captureNapier
@@ -47,6 +48,22 @@ class ImportDeckViewModelLoggingTest : FunSpec() {
                     log.message shouldBe "import read failed ext=apkg paste=false"
                     // 코루틴 경계를 지나며 예외가 복사되므로 같은 객체인지가 아니라 종류와 메시지로 확인한다.
                     log.throwable.shouldBeInstanceOf<IllegalStateException>().message shouldBe "boom"
+                }
+            }
+        }
+
+        test("Exception이 아닌 오류로 읽기가 실패하면 원인을 오류 수준으로 남긴다") {
+            runTest(rig.dispatcher) {
+                captureNapier { logs ->
+                    val harness = rig.create(reader = FakeImportSourceReader().fails(ForcedError()))
+
+                    harness.pick(FakePickedImportFile.ofSize("deck.apkg", size = 100))
+                    advanceUntilIdle()
+
+                    val log = logs.importLog("import read failed")
+                    log.level shouldBe LogLevel.ERROR
+                    log.message shouldBe "import read failed ext=apkg paste=false"
+                    log.throwable.shouldBeInstanceOf<ForcedError>().message shouldBe "forced"
                 }
             }
         }

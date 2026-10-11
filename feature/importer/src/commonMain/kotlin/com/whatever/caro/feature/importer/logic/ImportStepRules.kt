@@ -59,7 +59,7 @@ internal fun selectionStep(format: ImportFormat): ImportStep =
 
 /** 파서가 던진 오류만 종류를 가리고, 그 밖의 읽기 실패는 파일을 읽지 못했다는 문구가 나오는 종류로 보낸다. */
 internal fun readFailureDialog(
-    error: Exception,
+    error: Throwable,
     extension: String,
     isPaste: Boolean,
 ): ImportDialog =

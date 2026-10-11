@@ -15,6 +15,7 @@ import com.whatever.caro.feature.importer.platform.PickResult
 import com.whatever.caro.feature.importer.source.ImportLimitsConfig
 import com.whatever.caro.feature.importer.support.FakeImportSourceReader
 import com.whatever.caro.feature.importer.support.FakePickedImportFile
+import com.whatever.caro.feature.importer.support.ForcedError
 import com.whatever.caro.feature.importer.support.ImportTestTables
 import com.whatever.caro.feature.importer.support.ImportViewModelRig
 import com.whatever.caro.feature.importer.support.ReadCall
@@ -320,6 +321,37 @@ class ImportDeckViewModelReadTest : FunSpec() {
                     harness.state.loading shouldBe null
                     harness.tempStorage.regularFiles().shouldBeEmpty()
                 }
+            }
+        }
+
+        test("Exception이 아닌 오류로 첫 읽기가 실패해도 읽기 실패 대화상자를 띄우고 오버레이를 걷으며 임시 파일을 지운다") {
+            runTest(rig.dispatcher) {
+                val reader = FakeImportSourceReader().fails(ForcedError())
+                val harness = rig.create(reader = reader)
+
+                harness.pick(FakePickedImportFile.ofSize("deck.apkg", size = 20_000))
+                advanceUntilIdle()
+
+                harness.state.dialog shouldBe ImportDialog.ParseError(ImportParseErrorKind.ARCHIVE_LIMIT_EXCEEDED, "apkg", isPaste = false)
+                harness.state.step shouldBe ImportStep.Source
+                harness.state.loading shouldBe null
+                harness.tempStorage.regularFiles().shouldBeEmpty()
+            }
+        }
+
+        test("Exception이 아닌 오류로 다시 읽기가 실패해도 오버레이를 걷고 읽기 실패 대화상자를 띄운다") {
+            runTest(rig.dispatcher) {
+                val reader = FakeImportSourceReader().returns(ImportTestTables.text(sourceName = "words.txt")).fails(ForcedError())
+                val harness = rig.create(reader = reader)
+                harness.pick(FakePickedImportFile.ofSize("words.txt", size = 100))
+                advanceUntilIdle()
+
+                harness.send(ImportDeckIntent.SelectDelimiter(','))
+                advanceUntilIdle()
+
+                harness.state.loading shouldBe null
+                harness.state.pendingSelection shouldBe null
+                harness.state.dialog.shouldBeInstanceOf<ImportDialog.ParseError>()
             }
         }
 
