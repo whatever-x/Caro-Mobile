@@ -75,12 +75,30 @@ class ImportDeckRouteTest : FunSpec() {
 
             rig.events shouldBe listOf(NavCommand.Back)
         }
+
+        test("파일 선택기 열기 효과는 선택기를 한 번 열고 이동이나 스낵바는 보내지 않는다") {
+            val rig = RouteRig()
+
+            rig.handle(ImportDeckSideEffect.OpenFilePicker)
+
+            listOf(rig.pickerOpenCount, rig.events.size) shouldBe listOf(1, 0)
+        }
+
+        test("파일 선택기 열기 외의 효과는 선택기를 열지 않는다") {
+            val rig = RouteRig()
+
+            rig.handle(ImportDeckSideEffect.NavigateBack)
+
+            rig.pickerOpenCount shouldBe 0
+        }
     }
 }
 
 /** 이동 명령과 스낵바가 보낸 순서를 한 목록에 남긴다. 문구는 리소스 키와 인자를 이어 붙인 값으로 대신 읽는다. */
 private class RouteRig {
     val events = mutableListOf<Any>()
+    var pickerOpenCount = 0
+        private set
 
     private val navDispatcher =
         object : NavigationDispatcher {
@@ -105,6 +123,7 @@ private class RouteRig {
             sideEffect = sideEffect,
             navDispatcher = navDispatcher,
             snackbarController = snackbarController,
+            openFilePicker = { pickerOpenCount += 1 },
             resolveText = ::keyAndArgs,
         )
     }

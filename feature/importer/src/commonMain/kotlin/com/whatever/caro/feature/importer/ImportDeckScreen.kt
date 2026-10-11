@@ -7,6 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.intl.Locale
 import caromobile.core.designsystem.generated.resources.Res
 import caromobile.core.designsystem.generated.resources.import_title_deck_info
 import caromobile.core.designsystem.generated.resources.import_title_mapping
@@ -17,14 +18,19 @@ import caromobile.core.designsystem.generated.resources.import_title_sheet
 import caromobile.core.designsystem.generated.resources.import_title_source
 import caromobile.core.designsystem.generated.resources.import_title_subdeck
 import caromobile.core.designsystem.generated.resources.import_title_text_check
+import caromobile.core.designsystem.generated.resources.import_value_paste_deck_name
 import com.whatever.caro.core.designsystem.themes.CaroTheme
+import com.whatever.caro.core.model.importing.ImportLimits
 import com.whatever.caro.feature.importer.component.ImportCreatingDeckOverlay
 import com.whatever.caro.feature.importer.component.ImportDialogs
 import com.whatever.caro.feature.importer.component.ImportLoadingOverlay
 import com.whatever.caro.feature.importer.component.ImportTopBar
+import com.whatever.caro.feature.importer.logic.spreadsheetDateStyleFor
 import com.whatever.caro.feature.importer.mvi.ImportDeckIntent
 import com.whatever.caro.feature.importer.mvi.ImportDeckState
 import com.whatever.caro.feature.importer.mvi.ImportStep
+import com.whatever.caro.feature.importer.step.PasteStep
+import com.whatever.caro.feature.importer.step.SourceStep
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 import kotlin.random.Random
@@ -37,6 +43,8 @@ internal fun ImportDeckScreen(
     val stateHolder = rememberSaveableStateHolder()
     val tableKey = rememberInputKey(state.table)
     val previewKey = rememberInputKey(state.preview)
+    val pasteSourceName = stringResource(Res.string.import_value_paste_deck_name)
+    val dateStyle = spreadsheetDateStyleFor(Locale.current.language)
 
     ImportCreatingDeckOverlay(isCreating = state.step == ImportStep.CreatingDeck) {
         Column(
@@ -56,15 +64,50 @@ internal fun ImportDeckScreen(
             ) {
                 stateHolder.SaveableStateProvider(key = state.step.stateKey(tableKey, previewKey)) {
                     when (state.step) {
-                        ImportStep.Source -> Unit
-                        ImportStep.Paste -> Unit
-                        ImportStep.SubdeckSelect -> Unit
-                        ImportStep.SheetSelect -> Unit
-                        ImportStep.TextCheck -> Unit
-                        ImportStep.Mapping -> Unit
-                        ImportStep.Preview -> Unit
-                        ImportStep.DeckInfo, ImportStep.CreatingDeck -> Unit
-                        ImportStep.Saving -> Unit
+                        ImportStep.Source -> {
+                            SourceStep(
+                                maxCards = ImportLimits.MAX_CARDS,
+                                onClickFile = { onIntent(ImportDeckIntent.ClickPickFile) },
+                                onClickPaste = { onIntent(ImportDeckIntent.ClickPaste) },
+                            )
+                        }
+
+                        ImportStep.Paste -> {
+                            PasteStep(
+                                text = state.pasteText,
+                                maxPasteChars = ImportLimits.MAX_PASTE_CHARS,
+                                onTextChange = { onIntent(ImportDeckIntent.UpdatePasteText(it)) },
+                                onNext = { onIntent(ImportDeckIntent.ClickPasteNext(sourceName = pasteSourceName, dateStyle = dateStyle)) },
+                            )
+                        }
+
+                        ImportStep.SubdeckSelect -> {
+                            Unit
+                        }
+
+                        ImportStep.SheetSelect -> {
+                            Unit
+                        }
+
+                        ImportStep.TextCheck -> {
+                            Unit
+                        }
+
+                        ImportStep.Mapping -> {
+                            Unit
+                        }
+
+                        ImportStep.Preview -> {
+                            Unit
+                        }
+
+                        ImportStep.DeckInfo, ImportStep.CreatingDeck -> {
+                            Unit
+                        }
+
+                        ImportStep.Saving -> {
+                            Unit
+                        }
                     }
                 }
             }

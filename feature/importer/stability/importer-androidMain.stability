@@ -168,9 +168,68 @@ private fun com.whatever.caro.feature.importer.component.textColor(): androidx.c
   params:
 
 @Composable
+internal fun com.whatever.caro.feature.importer.platform.rememberImportFilePicker(onResult: kotlin.Function1<com.whatever.caro.feature.importer.platform.PickResult, kotlin.Unit>): kotlin.Function0<kotlin.Unit>
+  skippable: true
+  restartable: true
+  params:
+    - onResult: STABLE (function type)
+
+@Composable
 private fun com.whatever.caro.feature.importer.rememberInputKey(input: kotlin.Any?): kotlin.Int
   skippable: false
   restartable: true
   params:
     - input: UNSTABLE (has mutable properties or unstable members)
+
+@Composable
+private fun com.whatever.caro.feature.importer.step.PasteGuideLine(text: kotlin.String): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - text: STABLE (String is immutable)
+
+@Composable
+internal fun com.whatever.caro.feature.importer.step.PasteStep(text: kotlin.String, maxPasteChars: kotlin.Int, onTextChange: kotlin.Function1<kotlin.String, kotlin.Unit>, onNext: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier?): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - text: STABLE (String is immutable)
+    - maxPasteChars: STABLE (primitive type)
+    - onTextChange: STABLE (function type)
+    - onNext: STABLE (function type)
+    - modifier: STABLE (marked @Stable or @Immutable)
+
+@Composable
+private fun com.whatever.caro.feature.importer.step.SourceCard(icon: org.jetbrains.compose.resources.DrawableResource, label: kotlin.String, hint: kotlin.String, onClick: kotlin.Function0<kotlin.Unit>): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - icon: STABLE (marked @Stable or @Immutable)
+    - label: STABLE (String is immutable)
+    - hint: STABLE (String is immutable)
+    - onClick: STABLE (function type)
+
+@Composable
+internal fun com.whatever.caro.feature.importer.step.SourceStep(maxCards: kotlin.Int, onClickFile: kotlin.Function0<kotlin.Unit>, onClickPaste: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier?): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - maxCards: STABLE (primitive type)
+    - onClickFile: STABLE (function type)
+    - onClickPaste: STABLE (function type)
+    - modifier: STABLE (marked @Stable or @Immutable)
+
+@Composable
+private fun com.whatever.caro.feature.importer.step.SupportedFormatList(): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+
+@Composable
+private fun com.whatever.caro.feature.importer.step.SupportedFormatRow(label: org.jetbrains.compose.resources.StringResource, chip: org.jetbrains.compose.resources.StringResource): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - label: STABLE (marked @Stable or @Immutable)
+    - chip: STABLE (marked @Stable or @Immutable)
 

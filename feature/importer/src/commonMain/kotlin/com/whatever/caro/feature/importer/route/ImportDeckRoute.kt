@@ -4,6 +4,8 @@ import androidx.compose.material3.SnackbarDuration
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.ui.text.intl.Locale
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigationevent.NavigationEventInfo
 import androidx.navigationevent.compose.NavigationBackHandler
@@ -24,8 +26,10 @@ import com.whatever.caro.core.ui.snackbar.SnackbarController
 import com.whatever.caro.core.util.NumberFormatter.formatWithComma
 import com.whatever.caro.feature.importer.ImportDeckScreen
 import com.whatever.caro.feature.importer.ImportDeckViewModel
+import com.whatever.caro.feature.importer.logic.spreadsheetDateStyleFor
 import com.whatever.caro.feature.importer.mvi.ImportDeckIntent
 import com.whatever.caro.feature.importer.mvi.ImportDeckSideEffect
+import com.whatever.caro.feature.importer.platform.rememberImportFilePicker
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.getString
 
@@ -37,6 +41,10 @@ fun ImportDeckRoute(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val backState = rememberNavigationEventState(currentInfo = NavigationEventInfo.None)
+    val dateStyle = spreadsheetDateStyleFor(Locale.current.language)
+    val openFilePicker =
+        rememberImportFilePicker { result -> viewModel.intent(ImportDeckIntent.FilePicked(result = result, dateStyle = dateStyle)) }
+    val latestOpenFilePicker by rememberUpdatedState(openFilePicker)
 
     // 읽는 중, 대화상자, 저장 중 여부에 따른 판단은 ViewModel이 하므로 시스템 뒤로 가기도 늘 같은 intent로 보낸다.
     NavigationBackHandler(
@@ -50,6 +58,7 @@ fun ImportDeckRoute(
                 sideEffect = sideEffect,
                 navDispatcher = navDispatcher,
                 snackbarController = snackbarController,
+                openFilePicker = { latestOpenFilePicker() },
                 resolveText = { resource, args -> getString(resource, *args.toTypedArray()) },
             )
         }
@@ -65,11 +74,12 @@ internal suspend fun handleImportSideEffect(
     sideEffect: ImportDeckSideEffect,
     navDispatcher: NavigationDispatcher,
     snackbarController: SnackbarController,
+    openFilePicker: () -> Unit,
     resolveText: suspend (StringResource, List<Any>) -> String,
 ) {
     when (sideEffect) {
         ImportDeckSideEffect.OpenFilePicker -> {
-            Unit
+            openFilePicker()
         }
 
         ImportDeckSideEffect.NavigateBack -> {
