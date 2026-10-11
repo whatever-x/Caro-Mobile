@@ -20,9 +20,8 @@ internal sealed interface DetectedSource {
     data object Text : DetectedSource
 }
 
-/** 확장자는 지원 여부만 거르고, 확장자와 내용이 다르면 zip 내용을 따른다. */
+/** 지원하는 확장자만 받고, 확장자와 내용이 다르면 zip 내용을 따른다. */
 internal object ImportFormatDetector {
-    private val SUPPORTED_EXTENSIONS = setOf("apkg", "txt", "csv", "tsv", "xlsx")
     private val ZIP_SIGNATURE = "504b0304".decodeHex()
     private val OLE_SIGNATURE = "d0cf11e0".decodeHex()
     private val APKG_ENTRIES = listOf("meta", "collection.anki21b", "collection.anki21", "collection.anki2")
@@ -31,12 +30,10 @@ internal object ImportFormatDetector {
     fun detect(
         fileSystem: FileSystem,
         path: Path,
-        sourceName: String,
+        extension: String,
         fileBytes: Long,
         options: ParseOptions,
     ): DetectedSource {
-        val extension = sourceName.substringAfterLast('.', missingDelimiterValue = "").lowercase()
-        if (extension !in SUPPORTED_EXTENSIONS) unsupported("extension .$extension")
         val head = fileSystem.read(path) { readByteString(minOf(fileBytes, ZIP_SIGNATURE.size.toLong())) }
         return when {
             head == ZIP_SIGNATURE -> detectZip(ZipArchive.open(fileSystem, path, fileBytes, options.archiveLimits))

@@ -76,7 +76,7 @@ internal class ApkgReader(
             sourceName = sourceName,
             htmlMode = HtmlMode.HTML,
             subdecks = subdecks,
-            noteTypes = readNoteTypes(database, model),
+            noteTypes = readNoteTypes(database, model, noteDecks, selection),
             rows = scan.rows,
             warnings =
                 listOfNotNull(
@@ -115,16 +115,41 @@ internal class ApkgReader(
             .map { (deck, count) -> ParsedSubdeck(deck.toString(), model.deckPaths.getValue(deck), count) }
             .sortedWith(compareBy(String.CASE_INSENSITIVE_ORDER) { subdeck: ParsedSubdeck -> subdeck.path }.thenBy { it.path })
 
+    /**
+     * [ParsedNoteType.noteCount]는 컬렉션 전체 값이다. 요약이 덱 없음 노트 수를 전체에서 빼서 구하므로 선택 범위로 좁히지 않는다.
+     * [ParsedNoteType.selectedNoteCount]는 maxRows로 잘리면 안 되므로 행 읽기와 따로 id와 유형만 읽어 센다.
+     */
     private fun readNoteTypes(
         database: AnkiDatabase,
         model: AnkiCollectionModel,
+        noteDecks: Map<Long, Long>,
+        selection: Set<String>,
     ): List<ParsedNoteType> {
         val counts = LinkedHashMap<Long, Int>()
         database.query("SELECT mid, count(*) FROM notes GROUP BY mid ORDER BY mid") { statement ->
             while (statement.step()) counts[statement.getLong(0)] = statement.getLong(1).toInt()
         }
+        val selectedCounts = HashMap<Long, Int>()
+        database.query("SELECT id, mid FROM notes") { statement ->
+            while (statement.step()) {
+                val subdeckId = noteDecks[statement.getLong(0)]?.toString() ?: ParsedSubdeck.NO_DECK_ID
+                if (subdeckId !in selection) continue
+                val typeId = statement.getLong(1)
+                selectedCounts[typeId] = (selectedCounts[typeId] ?: 0) + 1
+            }
+        }
         return counts.mapNotNull { (id, count) ->
-            model.noteTypes[id]?.let { type -> ParsedNoteType(id.toString(), type.name, type.fieldNames, type.isCloze, count) }
+            model.noteTypes[id]?.let { type ->
+                ParsedNoteType(
+                    id = id.toString(),
+                    name = type.name,
+                    fieldNames = type.fieldNames,
+                    isCloze = type.isCloze,
+                    noteCount = count,
+                    isImageOcclusion = type.isImageOcclusion,
+                    selectedNoteCount = selectedCounts[id] ?: 0,
+                )
+            }
         }
     }
 

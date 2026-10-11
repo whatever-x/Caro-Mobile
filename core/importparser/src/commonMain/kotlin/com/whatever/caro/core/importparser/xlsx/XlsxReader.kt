@@ -7,6 +7,7 @@ import com.whatever.caro.core.importparser.archive.ZipArchive
 import com.whatever.caro.core.importparser.model.HtmlMode
 import com.whatever.caro.core.importparser.model.ImportFormat
 import com.whatever.caro.core.importparser.model.ParseWarningCode
+import com.whatever.caro.core.importparser.model.ParsedLayout
 import com.whatever.caro.core.importparser.model.ParsedNoteType
 import com.whatever.caro.core.importparser.model.ParsedRow
 import com.whatever.caro.core.importparser.model.ParsedSheet
@@ -138,6 +139,7 @@ internal class XlsxReader(
             sheets = sheets,
             noteTypes = noteTypes,
             rows = rows,
+            layout = ParsedLayout(delimiter = null, hasHeaderRow = hasHeaderRow),
             warnings =
                 listOfNotNull(
                     countWarning(ParseWarningCode.XLSX_FORMULA_WITHOUT_VALUE, kept.sumOf { it.formulaWithoutValue }),

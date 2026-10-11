@@ -17,7 +17,7 @@ data class ParsedTable(
     val noteTypes: List<ParsedNoteType>,
     val rows: List<ParsedRow>,
     val warnings: List<ParseWarning> = emptyList(),
-    val textLayout: ParsedTextLayout? = null,
+    val layout: ParsedLayout? = null,
     val rowLimitReached: Boolean = false,
 )
 
@@ -54,6 +54,8 @@ data class ParsedNoteType(
     val fieldNames: List<String>,
     val isCloze: Boolean,
     val noteCount: Int,
+    val isImageOcclusion: Boolean = false,
+    val selectedNoteCount: Int? = null,
 )
 
 @Serializable
@@ -70,9 +72,15 @@ data class ParseWarning(
     val detail: String? = null,
 )
 
-/** 텍스트 원본에서 실제로 쓴 구분자와 제목 행 판정. 연결 화면에서 바꿔 다시 파싱할 때 시작값이 된다. */
+/**
+ * 원본에서 실제로 쓴 구분자와 제목 행 판정. 연결 화면에서 바꿔 다시 파싱할 때 시작값이 된다.
+ *
+ * @property delimiter 구분자가 없는 XLSX는 null이다.
+ * @property columnsFromHeader 항목 이름을 Anki 텍스트 머리말의 `#columns`에서 가져왔다. 이때 첫 줄은 제목 행이 아니다.
+ */
 @Serializable
-data class ParsedTextLayout(
-    val delimiter: String,
+data class ParsedLayout(
+    val delimiter: String?,
     val hasHeaderRow: Boolean,
+    val columnsFromHeader: Boolean = false,
 )

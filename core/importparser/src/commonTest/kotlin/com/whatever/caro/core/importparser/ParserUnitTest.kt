@@ -1,5 +1,6 @@
 package com.whatever.caro.core.importparser
 
+import com.whatever.caro.core.importparser.model.ParsedLayout
 import com.whatever.caro.core.importparser.text.CharCursor
 import com.whatever.caro.core.importparser.text.DelimitedRecordReader
 import com.whatever.caro.core.importparser.xlsx.XlsxNumberFormat
@@ -51,6 +52,20 @@ class ParserUnitTest : FunSpec() {
 
             start.attributes["a"] shouldBe "\"x\""
             text.text shouldBe "<b> 한글 &foo;"
+        }
+
+        test("Anki 텍스트 머리말에 #columns가 있으면 layout이 머리말 항목 이름 사용을 알리고 제목 행은 없다고 한다") {
+            val text = "#separator:tab\n#columns:Front\tBack\na\tb"
+
+            val table = ImportParser(Fixtures.fileSystem).parseText(text, "붙여넣기", Fixtures.options())
+
+            table.layout shouldBe ParsedLayout(delimiter = "\t", hasHeaderRow = false, columnsFromHeader = true)
+        }
+
+        test("#columns가 없는 텍스트는 layout이 머리말 항목 이름 사용을 알리지 않는다") {
+            val table = ImportParser(Fixtures.fileSystem).parseText("a\tb\nc\td", "붙여넣기", Fixtures.options())
+
+            table.layout shouldBe ParsedLayout(delimiter = "\t", hasHeaderRow = false, columnsFromHeader = false)
         }
 
         test("XML 리더는 DOCTYPE 선언을 만나면 지원하지 않는 파일로 멈춘다") {

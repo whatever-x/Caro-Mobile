@@ -36,6 +36,11 @@ internal fun ParsedTable.shouldMatchNoteTypes(expectedTypes: List<JsonObject>) {
             noteTypes.first { it.name == type.string("name") }.id shouldBe id
         }
     }
+    expectedTypes.forEach { type ->
+        withClue("isImageOcclusion of ${type.string("name")}") {
+            noteTypes.first { it.name == type.string("name") }.isImageOcclusion shouldBe (type.boolean("isImageOcclusion") ?: false)
+        }
+    }
 }
 
 internal fun ParsedTable.shouldMatchWarnings(expectedWarnings: List<JsonObject>) {

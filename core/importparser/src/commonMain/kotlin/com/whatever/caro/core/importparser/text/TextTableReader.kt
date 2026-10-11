@@ -7,10 +7,10 @@ import com.whatever.caro.core.importparser.ParseOptions
 import com.whatever.caro.core.importparser.model.HtmlMode
 import com.whatever.caro.core.importparser.model.ImportFormat
 import com.whatever.caro.core.importparser.model.ParseWarningCode
+import com.whatever.caro.core.importparser.model.ParsedLayout
 import com.whatever.caro.core.importparser.model.ParsedNoteType
 import com.whatever.caro.core.importparser.model.ParsedRow
 import com.whatever.caro.core.importparser.model.ParsedTable
-import com.whatever.caro.core.importparser.model.ParsedTextLayout
 import com.whatever.caro.core.importparser.model.countWarning
 import com.whatever.caro.core.importparser.table.ColumnNames
 import kotlinx.coroutines.currentCoroutineContext
@@ -23,6 +23,7 @@ internal class TextTableReader(
         val titles: List<String>?,
         val rows: List<List<String>>,
         val hasHeaderRow: Boolean,
+        val columnsFromHeader: Boolean,
         val htmlSignal: Boolean,
     )
 
@@ -48,7 +49,7 @@ internal class TextTableReader(
                 true -> HtmlMode.HTML
                 false -> HtmlMode.PLAIN
             }
-        return buildTable(scan, sourceName, htmlMode, ParsedTextLayout(delimiter.toString(), scan.hasHeaderRow))
+        return buildTable(scan, sourceName, htmlMode, ParsedLayout(delimiter.toString(), scan.hasHeaderRow, scan.columnsFromHeader))
     }
 
     private suspend fun scan(
@@ -68,7 +69,7 @@ internal class TextTableReader(
                 }
             }
 
-        val first = take() ?: return Scan(null, emptyList(), hasHeaderRow = false, htmlSignal = false)
+        val first = take() ?: return Scan(null, emptyList(), hasHeaderRow = false, columnsFromHeader = false, htmlSignal = false)
         val hasHeaderRow = options.hasHeaderRow ?: (header.columns == null && ColumnNames.looksLikeTitleRow(first))
         val titles =
             when {
@@ -81,7 +82,7 @@ internal class TextTableReader(
             rows += take() ?: break
             if (rows.size % CANCEL_CHECK_INTERVAL == 0) currentCoroutineContext().ensureActive()
         }
-        return Scan(titles, rows, hasHeaderRow, htmlSignal)
+        return Scan(titles, rows, hasHeaderRow, columnsFromHeader = !hasHeaderRow && header.columns != null, htmlSignal = htmlSignal)
     }
 
     private fun columnsOf(
@@ -96,7 +97,7 @@ internal class TextTableReader(
         scan: Scan,
         sourceName: String,
         htmlMode: HtmlMode,
-        layout: ParsedTextLayout,
+        layout: ParsedLayout,
     ): ParsedTable {
         val width = tableWidth(scan)
         if (width > options.maxColumns) throw ImportParseException(ImportParseErrorKind.TOO_MANY_COLUMNS, "$width columns")
@@ -123,7 +124,7 @@ internal class TextTableReader(
             noteTypes = noteTypes,
             rows = rows,
             warnings = listOfNotNull(countWarning(ParseWarningCode.TEXT_INCONSISTENT_COLUMNS, padded)),
-            textLayout = layout,
+            layout = layout,
             // 상한 행에서 읽기를 멈췄으므로 뒤에 행이 더 있을 수 있다. 제외 카드가 생겨도 상한 초과 판정을 유지한다.
             rowLimitReached = scan.rows.size >= options.maxRows,
         )

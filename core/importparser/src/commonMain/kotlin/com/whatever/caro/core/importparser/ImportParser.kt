@@ -28,12 +28,16 @@ class ImportParser(
         options: ParseOptions,
     ): ParsedTable =
         translateFailures {
+            // 지원하지 않는 확장자는 크기와 상관없이 같은 오류여야 해서 크기 확인보다 먼저 거른다.
+            val extension =
+                ImportSourceName.supportedExtension(sourceName)
+                    ?: throw ImportParseException(ImportParseErrorKind.UNSUPPORTED_FILE, "unsupported or missing extension")
             val fileBytes = fileSystem.metadata(path).size ?: throw ImportParseException(ImportParseErrorKind.CORRUPT_FILE, "size unknown")
             // 크기만 보고 내용을 읽기 전에 멈춘다.
             if (fileBytes > options.maxFileBytes) {
                 throw ImportParseException(ImportParseErrorKind.FILE_TOO_LARGE, "file is $fileBytes bytes")
             }
-            when (val source = ImportFormatDetector.detect(fileSystem, path, sourceName, fileBytes, options)) {
+            when (val source = ImportFormatDetector.detect(fileSystem, path, extension, fileBytes, options)) {
                 is DetectedSource.Apkg -> ApkgReader(fileSystem, source.archive, options).read(sourceName)
                 is DetectedSource.Xlsx -> XlsxReader(source.archive, options).read(sourceName)
                 DetectedSource.Text -> TextFileReader(fileSystem, options).read(path, sourceName)

@@ -33,7 +33,7 @@ class TextFixtureTest : FunSpec() {
             val table = Fixtures.parse("text/quizlet_custom_comma_semicolon.txt", Fixtures.options(delimiter = ','))
 
             table.valuesAt(0) shouldBe listOf("abandon", "버리다;benevolent", "자비로운;candid", "솔직한")
-            table.textLayout?.delimiter shouldBe ","
+            table.layout?.delimiter shouldBe ","
         }
 
         test("제목 행 설정을 끄면 첫 행이 데이터 행이 되고 항목 이름은 열 N이다") {
@@ -41,7 +41,13 @@ class TextFixtureTest : FunSpec() {
 
             table.valuesAt(0) shouldBe listOf("term", "definition", "example")
             table.noteTypes.single().fieldNames shouldBe listOf("열 1", "열 2", "열 3")
-            table.textLayout?.hasHeaderRow shouldBe false
+            table.layout?.hasHeaderRow shouldBe false
+        }
+
+        test("텍스트 노트 유형은 선택 범위 노트 수를 채우지 않는다") {
+            val table = Fixtures.parse("text/tsv_no_header.tsv")
+
+            table.noteTypes.single().selectedNoteCount shouldBe null
         }
     }
 
@@ -83,8 +89,8 @@ class TextFixtureTest : FunSpec() {
         expected.obj("limit")?.takeIf { "parserStopsKeepingValuesAtRow" in it }?.let { limit ->
             table.rowLimitReached shouldBe (limit.int("parserStopsKeepingValuesAtRow") != null)
         }
-        expected.string("separator")?.let { separator -> table.textLayout?.delimiter shouldBe separator }
-        expected.boolean("hasHeaderRow")?.let { header -> table.textLayout?.hasHeaderRow shouldBe header }
+        expected.string("separator")?.let { separator -> table.layout?.delimiter shouldBe separator }
+        expected.boolean("hasHeaderRow")?.let { header -> table.layout?.hasHeaderRow shouldBe header }
         table.subdecks shouldBe emptyList()
         table.sheets shouldBe emptyList()
     }

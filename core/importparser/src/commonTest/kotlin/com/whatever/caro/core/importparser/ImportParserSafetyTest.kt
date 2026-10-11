@@ -24,6 +24,20 @@ class ImportParserSafetyTest : FunSpec() {
             error.kind shouldBe ImportParseErrorKind.UNSUPPORTED_FILE
         }
 
+        listOf("a.xls", "noext", "a.").forEach { name ->
+            test("확장자가 지원 대상이 아닌 ${name}은 크기 상한을 넘어도 내용을 읽기 전에 지원하지 않는 파일로 멈춘다") {
+                val error = shouldThrow<ImportParseException> { parseBytes(name, "68656c6c6f", Fixtures.options(maxFileBytes = 1)) }
+
+                error.kind shouldBe ImportParseErrorKind.UNSUPPORTED_FILE
+            }
+        }
+
+        test("지원하는 확장자는 대문자여도 크기 상한을 넘으면 내용을 읽기 전에 크기 초과로 멈춘다") {
+            val error = shouldThrow<ImportParseException> { parseBytes("WORDS.XLSX", "68656c6c6f", Fixtures.options(maxFileBytes = 1)) }
+
+            error.kind shouldBe ImportParseErrorKind.FILE_TOO_LARGE
+        }
+
         test("OLE 시그니처(.xls, 암호 걸린 xlsx)는 지원하지 않는 파일이다") {
             val error = shouldThrow<ImportParseException> { parseBytes("words.xlsx", "d0cf11e0a1b11ae1") }
 
@@ -89,12 +103,13 @@ class ImportParserSafetyTest : FunSpec() {
     private suspend fun parseBytes(
         name: String,
         hex: String,
+        options: ParseOptions = Fixtures.options(),
     ) = run {
         Fixtures.fileSystem.createDirectories(Fixtures.tempRoot)
         val path = Fixtures.tempRoot / "$TEST_INPUT_PREFIX$name"
         Fixtures.fileSystem.write(path) { write(hex.decodeHex()) }
         try {
-            ImportParser(Fixtures.fileSystem).parseFile(path, name, Fixtures.options())
+            ImportParser(Fixtures.fileSystem).parseFile(path, name, options)
         } finally {
             Fixtures.fileSystem.delete(path)
         }
