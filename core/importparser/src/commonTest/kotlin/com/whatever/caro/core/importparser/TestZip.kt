@@ -12,11 +12,27 @@ internal object TestZip {
     private const val ZIP64_END_RECORD = 0x06064b50
     private const val ZIP64_LOCATOR = 0x07064b50
     private const val ZIP64_END_RECORD_REMAINING_BYTES = 44L
+    private const val ZIP64_END_RECORD_BYTES = 56L
+    private const val ZIP64_LOCATOR_BYTES = 20L
+    private const val END_RECORD_BYTES = 22L
     private const val VERSION = 20
 
+    /** ZIP64 끝 레코드를 둘 위치. locator는 어느 쪽이든 일반 끝 레코드 바로 앞에 있다. */
+    enum class Zip64Placement {
+        /** 일반 끝 레코드 바로 앞(표준 배치). */
+        BEFORE_END_RECORD,
+
+        /** 중앙 디렉터리 앞. 레코드에서 중앙 디렉터리까지의 거리가 레코드 위치로는 잡히지 않는다. */
+        BEFORE_CENTRAL_DIRECTORY,
+
+        /** 일반 끝 레코드 뒤 코멘트 영역. */
+        IN_COMMENT,
+    }
+
     /**
-     * [zip64EntryCount]를 주면 끝 레코드 앞에 그 항목 수를 적은 ZIP64 끝 레코드와 locator를 붙인다.
-     * [claimedCentralDirectoryBytes]를 주면 끝 레코드에 실제와 다른 중앙 디렉터리 크기를 적는다.
+     * [zip64EntryCount]를 주면 그 항목 수를 적은 ZIP64 끝 레코드와 locator를 [zip64Placement]에 붙인다.
+     * [claimedCentralDirectoryBytes]를 주면 일반 끝 레코드에, [zip64ClaimedCentralDirectoryBytes]를 주면 ZIP64 끝 레코드에 실제와 다른 중앙 디렉터리 크기를 적는다.
+     * [trailingBytes]는 일반 끝 레코드 뒤에 0을 덧붙여 끝 레코드를 파일 끝에서 멀리 민다.
      */
     fun write(
         path: Path,
@@ -24,6 +40,9 @@ internal object TestZip {
         claimedEntryCount: Int = entries.size,
         zip64EntryCount: Long? = null,
         claimedCentralDirectoryBytes: Int? = null,
+        zip64Placement: Zip64Placement = Zip64Placement.BEFORE_END_RECORD,
+        zip64ClaimedCentralDirectoryBytes: Long? = null,
+        trailingBytes: Int = 0,
     ) {
         val body = Buffer()
         val central = Buffer()
@@ -65,34 +84,38 @@ internal object TestZip {
                 .writeIntLe(offset.toInt())
             central.write(nameBytes)
         }
-        val centralOffset = body.size
         val centralSize = central.size
+        val zip64Size = zip64ClaimedCentralDirectoryBytes ?: centralSize
+        var recordOffset = 0L
+        var comment = Buffer()
+        if (zip64EntryCount != null && zip64Placement == Zip64Placement.BEFORE_CENTRAL_DIRECTORY) {
+            recordOffset = body.size
+            body.writeAll(zip64End(zip64EntryCount, zip64Size, body.size + ZIP64_END_RECORD_BYTES))
+        }
+        val centralOffset = body.size
         body.writeAll(central)
-        zip64EntryCount?.let { count -> writeZip64End(body, count, centralSize, centralOffset) }
+        if (zip64EntryCount != null && zip64Placement == Zip64Placement.BEFORE_END_RECORD) {
+            recordOffset = body.size
+            body.writeAll(zip64End(zip64EntryCount, zip64Size, centralOffset))
+        }
+        if (zip64EntryCount != null && zip64Placement == Zip64Placement.IN_COMMENT) {
+            recordOffset = body.size + ZIP64_LOCATOR_BYTES + END_RECORD_BYTES
+            comment = zip64End(zip64EntryCount, zip64Size, centralOffset)
+        }
+        if (zip64EntryCount != null) writeZip64Locator(body, recordOffset)
         body.writeIntLe(END_OF_CENTRAL_DIRECTORY).writeShortLe(0).writeShortLe(0)
         body.writeShortLe(claimedEntryCount).writeShortLe(claimedEntryCount)
-        body.writeIntLe(claimedCentralDirectoryBytes ?: centralSize.toInt()).writeIntLe(centralOffset.toInt()).writeShortLe(0)
+        val declaredCentralSize = claimedCentralDirectoryBytes ?: centralSize.toInt()
+        body.writeIntLe(declaredCentralSize).writeIntLe(centralOffset.toInt()).writeShortLe(comment.size.toInt())
+        body.writeAll(comment)
+        body.write(ByteArray(trailingBytes))
         Fixtures.fileSystem.write(path) { writeAll(body) }
     }
 
-    private fun writeZip64End(
+    private fun writeZip64Locator(
         body: Buffer,
-        entryCount: Long,
-        centralSize: Long,
-        centralOffset: Long,
+        recordOffset: Long,
     ) {
-        val recordOffset = body.size
-        body.writeIntLe(ZIP64_END_RECORD).writeLongLe(ZIP64_END_RECORD_REMAINING_BYTES)
-        body
-            .writeShortLe(VERSION)
-            .writeShortLe(VERSION)
-            .writeIntLe(0)
-            .writeIntLe(0)
-        body
-            .writeLongLe(entryCount)
-            .writeLongLe(entryCount)
-            .writeLongLe(centralSize)
-            .writeLongLe(centralOffset)
         body
             .writeIntLe(ZIP64_LOCATOR)
             .writeIntLe(0)
@@ -100,12 +123,31 @@ internal object TestZip {
             .writeIntLe(1)
     }
 
+    private fun zip64End(
+        entryCount: Long,
+        centralSize: Long,
+        centralOffset: Long,
+    ): Buffer =
+        Buffer()
+            .writeIntLe(ZIP64_END_RECORD)
+            .writeLongLe(ZIP64_END_RECORD_REMAINING_BYTES)
+            .writeShortLe(VERSION)
+            .writeShortLe(VERSION)
+            .writeIntLe(0)
+            .writeIntLe(0)
+            .writeLongLe(entryCount)
+            .writeLongLe(entryCount)
+            .writeLongLe(centralSize)
+            .writeLongLe(centralOffset)
+
     fun xlsx(
         path: Path,
         sheetXml: String,
         sharedStrings: String? = null,
         zip64EntryCount: Long? = null,
         claimedCentralDirectoryBytes: Int? = null,
+        zip64Placement: Zip64Placement = Zip64Placement.BEFORE_END_RECORD,
+        zip64ClaimedCentralDirectoryBytes: Long? = null,
     ) = write(
         path,
         entries =
@@ -117,6 +159,8 @@ internal object TestZip {
             ),
         zip64EntryCount = zip64EntryCount,
         claimedCentralDirectoryBytes = claimedCentralDirectoryBytes,
+        zip64Placement = zip64Placement,
+        zip64ClaimedCentralDirectoryBytes = zip64ClaimedCentralDirectoryBytes,
     )
 
     fun sheet(rows: String): String = "<worksheet><sheetData>$rows</sheetData></worksheet>"
