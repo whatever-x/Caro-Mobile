@@ -3,8 +3,11 @@ package com.whatever.caro.feature.importer.route
 import androidx.compose.material3.SnackbarDuration
 import caromobile.core.designsystem.generated.resources.Res
 import caromobile.core.designsystem.generated.resources.import_snackbar_completed
+import caromobile.core.designsystem.generated.resources.import_snackbar_deck_create_failed
+import caromobile.core.designsystem.generated.resources.import_snackbar_deck_invalid_input
 import caromobile.core.designsystem.generated.resources.import_snackbar_empty_deck
 import caromobile.core.designsystem.generated.resources.import_snackbar_partial
+import com.whatever.caro.core.designsystem.components.CaroSnackbarStyle
 import com.whatever.caro.core.navigator.contract.NavCommand
 import com.whatever.caro.core.navigator.dispatcher.NavigationDispatcher
 import com.whatever.caro.core.navigator.entries.DeckDetailEntry
@@ -74,6 +77,24 @@ class ImportDeckRouteTest : FunSpec() {
             rig.handle(ImportDeckSideEffect.NavigateBack)
 
             rig.events shouldBe listOf(NavCommand.Back)
+        }
+
+        test("입력 값 오류로 덱 생성이 거절되면 이름과 설명을 확인하라는 오류 스낵바만 띄운다") {
+            val rig = RouteRig()
+
+            rig.handle(ImportDeckSideEffect.ShowDeckInputError)
+
+            rig.events shouldBe
+                listOf(SnackBarMessage(message = Res.string.import_snackbar_deck_invalid_input.key, style = CaroSnackbarStyle.Error))
+        }
+
+        test("그 밖의 이유로 덱 생성이 거절되면 잠시 뒤 다시 시도하라는 오류 스낵바만 띄운다") {
+            val rig = RouteRig()
+
+            rig.handle(ImportDeckSideEffect.ShowDeckCreateError)
+
+            rig.events shouldBe
+                listOf(SnackBarMessage(message = Res.string.import_snackbar_deck_create_failed.key, style = CaroSnackbarStyle.Error))
         }
 
         test("파일 선택기 열기 효과는 선택기를 한 번 열고 이동이나 스낵바는 보내지 않는다") {

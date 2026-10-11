@@ -35,9 +35,12 @@ import com.whatever.caro.feature.importer.mvi.ImportDeckState
 import com.whatever.caro.feature.importer.mvi.ImportDialog
 import com.whatever.caro.feature.importer.mvi.ImportLoading
 import com.whatever.caro.feature.importer.mvi.ImportStep
+import com.whatever.caro.feature.importer.platform.rememberReduceMotionEnabled
+import com.whatever.caro.feature.importer.step.DeckInfoStep
 import com.whatever.caro.feature.importer.step.MappingStep
 import com.whatever.caro.feature.importer.step.PasteStep
 import com.whatever.caro.feature.importer.step.PreviewStep
+import com.whatever.caro.feature.importer.step.SavingStep
 import com.whatever.caro.feature.importer.step.SheetStep
 import com.whatever.caro.feature.importer.step.SourceStep
 import com.whatever.caro.feature.importer.step.SubdeckStep
@@ -179,11 +182,27 @@ internal fun ImportDeckScreen(
                         }
 
                         ImportStep.DeckInfo, ImportStep.CreatingDeck -> {
-                            Unit
+                            state.preview?.let { preview ->
+                                DeckInfoStep(
+                                    name = state.deckName,
+                                    description = state.deckDescription,
+                                    cardCount = preview.stats.cardCount,
+                                    isConfirmEnabled = state.isDeckInfoConfirmEnabled,
+                                    onNameChange = { name -> onIntent(ImportDeckIntent.UpdateDeckName(name)) },
+                                    onDescriptionChange = { description -> onIntent(ImportDeckIntent.UpdateDeckDescription(description)) },
+                                    onConfirm = { onIntent(ImportDeckIntent.ClickCreateDeck) },
+                                )
+                            }
                         }
 
                         ImportStep.Saving -> {
-                            Unit
+                            state.saving?.let { saving ->
+                                SavingStep(
+                                    progress = saving,
+                                    reduceMotion = rememberReduceMotionEnabled(),
+                                    onStop = { onIntent(ImportDeckIntent.ClickStop) },
+                                )
+                            }
                         }
                     }
                 }

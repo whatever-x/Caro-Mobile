@@ -209,6 +209,12 @@ internal fun com.whatever.caro.feature.importer.platform.rememberImportFilePicke
     - onResult: STABLE (function type)
 
 @Composable
+internal fun com.whatever.caro.feature.importer.platform.rememberReduceMotionEnabled(): kotlin.Boolean
+  skippable: true
+  restartable: true
+  params:
+
+@Composable
 private fun com.whatever.caro.feature.importer.rememberInputKey(input: kotlin.Any?): kotlin.Int
   skippable: false
   restartable: true
@@ -245,6 +251,20 @@ private fun com.whatever.caro.feature.importer.step.ClozeBanner(): kotlin.Unit
   skippable: true
   restartable: true
   params:
+
+@Composable
+internal fun com.whatever.caro.feature.importer.step.DeckInfoStep(name: kotlin.String, description: kotlin.String, cardCount: kotlin.Int, isConfirmEnabled: kotlin.Boolean, onNameChange: kotlin.Function1<kotlin.String, kotlin.Unit>, onDescriptionChange: kotlin.Function1<kotlin.String, kotlin.Unit>, onConfirm: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - name: STABLE (String is immutable)
+    - description: STABLE (String is immutable)
+    - cardCount: STABLE (primitive type)
+    - isConfirmEnabled: STABLE (primitive type)
+    - onNameChange: STABLE (function type)
+    - onDescriptionChange: STABLE (function type)
+    - onConfirm: STABLE (function type)
+    - modifier: STABLE (marked @Stable or @Immutable)
 
 @Composable
 private fun com.whatever.caro.feature.importer.step.DelimiterChipButton(chip: com.whatever.caro.feature.importer.logic.DelimiterChip, onSelect: kotlin.Function1<kotlin.Char, kotlin.Unit>): kotlin.Unit
@@ -315,6 +335,14 @@ private fun com.whatever.caro.feature.importer.step.FilterChip(text: kotlin.Stri
     - text: STABLE (String is immutable)
     - isSelected: STABLE (primitive type)
     - onClick: STABLE (function type)
+
+@Composable
+private fun com.whatever.caro.feature.importer.step.FlowSegment(startProvider: kotlin.Function0<kotlin.Float>, color: androidx.compose.ui.graphics.Color): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - startProvider: STABLE (function type)
+    - color: STABLE (marked @Stable or @Immutable)
 
 @Composable
 internal fun com.whatever.caro.feature.importer.step.HeaderRowToggle(checked: kotlin.Boolean, onCheckedChange: kotlin.Function1<kotlin.Boolean, kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
@@ -518,6 +546,14 @@ internal fun com.whatever.caro.feature.importer.step.PreviewWarningLines(warning
     - modifier: STABLE (marked @Stable or @Immutable)
 
 @Composable
+private fun com.whatever.caro.feature.importer.step.ProgressTrack(style: com.whatever.caro.feature.importer.logic.SavingProgressStyle, fraction: kotlin.Float): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - style: STABLE (class with no mutable properties)
+    - fraction: STABLE (primitive type)
+
+@Composable
 private fun com.whatever.caro.feature.importer.step.RadioMark(isSelected: kotlin.Boolean): kotlin.Unit
   skippable: true
   restartable: true
@@ -561,6 +597,24 @@ private fun com.whatever.caro.feature.importer.step.RowCard(rowNumber: kotlin.In
     - headerLabels: RUNTIME (requires runtime check)
     - cells: RUNTIME (requires runtime check)
     - reading: STABLE (String is immutable)
+
+@Composable
+private fun com.whatever.caro.feature.importer.step.SavingProgressBar(progress: com.whatever.caro.feature.importer.mvi.SavingProgress, reduceMotion: kotlin.Boolean): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - progress: STABLE (class with no mutable properties)
+    - reduceMotion: STABLE (primitive type)
+
+@Composable
+internal fun com.whatever.caro.feature.importer.step.SavingStep(progress: com.whatever.caro.feature.importer.mvi.SavingProgress, reduceMotion: kotlin.Boolean, onStop: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - progress: STABLE (class with no mutable properties)
+    - reduceMotion: STABLE (primitive type)
+    - onStop: STABLE (function type)
+    - modifier: STABLE (marked @Stable or @Immutable)
 
 @Composable
 internal fun com.whatever.caro.feature.importer.step.SelectionCardRow(label: kotlin.String, detail: kotlin.String, labelMaxLines: kotlin.Int, position: com.whatever.caro.feature.importer.step.CardPosition, interaction: androidx.compose.ui.Modifier, leading: @[Composable] androidx.compose.runtime.internal.ComposableFunction0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier, indent: androidx.compose.ui.unit.Dp, caption: kotlin.String?, showDivider: kotlin.Boolean): kotlin.Unit
@@ -889,4 +943,11 @@ private fun com.whatever.caro.feature.importer.step.sheetRowText(sheet: com.what
   params:
     - sheet: UNSTABLE (has mutable properties or unstable members)
     - maxCards: STABLE (primitive type)
+
+@Composable
+private fun com.whatever.caro.feature.importer.step.statusText(progress: com.whatever.caro.feature.importer.mvi.SavingProgress): kotlin.String
+  skippable: true
+  restartable: true
+  params:
+    - progress: STABLE (class with no mutable properties)
 
