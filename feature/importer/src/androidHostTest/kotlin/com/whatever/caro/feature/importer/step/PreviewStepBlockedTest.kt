@@ -68,7 +68,7 @@ class PreviewStepBlockedTest {
     fun `막히지 않았으면 사유 줄도 상태 설명도 없다`() {
         host.show()
 
-        composeRule.onNode(isPoliteRegion).assertDoesNotExist()
+        composeRule.onAllNodes(isPoliteRegion and hasText(".", substring = true)).assertCountEquals(0)
         nextButton().assert(SemanticsMatcher.keyNotDefined(SemanticsProperties.StateDescription))
     }
 

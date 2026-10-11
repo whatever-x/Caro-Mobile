@@ -17,6 +17,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.focusProperties
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
@@ -83,7 +86,10 @@ internal fun ImportCreatingDeckOverlay(
     )
 }
 
-/** 입력 차단, semantics 비우기, 포커스 해제는 바로 하고 스크림과 카드는 200ms 뒤에 보여 짧은 읽기에서 깜빡이지 않게 한다. */
+/**
+ * 입력 차단, semantics 비우기, 포커스 해제는 바로 하고 스크림과 카드는 200ms 뒤에 보여 짧은 읽기에서 깜빡이지 않게 한다.
+ * 읽는 동안에도 뒤로 가기는 쓸 수 있어야 하므로 Back과 Escape 키는 막지 않는다. 키보드 Tab이 가려진 내용으로 들어가지 못하게 포커스도 막는다.
+ */
 @Composable
 private fun ImportBlockingBox(
     isBlocking: Boolean,
@@ -102,12 +108,13 @@ private fun ImportBlockingBox(
         modifier =
             modifier
                 .fillMaxSize()
-                .onPreviewKeyEvent { isBlocking },
+                .onPreviewKeyEvent { event -> isBlocking && event.key != Key.Back && event.key != Key.Escape },
     ) {
         Box(
             modifier =
                 Modifier
                     .fillMaxSize()
+                    .focusProperties { canFocus = !isBlocking }
                     .then(if (isBlocking) Modifier.clearAndSetSemantics { } else Modifier),
         ) {
             content()

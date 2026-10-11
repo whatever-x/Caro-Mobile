@@ -4,6 +4,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusable
+import androidx.compose.foundation.indication
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,6 +19,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material3.Text
+import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -34,10 +37,12 @@ import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
+import androidx.compose.ui.semantics.text
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import caromobile.core.designsystem.generated.resources.Res
-import caromobile.core.designsystem.generated.resources.import_a11y_field_selected
+import caromobile.core.designsystem.generated.resources.import_a11y_field_order_state
 import caromobile.core.designsystem.generated.resources.import_a11y_field_unavailable
 import caromobile.core.designsystem.generated.resources.import_a11y_pick_fields
 import caromobile.core.designsystem.generated.resources.import_button_pick_fields
@@ -50,6 +55,7 @@ import com.whatever.caro.feature.importer.logic.pickerRows
 import com.whatever.caro.feature.importer.logic.summarizeChosenFields
 import com.whatever.caro.feature.importer.logic.truncateChip
 import com.whatever.caro.feature.importer.logic.usesFieldPicker
+import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import org.jetbrains.compose.resources.stringResource
 
@@ -79,7 +85,7 @@ internal fun FieldSide(
     onToggleField: (noteTypeId: String, target: String, fieldName: String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val chosen = mapping.targets[side.target].orEmpty()
+    val chosen = remember(mapping, side.target) { mapping.targets[side.target].orEmpty().toImmutableList() }
 
     Column(modifier = modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(CaroTheme.spacing.s)) {
         Text(
@@ -105,7 +111,7 @@ internal fun FieldSide(
 @Composable
 private fun FieldChips(
     type: ParsedNoteType,
-    chosen: List<String>,
+    chosen: ImmutableList<String>,
     side: FieldSideSpec,
     isEnabled: Boolean,
     onToggleField: (noteTypeId: String, target: String, fieldName: String) -> Unit,
@@ -129,7 +135,7 @@ private fun FieldChips(
 
 /**
  * 선택해도 테두리 두께가 같아 칩 높이와 글자 기준선이 흔들리지 않는다. 높이는 고정하지 않아 큰 글자에서 커진다.
- * 고른 칩은 안쪽 글자와 번호를 한 문장으로 읽도록 하위 semantics를 지우고, 누르는 동작은 바깥 toggleable이 맡는다.
+ * 고른 칩은 번호 글자가 따로 읽히지 않도록 하위 semantics를 지우고, 선택됨과 면, 순서를 상태 설명 하나로 읽는다. 누르는 동작은 바깥 toggleable이 맡는다.
  */
 @Composable
 private fun FieldChip(
@@ -142,8 +148,15 @@ private fun FieldChip(
     val shape = CaroTheme.shape.xxl
     val isChosen = order != null
     val label = truncateChip(name)
-    val chosenDescription = order?.let { number -> stringResource(Res.string.import_a11y_field_selected, label, sideName, number) }
+    val chosenState = order?.let { number -> stringResource(Res.string.import_a11y_field_order_state, sideName, number) }
     val unavailable = stringResource(Res.string.import_a11y_field_unavailable)
+    val stateText =
+        when {
+            chosenState != null && !isEnabled -> "$unavailable, $chosenState"
+            chosenState != null -> chosenState
+            !isEnabled -> unavailable
+            else -> null
+        }
 
     Row(
         modifier =
@@ -154,15 +167,15 @@ private fun FieldChip(
                 .toggleable(value = isChosen, enabled = isEnabled, role = Role.Checkbox, onValueChange = { onClick() })
                 .then(
                     when {
-                        chosenDescription != null -> {
+                        isChosen -> {
                             Modifier.clearAndSetSemantics {
-                                contentDescription = chosenDescription
-                                if (!isEnabled) stateDescription = unavailable
+                                text = AnnotatedString(label)
+                                stateDescription = stateText.orEmpty()
                             }
                         }
 
-                        !isEnabled -> {
-                            Modifier.semantics { stateDescription = unavailable }
+                        stateText != null -> {
+                            Modifier.semantics { stateDescription = stateText }
                         }
 
                         else -> {
@@ -295,6 +308,7 @@ private fun SummaryText(
 /**
  * 눌리는 높이는 [PickerButtonMinHeight] 이상이고 보이는 모양은 그 안의 테두리 알약이다. 접근성 문장은 면을 넣은 [description]이다.
  * clickable만으로는 터치 모드에서 포커스 요청을 받지 않으므로 focusable을 따로 둔다.
+ * 포커스와 눌림 표시는 눌리는 영역이 아니라 알약에 그려야 하므로 같은 소스를 알약의 indication으로 넘긴다.
  */
 @Composable
 private fun PickerButton(
@@ -306,14 +320,20 @@ private fun PickerButton(
 ) {
     val shape = CaroTheme.shape.xxl
     val unavailable = stringResource(Res.string.import_a11y_field_unavailable)
+    val interactionSource = remember { MutableInteractionSource() }
 
     Box(
         modifier =
             modifier
                 .heightIn(min = PickerButtonMinHeight)
-                .focusable(enabled = isEnabled)
-                .clickable(enabled = isEnabled, role = Role.Button, onClick = onClick)
-                .clearAndSetSemantics {
+                .focusable(enabled = isEnabled, interactionSource = interactionSource)
+                .clickable(
+                    interactionSource = interactionSource,
+                    indication = null,
+                    enabled = isEnabled,
+                    role = Role.Button,
+                    onClick = onClick,
+                ).clearAndSetSemantics {
                     contentDescription = description
                     if (!isEnabled) stateDescription = unavailable
                 },
@@ -323,6 +343,7 @@ private fun PickerButton(
             modifier =
                 Modifier
                     .clip(shape)
+                    .indication(interactionSource, ripple())
                     .border(ChipBorderWidth, CaroTheme.color.border.secondary, shape)
                     .padding(horizontal = CaroTheme.spacing.m, vertical = ChipVerticalPadding),
             text = text,

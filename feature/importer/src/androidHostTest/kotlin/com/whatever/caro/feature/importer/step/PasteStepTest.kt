@@ -182,6 +182,13 @@ class PasteStepTest {
         field().assertHeightIsEqualTo(120.dp - verticalPadding * 2)
     }
 
+    @Test
+    fun `입력칸은 붙여 넣을 내용을 안내하는 이름을 가진다`() {
+        show()
+
+        field().fetchSemanticsNode().config[SemanticsProperties.ContentDescription] shouldBe listOf(TITLE)
+    }
+
     private companion object {
         const val NEXT = "다음"
         const val TITLE = "복사한 내용을 붙여 넣어 주세요"

@@ -15,6 +15,7 @@ import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -40,6 +41,8 @@ import com.whatever.caro.feature.importer.logic.DelimiterChip
 import com.whatever.caro.feature.importer.logic.DelimiterKind
 import com.whatever.caro.feature.importer.logic.buildTextCheckTable
 import com.whatever.caro.feature.importer.logic.delimiterChips
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
 import org.jetbrains.compose.resources.stringResource
 
 private val ChipBorderWidth = 1.dp
@@ -62,9 +65,13 @@ internal fun TextCheckStep(
     modifier: Modifier = Modifier,
 ) {
     val checkTable = remember(table) { buildTextCheckTable(table) }
-    val chips = remember(delimiter) { delimiterChips(delimiter) }
+    val chips = remember(delimiter) { delimiterChips(delimiter).toImmutableList() }
     val verticalScrollState = rememberScrollState()
     val tableScrollState = rememberScrollState()
+
+    // 다시 나눈 결과는 열 수가 달라지므로 표의 가로 위치만 처음으로 돌리고 세로 위치와 포커스는 남긴다.
+    val firstTable = remember { table }
+    LaunchedEffect(table) { if (table !== firstTable) tableScrollState.scrollTo(0) }
 
     Column(modifier = modifier.fillMaxSize()) {
         Column(
@@ -124,7 +131,7 @@ private fun TextCheckGuide() {
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun DelimiterSetting(
-    chips: List<DelimiterChip>,
+    chips: ImmutableList<DelimiterChip>,
     onSelect: (Char) -> Unit,
 ) {
     Column(
@@ -140,7 +147,6 @@ private fun DelimiterSetting(
             style = CaroTheme.typography.body2.semiBold,
             color = CaroTheme.color.text.primary,
         )
-        // 하나만 고르는 그룹이다. 큰 글자에서 칩이 한 줄에 다 들어가지 않으면 줄을 바꾼다.
         FlowRow(
             modifier = Modifier.fillMaxWidth().selectableGroup(),
             horizontalArrangement = Arrangement.spacedBy(CaroTheme.spacing.s),

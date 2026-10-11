@@ -44,7 +44,7 @@ internal class RecordingSheetFrame {
     val frame: FieldPickerSheetFrame =
         { dismissRequest, content ->
             SideEffect { onDismissRequest = dismissRequest }
-            Column(modifier = Modifier.fillMaxSize()) { content() }
+            Column(modifier = Modifier.fillMaxSize()) { content(dismissRequest) }
         }
 }
 

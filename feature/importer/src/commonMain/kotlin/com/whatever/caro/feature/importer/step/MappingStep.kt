@@ -31,6 +31,10 @@ import org.jetbrains.compose.resources.stringResource
 
 private const val HEADER_KEY = "header"
 private const val FOOTER_KEY = "footer"
+private const val HEADER_TYPE = "header"
+private const val FOOTER_TYPE = "footer"
+private const val NOTE_TYPE = "type"
+private const val IMAGE_OCCLUSION_TYPE = "image-occlusion"
 
 /**
  * 유형마다 카드 하나를 LazyColumn 아이템으로 둬 세로 스크롤 컨테이너가 하나다.
@@ -57,8 +61,12 @@ internal fun MappingStep(
         reason = reason,
         modifier = modifier,
     ) {
-        item(key = HEADER_KEY) { MappingHeader() }
-        items(noteTypes, key = { type -> "type-${type.id}" }) { type ->
+        item(key = HEADER_KEY, contentType = HEADER_TYPE) { MappingHeader() }
+        items(
+            noteTypes,
+            key = { type -> "type-${type.id}" },
+            contentType = { type -> if (type.isImageOcclusion) IMAGE_OCCLUSION_TYPE else NOTE_TYPE },
+        ) { type ->
             val cardModifier = Modifier.padding(horizontal = CaroTheme.spacing.xl2).padding(bottom = CaroTheme.spacing.m)
             if (type.isImageOcclusion) {
                 ImageOcclusionCard(type = type, modifier = cardModifier)
@@ -73,7 +81,7 @@ internal fun MappingStep(
                 )
             }
         }
-        item(key = FOOTER_KEY) { Spacer(modifier = Modifier.height(CaroTheme.spacing.m)) }
+        item(key = FOOTER_KEY, contentType = FOOTER_TYPE) { Spacer(modifier = Modifier.height(CaroTheme.spacing.m)) }
     }
 }
 

@@ -65,6 +65,20 @@ class PreviewStepTest {
     }
 
     @Test
+    fun `가져올 장수 제목은 라벨과 장수를 한 문장으로 읽는다`() {
+        host.show()
+
+        composeRule.onNode(isHeading and readsAs("가져올 카드 8장")).assertIsDisplayed()
+    }
+
+    @Test
+    fun `상한을 넘으면 가져올 장수 제목은 라벨과 상한을 한 문장으로 읽는다`() {
+        host.show(preview = PreviewStepTables.preview(limitExceeded = true))
+
+        composeRule.onNode(isHeading and readsAs("가져올 카드 10,000장 넘음")).assertIsDisplayed()
+    }
+
+    @Test
     fun `가져올 장수는 라벨 아래에 놓인다`() {
         host.show()
 

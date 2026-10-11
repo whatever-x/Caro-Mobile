@@ -27,7 +27,7 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import org.robolectric.annotation.GraphicsMode
 
-// 문구는 Figma 09, 09-B, 09-C, 09-G 프레임의 표시 문구다. 막대의 모양(흐름, 정지)은 SavingProgressStyleTest와 손 확인이 맡는다.
+// 문구는 Figma 프레임의 표시 문구다. 막대의 모양(흐름, 정지)은 SavingProgressStyleTest와 손 확인이 맡는다.
 @RunWith(RobolectricTestRunner::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
 @Config(sdk = [35], qualifiers = "ko-rKR-w393dp-h852dp-xxhdpi")

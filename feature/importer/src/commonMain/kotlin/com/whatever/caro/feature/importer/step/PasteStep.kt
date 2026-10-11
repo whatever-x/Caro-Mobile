@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.requiredHeightIn
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
@@ -46,7 +47,9 @@ internal fun PasteStep(
     modifier: Modifier = Modifier,
 ) {
     val density = LocalDensity.current
-    val isImeVisible = WindowInsets.ime.getBottom(density) > 0
+    val ime = WindowInsets.ime
+    // 키보드가 올라오는 애니메이션 동안 매 프레임 바뀌는 높이를 구성에서 읽으면 최대 100만 자 입력칸까지 다시 구성하므로 보이는지 여부만 읽는다.
+    val isImeVisible by remember(ime, density) { derivedStateOf { ime.getBottom(density) > 0 } }
 
     // 제목과 안내를 보였을 때 잰 높이다. 숨긴 동안 입력칸이 이만큼 커지므로 보였다면 남았을 높이를 구하는 데 쓴다.
     var titleHeight by remember { mutableIntStateOf(0) }
@@ -54,6 +57,7 @@ internal fun PasteStep(
     var inputHeightWithGuide by remember { mutableIntStateOf(Int.MAX_VALUE) }
     val hideGuide = shouldHidePasteGuide(isImeVisible, with(density) { inputHeightWithGuide.toDp() })
 
+    val fieldLabel = stringResource(Res.string.import_subtitle_paste)
     val blockReason = pasteBlockReason(text, maxPasteChars)
     val tooLongReason =
         if (blockReason == PasteBlockReason.TooLong) {
@@ -71,7 +75,7 @@ internal fun PasteStep(
     ) {
         if (!hideGuide) {
             ImportStepTitle(
-                text = stringResource(Res.string.import_subtitle_paste),
+                text = fieldLabel,
                 modifier =
                     Modifier
                         .fillMaxWidth()
@@ -91,6 +95,7 @@ internal fun PasteStep(
                     }.requiredHeightIn(min = PasteInputMinHeight)
                     .padding(horizontal = CaroTheme.spacing.xl2),
             fillHeight = true,
+            semanticsLabel = fieldLabel,
         )
         if (!hideGuide) {
             Column(

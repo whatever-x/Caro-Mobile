@@ -4,9 +4,16 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.SaveableStateHolder
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.text.intl.Locale
 import caromobile.core.designsystem.generated.resources.Res
 import caromobile.core.designsystem.generated.resources.import_title_deck_info
@@ -55,8 +62,9 @@ internal fun ImportDeckScreen(
     onIntent: (ImportDeckIntent) -> Unit,
 ) {
     val stateHolder = rememberSaveableStateHolder()
-    val tableKey = rememberInputKey(state.table)
-    val previewKey = rememberInputKey(state.preview)
+    val stateKeys = StepStateKeys(state.sourceVersion, state.mappingInputVersion, rememberInputKey(state.preview))
+    val backFocus = remember { FocusRequester() }
+    val ctaFocus = remember { FocusRequester() }
     val pasteSourceName = stringResource(Res.string.import_value_paste_deck_name)
     val emptySideText = stringResource(Res.string.import_value_empty_field)
     // 파일 이름은 ViewModel이 120자로 줄여 {file} 자리에 넣는다.
@@ -74,13 +82,14 @@ internal fun ImportDeckScreen(
             ImportTopBar(
                 title = stringResource(state.step.titleResource()),
                 onBack = { onIntent(ImportDeckIntent.ClickBack) },
+                backFocusRequester = backFocus,
             )
 
             ImportLoadingOverlay(
                 loading = state.overlayLoading,
                 modifier = Modifier.weight(1f),
             ) {
-                stateHolder.SaveableStateProvider(key = state.step.stateKey(tableKey, previewKey)) {
+                stateHolder.SaveableStateProvider(key = stateKeys.of(state.step)) {
                     when (state.step) {
                         ImportStep.Source -> {
                             SourceStep(
@@ -191,6 +200,7 @@ internal fun ImportDeckScreen(
                                     onNameChange = { name -> onIntent(ImportDeckIntent.UpdateDeckName(name)) },
                                     onDescriptionChange = { description -> onIntent(ImportDeckIntent.UpdateDeckDescription(description)) },
                                     onConfirm = { onIntent(ImportDeckIntent.ClickCreateDeck) },
+                                    confirmFocusRequester = ctaFocus,
                                 )
                             }
                         }
@@ -201,6 +211,7 @@ internal fun ImportDeckScreen(
                                     progress = saving,
                                     reduceMotion = rememberReduceMotionEnabled(),
                                     onStop = { onIntent(ImportDeckIntent.ClickStop) },
+                                    stopFocusRequester = ctaFocus,
                                 )
                             }
                         }
@@ -211,6 +222,15 @@ internal fun ImportDeckScreen(
     }
 
     ImportDialogs(dialog = state.dialog, onIntent = onIntent)
+    DiscardReplacedStepStates(stateHolder, stateKeys)
+    RestoreFocusAfterDialog(
+        dialog = state.dialog,
+        step = state.step,
+        isCtaShown =
+            (state.step == ImportStep.Saving && state.saving != null) || (state.step == ImportStep.DeckInfo && state.preview != null),
+        backFocus = backFocus,
+        ctaFocus = ctaFocus,
+    )
 }
 
 private fun ImportStep.titleResource(): StringResource =
@@ -229,17 +249,75 @@ private fun ImportStep.titleResource(): StringResource =
 /**
  * 키는 Android Bundle에 넣을 수 있는 String이어야 한다. 다른 타입이면 상태 저장 때 죽는다.
  * 덱 생성 중 화면은 덱 정보 위에 덮이므로 같은 키를 쓴다.
- * 앞 단계 입력이 바뀌면 키가 달라져 저장한 상태를 쓰지 않는다. 읽은 표는 미리보기 이전 단계에, 미리보기는 그 이후 단계에 영향을 준다.
+ * 단계가 쓰는 입력이 바뀌면 키가 달라져 저장한 상태를 쓰지 않는다. 같은 단계 안에서 표 객체만 바뀌는 다시 읽기는 키를 바꾸지 않아야 스크롤과 포커스가 남는다.
  */
-private fun ImportStep.stateKey(
-    tableKey: Int,
-    previewKey: Int,
-): String {
-    val step = if (this == ImportStep.CreatingDeck) ImportStep.DeckInfo else this
-    val name = step::class.simpleName
-    return when (step) {
-        ImportStep.Preview, ImportStep.DeckInfo, ImportStep.Saving -> "$name-$tableKey-$previewKey"
-        else -> "$name-$tableKey"
+private data class StepStateKeys(
+    val sourceVersion: Int,
+    val mappingInputVersion: Int,
+    val previewKey: Int,
+) {
+    fun of(step: ImportStep): String {
+        val keyed = if (step == ImportStep.CreatingDeck) ImportStep.DeckInfo else step
+        val name = keyed::class.simpleName
+        return when (keyed) {
+            ImportStep.SubdeckSelect, ImportStep.SheetSelect, ImportStep.TextCheck -> "$name-$sourceVersion"
+            ImportStep.Mapping -> "$name-$mappingInputVersion"
+            ImportStep.Preview, ImportStep.DeckInfo, ImportStep.Saving -> "$name-$previewKey"
+            else -> name.orEmpty()
+        }
+    }
+
+    val inputKeyed: Set<String> get() = INPUT_KEYED_STEPS.map(::of).toSet()
+}
+
+private val INPUT_KEYED_STEPS =
+    listOf(
+        ImportStep.SubdeckSelect,
+        ImportStep.SheetSelect,
+        ImportStep.TextCheck,
+        ImportStep.Mapping,
+        ImportStep.Preview,
+        ImportStep.DeckInfo,
+        ImportStep.Saving,
+    )
+
+/** 입력이 바뀌어 다시는 쓰이지 않는 키의 저장 상태를 지워 저장 인스턴스 상태가 다시 읽을 때마다 쌓이지 않게 한다. */
+@Composable
+private fun DiscardReplacedStepStates(
+    holder: SaveableStateHolder,
+    keys: StepStateKeys,
+) {
+    var previous by remember { mutableStateOf(keys) }
+
+    LaunchedEffect(keys) {
+        (previous.inputKeyed - keys.inputKeyed).forEach(holder::removeState)
+        previous = keys
+    }
+}
+
+/**
+ * 팝업을 닫으면 팝업을 연 요소로 포커스를 돌려준다. 닫기 요청을 처리하는 시점에는 팝업 창이 아직 붙어 있어, 창을 걷은 다음 구성에서 요청한다.
+ * 닫으면서 단계가 바뀌면 돌려줄 요소가 사라졌거나 다른 요소이므로 요청하지 않는다.
+ */
+@Composable
+private fun RestoreFocusAfterDialog(
+    dialog: ImportDialog?,
+    step: ImportStep,
+    isCtaShown: Boolean,
+    backFocus: FocusRequester,
+    ctaFocus: FocusRequester,
+) {
+    var opened by remember { mutableStateOf<Pair<ImportDialog, ImportStep>?>(null) }
+
+    LaunchedEffect(dialog) {
+        val previous = opened
+        opened = dialog?.let { it to step }
+        if (dialog != null || previous == null || previous.second != step) return@LaunchedEffect
+        when (previous.first) {
+            ImportDialog.DiscardConfirm -> backFocus.requestFocus()
+            ImportDialog.StopConfirm, ImportDialog.DeckCreateFailed -> if (isCtaShown) ctaFocus.requestFocus()
+            else -> Unit
+        }
     }
 }
 

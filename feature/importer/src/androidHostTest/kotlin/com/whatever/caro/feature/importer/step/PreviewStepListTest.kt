@@ -36,6 +36,8 @@ class PreviewStepListTest {
 
     private val host by lazy { PreviewStepHost(composeRule) }
 
+    private val hasEmptyDescription = SemanticsMatcher.expectValue(SemanticsProperties.ContentDescription, listOf(""))
+
     private fun chip(label: String): SemanticsNodeInteraction = composeRule.onNode(isTabRole and hasText(label))
 
     private fun chipLabelsLeftToRight(): List<String> =
@@ -350,6 +352,23 @@ class PreviewStepListTest {
         host.show()
 
         composeRule.onAllNodes(isPoliteRegion and readsContaining("8장")).assertCountEquals(0)
+    }
+
+    @Test
+    fun `처음 그릴 때부터 비어 있는 필터 결과 알림 노드가 있다`() {
+        host.show()
+
+        composeRule.onAllNodes(isPoliteRegion and hasEmptyDescription).assertCountEquals(1)
+    }
+
+    @Test
+    fun `필터를 바꾸면 처음부터 있던 알림 노드의 설명이 바뀐다`() {
+        host.show(applyEdits = true)
+        val before = composeRule.onNode(isPoliteRegion and hasEmptyDescription).fetchSemanticsNode().id
+
+        chip("빈 면 채움").performClick()
+
+        composeRule.onNode(isPoliteRegion and readsAs("빈 면 채움 3장")).fetchSemanticsNode().id shouldBe before
     }
 
     @Test

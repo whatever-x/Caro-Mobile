@@ -161,6 +161,19 @@ class ImportDialogsTest {
     }
 
     @Test
+    fun `기본 틀의 실제 팝업 창에서도 팝업이 열리면 제목에 포커스를 둔다`() {
+        composeRule.setContent {
+            CaroTheme {
+                ImportDialogs(dialog = ImportDialog.DiscardConfirm, onIntent = {})
+            }
+        }
+        composeRule.waitForIdle()
+
+        composeRule.onNode(isDialog()).assertExists()
+        composeRule.titleNode().assertIsFocused()
+    }
+
+    @Test
     fun `저장한 카드가 0장이면 멈춤 팝업 본문은 저장한 카드가 없다는 문장으로 시작한다`() {
         show(ImportDialog.Paused(saved = 0, reason = PauseReason.NETWORK))
 

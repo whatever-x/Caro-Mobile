@@ -23,7 +23,7 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import org.robolectric.annotation.GraphicsMode
 
-// 문구와 글자 수는 Figma 08 프레임의 표시 값이다. 상한(50, 500)은 덱 만들기와 같은 DeckInputLimits다.
+// 문구와 글자 수는 Figma 프레임의 표시 값이다. 상한(50, 500)은 덱 만들기와 같은 DeckInputLimits다.
 @RunWith(RobolectricTestRunner::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
 @Config(sdk = [35], qualifiers = "ko-rKR-w393dp-h852dp-xxhdpi")

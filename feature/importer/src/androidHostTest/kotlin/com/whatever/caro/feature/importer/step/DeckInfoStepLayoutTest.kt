@@ -16,7 +16,7 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import org.robolectric.annotation.GraphicsMode
 
-// 키보드가 열리면 쓸 수 있는 높이가 줄어드므로(Figma 08-A, 08-A-2) 줄어든 높이를 호스트 높이로 대신 준다.
+// 키보드가 열린 작은 화면을 흉내 내려고 줄어든 높이를 호스트 높이로 준다.
 // 내용이 다 들어갈 때는 스크롤하지 않고, 모자랄 때만 스크롤하며, 가져오기 버튼은 어느 경우에도 보여야 한다.
 @RunWith(RobolectricTestRunner::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)

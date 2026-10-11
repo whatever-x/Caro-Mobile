@@ -249,10 +249,12 @@ class PreviewStepWiringTest {
             }
         }
         scrollListUp()
+        val scrolled = verticalOffset()
 
         restorationTester.emulateSavedInstanceStateRestore()
 
         composeRule.onNodeWithContentDescription("뒤로 가기").assertExists()
+        verticalOffset() shouldBe scrolled
     }
 
     private companion object {

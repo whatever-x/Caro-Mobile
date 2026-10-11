@@ -48,8 +48,10 @@ import com.whatever.caro.core.ui.card.CaroFullTextDialog
 import com.whatever.caro.core.ui.card.CaroFullTextSection
 import com.whatever.caro.core.util.NumberFormatter.formatWithComma
 import com.whatever.caro.feature.importer.component.ImportBottomBar
+import com.whatever.caro.feature.importer.logic.PreviewBlockReason
 import com.whatever.caro.feature.importer.logic.PreviewWarning
 import com.whatever.caro.feature.importer.logic.filterCards
+import com.whatever.caro.feature.importer.logic.previewBlockReason
 import com.whatever.caro.feature.importer.logic.previewWarnings
 import com.whatever.caro.feature.importer.logic.visibleFilters
 import com.whatever.caro.feature.importer.mvi.ImportPreviewFilter
@@ -67,6 +69,7 @@ private const val HINT_KEY = "hint"
 private const val HEADER_KEY = "header"
 private const val EMPTY_KEY = "empty"
 private const val FILLER_KEY = "filler"
+private const val CARD_TYPE = "card"
 
 // 요약, 안내 줄 다음이 머리다. 경고 줄이 있으면 요약과 안내 줄 사이에 한 칸 더 있다.
 private const val HEADER_INDEX = 2
@@ -92,10 +95,10 @@ internal fun PreviewStep(
 ) {
     val filters = remember(preview) { visibleFilters(preview).toImmutableList() }
     val warnings = remember(preview) { previewWarnings(preview.warnings).toImmutableList() }
-    val cards = remember(preview, filter) { filterCards(preview.cards, filter) }
+    val cards = remember(preview, filter) { filterCards(preview.cards, filter).toImmutableList() }
     val headerIndex = if (warnings.isEmpty()) HEADER_INDEX else HEADER_INDEX + 1
     val listState = rememberLazyListState()
-    val reason = previewBlockReason(preview, format, isPaste, maxCards)
+    val reason = previewBlockReason(preview, format, isPaste)?.let { block -> stringResource(block.resource(), maxCards.formatWithComma()) }
     val announcement = rememberFilterChangeAnnouncement(filter, resultCount = cards.size, listState, headerIndex)
     val returnFocus = remember { FocusRequester() }
     val openedIndex = rememberOpenedCardIndex(detailCard, returnFocus)
@@ -125,18 +128,16 @@ internal fun PreviewStep(
                 reason = reason,
             )
         }
-        // 화면에 보이는 변화가 없는 필터 결과를 스크린 리더로만 알린다. 첫 구성에서는 만들지 않아 처음부터 읽히지 않는다.
-        if (announcement != null) {
-            Box(
-                modifier =
-                    Modifier
-                        .size(LiveRegionSize)
-                        .semantics {
-                            liveRegion = LiveRegionMode.Polite
-                            contentDescription = announcement
-                        },
-            )
-        }
+        // 화면에 보이는 변화가 없는 필터 결과를 스크린 리더로만 알린다. 새로 생긴 노드에는 알림이 가지 않을 수 있어 처음부터 두고 설명만 바꾼다.
+        Box(
+            modifier =
+                Modifier
+                    .size(LiveRegionSize)
+                    .semantics {
+                        liveRegion = LiveRegionMode.Polite
+                        contentDescription = announcement.orEmpty()
+                    },
+        )
     }
 
     if (detailCard != null) CardDetailDialog(card = detailCard, onDismiss = onDismissDetail)
@@ -149,7 +150,7 @@ private fun PreviewList(
     maxCards: Int,
     filters: ImmutableList<ImportPreviewFilter>,
     filter: ImportPreviewFilter,
-    cards: List<ImportCard>,
+    cards: ImmutableList<ImportCard>,
     warnings: ImmutableList<PreviewWarning>,
     headerIndex: Int,
     listState: LazyListState,
@@ -169,10 +170,10 @@ private fun PreviewList(
         state = listState,
         contentPadding = PaddingValues(bottom = CaroTheme.spacing.m),
     ) {
-        item(key = SUMMARY_KEY) { PreviewSummary(preview = preview, maxCards = maxCards) }
-        if (warnings.isNotEmpty()) item(key = WARNINGS_KEY) { PreviewWarningLines(warnings = warnings) }
-        item(key = HINT_KEY) { PreviewEditLaterHint() }
-        stickyHeader(key = HEADER_KEY) {
+        item(key = SUMMARY_KEY, contentType = SUMMARY_KEY) { PreviewSummary(preview = preview, maxCards = maxCards) }
+        if (warnings.isNotEmpty()) item(key = WARNINGS_KEY, contentType = WARNINGS_KEY) { PreviewWarningLines(warnings = warnings) }
+        item(key = HINT_KEY, contentType = HINT_KEY) { PreviewEditLaterHint() }
+        stickyHeader(key = HEADER_KEY, contentType = HEADER_KEY) {
             PreviewListHeader(
                 filters = filters,
                 selected = filter,
@@ -182,9 +183,9 @@ private fun PreviewList(
             )
         }
         if (cards.isEmpty()) {
-            item(key = EMPTY_KEY) { PreviewEmptyList() }
+            item(key = EMPTY_KEY, contentType = EMPTY_KEY) { PreviewEmptyList() }
         } else {
-            items(cards, key = { card -> card.sourceIndex }) { card ->
+            items(cards, key = { card -> card.sourceIndex }, contentType = { CARD_TYPE }) { card ->
                 PreviewCardItem(
                     card = card,
                     onClick = { onClickCard(card) },
@@ -192,7 +193,11 @@ private fun PreviewList(
                 )
             }
         }
-        if (fillPx > 0) item(key = FILLER_KEY) { Spacer(modifier = Modifier.height(with(density) { fillPx.toDp() })) }
+        if (fillPx >
+            0
+        ) {
+            item(key = FILLER_KEY, contentType = FILLER_KEY) { Spacer(modifier = Modifier.height(with(density) { fillPx.toDp() })) }
+        }
     }
 }
 
@@ -263,29 +268,13 @@ private fun rememberFilterChangeAnnouncement(
     return announcement
 }
 
-@Composable
-private fun previewBlockReason(
-    preview: ImportPreview,
-    format: ImportFormat,
-    isPaste: Boolean,
-    maxCards: Int,
-): String? =
-    when {
-        preview.limitExceeded -> stringResource(overLimitReason(format, isPaste), maxCards.formatWithComma())
-        preview.cards.isEmpty() -> stringResource(Res.string.import_reason_preview_empty)
-        else -> null
-    }
-
-/** 하위 덱 선택에서 상한을 막는 Anki는 이 화면에서 넘지 않지만 같은 화면 규칙으로 안내를 둔다. */
-private fun overLimitReason(
-    format: ImportFormat,
-    isPaste: Boolean,
-): StringResource =
-    when {
-        format == ImportFormat.XLSX -> Res.string.import_reason_preview_over_limit_xlsx
-        format == ImportFormat.TEXT && isPaste -> Res.string.import_reason_preview_over_limit_paste
-        format == ImportFormat.TEXT -> Res.string.import_reason_preview_over_limit_text
-        else -> Res.string.import_reason_subdeck_over_limit
+private fun PreviewBlockReason.resource(): StringResource =
+    when (this) {
+        PreviewBlockReason.NoCards -> Res.string.import_reason_preview_empty
+        PreviewBlockReason.TooManyPaste -> Res.string.import_reason_preview_over_limit_paste
+        PreviewBlockReason.TooManyTextFile -> Res.string.import_reason_preview_over_limit_text
+        PreviewBlockReason.TooManyXlsx -> Res.string.import_reason_preview_over_limit_xlsx
+        PreviewBlockReason.TooManyApkg -> Res.string.import_reason_subdeck_over_limit
     }
 
 @Composable

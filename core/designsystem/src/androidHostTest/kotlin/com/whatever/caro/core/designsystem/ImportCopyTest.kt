@@ -124,10 +124,10 @@ class ImportCopyTest :
             ImportStringsXml.render(picked, "뒷면", "20", "4") shouldBe "뒷면에 넣을 항목 고르기, 20개 중 4개 선택됨"
         }
 
-        test("ko 순서 있는 선택 읽기 문구에 설계 예시 인자를 넣으면 설계 예시 문장이 된다") {
-            val selected = ImportStringsXml.valueOf(StringsLocale.Ko, "import_a11y_field_selected")
+        test("ko 순서 있는 선택 상태 문구에 설계 예시 인자를 넣으면 설계 예시 문장이 된다") {
+            val selected = ImportStringsXml.valueOf(StringsLocale.Ko, "import_a11y_field_order_state")
 
-            ImportStringsXml.render(selected, "뜻", "뒷면", "1") shouldBe "뜻, 선택됨, 뒷면 1번째"
+            ImportStringsXml.render(selected, "뒷면", "1") shouldBe "선택됨, 뒷면 1번째"
         }
 
         test("ko 다른 면 항목 이동 알림에 설계 예시 인자를 넣으면 설계 예시 문장이 된다") {

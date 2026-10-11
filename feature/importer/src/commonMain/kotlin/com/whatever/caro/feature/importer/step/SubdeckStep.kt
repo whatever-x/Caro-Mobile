@@ -49,10 +49,13 @@ import com.whatever.caro.feature.importer.logic.subdeckDisplayName
 import com.whatever.caro.feature.importer.logic.summarizeSubdeckSelection
 import com.whatever.caro.feature.importer.logic.truncatePath
 import kotlinx.collections.immutable.PersistentSet
+import kotlinx.collections.immutable.toImmutableList
 import org.jetbrains.compose.resources.stringResource
 
 private const val HEADER_KEY = "header"
 private const val HINTS_KEY = "hints"
+private const val HEADER_TYPE = "header"
+private const val HINTS_TYPE = "hints"
 private const val SUBDECK_NAME_MAX_LINES = 3
 private val SubdeckIndent = 32.dp
 
@@ -92,7 +95,7 @@ internal fun SubdeckStep(
     onNext: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val rows = remember(table) { subdeckRows(table) }
+    val rows = remember(table) { subdeckRows(table).toImmutableList() }
     val selection = remember(table, selectedIds, maxCards) { summarizeSubdeckSelection(table, selectedIds, maxCards) }
     val selectAll = remember(table, selectedIds) { selectAllState(table, selectedIds) }
     val title = stringResource(Res.string.import_subtitle_subdeck)
@@ -113,21 +116,21 @@ internal fun SubdeckStep(
             )
         },
     ) {
-        item(key = HEADER_KEY) {
+        item(key = HEADER_KEY, contentType = HEADER_TYPE) {
             SelectionHeader(fileName = table.sourceName, title = title, hint = hint)
         }
-        itemsIndexed(rows, key = { _, row -> row.key }) { index, row ->
+        itemsIndexed(rows, key = { _, row -> row.key }, contentType = { _, row -> row::class }) { index, row ->
             SubdeckListItem(
                 row = row,
                 position = CardPosition.of(index, rows.lastIndex),
                 showDivider = index > 0 && (row is SubdeckListRow.NoDeck || rows[index - 1] is SubdeckListRow.SelectAll),
                 selectAll = selectAll,
-                isSelected = { id -> id in selectedIds },
+                isChecked = row.isCheckedIn(selectedIds),
                 onToggleSubdeck = onToggleSubdeck,
                 onToggleAll = onToggleAll,
             )
         }
-        item(key = HINTS_KEY) {
+        item(key = HINTS_KEY, contentType = HINTS_TYPE) {
             Column(
                 modifier = Modifier.fillMaxWidth().padding(horizontal = CaroTheme.spacing.xl2, vertical = CaroTheme.spacing.xl2),
             ) {
@@ -137,6 +140,13 @@ internal fun SubdeckStep(
         }
     }
 }
+
+private fun SubdeckListRow.isCheckedIn(selectedIds: Set<String>): Boolean =
+    when (this) {
+        is SubdeckListRow.SelectAll -> false
+        is SubdeckListRow.Subdeck -> id in selectedIds
+        is SubdeckListRow.NoDeck -> ParsedSubdeck.NO_DECK_ID in selectedIds
+    }
 
 private fun subdeckRows(table: ParsedTable): List<SubdeckListRow> {
     val commonParent = commonParentPath(table.subdecks.map { subdeck -> subdeck.path })
@@ -162,7 +172,7 @@ private fun SubdeckListItem(
     position: CardPosition,
     showDivider: Boolean,
     selectAll: ToggleableState,
-    isSelected: (String) -> Boolean,
+    isChecked: Boolean,
     onToggleSubdeck: (String) -> Unit,
     onToggleAll: () -> Unit,
 ) {
@@ -179,21 +189,19 @@ private fun SubdeckListItem(
         }
 
         is SubdeckListRow.Subdeck -> {
-            val checked = isSelected(row.id)
             SelectionCardRow(
                 label = row.name,
                 detail = stringResource(Res.string.import_label_card_count, row.noteCount.formatWithComma()),
                 labelMaxLines = SUBDECK_NAME_MAX_LINES,
                 position = position,
-                interaction = Modifier.toggleable(value = checked, role = Role.Checkbox, onValueChange = { onToggleSubdeck(row.id) }),
-                leading = { CaroCheckbox(state = checked.toToggleableState()) },
+                interaction = Modifier.toggleable(value = isChecked, role = Role.Checkbox, onValueChange = { onToggleSubdeck(row.id) }),
+                leading = { CaroCheckbox(state = isChecked.toToggleableState()) },
                 indent = SubdeckIndent,
                 showDivider = showDivider,
             )
         }
 
         is SubdeckListRow.NoDeck -> {
-            val checked = isSelected(ParsedSubdeck.NO_DECK_ID)
             SelectionCardRow(
                 label = stringResource(Res.string.import_label_no_deck),
                 detail = stringResource(Res.string.import_label_item_count, row.noteCount.formatWithComma()),
@@ -201,11 +209,11 @@ private fun SubdeckListItem(
                 position = position,
                 interaction =
                     Modifier.toggleable(
-                        value = checked,
+                        value = isChecked,
                         role = Role.Checkbox,
                         onValueChange = { onToggleSubdeck(ParsedSubdeck.NO_DECK_ID) },
                     ),
-                leading = { CaroCheckbox(state = checked.toToggleableState()) },
+                leading = { CaroCheckbox(state = isChecked.toToggleableState()) },
                 caption = stringResource(Res.string.import_hint_subdeck_no_deck_notes),
                 showDivider = showDivider,
             )

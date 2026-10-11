@@ -1,14 +1,19 @@
 package com.whatever.caro.feature.importer.component
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assert
+import androidx.compose.ui.test.assertHeightIsEqualTo
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.unit.dp
 import com.whatever.caro.core.designsystem.themes.CaroTheme
 import io.kotest.matchers.shouldBe
 import org.junit.Rule
@@ -26,6 +31,7 @@ class ImportBottomBarTest {
     val composeRule = createComposeRule()
 
     private var clickCount = 0
+    private var shownReason by mutableStateOf<String?>(null)
 
     private val isPoliteLiveRegion = SemanticsMatcher.expectValue(SemanticsProperties.LiveRegion, LiveRegionMode.Polite)
 
@@ -33,13 +39,14 @@ class ImportBottomBarTest {
         enabled: Boolean = true,
         reason: String? = null,
     ) {
+        shownReason = reason
         composeRule.setContent {
             CaroTheme {
                 ImportBottomBar(
                     buttonText = BUTTON_TEXT,
                     onClick = { clickCount += 1 },
                     enabled = enabled,
-                    reason = reason,
+                    reason = shownReason,
                 )
             }
         }
@@ -53,10 +60,30 @@ class ImportBottomBarTest {
     }
 
     @Test
-    fun `사유가 없으면 live region이 없다`() {
+    fun `사유가 없어도 live region 노드는 남아 있고 글자는 비어 있다`() {
         show()
 
-        composeRule.onNode(isPoliteLiveRegion).assertDoesNotExist()
+        val texts = composeRule.onNode(isPoliteLiveRegion).fetchSemanticsNode().config[SemanticsProperties.Text]
+        texts.joinToString("") { text -> text.text } shouldBe ""
+    }
+
+    @Test
+    fun `사유가 생기면 같은 live region 노드의 글자만 바뀐다`() {
+        show()
+        val before = composeRule.onNode(isPoliteLiveRegion).fetchSemanticsNode().id
+
+        composeRule.runOnIdle { shownReason = REASON }
+        composeRule.waitForIdle()
+
+        composeRule.onNode(isPoliteLiveRegion).fetchSemanticsNode().id shouldBe before
+        composeRule.onNodeWithText(REASON).assert(isPoliteLiveRegion)
+    }
+
+    @Test
+    fun `사유가 없으면 사유 줄은 높이를 차지하지 않는다`() {
+        show()
+
+        composeRule.onNode(isPoliteLiveRegion).assertHeightIsEqualTo(0.dp)
     }
 
     @Test

@@ -113,15 +113,18 @@ internal val hasHorizontalScrollRange: SemanticsMatcher = SemanticsMatcher.keyIs
 /** 읽는 문구에 상태 설명까지 더한다. 사용할 수 없음을 글자로 읽든 상태 설명으로 읽든 같은 기준으로 확인하려는 것이다. */
 internal fun SemanticsNode.spokenParts(): List<String> = readings() + listOfNotNull(config.getOrNull(SemanticsProperties.StateDescription))
 
-/** 고른 칩. 항목 이름과 면, 고른 순서를 한 문장으로 읽는다. */
+/** 고른 칩. 이름은 글자로 읽고 선택됨과 면, 고른 순서는 상태 설명 하나로 읽는다. */
 internal fun chosenChip(
     name: String,
     side: String,
     order: Int,
-): SemanticsMatcher = isCheckboxRole and readsAs("$name, 선택됨, $side ${order}번째")
+): SemanticsMatcher =
+    isCheckboxRole and readsAs(name) and
+        SemanticsMatcher.expectValue(SemanticsProperties.StateDescription, "선택됨, $side ${order}번째")
 
 /** 그 면에 고르지 않은 칩. 이름만 읽는다. */
-internal fun plainChip(name: String): SemanticsMatcher = isCheckboxRole and readsAs(name)
+internal fun plainChip(name: String): SemanticsMatcher =
+    isCheckboxRole and readsAs(name) and SemanticsMatcher.keyNotDefined(SemanticsProperties.StateDescription)
 
 /** 끈 유형의 칩. 이름과 사용할 수 없음을 함께 읽는다. */
 internal fun unavailableChip(name: String): SemanticsMatcher =

@@ -438,7 +438,7 @@
     <string name="import_sheet_import_body">Anki, Quizlet, 엑셀 자료로 덱을 만들어요</string>
     <!-- import accessibility -->
     <string name="import_a11y_back">뒤로 가기</string>
-    <string name="import_a11y_field_selected">%1$s, 선택됨, %2$s %3$s번째</string>
+    <string name="import_a11y_field_order_state">선택됨, %1$s %2$s번째</string>
     <string name="import_a11y_field_unavailable">사용할 수 없음</string>
     <string name="import_a11y_pick_fields">%1$s에 넣을 항목 고르기, %2$s개 중 %3$s개 선택됨</string>
     <string name="import_a11y_field_moved">%1$s에서 빼고 %2$s %3$s번째로 넣었어요</string>

@@ -14,7 +14,7 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import org.robolectric.annotation.GraphicsMode
 
-// 면 색은 core:designsystem의 CaroCtaButtonTest가 고정한 Danger와 비활성 색이다. Figma 09의 연한 빨강 버튼과 09-B의 연한 파랑 버튼이다.
+// 면 색은 core:designsystem의 CaroCtaButtonTest가 고정한 Danger와 비활성 색이다. 평소는 연한 빨강 버튼이고 멈추는 중은 연한 파랑 버튼이다.
 @RunWith(RobolectricTestRunner::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
 @Config(sdk = [35], qualifiers = "ko-rKR-w393dp-h852dp-xxhdpi")

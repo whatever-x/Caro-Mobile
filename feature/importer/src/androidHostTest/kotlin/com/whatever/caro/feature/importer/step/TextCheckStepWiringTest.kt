@@ -3,9 +3,11 @@ package com.whatever.caro.feature.importer.step
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.test.SemanticsMatcher
+import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.assertIsNotSelected
@@ -46,6 +48,7 @@ class TextCheckStepWiringTest {
     private var screenState by mutableStateOf(ImportDeckState())
 
     private val hasHorizontalScroll = SemanticsMatcher.keyIsDefined(SemanticsProperties.HorizontalScrollAxisRange)
+    private val isPoliteLiveRegion = SemanticsMatcher.expectValue(SemanticsProperties.LiveRegion, LiveRegionMode.Polite)
 
     private fun show(
         state: ImportDeckState,
@@ -198,6 +201,27 @@ class TextCheckStepWiringTest {
     }
 
     @Test
+    fun `다시 나누는 동안에는 이전 표 정보 줄을 읽히지 않게 숨긴다`() {
+        show(textState(), manualClock = true)
+        composeRule.onNodeWithText(INFO_TEXT).assertExists()
+
+        applyState(textState(loading = ImportLoading.TextReparsing))
+
+        composeRule.onAllNodes(hasText(INFO_TEXT)).assertCountEquals(0)
+    }
+
+    @Test
+    fun `다시 나누기가 끝나면 숨겼던 표 정보 줄이 같은 노드에서 새 값으로 나타난다`() {
+        show(textState(), manualClock = true)
+        val before = composeRule.onNode(isPoliteLiveRegion and hasText(INFO_TEXT)).fetchSemanticsNode().id
+        applyState(textState(loading = ImportLoading.TextReparsing))
+
+        applyState(textState(table = TextCheckStepTables.wide(columnCount = 6)))
+
+        composeRule.onNodeWithText("열 6개 · 10줄 중 처음 4줄").fetchSemanticsNode().id shouldBe before
+    }
+
+    @Test
     fun `다른 단계로 갔다 같은 결과로 돌아오면 표의 가로 스크롤 위치를 보존한다`() {
         val table = TextCheckStepTables.text(fieldNames = TextCheckStepTables.HEADER_NAMES)
         show(textState(table = table))
@@ -227,7 +251,15 @@ class TextCheckStepWiringTest {
         horizontalOffset() shouldBe 0f
     }
 
+    private fun applyState(next: ImportDeckState) {
+        composeRule.runOnIdle { screenState = next }
+        composeRule.waitForIdle()
+        composeRule.mainClock.advanceTimeBy(SETTLE_MILLIS)
+    }
+
     private companion object {
         const val CARD_DELAY_MILLIS = 250L
+        const val SETTLE_MILLIS = 48L
+        const val INFO_TEXT = "열 4개 · 10줄 중 처음 4줄"
     }
 }

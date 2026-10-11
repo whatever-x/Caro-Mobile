@@ -15,7 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -27,6 +27,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -39,12 +40,15 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
+import androidx.compose.ui.semantics.text
 import androidx.compose.ui.state.ToggleableState
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import caromobile.core.designsystem.generated.resources.Res
 import caromobile.core.designsystem.generated.resources.import_a11y_field_moved
-import caromobile.core.designsystem.generated.resources.import_a11y_field_selected
+import caromobile.core.designsystem.generated.resources.import_a11y_field_order_state
 import caromobile.core.designsystem.generated.resources.import_button_done
 import caromobile.core.designsystem.generated.resources.import_hint_pick_order
 import caromobile.core.designsystem.generated.resources.import_label_in_side
@@ -54,13 +58,17 @@ import com.whatever.caro.core.designsystem.themes.CaroTheme
 import com.whatever.caro.feature.importer.logic.PickerRow
 import com.whatever.caro.feature.importer.logic.truncateChip
 import kotlinx.collections.immutable.ImmutableList
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 
-/** 창을 띄우지 않고 내용만 확인하는 테스트가 틀을 바꿔 끼울 수 있도록 분리했다. 밀어 닫기와 뒤로 가기는 모두 [onDismissRequest]로 들어온다. */
+/**
+ * 창을 띄우지 않고 내용만 확인하는 테스트가 틀을 바꿔 끼울 수 있도록 분리했다. 밀어 닫기와 뒤로 가기는 모두 [onDismissRequest]로 들어온다.
+ * 내용 안의 닫기 버튼은 시트를 밀어 내린 뒤에 닫아야 하므로 틀이 만든 `close`를 받아 쓴다.
+ */
 internal typealias FieldPickerSheetFrame =
     @Composable (
         onDismissRequest: () -> Unit,
-        content: @Composable ColumnScope.() -> Unit,
+        content: @Composable ColumnScope.(close: () -> Unit) -> Unit,
     ) -> Unit
 
 private val RowMinHeight = 50.dp
@@ -70,10 +78,13 @@ private const val NAME_MAX_LINES = 2
 
 @OptIn(ExperimentalMaterial3Api::class)
 private val ModalFieldPickerSheetFrame: FieldPickerSheetFrame = { onDismissRequest, content ->
+    // 반만 열리면 완료 버튼이 화면 밖에 남을 수 있어 항상 끝까지 펼친다.
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val scope = rememberCoroutineScope()
+
     ModalBottomSheet(
         onDismissRequest = onDismissRequest,
-        // 반만 열리면 완료 버튼이 화면 밖에 남을 수 있어 항상 끝까지 펼친다.
-        sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
+        sheetState = sheetState,
         shape = RoundedCornerShape(topStart = CaroTheme.spacing.xl2, topEnd = CaroTheme.spacing.xl2),
         containerColor = CaroTheme.color.surface.primary,
         dragHandle = {
@@ -94,8 +105,11 @@ private val ModalFieldPickerSheetFrame: FieldPickerSheetFrame = { onDismissReque
                 )
             }
         },
-        content = content,
-    )
+    ) {
+        content {
+            scope.launch { sheetState.hide() }.invokeOnCompletion { if (!sheetState.isVisible) onDismissRequest() }
+        }
+    }
 }
 
 /**
@@ -116,11 +130,11 @@ internal fun FieldPickerSheet(
     var movedOrder by remember { mutableStateOf<Int?>(null) }
     val movedMessage = movedOrder?.let { order -> stringResource(Res.string.import_a11y_field_moved, otherSideLabel, sideLabel, order) }
 
-    frame(onDismiss) {
+    frame(onDismiss) { close ->
         Column(modifier = modifier.weight(1f, fill = false).fillMaxWidth()) {
             PickerSheetHeader(title = title, movedMessage = movedMessage)
             LazyColumn(modifier = Modifier.weight(1f, fill = false)) {
-                itemsIndexed(rows, key = { index, _ -> index }) { _, row ->
+                items(rows, key = { row -> row.name }) { row ->
                     PickerRowItem(
                         row = row,
                         sideLabel = sideLabel,
@@ -132,7 +146,7 @@ internal fun FieldPickerSheet(
                     )
                 }
             }
-            ImportBottomBar(buttonText = stringResource(Res.string.import_button_done), onClick = onDismiss)
+            ImportBottomBar(buttonText = stringResource(Res.string.import_button_done), onClick = close)
         }
     }
 }
@@ -187,7 +201,10 @@ private fun PickerSheetHeader(
     }
 }
 
-/** 상태 semantics는 줄 전체의 toggleable이 맡으므로 체크박스는 장식이다. */
+/**
+ * 상태 semantics는 줄 전체의 toggleable이 맡으므로 체크박스는 장식이다.
+ * 고른 줄은 이름만 글자로 남기고 선택됨과 면, 순서를 상태 설명 하나로 읽어 선택됨이 두 번 읽히지 않게 한다.
+ */
 @Composable
 private fun PickerRowItem(
     row: PickerRow,
@@ -196,7 +213,7 @@ private fun PickerRowItem(
     onClick: () -> Unit,
 ) {
     val name = truncateChip(row.name)
-    val chosenDescription = row.order?.let { order -> stringResource(Res.string.import_a11y_field_selected, name, sideLabel, order) }
+    val chosenState = row.order?.let { order -> stringResource(Res.string.import_a11y_field_order_state, sideLabel, order) }
 
     Row(
         modifier =
@@ -205,8 +222,11 @@ private fun PickerRowItem(
                 .heightIn(min = RowMinHeight)
                 .toggleable(value = row.order != null, role = Role.Checkbox, onValueChange = { onClick() })
                 .then(
-                    if (chosenDescription != null) {
-                        Modifier.clearAndSetSemantics { contentDescription = chosenDescription }
+                    if (chosenState != null) {
+                        Modifier.clearAndSetSemantics {
+                            text = AnnotatedString(name)
+                            stateDescription = chosenState
+                        }
                     } else {
                         Modifier
                     },

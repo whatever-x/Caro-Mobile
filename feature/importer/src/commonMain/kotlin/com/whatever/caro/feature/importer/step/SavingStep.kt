@@ -23,6 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
@@ -62,16 +63,14 @@ private const val FLOW_DURATION_MILLIS = 1_400
 // 트랙 색 위에서 한 단계 옅은 brand 색으로 보이는 투명도다.
 private const val FLOW_SEGMENT_ALPHA = 0.45f
 
-/**
- * 평소에는 내용이 가운데에 놓이고 공간이 모자랄 때만 스크롤한다. [가져오기 멈추기]는 어느 경우에도 고정이다.
- * 멈추는 중에는 이미 멈춤을 요청한 뒤라 버튼을 막는다. 멈춤 확인은 ViewModel이 연다.
- */
+/** 멈추는 중에는 이미 멈춤을 요청한 뒤라 버튼을 막는다. 멈춤 확인은 ViewModel이 연다. */
 @Composable
 internal fun SavingStep(
     progress: SavingProgress,
     reduceMotion: Boolean,
     onStop: () -> Unit,
     modifier: Modifier = Modifier,
+    stopFocusRequester: FocusRequester? = null,
 ) {
     Column(modifier = modifier.fillMaxSize()) {
         Column(
@@ -113,6 +112,7 @@ internal fun SavingStep(
             onClick = onStop,
             enabled = progress.status != SavingStatus.Stopping,
             style = CaroCtaButtonStyle.Danger,
+            focusRequester = stopFocusRequester,
         )
     }
 }

@@ -197,8 +197,11 @@ class MappingStepWiringTest {
         scrollListUp()
         verticalOffset() shouldBeGreaterThan 0f
 
-        // 값이 같은 표는 같은 상태로 보아 다시 그리지 않으므로, 다시 읽은 결과는 값이 다른 표여야 한다.
-        composeRule.runOnIdle { screenState = mappingState(table = manyTypesTable().copy(sourceName = "다른.apkg")) }
+        // 값이 같은 표는 같은 상태로 보아 다시 그리지 않으므로, 다시 읽은 결과는 값이 다른 표여야 한다. 연결 입력 버전은 ViewModel이 읽을 때마다 올린다.
+        composeRule.runOnIdle {
+            screenState =
+                mappingState(table = manyTypesTable().copy(sourceName = "다른.apkg")).copy(mappingInputVersion = 1)
+        }
         composeRule.waitForIdle()
 
         verticalOffset() shouldBe 0f
@@ -218,6 +221,7 @@ class MappingStepWiringTest {
         restorationTester.emulateSavedInstanceStateRestore()
 
         composeRule.onNodeWithContentDescription("뒤로 가기").assertExists()
+        composeRule.onNode(hasText("뒷면에 넣을 항목") and isHeading).assertExists()
     }
 
     private companion object {

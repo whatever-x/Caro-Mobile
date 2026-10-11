@@ -9,6 +9,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
@@ -33,11 +34,13 @@ internal class ImportTitleFocus {
 
 internal val LocalImportTitleFocus = compositionLocalOf<ImportTitleFocus?> { null }
 
+/** [readAs]는 화면의 글자만으로는 무엇의 제목인지 알 수 없을 때 스크린 리더가 대신 읽을 문장이다. */
 @Composable
 internal fun ImportStepTitle(
     text: String,
     modifier: Modifier = Modifier,
     style: TextStyle = CaroTheme.typography.heading1,
+    readAs: String? = null,
 ) {
     val focusRequester = remember { FocusRequester() }
     val titleFocus = LocalImportTitleFocus.current
@@ -51,7 +54,10 @@ internal fun ImportStepTitle(
             modifier
                 .focusRequester(focusRequester)
                 .focusable()
-                .semantics { heading() },
+                .semantics {
+                    heading()
+                    if (readAs != null) contentDescription = readAs
+                },
         text = text,
         style = style,
         color = CaroTheme.color.text.primary,

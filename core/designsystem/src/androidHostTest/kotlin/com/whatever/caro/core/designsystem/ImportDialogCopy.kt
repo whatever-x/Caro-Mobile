@@ -81,7 +81,7 @@ private val importMessageCopy: Map<String, String> =
 private val importAccessibilityCopy: Map<String, String> =
     mapOf(
         "import_a11y_back" to "뒤로 가기",
-        "import_a11y_field_selected" to "%1\$s, 선택됨, %2\$s %3\$s번째",
+        "import_a11y_field_order_state" to "선택됨, %1\$s %2\$s번째",
         "import_a11y_field_unavailable" to "사용할 수 없음",
         "import_a11y_pick_fields" to "%1\$s에 넣을 항목 고르기, %2\$s개 중 %3\$s개 선택됨",
         "import_a11y_field_moved" to "%1\$s에서 빼고 %2\$s %3\$s번째로 넣었어요",

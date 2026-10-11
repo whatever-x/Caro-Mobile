@@ -5,6 +5,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -18,6 +19,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material3.Text
+import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -126,6 +128,7 @@ private fun FilterChip(
 /**
  * 덱 상세 카드 값에 줄 수만 앞면 2줄, 뒷면 3줄로 늘렸다. 줄임은 표시용이고 500자 잘림과 별개다.
  * clickable만으로는 터치 모드에서 포커스 요청을 받지 않으므로 전체 보기를 닫을 때 돌아올 수 있게 focusable을 따로 둔다.
+ * 포커스와 눌림을 같은 소스로 보내야 돌려받은 포커스가 물결로 보인다.
  */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -135,6 +138,7 @@ internal fun PreviewCardItem(
     modifier: Modifier = Modifier,
 ) {
     val badges = remember(card) { changeBadges(card) }
+    val interactionSource = remember { MutableInteractionSource() }
     Column(
         modifier =
             modifier
@@ -144,8 +148,8 @@ internal fun PreviewCardItem(
                 .background(CaroTheme.color.surface.primary, CaroTheme.shape.m)
                 .border(BorderWidth, CaroTheme.color.border.secondary, CaroTheme.shape.m)
                 .clip(CaroTheme.shape.m)
-                .focusable()
-                .clickable(role = Role.Button, onClick = onClick)
+                .focusable(interactionSource = interactionSource)
+                .clickable(interactionSource = interactionSource, indication = ripple(), role = Role.Button, onClick = onClick)
                 .padding(CaroTheme.spacing.xl),
     ) {
         Text(

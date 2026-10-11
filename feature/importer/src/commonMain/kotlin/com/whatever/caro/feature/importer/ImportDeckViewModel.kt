@@ -95,6 +95,9 @@ class ImportDeckViewModel internal constructor(
 
     private var saveSession: ImportSaveSession? = null
 
+    // 화면이 단계별 보존 상태의 키로 쓰는 번호다. 상태가 초기화돼도 이전 번호와 겹치면 지난 자료의 스크롤이 되살아나므로 상태 밖에서 센다.
+    private var inputVersion = 0
+
     private val saveHost =
         object : ImportSaveHost {
             override val state: ImportDeckState get() = currentState
@@ -342,7 +345,17 @@ class ImportDeckViewModel internal constructor(
                     ImportStep.TextCheck to ImportSelection()
                 }
             }
-        reduce { copy(loading = null, step = step, table = table, selection = selection) }
+        val version = nextInputVersion()
+        reduce {
+            copy(
+                loading = null,
+                step = step,
+                table = table,
+                selection = selection,
+                sourceVersion = version,
+                mappingInputVersion = version,
+            )
+        }
     }
 
     private fun onToggleSubdeck(id: String) {
@@ -405,7 +418,7 @@ class ImportDeckViewModel internal constructor(
             read = { read.read(sourceReader, dispatchers, subdeckIds = selection.subdeckIds) },
             onRead = { reread ->
                 isDeckInfoPrefilled = false
-                enterMapping(reread)
+                enterMapping(reread, isNewInput = true)
             },
         )
     }
@@ -431,22 +444,39 @@ class ImportDeckViewModel internal constructor(
             onRead = { reread ->
                 // 시트 이름이 덱 이름에 들어가므로 시트가 바뀐 경우에만 덱 정보를 다시 채운다.
                 if (candidate.sheetIndex != currentState.selection.sheetIndex) isDeckInfoPrefilled = false
-                reduce { copy(loading = null, table = reread, selection = candidate.confirm(reread), pendingSelection = null) }
+                val version = nextInputVersion()
+                reduce {
+                    copy(
+                        loading = null,
+                        table = reread,
+                        selection = candidate.confirm(reread),
+                        pendingSelection = null,
+                        mappingInputVersion = version,
+                    )
+                }
             },
         )
     }
 
-    /** 항목 이름이 달라진 유형에 옛 연결을 쓰면 없는 항목을 가리켜 빈 카드가 되므로, 유형별 항목 이름이 모두 같을 때만 고친 연결을 이어 쓴다. */
-    private fun enterMapping(table: ParsedTable) {
+    /**
+     * 항목 이름이 달라진 유형에 옛 연결을 쓰면 없는 항목을 가리켜 빈 카드가 되므로, 유형별 항목 이름이 모두 같을 때만 고친 연결을 이어 쓴다.
+     * [isNewInput]은 방금 다시 읽은 표라는 뜻이라 항목 연결 화면의 보존 상태를 버리게 한다.
+     */
+    private fun enterMapping(
+        table: ParsedTable,
+        isNewInput: Boolean = false,
+    ) {
         val fieldNames = importableNoteTypes(table).associate { type -> type.id to type.fieldNames }
         val keepEdits = currentState.mappings.isNotEmpty() && fieldNames == mappedFieldNames
         mappedFieldNames = fieldNames
+        val version = if (isNewInput) nextInputVersion() else null
         reduce {
             copy(
                 loading = null,
                 step = ImportStep.Mapping,
                 table = table,
                 mappings = if (keepEdits) mappings else defaultFieldMappings(table).toPersistentMap(),
+                mappingInputVersion = version ?: mappingInputVersion,
             )
         }
     }
@@ -628,6 +658,11 @@ class ImportDeckViewModel internal constructor(
                     }
                 }
             }
+    }
+
+    private fun nextInputVersion(): Int {
+        inputVersion += 1
+        return inputVersion
     }
 
     /** 이전 읽기나 미리보기 계산을 취소하고, 늦게 끝난 결과를 버리는 데 쓸 새 번호를 돌려준다. */

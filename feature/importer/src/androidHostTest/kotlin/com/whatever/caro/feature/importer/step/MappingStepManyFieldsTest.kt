@@ -67,7 +67,8 @@ class MappingStepManyFieldsTest {
     private fun doneButton(): SemanticsNodeInteraction = composeRule.onNodeWithText("완료")
 
     // 다른 면에 있는 줄은 읽는 문구에 어느 면에 있는지가 붙을 수 있어 이름을 포함하는지로 찾는다.
-    private fun sheetRow(name: String): SemanticsNodeInteraction = composeRule.onNode(isCheckboxRole and readsContaining(name))
+    // 머리 줄의 가져오기 토글도 유형 이름에 같은 낱말이 있으면 체크 역할로 읽히므로 이름이 정확히 같은 줄만 찾는다.
+    private fun sheetRow(name: String): SemanticsNodeInteraction = composeRule.onNode(isCheckboxRole and readsAs(name))
 
     @Test
     fun `항목이 열두 개면 고르기 버튼 없이 칩을 그린다`() {

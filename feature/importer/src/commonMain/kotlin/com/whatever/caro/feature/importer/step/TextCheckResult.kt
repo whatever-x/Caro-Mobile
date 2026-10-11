@@ -98,7 +98,7 @@ internal fun TextCheckResult(
         modifier = modifier.fillMaxWidth().padding(horizontal = CaroTheme.spacing.xl2),
         verticalArrangement = Arrangement.spacedBy(CaroTheme.spacing.s),
     ) {
-        ResultTitleRow(info = table.info)
+        ResultTitleRow(info = table.info, isReparsing = isReparsing)
         if (isLargeText()) {
             ResultCards(headerLabels = headerLabels, rows = table.rows, readings = readings, isReparsing = isReparsing)
         } else {
@@ -121,7 +121,10 @@ internal fun TextCheckResult(
 }
 
 @Composable
-private fun ResultTitleRow(info: TextCheckInfo) {
+private fun ResultTitleRow(
+    info: TextCheckInfo,
+    isReparsing: Boolean,
+) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(CaroTheme.spacing.s),
@@ -132,10 +135,17 @@ private fun ResultTitleRow(info: TextCheckInfo) {
             style = CaroTheme.typography.body2.semiBold,
             color = CaroTheme.color.text.primary,
         )
-        // 다시 나눈 결과가 나오면 문구가 바뀌어 스크린 리더로 알린다.
+        // 다시 나누는 동안 이전 값은 화면에 두되 스크린 리더에는 비운다. 같은 노드의 문구가 바뀌어야 결과가 나왔을 때 알려진다.
         Text(
             text = infoText(info),
-            modifier = Modifier.weight(1f).semantics { liveRegion = LiveRegionMode.Polite },
+            modifier =
+                Modifier.weight(1f).then(
+                    if (isReparsing) {
+                        Modifier.clearAndSetSemantics { liveRegion = LiveRegionMode.Polite }
+                    } else {
+                        Modifier.semantics { liveRegion = LiveRegionMode.Polite }
+                    },
+                ),
             style = CaroTheme.typography.caption1.regular,
             color = CaroTheme.color.text.secondary,
             textAlign = TextAlign.End,

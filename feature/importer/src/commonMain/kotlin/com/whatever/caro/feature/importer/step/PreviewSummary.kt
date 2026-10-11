@@ -43,7 +43,7 @@ private val SummaryBorderWidth = 1.dp
 private val DividerThickness = 1.dp
 
 /**
- * 장수 제목은 [ImportStepTitle]이어야 미리보기를 만든 뒤 이 제목으로 포커스가 온다.
+ * 장수 제목은 [ImportStepTitle]이어야 미리보기를 만든 뒤 이 제목으로 포커스가 온다. 포커스가 온 제목만 읽혀도 무엇의 장수인지 알도록 라벨을 붙여 읽는다.
  * 상한을 넘으면 읽은 만큼 센 장수 대신 상한을 보여주고, 아래 수치는 읽은 행까지만 센 값 그대로다.
  */
 @Composable
@@ -53,6 +53,7 @@ internal fun PreviewSummary(
     modifier: Modifier = Modifier,
 ) {
     val stats = preview.stats
+    val label = stringResource(Res.string.import_summary_importable_label)
     val countText =
         if (preview.limitExceeded) {
             stringResource(Res.string.import_summary_importable_over_limit, maxCards.formatWithComma())
@@ -71,12 +72,12 @@ internal fun PreviewSummary(
                 .padding(CaroTheme.spacing.xl),
     ) {
         Text(
-            text = stringResource(Res.string.import_summary_importable_label),
+            text = label,
             style = CaroTheme.typography.label1,
             color = CaroTheme.color.text.secondary,
         )
         Spacer(modifier = Modifier.height(CaroTheme.spacing.xs))
-        ImportStepTitle(text = countText, style = CaroTheme.typography.display)
+        ImportStepTitle(text = countText, style = CaroTheme.typography.display, readAs = "$label $countText")
         Spacer(modifier = Modifier.height(CaroTheme.spacing.l))
         Spacer(
             modifier =

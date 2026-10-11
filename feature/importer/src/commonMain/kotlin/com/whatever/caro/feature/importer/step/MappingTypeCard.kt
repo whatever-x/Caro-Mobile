@@ -147,26 +147,35 @@ private fun Modifier.cardSurface(
         .padding(start = CaroTheme.spacing.xl, top = CaroTheme.spacing.m, end = CaroTheme.spacing.xl, bottom = CaroTheme.spacing.xl)
 }
 
-/** 큰 글자에서는 이름과 부제가 가져오기 줄에 밀려 글자 단위로 끊기므로 가져오기 줄을 아래로 내린다. */
+/**
+ * 머리 줄 어디를 눌러도 가져오기를 켜고 끄고, 이름과 부제가 함께 읽혀 어느 유형의 토글인지 알 수 있다.
+ * 큰 글자에서는 이름과 부제가 가져오기 표시에 밀려 글자 단위로 끊기므로 표시를 아래로 내린다.
+ */
 @Composable
 private fun NoteTypeHeader(
     type: ParsedNoteType,
     isEnabled: Boolean,
     onToggleNoteType: (String) -> Unit,
 ) {
+    val toggle =
+        Modifier
+            .fillMaxWidth()
+            .heightIn(min = ToggleMinHeight)
+            .toggleable(value = isEnabled, role = Role.Checkbox, onValueChange = { onToggleNoteType(type.id) })
+
     if (isLargeText()) {
-        Column(modifier = Modifier.fillMaxWidth()) {
+        Column(modifier = toggle) {
             NoteTypeInfo(type)
-            ImportToggle(isEnabled = isEnabled, onClick = { onToggleNoteType(type.id) })
+            ImportToggleMark(isEnabled = isEnabled)
         }
     } else {
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = toggle,
             horizontalArrangement = Arrangement.spacedBy(CaroTheme.spacing.m),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             NoteTypeInfo(type, modifier = Modifier.weight(1f))
-            ImportToggle(isEnabled = isEnabled, onClick = { onToggleNoteType(type.id) })
+            ImportToggleMark(isEnabled = isEnabled)
         }
     }
 }
@@ -188,16 +197,11 @@ private fun NoteTypeInfo(
     }
 }
 
+/** 상태 semantics는 머리 줄의 toggleable이 맡으므로 이 표시는 장식이다. */
 @Composable
-private fun ImportToggle(
-    isEnabled: Boolean,
-    onClick: () -> Unit,
-) {
+private fun ImportToggleMark(isEnabled: Boolean) {
     Row(
-        modifier =
-            Modifier
-                .heightIn(min = ToggleMinHeight)
-                .toggleable(value = isEnabled, role = Role.Checkbox, onValueChange = { onClick() }),
+        modifier = Modifier.heightIn(min = ToggleMinHeight),
         horizontalArrangement = Arrangement.spacedBy(ToggleGap),
         verticalAlignment = Alignment.CenterVertically,
     ) {

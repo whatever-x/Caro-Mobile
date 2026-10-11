@@ -13,6 +13,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
@@ -47,6 +48,7 @@ internal fun DeckInfoStep(
     onDescriptionChange: (String) -> Unit,
     onConfirm: () -> Unit,
     modifier: Modifier = Modifier,
+    confirmFocusRequester: FocusRequester? = null,
 ) {
     val focusManager = LocalFocusManager.current
 
@@ -92,6 +94,7 @@ internal fun DeckInfoStep(
             buttonText = stringResource(Res.string.import_button_import),
             onClick = onConfirm,
             enabled = isConfirmEnabled,
+            focusRequester = confirmFocusRequester,
         )
     }
 }

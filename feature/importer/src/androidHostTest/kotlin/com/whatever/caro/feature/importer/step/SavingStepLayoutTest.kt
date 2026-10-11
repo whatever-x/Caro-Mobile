@@ -19,7 +19,7 @@ import org.robolectric.annotation.Config
 import org.robolectric.annotation.GraphicsMode
 import kotlin.math.abs
 
-// 평소에는 내용이 가운데에 놓이고 스크롤하지 않으며, 공간이 모자랄 때만 스크롤한다(Figma 09). 가져오기 멈추기 버튼은 어느 경우에도 고정이다.
+// 평소에는 내용이 가운데에 놓이고 스크롤하지 않으며, 공간이 모자랄 때만 스크롤한다. 가져오기 멈추기 버튼은 어느 경우에도 고정이다.
 @RunWith(RobolectricTestRunner::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
 @Config(sdk = [35], qualifiers = "ko-rKR-w393dp-h852dp-xxhdpi")
