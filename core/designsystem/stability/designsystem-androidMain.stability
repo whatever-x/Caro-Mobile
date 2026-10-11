@@ -33,6 +33,18 @@ private fun com.whatever.caro.core.designsystem.animation.animatedSlideOffsetY(a
     - onAnimationFinish: STABLE (function type)
 
 @Composable
+public fun com.whatever.caro.core.designsystem.components.CaroCtaButton(enabled: kotlin.Boolean, text: kotlin.String, onClick: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier, style: com.whatever.caro.core.designsystem.components.CaroCtaButtonStyle, disabledReason: kotlin.String?): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - enabled: STABLE (primitive type)
+    - text: STABLE (String is immutable)
+    - onClick: STABLE (function type)
+    - modifier: STABLE (marked @Stable or @Immutable)
+    - style: STABLE (class with no mutable properties)
+    - disabledReason: STABLE (class with no mutable properties)
+
+@Composable
 public fun com.whatever.caro.core.designsystem.components.CaroDialog(onDismissRequest: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier, properties: androidx.compose.ui.window.DialogProperties, title: @[Composable] androidx.compose.runtime.internal.ComposableFunction0<kotlin.Unit>?, buttons: @[Composable] androidx.compose.runtime.internal.ComposableFunction0<kotlin.Unit>?, content: @[Composable] androidx.compose.runtime.internal.ComposableFunction0<kotlin.Unit>): kotlin.Unit
   skippable: true
   restartable: true
@@ -65,6 +77,20 @@ private fun com.whatever.caro.core.designsystem.components.CaroDialogContent(mod
     - title: STABLE (composable function type)
     - buttons: STABLE (composable function type)
     - content: STABLE (composable function type)
+
+@Composable
+public fun com.whatever.caro.core.designsystem.components.CaroFieldCounter(count: kotlin.String): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - count: STABLE (String is immutable)
+
+@Composable
+public fun com.whatever.caro.core.designsystem.components.CaroRequiredFieldHeader(label: kotlin.String): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - label: STABLE (String is immutable)
 
 @Composable
 public fun com.whatever.caro.core.designsystem.components.CaroSnackBarHost(modifier: androidx.compose.ui.Modifier, hostState: androidx.compose.material3.SnackbarHostState, snackbar: @[Composable] androidx.compose.runtime.internal.ComposableFunction1<androidx.compose.material3.SnackbarData, kotlin.Unit>): kotlin.Unit
@@ -120,6 +146,14 @@ public fun com.whatever.caro.core.designsystem.components.CaroTextField(value: k
     - trailingIcon: STABLE (composable function type)
     - interactionSource: STABLE (marked @Stable or @Immutable)
     - focusRequester: STABLE (marked @Stable or @Immutable)
+
+@Composable
+public fun com.whatever.caro.core.designsystem.components.CaroTipSection(lines: kotlin.collections.List<kotlin.String>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+  skippable: false
+  restartable: true
+  params:
+    - lines: RUNTIME (requires runtime check)
+    - modifier: STABLE (marked @Stable or @Immutable)
 
 @Composable
 public fun com.whatever.caro.core.designsystem.components.CaroTopBar(modifier: androidx.compose.ui.Modifier, leadingContent: @[Composable] @[ExtensionFunctionType] androidx.compose.runtime.internal.ComposableFunction1<androidx.compose.foundation.layout.BoxScope, kotlin.Unit>?, centerContent: @[Composable] @[ExtensionFunctionType] androidx.compose.runtime.internal.ComposableFunction1<androidx.compose.foundation.layout.BoxScope, kotlin.Unit>?, trailingContent: @[Composable] @[ExtensionFunctionType] androidx.compose.runtime.internal.ComposableFunction1<androidx.compose.foundation.layout.BoxScope, kotlin.Unit>?): kotlin.Unit

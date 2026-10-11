@@ -1,4 +1,4 @@
-package com.whatever.caro.feature.deck.component
+package com.whatever.caro.core.designsystem.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -15,7 +15,7 @@ import com.whatever.caro.core.designsystem.themes.CaroTheme
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
-internal fun RequiredFieldHeader(label: String) {
+fun CaroRequiredFieldHeader(label: String) {
     Row(
         horizontalArrangement = Arrangement.spacedBy(CaroTheme.spacing.xxs),
         verticalAlignment = Alignment.CenterVertically,
@@ -34,7 +34,7 @@ internal fun RequiredFieldHeader(label: String) {
 }
 
 @Composable
-internal fun FieldCounter(count: String) {
+fun CaroFieldCounter(count: String) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,

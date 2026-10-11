@@ -5,37 +5,6 @@
 //   ./gradlew :deck:stabilityDump
 
 @Composable
-internal fun com.whatever.caro.feature.deck.component.CtaButton(enabled: kotlin.Boolean, text: kotlin.String, onClick: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
-  skippable: true
-  restartable: true
-  params:
-    - enabled: STABLE (primitive type)
-    - text: STABLE (String is immutable)
-    - onClick: STABLE (function type)
-    - modifier: STABLE (marked @Stable or @Immutable)
-
-@Composable
-internal fun com.whatever.caro.feature.deck.component.DeckTipSection(modifier: androidx.compose.ui.Modifier): kotlin.Unit
-  skippable: true
-  restartable: true
-  params:
-    - modifier: STABLE (marked @Stable or @Immutable)
-
-@Composable
-internal fun com.whatever.caro.feature.deck.component.FieldCounter(count: kotlin.String): kotlin.Unit
-  skippable: true
-  restartable: true
-  params:
-    - count: STABLE (String is immutable)
-
-@Composable
-internal fun com.whatever.caro.feature.deck.component.RequiredFieldHeader(label: kotlin.String): kotlin.Unit
-  skippable: true
-  restartable: true
-  params:
-    - label: STABLE (String is immutable)
-
-@Composable
 internal fun com.whatever.caro.feature.deck.edit.CreateDeckScreen(state: com.whatever.caro.feature.deck.create.mvi.CreateDeckState, onIntent: kotlin.Function1<com.whatever.caro.feature.deck.create.mvi.CreateDeckIntent, kotlin.Unit>): kotlin.Unit
   skippable: true
   restartable: true
