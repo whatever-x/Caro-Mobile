@@ -2,35 +2,26 @@ package com.whatever.caro.feature.importer.step
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.selection.selectable
-import androidx.compose.foundation.selection.toggleable
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.unit.dp
 import caromobile.core.designsystem.generated.resources.Res
 import caromobile.core.designsystem.generated.resources.import_button_next
 import caromobile.core.designsystem.generated.resources.import_hint_sheet_only_selected
-import caromobile.core.designsystem.generated.resources.import_label_header_row
 import caromobile.core.designsystem.generated.resources.import_label_row_count
 import caromobile.core.designsystem.generated.resources.import_label_row_over_limit
 import caromobile.core.designsystem.generated.resources.import_label_sheet_empty
 import caromobile.core.designsystem.generated.resources.import_reason_sheet_empty
 import caromobile.core.designsystem.generated.resources.import_subtitle_sheet
-import com.whatever.caro.core.designsystem.components.CaroCheckbox
 import com.whatever.caro.core.designsystem.themes.CaroTheme
 import com.whatever.caro.core.importparser.model.ParsedSheet
 import com.whatever.caro.core.importparser.model.ParsedTable
@@ -44,7 +35,6 @@ import org.jetbrains.compose.resources.stringResource
 private const val HEADER_KEY = "header"
 private const val HEADER_ROW_KEY = "header-row"
 private const val SHEET_NAME_MAX_LINES = 2
-private val HeaderRowMinHeight = 48.dp
 private val RadioSize = 22.dp
 private val RadioDotSize = 8.dp
 private val RadioBorderWidth = 1.dp
@@ -88,7 +78,11 @@ internal fun SheetStep(
             )
         }
         item(key = HEADER_ROW_KEY) {
-            HeaderRowToggle(checked = hasHeaderRow, onCheckedChange = onChangeHeaderRow)
+            HeaderRowToggle(
+                checked = hasHeaderRow,
+                onCheckedChange = onChangeHeaderRow,
+                modifier = Modifier.padding(top = CaroTheme.spacing.m, bottom = CaroTheme.spacing.xl2),
+            )
         }
     }
 }
@@ -129,31 +123,5 @@ private fun RadioMark(isSelected: Boolean) {
                         .background(CaroTheme.color.icon.inverse),
             )
         }
-    }
-}
-
-/** 줄 전체를 누르는 영역으로 두고 눌리는 높이는 48 이상이다. 보이는 체크박스는 22라 줄 높이와 별개다. */
-@Composable
-private fun HeaderRowToggle(
-    checked: Boolean,
-    onCheckedChange: (Boolean) -> Unit,
-) {
-    Row(
-        modifier =
-            Modifier
-                .fillMaxWidth()
-                .padding(top = CaroTheme.spacing.m, bottom = CaroTheme.spacing.xl2)
-                .heightIn(min = HeaderRowMinHeight)
-                .toggleable(value = checked, role = Role.Checkbox, onValueChange = onCheckedChange)
-                .padding(horizontal = CaroTheme.spacing.xl2),
-        horizontalArrangement = Arrangement.spacedBy(CaroTheme.spacing.s),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        CaroCheckbox(state = if (checked) ToggleableState.On else ToggleableState.Off)
-        Text(
-            text = stringResource(Res.string.import_label_header_row),
-            style = CaroTheme.typography.label1,
-            color = CaroTheme.color.text.primary,
-        )
     }
 }

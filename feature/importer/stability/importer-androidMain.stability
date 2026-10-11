@@ -183,12 +183,39 @@ private fun com.whatever.caro.feature.importer.rememberInputKey(input: kotlin.An
     - input: UNSTABLE (has mutable properties or unstable members)
 
 @Composable
-private fun com.whatever.caro.feature.importer.step.HeaderRowToggle(checked: kotlin.Boolean, onCheckedChange: kotlin.Function1<kotlin.Boolean, kotlin.Unit>): kotlin.Unit
+private fun com.whatever.caro.feature.importer.step.CellText(text: kotlin.String, columnWidth: androidx.compose.ui.unit.Dp?, style: androidx.compose.ui.text.TextStyle, color: androidx.compose.ui.graphics.Color): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - text: STABLE (String is immutable)
+    - columnWidth: STABLE (marked @Stable or @Immutable)
+    - style: STABLE (marked @Stable or @Immutable)
+    - color: STABLE (marked @Stable or @Immutable)
+
+@Composable
+private fun com.whatever.caro.feature.importer.step.DelimiterChipButton(chip: com.whatever.caro.feature.importer.logic.DelimiterChip, onSelect: kotlin.Function1<kotlin.Char, kotlin.Unit>): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - chip: STABLE (class with no mutable properties)
+    - onSelect: STABLE (function type)
+
+@Composable
+private fun com.whatever.caro.feature.importer.step.DelimiterSetting(chips: kotlin.collections.List<com.whatever.caro.feature.importer.logic.DelimiterChip>, onSelect: kotlin.Function1<kotlin.Char, kotlin.Unit>): kotlin.Unit
+  skippable: false
+  restartable: true
+  params:
+    - chips: RUNTIME (requires runtime check)
+    - onSelect: STABLE (function type)
+
+@Composable
+internal fun com.whatever.caro.feature.importer.step.HeaderRowToggle(checked: kotlin.Boolean, onCheckedChange: kotlin.Function1<kotlin.Boolean, kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
   skippable: true
   restartable: true
   params:
     - checked: STABLE (primitive type)
     - onCheckedChange: STABLE (function type)
+    - modifier: STABLE (marked @Stable or @Immutable)
 
 @Composable
 private fun com.whatever.caro.feature.importer.step.PasteGuideLine(text: kotlin.String): kotlin.Unit
@@ -214,6 +241,44 @@ private fun com.whatever.caro.feature.importer.step.RadioMark(isSelected: kotlin
   restartable: true
   params:
     - isSelected: STABLE (primitive type)
+
+@Composable
+private fun com.whatever.caro.feature.importer.step.ResultCards(headerLabels: kotlin.collections.List<kotlin.String>, rows: kotlin.collections.List<kotlin.collections.List<kotlin.String>>, readings: kotlin.collections.List<kotlin.String>, isReparsing: kotlin.Boolean): kotlin.Unit
+  skippable: false
+  restartable: true
+  params:
+    - headerLabels: RUNTIME (requires runtime check)
+    - rows: RUNTIME (requires runtime check)
+    - readings: RUNTIME (requires runtime check)
+    - isReparsing: STABLE (primitive type)
+
+@Composable
+private fun com.whatever.caro.feature.importer.step.ResultTable(headerLabels: kotlin.collections.List<kotlin.String>, rows: kotlin.collections.List<kotlin.collections.List<kotlin.String>>, readings: kotlin.collections.List<kotlin.String>, isReparsing: kotlin.Boolean, scrollState: androidx.compose.foundation.ScrollState): kotlin.Unit
+  skippable: false
+  restartable: true
+  params:
+    - headerLabels: RUNTIME (requires runtime check)
+    - rows: RUNTIME (requires runtime check)
+    - readings: RUNTIME (requires runtime check)
+    - isReparsing: STABLE (primitive type)
+    - scrollState: STABLE (marked @Stable or @Immutable)
+
+@Composable
+private fun com.whatever.caro.feature.importer.step.ResultTitleRow(info: com.whatever.caro.feature.importer.logic.TextCheckInfo): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - info: STABLE (class with no mutable properties)
+
+@Composable
+private fun com.whatever.caro.feature.importer.step.RowCard(rowNumber: kotlin.Int, headerLabels: kotlin.collections.List<kotlin.String>, cells: kotlin.collections.List<kotlin.String>, reading: kotlin.String): kotlin.Unit
+  skippable: false
+  restartable: true
+  params:
+    - rowNumber: STABLE (primitive type)
+    - headerLabels: RUNTIME (requires runtime check)
+    - cells: RUNTIME (requires runtime check)
+    - reading: STABLE (String is immutable)
 
 @Composable
 internal fun com.whatever.caro.feature.importer.step.SelectionCardRow(label: kotlin.String, detail: kotlin.String, labelMaxLines: kotlin.Int, position: com.whatever.caro.feature.importer.step.CardPosition, interaction: androidx.compose.ui.Modifier, leading: @[Composable] androidx.compose.runtime.internal.ComposableFunction0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier, indent: androidx.compose.ui.unit.Dp, caption: kotlin.String?, showDivider: kotlin.Boolean): kotlin.Unit
@@ -305,6 +370,14 @@ internal fun com.whatever.caro.feature.importer.step.SourceStep(maxCards: kotlin
     - modifier: STABLE (marked @Stable or @Immutable)
 
 @Composable
+internal fun com.whatever.caro.feature.importer.step.StepBottomDivider(isVisible: kotlin.Boolean, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - isVisible: STABLE (primitive type)
+    - modifier: STABLE (marked @Stable or @Immutable)
+
+@Composable
 private fun com.whatever.caro.feature.importer.step.SubdeckHint(text: kotlin.String): kotlin.Unit
   skippable: true
   restartable: true
@@ -374,7 +447,74 @@ private fun com.whatever.caro.feature.importer.step.SupportedFormatRow(label: or
     - chip: STABLE (marked @Stable or @Immutable)
 
 @Composable
+private fun com.whatever.caro.feature.importer.step.TableDataRow(cells: kotlin.collections.List<kotlin.String>, reading: kotlin.String, columnWidth: androidx.compose.ui.unit.Dp?): kotlin.Unit
+  skippable: false
+  restartable: true
+  params:
+    - cells: RUNTIME (requires runtime check)
+    - reading: STABLE (String is immutable)
+    - columnWidth: STABLE (marked @Stable or @Immutable)
+
+@Composable
+private fun com.whatever.caro.feature.importer.step.TableDivider(): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+
+@Composable
+private fun com.whatever.caro.feature.importer.step.TableHeaderRow(labels: kotlin.collections.List<kotlin.String>, columnWidth: androidx.compose.ui.unit.Dp?, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+  skippable: false
+  restartable: true
+  params:
+    - labels: RUNTIME (requires runtime check)
+    - columnWidth: STABLE (marked @Stable or @Immutable)
+    - modifier: STABLE (marked @Stable or @Immutable)
+
+@Composable
+private fun com.whatever.caro.feature.importer.step.TextCheckGuide(): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+
+@Composable
+internal fun com.whatever.caro.feature.importer.step.TextCheckResult(table: com.whatever.caro.feature.importer.logic.TextCheckTable, isReparsing: kotlin.Boolean, tableScrollState: androidx.compose.foundation.ScrollState, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+  skippable: false
+  restartable: true
+  params:
+    - table: RUNTIME (requires runtime check)
+    - isReparsing: STABLE (primitive type)
+    - tableScrollState: STABLE (marked @Stable or @Immutable)
+    - modifier: STABLE (marked @Stable or @Immutable)
+
+@Composable
+internal fun com.whatever.caro.feature.importer.step.TextCheckStep(table: com.whatever.caro.core.importparser.model.ParsedTable, delimiter: kotlin.Char, hasHeaderRow: kotlin.Boolean, isReparsing: kotlin.Boolean, onSelectDelimiter: kotlin.Function1<kotlin.Char, kotlin.Unit>, onChangeHeaderRow: kotlin.Function1<kotlin.Boolean, kotlin.Unit>, onNext: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+  skippable: false
+  restartable: true
+  params:
+    - table: UNSTABLE (has mutable properties or unstable members)
+    - delimiter: STABLE (primitive type)
+    - hasHeaderRow: STABLE (primitive type)
+    - isReparsing: STABLE (primitive type)
+    - onSelectDelimiter: STABLE (function type)
+    - onChangeHeaderRow: STABLE (function type)
+    - onNext: STABLE (function type)
+    - modifier: STABLE (marked @Stable or @Immutable)
+
+@Composable
+private fun com.whatever.caro.feature.importer.step.infoText(info: com.whatever.caro.feature.importer.logic.TextCheckInfo): kotlin.String
+  skippable: true
+  restartable: true
+  params:
+    - info: STABLE (class with no mutable properties)
+
+@Composable
 internal fun com.whatever.caro.feature.importer.step.isLargeText(): kotlin.Boolean
+  skippable: true
+  restartable: true
+  params:
+
+@Composable
+private fun com.whatever.caro.feature.importer.step.label(): kotlin.String
   skippable: true
   restartable: true
   params:

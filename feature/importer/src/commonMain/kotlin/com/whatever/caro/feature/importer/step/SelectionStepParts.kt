@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -27,21 +28,27 @@ import androidx.compose.ui.graphics.drawOutline
 import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import caromobile.core.designsystem.generated.resources.Res
 import caromobile.core.designsystem.generated.resources.ic_file_text_16
+import caromobile.core.designsystem.generated.resources.import_label_header_row
+import com.whatever.caro.core.designsystem.components.CaroCheckbox
 import com.whatever.caro.core.designsystem.themes.CaroTheme
 import com.whatever.caro.feature.importer.component.ImportBottomBar
 import com.whatever.caro.feature.importer.component.ImportStepTitle
 import com.whatever.caro.feature.importer.logic.truncateFileName
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 
 private val CardBorderWidth = 1.dp
 private val CardEdgePadding = 4.dp
 private val CardEdgeExtend = 24.dp
 private val RowMinHeight = 50.dp
+private val HeaderRowMinHeight = 48.dp
 private val RowVerticalPadding = 14.dp
 private val RowHorizontalPadding = 16.dp
 private val FileIconSize = 16.dp
@@ -101,19 +108,54 @@ internal fun SelectionStepFrame(
             state = listState,
             content = content,
         )
-        Box(
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .height(DividerThickness)
-                    .then(if (isScrollable) Modifier.background(CaroTheme.color.surface.tertiary) else Modifier),
-        )
+        StepBottomDivider(isVisible = isScrollable)
         ImportBottomBar(
             buttonText = buttonText,
             onClick = onNext,
             enabled = enabled,
             reason = reason,
             summary = summary,
+        )
+    }
+}
+
+/** 고정 하단 영역 위의 구분선이다. 높이는 항상 차지해 선이 생겨도 내용이 밀리지 않는다. */
+@Composable
+internal fun StepBottomDivider(
+    isVisible: Boolean,
+    modifier: Modifier = Modifier,
+) {
+    Box(
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .height(DividerThickness)
+                .then(if (isVisible) Modifier.background(CaroTheme.color.surface.tertiary) else Modifier),
+    )
+}
+
+/** 줄 전체를 누르는 영역으로 두고 눌리는 높이는 48 이상이다. 보이는 체크박스는 22라 줄 높이와 별개다. */
+@Composable
+internal fun HeaderRowToggle(
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .heightIn(min = HeaderRowMinHeight)
+                .toggleable(value = checked, role = Role.Checkbox, onValueChange = onCheckedChange)
+                .padding(horizontal = CaroTheme.spacing.xl2),
+        horizontalArrangement = Arrangement.spacedBy(CaroTheme.spacing.s),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        CaroCheckbox(state = if (checked) ToggleableState.On else ToggleableState.Off)
+        Text(
+            text = stringResource(Res.string.import_label_header_row),
+            style = CaroTheme.typography.label1,
+            color = CaroTheme.color.text.primary,
         )
     }
 }

@@ -74,6 +74,7 @@ private val importSelectStepCopy: Map<String, String> =
         "import_label_table_info_truncated" to "열 %1\$s개 중 %2\$s개 · %3\$s줄 중 처음 %4\$s줄",
         "import_hint_table_more_columns" to "나머지 열은 항목 연결에서 고를 수 있어요.",
         "import_label_column" to "열 %1\$s",
+        "import_label_table_row" to "%1\$s행",
     )
 
 private val importMappingCopy: Map<String, String> =

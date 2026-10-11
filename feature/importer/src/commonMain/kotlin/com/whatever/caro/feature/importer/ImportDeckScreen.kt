@@ -25,14 +25,17 @@ import com.whatever.caro.feature.importer.component.ImportCreatingDeckOverlay
 import com.whatever.caro.feature.importer.component.ImportDialogs
 import com.whatever.caro.feature.importer.component.ImportLoadingOverlay
 import com.whatever.caro.feature.importer.component.ImportTopBar
+import com.whatever.caro.feature.importer.logic.resolveDelimiter
 import com.whatever.caro.feature.importer.logic.spreadsheetDateStyleFor
 import com.whatever.caro.feature.importer.mvi.ImportDeckIntent
 import com.whatever.caro.feature.importer.mvi.ImportDeckState
+import com.whatever.caro.feature.importer.mvi.ImportLoading
 import com.whatever.caro.feature.importer.mvi.ImportStep
 import com.whatever.caro.feature.importer.step.PasteStep
 import com.whatever.caro.feature.importer.step.SheetStep
 import com.whatever.caro.feature.importer.step.SourceStep
 import com.whatever.caro.feature.importer.step.SubdeckStep
+import com.whatever.caro.feature.importer.step.TextCheckStep
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 import kotlin.random.Random
@@ -113,7 +116,19 @@ internal fun ImportDeckScreen(
                         }
 
                         ImportStep.TextCheck -> {
-                            Unit
+                            state.table?.let { table ->
+                                // 다시 나누는 동안 selection은 바꾸기 전 값이라 방금 고른 칩이 바로 보이려면 pendingSelection이 먼저다.
+                                val selection = state.pendingSelection ?: state.selection
+                                TextCheckStep(
+                                    table = table,
+                                    delimiter = resolveDelimiter(selection.delimiter, table.layout),
+                                    hasHeaderRow = selection.hasHeaderRow ?: table.layout?.hasHeaderRow ?: false,
+                                    isReparsing = state.loading == ImportLoading.TextReparsing,
+                                    onSelectDelimiter = { delimiter -> onIntent(ImportDeckIntent.SelectDelimiter(delimiter)) },
+                                    onChangeHeaderRow = { checked -> onIntent(ImportDeckIntent.ChangeHeaderRow(checked)) },
+                                    onNext = { onIntent(ImportDeckIntent.ClickSelectionNext) },
+                                )
+                            }
                         }
 
                         ImportStep.Mapping -> {
