@@ -9,6 +9,9 @@ import com.whatever.caro.core.importparser.text.TextFileReader
 import com.whatever.caro.core.importparser.text.TextTableReader
 import com.whatever.caro.core.importparser.xlsx.XlsxReader
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.job
 import okio.FileSystem
 import okio.IOException
 import okio.Path
@@ -37,7 +40,9 @@ class ImportParser(
             if (fileBytes > options.maxFileBytes) {
                 throw ImportParseException(ImportParseErrorKind.FILE_TOO_LARGE, "file is $fileBytes bytes")
             }
-            when (val source = ImportFormatDetector.detect(fileSystem, path, extension, fileBytes, options)) {
+            // 압축 해제와 SQLite 반복문은 블로킹이라 취소를 스스로 확인해야 Back 뒤에 계속 돌며 메모리와 CPU를 쓰지 않는다.
+            val job = currentCoroutineContext().job
+            when (val source = ImportFormatDetector.detect(fileSystem, path, extension, fileBytes, options, job::ensureActive)) {
                 is DetectedSource.Apkg -> ApkgReader(fileSystem, source.archive, options).read(sourceName)
                 is DetectedSource.Xlsx -> XlsxReader(source.archive, options).read(sourceName)
                 DetectedSource.Text -> TextFileReader(fileSystem, options).read(path, sourceName)

@@ -2,6 +2,7 @@ package com.whatever.caro.feature.importer.source
 
 import io.kotest.assertions.throwables.shouldNotThrowAny
 import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import okio.FileSystem
@@ -148,16 +149,131 @@ class ImportTempStorageTest : FunSpec() {
             }
         }
 
-        test("clearStale은 기준 시간보다 새로 만든 다른 화면의 디렉터리를 남긴다") {
+        test("clearStale은 같은 프로세스에서 기준 시간보다 새로 만든 다른 화면의 디렉터리를 남긴다") {
             withSandbox { sandbox ->
                 val base = sandbox / "caro-import"
-                val storage = ImportTempStorage(fileSystem, base / "session-mine", staleAfterMillis = 60L * 60 * 1000)
-                fileSystem.createDirectories(base / "session-fresh")
-                fileSystem.write(base / "session-fresh" / "copy-1") { writeUtf8("live") }
+                val storage = storageIn(base, staleAfterMillis = 60L * 60 * 1000)
+                fileSystem.createDirectories(base / "session-tag1-fresh")
+                fileSystem.write(base / "session-tag1-fresh" / "copy-1") { writeUtf8("live") }
 
                 storage.clearStale()
 
-                fileSystem.exists(base / "session-fresh" / "copy-1") shouldBe true
+                fileSystem.exists(base / "session-tag1-fresh" / "copy-1") shouldBe true
+            }
+        }
+
+        test("clearStale은 같은 프로세스의 다른 화면 디렉터리도 기준 시간이 지나면 지운다") {
+            withSandbox { sandbox ->
+                val base = sandbox / "caro-import"
+                val storage = storageIn(base, staleAfterMillis = 0L)
+                fileSystem.createDirectories(base / "session-tag1-old")
+                fileSystem.write(base / "session-tag1-old" / "copy-1") { writeUtf8("old") }
+
+                storage.clearStale()
+
+                fileSystem.exists(base / "session-tag1-old") shouldBe false
+            }
+        }
+
+        test("clearStale은 이전 프로세스가 만든 디렉터리를 방금 만든 것이어도 시간과 상관없이 지운다") {
+            withSandbox { sandbox ->
+                val base = sandbox / "caro-import"
+                val storage = storageIn(base, staleAfterMillis = 60L * 60 * 1000)
+                fileSystem.createDirectories(base / "session-tag0-crashed")
+                fileSystem.write(base / "session-tag0-crashed" / "copy-1") { writeUtf8("study data") }
+                fileSystem.write(base / "session-tag0-crashed" / "importparser-1a2b") { writeUtf8("db") }
+
+                storage.clearStale()
+
+                fileSystem.exists(base / "session-tag0-crashed") shouldBe false
+                fileSystem.exists(base / "session-tag1-mine") shouldBe true
+            }
+        }
+
+        test("clearStale은 프로세스 표식이 없는 옛 형식의 세션 디렉터리도 이전 프로세스의 것으로 보고 지운다") {
+            withSandbox { sandbox ->
+                val base = sandbox / "caro-import"
+                val storage = storageIn(base, staleAfterMillis = 60L * 60 * 1000)
+                fileSystem.createDirectories(base / "session-legacy")
+
+                storage.clearStale()
+
+                fileSystem.exists(base / "session-legacy") shouldBe false
+            }
+        }
+
+        test("clearStale은 표식이 앞부분만 같은 다른 프로세스의 디렉터리를 현재 것으로 착각하지 않는다") {
+            withSandbox { sandbox ->
+                val base = sandbox / "caro-import"
+                val storage = storageIn(base, staleAfterMillis = 60L * 60 * 1000)
+                fileSystem.createDirectories(base / "session-tag10-other")
+
+                storage.clearStale()
+
+                fileSystem.exists(base / "session-tag10-other") shouldBe false
+            }
+        }
+
+        test("기본 세션 디렉터리 이름은 프로세스 표식을 포함하고 같은 프로세스의 화면끼리 표식이 같다") {
+            val first =
+                ImportTempStorage()
+                    .newFile()
+                    .parent
+                    ?.name
+                    .orEmpty()
+            val second =
+                ImportTempStorage()
+                    .newFile()
+                    .parent
+                    ?.name
+                    .orEmpty()
+            try {
+                val pattern = Regex("session-([0-9a-f]+)-([0-9a-f]+)")
+                val firstMatch = pattern.matchEntire(first)
+                val secondMatch = pattern.matchEntire(second)
+                firstMatch.shouldNotBeNull()
+                secondMatch.shouldNotBeNull()
+                firstMatch.groupValues[1] shouldBe secondMatch.groupValues[1]
+                firstMatch.groupValues[2] shouldNotBe secondMatch.groupValues[2]
+            } finally {
+                listOf(first, second).forEach { name ->
+                    fileSystem.deleteRecursively(ImportTempStorage.DEFAULT_ROOT / name, mustExist = false)
+                }
+            }
+        }
+
+        test("clearStale은 기준 시간이 지난 시스템 선택기 사본을 지우고 디렉터리는 남긴다") {
+            withSandbox { sandbox ->
+                val inbox = sandbox / "app-Inbox"
+                fileSystem.createDirectories(inbox)
+                fileSystem.write(inbox / "deck.apkg") { writeUtf8("study data") }
+                val storage = storageIn(sandbox / "caro-import", staleAfterMillis = 0L, inboxDirectory = inbox)
+
+                storage.clearStale()
+
+                fileSystem.exists(inbox / "deck.apkg") shouldBe false
+                fileSystem.exists(inbox) shouldBe true
+            }
+        }
+
+        test("clearStale은 기준 시간보다 새로 생긴 시스템 선택기 사본을 남긴다") {
+            withSandbox { sandbox ->
+                val inbox = sandbox / "app-Inbox"
+                fileSystem.createDirectories(inbox)
+                fileSystem.write(inbox / "deck.apkg") { writeUtf8("picking now") }
+                val storage = storageIn(sandbox / "caro-import", staleAfterMillis = 60L * 60 * 1000, inboxDirectory = inbox)
+
+                storage.clearStale()
+
+                fileSystem.exists(inbox / "deck.apkg") shouldBe true
+            }
+        }
+
+        test("clearStale은 시스템 선택기 디렉터리가 없어도 던지지 않는다") {
+            withSandbox { sandbox ->
+                val storage = storageIn(sandbox / "caro-import", staleAfterMillis = 0L, inboxDirectory = sandbox / "missing-Inbox")
+
+                shouldNotThrowAny { storage.clearStale() }
             }
         }
 
@@ -169,6 +285,13 @@ class ImportTempStorageTest : FunSpec() {
             }
         }
     }
+
+    // 현재 프로세스 표식을 tag1로 고정한다. 이 프로세스의 화면은 session-tag1-*, 이전 프로세스의 화면은 그 밖의 이름이다.
+    private fun storageIn(
+        base: Path,
+        staleAfterMillis: Long,
+        inboxDirectory: Path? = null,
+    ) = ImportTempStorage(fileSystem, base / "session-tag1-mine", staleAfterMillis, processTag = "tag1", inboxDirectory = inboxDirectory)
 
     private fun withSandbox(block: (Path) -> Unit) {
         val sandbox =

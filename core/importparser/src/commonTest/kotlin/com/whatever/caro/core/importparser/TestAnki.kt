@@ -9,7 +9,10 @@ import okio.Path
 import okio.buffer
 import okio.use
 
-/** 노트 유형 항목 수와 노트 값 길이를 마음대로 정한 작은 Anki 패키지를 만든다. 실제 Anki 내보내기에 없는 악성 구조를 재현하려고 쓴다. */
+/**
+ * 노트 유형 항목 수와 노트 값 길이를 마음대로 정한 작은 Anki 패키지를 만든다. 실제 Anki 내보내기에 없는 악성 구조를 재현하려고 쓴다.
+ * [notesAndCardsSql]을 주면 notes와 cards를 만드는 기본 문장 대신 그 문장을 순서대로 실행한다.
+ */
 internal object TestAnki {
     private const val NOTE_TYPE_ID = 1L
     private const val DECK_ID = 1L
@@ -18,6 +21,7 @@ internal object TestAnki {
         path: Path,
         fieldCount: Int,
         notes: List<String>,
+        notesAndCardsSql: List<String>? = null,
     ) {
         val database =
             buildDatabase(path) { connection ->
@@ -29,7 +33,7 @@ internal object TestAnki {
                     """{"$NOTE_TYPE_ID":{"name":"T","type":0,"flds":[$fields]}}""",
                     """{"$DECK_ID":{"name":"D"}}""",
                 )
-                insertNotesAndCards(connection, notes)
+                insertNotesAndCards(connection, notes, notesAndCardsSql)
             }
         TestZip.write(path, listOf("collection.anki2" to database))
     }
@@ -38,6 +42,7 @@ internal object TestAnki {
         path: Path,
         fieldCount: Int,
         notes: List<String>,
+        notesAndCardsSql: List<String>? = null,
     ) {
         val database =
             buildDatabase(path) { connection ->
@@ -47,7 +52,7 @@ internal object TestAnki {
                 connection.execSQL("INSERT INTO notetypes VALUES ($NOTE_TYPE_ID, 'T', x'')")
                 connection.execSQL("INSERT INTO decks VALUES ($DECK_ID, 'D')")
                 repeat(fieldCount) { index -> connection.execSQL("INSERT INTO fields VALUES ($NOTE_TYPE_ID, $index, 'f$index')") }
-                insertNotesAndCards(connection, notes)
+                insertNotesAndCards(connection, notes, notesAndCardsSql)
             }
         val compressed = Buffer().also { buffer -> buffer.zstdCompress().buffer().use { it.write(database) } }.readByteArray()
         TestZip.write(path, listOf("meta" to byteArrayOf(META_VERSION_KEY, META_VERSION_LATEST), "collection.anki21b" to compressed))
@@ -69,7 +74,12 @@ internal object TestAnki {
     private fun insertNotesAndCards(
         connection: SQLiteConnection,
         notes: List<String>,
+        overrideSql: List<String>?,
     ) {
+        if (overrideSql != null) {
+            overrideSql.forEach { sql -> connection.execSQL(sql) }
+            return
+        }
         connection.execSQL("CREATE TABLE notes (id INTEGER, mid INTEGER, flds TEXT)")
         connection.execSQL("CREATE TABLE cards (nid INTEGER, did INTEGER, odid INTEGER, ord INTEGER)")
         notes.forEachIndexed { index, flds ->

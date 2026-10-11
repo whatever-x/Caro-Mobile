@@ -9,12 +9,21 @@ internal object TestZip {
     private const val LOCAL_HEADER = 0x04034b50
     private const val CENTRAL_HEADER = 0x02014b50
     private const val END_OF_CENTRAL_DIRECTORY = 0x06054b50
+    private const val ZIP64_END_RECORD = 0x06064b50
+    private const val ZIP64_LOCATOR = 0x07064b50
+    private const val ZIP64_END_RECORD_REMAINING_BYTES = 44L
     private const val VERSION = 20
 
+    /**
+     * [zip64EntryCount]를 주면 끝 레코드 앞에 그 항목 수를 적은 ZIP64 끝 레코드와 locator를 붙인다.
+     * [claimedCentralDirectoryBytes]를 주면 끝 레코드에 실제와 다른 중앙 디렉터리 크기를 적는다.
+     */
     fun write(
         path: Path,
         entries: List<Pair<String, ByteArray>>,
         claimedEntryCount: Int = entries.size,
+        zip64EntryCount: Long? = null,
+        claimedCentralDirectoryBytes: Int? = null,
     ) {
         val body = Buffer()
         val central = Buffer()
@@ -59,24 +68,55 @@ internal object TestZip {
         val centralOffset = body.size
         val centralSize = central.size
         body.writeAll(central)
+        zip64EntryCount?.let { count -> writeZip64End(body, count, centralSize, centralOffset) }
         body.writeIntLe(END_OF_CENTRAL_DIRECTORY).writeShortLe(0).writeShortLe(0)
         body.writeShortLe(claimedEntryCount).writeShortLe(claimedEntryCount)
-        body.writeIntLe(centralSize.toInt()).writeIntLe(centralOffset.toInt()).writeShortLe(0)
+        body.writeIntLe(claimedCentralDirectoryBytes ?: centralSize.toInt()).writeIntLe(centralOffset.toInt()).writeShortLe(0)
         Fixtures.fileSystem.write(path) { writeAll(body) }
+    }
+
+    private fun writeZip64End(
+        body: Buffer,
+        entryCount: Long,
+        centralSize: Long,
+        centralOffset: Long,
+    ) {
+        val recordOffset = body.size
+        body.writeIntLe(ZIP64_END_RECORD).writeLongLe(ZIP64_END_RECORD_REMAINING_BYTES)
+        body
+            .writeShortLe(VERSION)
+            .writeShortLe(VERSION)
+            .writeIntLe(0)
+            .writeIntLe(0)
+        body
+            .writeLongLe(entryCount)
+            .writeLongLe(entryCount)
+            .writeLongLe(centralSize)
+            .writeLongLe(centralOffset)
+        body
+            .writeIntLe(ZIP64_LOCATOR)
+            .writeIntLe(0)
+            .writeLongLe(recordOffset)
+            .writeIntLe(1)
     }
 
     fun xlsx(
         path: Path,
         sheetXml: String,
         sharedStrings: String? = null,
+        zip64EntryCount: Long? = null,
+        claimedCentralDirectoryBytes: Int? = null,
     ) = write(
         path,
-        listOfNotNull(
-            "xl/workbook.xml" to WORKBOOK.encodeToByteArray(),
-            "xl/_rels/workbook.xml.rels" to (if (sharedStrings == null) RELATIONS else RELATIONS_WITH_STRINGS).encodeToByteArray(),
-            "xl/worksheets/sheet1.xml" to sheetXml.encodeToByteArray(),
-            sharedStrings?.let { "xl/sharedStrings.xml" to "<sst>$it</sst>".encodeToByteArray() },
-        ),
+        entries =
+            listOfNotNull(
+                "xl/workbook.xml" to WORKBOOK.encodeToByteArray(),
+                "xl/_rels/workbook.xml.rels" to (if (sharedStrings == null) RELATIONS else RELATIONS_WITH_STRINGS).encodeToByteArray(),
+                "xl/worksheets/sheet1.xml" to sheetXml.encodeToByteArray(),
+                sharedStrings?.let { "xl/sharedStrings.xml" to "<sst>$it</sst>".encodeToByteArray() },
+            ),
+        zip64EntryCount = zip64EntryCount,
+        claimedCentralDirectoryBytes = claimedCentralDirectoryBytes,
     )
 
     fun sheet(rows: String): String = "<worksheet><sheetData>$rows</sheetData></worksheet>"

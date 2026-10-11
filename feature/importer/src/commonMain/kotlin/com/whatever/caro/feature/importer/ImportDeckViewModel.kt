@@ -22,6 +22,7 @@ import com.whatever.caro.feature.importer.logic.pasteBlockReason
 import com.whatever.caro.feature.importer.logic.pickFailedDialog
 import com.whatever.caro.feature.importer.logic.previewBlockReason
 import com.whatever.caro.feature.importer.logic.readFailureDialog
+import com.whatever.caro.feature.importer.logic.sanitizeDisplayName
 import com.whatever.caro.feature.importer.logic.selectionStep
 import com.whatever.caro.feature.importer.logic.summarizeSubdeckSelection
 import com.whatever.caro.feature.importer.logic.takeWithoutSplittingSurrogate
@@ -149,7 +150,11 @@ class ImportDeckViewModel internal constructor(
 
     override fun onCleared() {
         // viewModelScope는 이미 취소됐고, 디스크 작업을 main에서 하지 않으려고 별도 scope에서 지운다.
-        CoroutineScope(dispatchers.io).launch { tempStorage.clearAll() }
+        val reading = readJob
+        CoroutineScope(dispatchers.io).launch {
+            reading?.join()
+            tempStorage.clearAll()
+        }
         super.onCleared()
     }
 
@@ -233,7 +238,9 @@ class ImportDeckViewModel internal constructor(
 
     private fun onUpdatePasteText(text: String) {
         if (currentState.step != ImportStep.Paste) return
-        reduce { copy(pasteText = text) }
+        // 상한을 1자 넘긴 값까지만 두어도 너무 김 판정은 같고, 거대한 클립보드 글이 레이아웃과 메모리를 잡지 않는다.
+        // 서로게이트 쌍 가운데서 자르면 길이가 상한 이하로 돌아가 잘린 글이 통과하므로, 쌍을 보존하지 않고 그대로 자른다.
+        reduce { copy(pasteText = text.take(limits.maxPasteChars + 1)) }
     }
 
     private suspend fun onFilePicked(intent: ImportDeckIntent.FilePicked) {
@@ -294,7 +301,7 @@ class ImportDeckViewModel internal constructor(
         dateStyle: SpreadsheetDateStyle,
     ): ImportReadSource.File? {
         try {
-            val (name, size) = withContext(dispatchers.io) { file.displayName() to file.sizeBytes() }
+            val (name, size) = withContext(dispatchers.io) { sanitizeDisplayName(file.displayName()) to file.sizeBytes() }
             val rejection = classifyPick(name, size, limits.maxFileBytes)
             if (rejection != null) {
                 failRead(rejection)
@@ -596,9 +603,12 @@ class ImportDeckViewModel internal constructor(
         read: suspend () -> ParsedTable?,
         onRead: (ParsedTable) -> Unit,
     ) {
+        val previous = readJob
         val ticket = nextTicket()
         readJob =
             launch {
+                // 취소한 이전 읽기도 블로킹 단계에서는 계속 돌므로, 그 읽기가 끝난 뒤에 시작해야 표와 임시 파일이 겹쳐 쌓이지 않는다.
+                previous?.join()
                 try {
                     val table = read() ?: return@launch
                     if (ticket == generation) onRead(table)
@@ -627,9 +637,9 @@ class ImportDeckViewModel internal constructor(
         return generation
     }
 
+    // readJob을 비우지 않는다. 취소한 읽기가 끝나기를 다음 읽기와 임시 파일 정리가 기다려야 한다.
     private fun cancelRead() {
         nextTicket()
-        readJob = null
     }
 
     private fun failRead(dialog: ImportDialog) {
@@ -638,8 +648,13 @@ class ImportDeckViewModel internal constructor(
         reduce { copy(loading = null, isPickerOpen = false, pendingSelection = null, dialog = dialog) }
     }
 
+    // 취소한 읽기가 아직 파일을 쓰고 있을 수 있으므로 그 읽기가 끝난 뒤에 지워야 정리 뒤에 임시 디렉터리가 다시 생기지 않는다.
     private fun clearTempAsync() {
-        launch(dispatchers.io) { tempStorage.clearAll() }
+        val reading = readJob
+        launch(dispatchers.io) {
+            reading?.join()
+            tempStorage.clearAll()
+        }
     }
 }
 

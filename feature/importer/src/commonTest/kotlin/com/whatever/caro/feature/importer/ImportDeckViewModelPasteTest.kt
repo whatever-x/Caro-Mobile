@@ -41,7 +41,7 @@ class ImportDeckViewModelPasteTest : FunSpec() {
             }
         }
 
-        test("UpdatePasteText는 상한을 넘는 글도 자르지 않고 보관한다") {
+        test("UpdatePasteText는 상한을 한 글자 넘는 글은 자르지 않고 보관한다") {
             runTest(rig.dispatcher) {
                 val harness = rig.create(limits = limits)
                 harness.send(ImportDeckIntent.ClickPaste)
@@ -50,6 +50,35 @@ class ImportDeckViewModelPasteTest : FunSpec() {
                 advanceUntilIdle()
 
                 harness.state.pasteText shouldBe OVER_LIMIT_TEXT
+            }
+        }
+
+        test("UpdatePasteText는 상한을 크게 넘는 글을 상한 + 1자까지만 보관하고 [다음]을 막는다") {
+            runTest(rig.dispatcher) {
+                val harness = rig.create(limits = limits)
+                harness.send(ImportDeckIntent.ClickPaste)
+
+                harness.send(ImportDeckIntent.UpdatePasteText("x".repeat(1_000)))
+                harness.send(ImportDeckIntent.ClickPasteNext(ImportViewModelHarness.PASTE_SOURCE_NAME, SpreadsheetDateStyle.YEAR_MONTH_DAY))
+                advanceUntilIdle()
+
+                harness.state.pasteText shouldBe "x".repeat(11)
+                harness.state.step shouldBe ImportStep.Paste
+                harness.reader.calls.shouldBeEmpty()
+            }
+        }
+
+        test("상한 바로 뒤가 서로게이트 쌍 가운데여도 보관한 글은 상한을 넘어 [다음]이 막힌다") {
+            runTest(rig.dispatcher) {
+                val harness = rig.create(limits = limits)
+                harness.send(ImportDeckIntent.ClickPaste)
+
+                harness.send(ImportDeckIntent.UpdatePasteText(AT_LIMIT_TEXT + "\uD83D\uDE00\uD83D\uDE00"))
+                harness.send(ImportDeckIntent.ClickPasteNext(ImportViewModelHarness.PASTE_SOURCE_NAME, SpreadsheetDateStyle.YEAR_MONTH_DAY))
+                advanceUntilIdle()
+
+                harness.state.pasteText.length shouldBe 11
+                harness.reader.calls.shouldBeEmpty()
             }
         }
 

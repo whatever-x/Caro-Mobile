@@ -79,6 +79,82 @@ class ParserBudgetTest : FunSpec() {
             }
         }
 
+        context("전체 글자 수 예산") {
+            test("텍스트의 값 글자 수 합계가 예산을 넘으면 읽는 중에 멈추고 같으면 읽는다") {
+                val text = "aaaaa\tbbbbb\ncccc\tdddd"
+
+                parseText(text, Fixtures.options(maxTotalChars = 18)).rows.size shouldBe 2
+                shouldThrow<ImportParseException> { parseText(text, Fixtures.options(maxTotalChars = 17)) }.kind shouldBe
+                    ImportParseErrorKind.CONTENT_TOO_LONG
+            }
+
+            test("엑셀의 셀 글자 수 합계가 예산을 넘으면 멈춘다") {
+                val path = temp("chars.xlsx")
+                val rows = (1..3).joinToString("") { row -> "<row r=\"$row\">${inlineCell("A$row", "abcde")}</row>" }
+                TestZip.xlsx(path, TestZip.sheet(rows))
+
+                parse(path, Fixtures.options(maxTotalChars = 15)).rows.size shouldBe 3
+                shouldThrow<ImportParseException> { parse(path, Fixtures.options(maxTotalChars = 14)) }.kind shouldBe
+                    ImportParseErrorKind.CONTENT_TOO_LONG
+            }
+
+            test("엑셀 셀 하나의 글이 주석이나 CDATA로 나뉘어도 합쳐서 값 길이 상한을 넘으면 멈춘다") {
+                val comment = "<c r=\"A1\" t=\"inlineStr\"><is><t>aaaa<!--x-->aaaa<!--x-->aaaa</t></is></c>"
+                val cdata = "<c r=\"A1\" t=\"inlineStr\"><is><t><![CDATA[aaaa]]><![CDATA[aaaa]]><![CDATA[aaaa]]></t></is></c>"
+                listOf(comment, cdata).forEachIndexed { index, cell ->
+                    val path = temp("split-$index.xlsx")
+                    TestZip.xlsx(path, TestZip.sheet("<row r=\"1\">$cell</row>"))
+
+                    shouldThrow<ImportParseException> { parse(path, Fixtures.options(maxFieldChars = 10)) }.kind shouldBe
+                        ImportParseErrorKind.CONTENT_TOO_LONG
+                }
+            }
+
+            test("엑셀 공유 문자열 하나가 나뉜 글로 값 길이 상한을 넘으면 멈춘다") {
+                val path = temp("split-shared.xlsx")
+                TestZip.xlsx(
+                    path,
+                    TestZip.sheet("<row r=\"1\">${shared("A1", 0)}</row>"),
+                    sharedStrings = "<si><t>aaaa<!--x-->aaaa<!--x-->aaaa</t></si>",
+                )
+
+                shouldThrow<ImportParseException> { parse(path, Fixtures.options(maxFieldChars = 10)) }.kind shouldBe
+                    ImportParseErrorKind.CONTENT_TOO_LONG
+            }
+
+            test("엑셀 공유 문자열 글자 수 합계가 예산을 넘으면 멈춘다") {
+                val path = temp("shared-total.xlsx")
+                val rows = (0..2).joinToString("") { index -> "<row r=\"${index + 1}\">${shared("A${index + 1}", index)}</row>" }
+                TestZip.xlsx(
+                    path,
+                    TestZip.sheet(rows),
+                    sharedStrings = "<si><t>aaaaaa</t></si><si><t>bbbbbb</t></si><si><t>cccccc</t></si>",
+                )
+
+                shouldThrow<ImportParseException> { parse(path, Fixtures.options(maxTotalChars = 17)) }.kind shouldBe
+                    ImportParseErrorKind.CONTENT_TOO_LONG
+            }
+
+            test("같은 공유 문자열을 여러 칸이 참조해도 칸마다 글자 수를 센다") {
+                val path = temp("shared-repeat.xlsx")
+                val rows = (1..4).joinToString("") { row -> "<row r=\"$row\">${shared("A$row", 0)}</row>" }
+                TestZip.xlsx(path, TestZip.sheet(rows), sharedStrings = "<si><t>aaaaaa</t></si>")
+
+                parse(path, Fixtures.options(maxTotalChars = 24)).rows.size shouldBe 4
+                shouldThrow<ImportParseException> { parse(path, Fixtures.options(maxTotalChars = 23)) }.kind shouldBe
+                    ImportParseErrorKind.CONTENT_TOO_LONG
+            }
+
+            test("Anki 노트 글자 수 합계가 예산을 넘으면 멈춘다").config(enabled = nativeArchiveLibrariesLoadable) {
+                val path = temp("chars.apkg")
+                TestAnki.legacy(path, fieldCount = 2, notes = List(3) { "xxxxxxxxxx\u001fy" })
+
+                parse(path, Fixtures.options(maxTotalChars = 36)).rows.size shouldBe 3
+                shouldThrow<ImportParseException> { parse(path, Fixtures.options(maxTotalChars = 35)) }.kind shouldBe
+                    ImportParseErrorKind.CONTENT_TOO_LONG
+            }
+        }
+
         test("텍스트 끝에 빈 값만 이어지는 구분자는 열 상한에 넣지 않는다") {
             val trailing = "\t".repeat(2_000)
             val table = parseText("a\tb$trailing\nc\td$trailing", Fixtures.options(maxColumns = 1_000))

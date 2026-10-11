@@ -25,6 +25,8 @@ internal class XlsxSheetReader(
     private val numberFormat: XlsxNumberFormat,
     private val maxColumns: Int,
     private val maxCells: Int,
+    private val maxFieldChars: Int,
+    private val maxTotalChars: Long,
 ) {
     private class CellState(
         val column: Int,
@@ -44,14 +46,28 @@ internal class XlsxSheetReader(
         private var cell: CellState? = null
         private var nextColumn = 0
         private var cellCount = 0
+        private var capturedChars = 0L
 
         fun accept(event: XmlEvent) {
             when (event) {
                 is XmlEvent.Start -> start(event)
-                is XmlEvent.Text -> cell?.capture?.append(event.text)
+                is XmlEvent.Text -> cell?.capture?.let { capture -> append(capture, event.text) }
                 is XmlEvent.End -> end(event.name)
             }
         }
+
+        // 주석이나 CDATA로 나뉜 글은 이벤트 하나가 작아도 이어 붙으면 커지므로, 붙이기 전에 값 하나와 합계를 함께 확인한다.
+        private fun append(
+            capture: StringBuilder,
+            text: String,
+        ) {
+            if (capture.length + text.length > maxFieldChars) throw tooLong("cell over $maxFieldChars chars")
+            capturedChars += text.length
+            if (capturedChars > maxTotalChars) throw tooLong("sheet over $maxTotalChars chars")
+            capture.append(text)
+        }
+
+        private fun tooLong(reason: String) = ImportParseException(ImportParseErrorKind.CONTENT_TOO_LONG, reason)
 
         private fun start(event: XmlEvent.Start) {
             when (event.name) {

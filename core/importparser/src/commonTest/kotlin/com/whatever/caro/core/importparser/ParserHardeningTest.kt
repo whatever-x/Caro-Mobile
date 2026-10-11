@@ -1,10 +1,14 @@
 package com.whatever.caro.core.importparser
 
+import androidx.sqlite.SQLiteConnection
+import androidx.sqlite.SQLiteDriver
 import androidx.sqlite.driver.bundled.BundledSQLiteDriver
 import androidx.sqlite.execSQL
 import com.whatever.caro.core.importparser.apkg.AnkiDatabase
+import com.whatever.caro.core.importparser.archive.ZipArchive
 import com.whatever.caro.core.importparser.archive.withTempWorkspace
 import com.whatever.caro.core.importparser.model.ParsedSubdeck
+import com.whatever.caro.core.importparser.model.ParsedTable
 import com.whatever.caro.core.importparser.table.ColumnNames
 import com.whatever.caro.core.importparser.text.EncodedTextChunks
 import com.whatever.caro.core.importparser.text.decodeStrictUtf8
@@ -13,9 +17,13 @@ import com.whatever.caro.core.importparser.xlsx.XlsxSheetReader
 import com.whatever.caro.core.importparser.xlsx.XmlPullReader
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldBeUnique
 import io.kotest.matchers.ints.shouldBeLessThanOrEqual
 import io.kotest.matchers.shouldBe
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.job
 import okio.Buffer
 import okio.FileSystem
 import okio.ForwardingFileSystem
@@ -193,6 +201,54 @@ class ParserHardeningTest : FunSpec() {
                 error.kind shouldBe ImportParseErrorKind.ARCHIVE_LIMIT_EXCEEDED
             }
 
+            test("16비트 항목 수가 작아도 ZIP64 끝 레코드가 큰 항목 수를 적으면 중앙 디렉터리를 읽기 전에 멈춘다") {
+                val path = temp("zip64-claims-many.xlsx")
+                TestZip.write(path, listOf("xl/workbook.xml" to "<workbook/>".encodeToByteArray()), zip64EntryCount = 200_000)
+
+                val error = shouldThrow<ImportParseException> { parseFile(path, "zip64-claims-many.xlsx") }
+
+                error.kind shouldBe ImportParseErrorKind.ARCHIVE_LIMIT_EXCEEDED
+            }
+
+            test("항목 수가 상한 안인 정상 ZIP64 끝 레코드는 그대로 읽는다") {
+                val path = temp("zip64-valid.xlsx")
+                TestZip.xlsx(
+                    path,
+                    TestZip.sheet("<row r=\"1\"><c r=\"A1\" t=\"inlineStr\"><is><t>a</t></is></c></row>"),
+                    zip64EntryCount = 3,
+                )
+
+                parseFile(path, "zip64-valid.xlsx").rows.size shouldBe 1
+            }
+
+            test("중앙 디렉터리 크기가 상한을 넘으면 압축 상한 초과로 멈춘다") {
+                val path = temp("big-central.xlsx")
+                TestZip.xlsx(path, TestZip.sheet(""))
+
+                val error =
+                    shouldThrow<ImportParseException> {
+                        parseFile(path, "big-central.xlsx", Fixtures.options(archiveLimits = ArchiveLimits(maxCentralDirectoryBytes = 100)))
+                    }
+
+                error.kind shouldBe ImportParseErrorKind.ARCHIVE_LIMIT_EXCEEDED
+            }
+
+            test("끝 레코드가 중앙 디렉터리 크기를 줄여 적어도 실제 크기로 판정한다") {
+                val path = temp("lying-central.xlsx")
+                TestZip.xlsx(path, TestZip.sheet(""), claimedCentralDirectoryBytes = 0)
+
+                val error =
+                    shouldThrow<ImportParseException> {
+                        parseFile(
+                            path,
+                            "lying-central.xlsx",
+                            Fixtures.options(archiveLimits = ArchiveLimits(maxCentralDirectoryBytes = 100)),
+                        )
+                    }
+
+                error.kind shouldBe ImportParseErrorKind.ARCHIVE_LIMIT_EXCEEDED
+            }
+
             test("항목마다 상한 안이어도 한 압축 파일에서 풀어낸 바이트 합계가 상한을 넘으면 멈춘다") {
                 val limits = ArchiveLimits(maxTotalBytes = 2_000)
 
@@ -205,6 +261,49 @@ class ParserHardeningTest : FunSpec() {
                     }
 
                 error.kind shouldBe ImportParseErrorKind.ARCHIVE_LIMIT_EXCEEDED
+            }
+        }
+
+        context("취소") {
+            test("압축 항목을 읽는 중 취소되면 다음 읽기에서 멈춘다") {
+                val path = temp("cancel-entry.xlsx")
+                TestZip.xlsx(path, TestZip.sheet("<row r=\"1\"/>") + "x".repeat(100_000))
+                var checks = 0
+                val archive =
+                    ZipArchive.open(
+                        Fixtures.fileSystem,
+                        path,
+                        Fixtures.fileSystem.metadata(path).size ?: error("size unknown"),
+                        ArchiveLimits(),
+                        checkCancelled = { if (++checks > 1) throw CancellationException("stop") },
+                    )
+
+                shouldThrow<CancellationException> { archive.open("xl/worksheets/sheet1.xml").readUtf8() }
+            }
+
+            test("Anki 행을 읽는 SQLite 반복문도 취소되면 다음 행에서 멈추고 임시 파일을 남기지 않는다").config(enabled = nativeArchiveLibrariesLoadable) {
+                val path = temp("cancel-sqlite.apkg")
+                TestAnki.legacy(path, fieldCount = 2, notes = List(5) { "a\u001fb" })
+                var parsed: ParsedTable? = null
+
+                try {
+                    coroutineScope {
+                        val job = coroutineContext.job
+                        val driver = CancelOnPrepareDriver(BundledSQLiteDriver()) { sql -> if ("FROM cards" in sql) job.cancel() }
+                        parsed =
+                            ImportParser(
+                                Fixtures.fileSystem,
+                            ).parseFile(path, "cancel-sqlite.apkg", Fixtures.options().copy(sqliteDriver = driver))
+                    }
+                } catch (_: CancellationException) {
+                    // 취소로 끝나는 것이 기대 동작이다.
+                }
+
+                parsed shouldBe null
+                Fixtures.fileSystem
+                    .list(Fixtures.tempRoot)
+                    .filter { entry -> entry.name.startsWith("importparser-") }
+                    .shouldBeEmpty()
             }
         }
 
@@ -285,5 +384,18 @@ class ParserHardeningTest : FunSpec() {
 
         // 다른 테스트가 파서 임시 디렉터리를 비웠는지 확인하는 위치와 섞이지 않게 따로 둔다.
         val isolatedRoot: Path = FileSystem.SYSTEM_TEMPORARY_DIRECTORY / "caro-importparser-workspace-test"
+    }
+}
+
+/** 쿼리를 준비하는 시점에 [onPrepare]를 불러 읽기 도중 취소를 재현한다. */
+private class CancelOnPrepareDriver(
+    private val delegate: SQLiteDriver,
+    private val onPrepare: (String) -> Unit,
+) : SQLiteDriver {
+    override fun open(fileName: String): SQLiteConnection {
+        val connection = delegate.open(fileName)
+        return object : SQLiteConnection by connection {
+            override fun prepare(sql: String) = connection.prepare(sql).also { onPrepare(sql) }
+        }
     }
 }

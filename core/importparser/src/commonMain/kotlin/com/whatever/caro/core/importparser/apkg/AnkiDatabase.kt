@@ -28,6 +28,10 @@ internal class AnkiDatabase private constructor(
     companion object {
         private const val UNICASE_SCHEMA_FILTER = "WHERE sql LIKE '%COLLATE unicase%'"
         private const val URI_SAFE_CHARACTERS = "/-._~"
+        private const val EXECUTABLE_SCHEMA_QUERY =
+            "SELECT count(*) FROM sqlite_master WHERE type IN ('view', 'trigger') OR sql LIKE 'CREATE VIRTUAL%'"
+        private const val GENERATED_COLUMN_QUERY = "SELECT count(*) FROM pragma_table_xinfo(?) WHERE hidden IN (2, 3)"
+        private val QUERIED_TABLES = listOf("col", "notes", "cards", "notetypes", "fields", "decks")
 
         /**
          * 최신 형식 컬렉션은 Anki 전용 `unicase` 콜레이션을 선언해 등록하지 않으면 `fields` 조회와 무결성 검사가 실패한다.
@@ -43,6 +47,7 @@ internal class AnkiDatabase private constructor(
             val connection = openReadOnly(driver, path)
             try {
                 applySafetyPragmas(connection)
+                verifySchema(connection)
                 if (verifyIntegrity) checkIntegrity(connection)
             } catch (exception: Exception) {
                 connection.close()
@@ -57,6 +62,7 @@ internal class AnkiDatabase private constructor(
         ) {
             driver.open(path.toString()).use { connection ->
                 applySafetyPragmas(connection)
+                verifySchema(connection)
                 connection.execSQL("PRAGMA journal_mode=DELETE")
                 val declared =
                     connection.prepare("SELECT count(*) FROM sqlite_master $UNICASE_SCHEMA_FILTER").use {
@@ -90,6 +96,23 @@ internal class AnkiDatabase private constructor(
             connection.execSQL("PRAGMA trusted_schema=OFF")
             connection.execSQL("PRAGMA cell_size_check=ON")
             connection.execSQL("PRAGMA mmap_size=0")
+        }
+
+        /**
+         * view, trigger, 가상 테이블, 생성 열은 고정 SELECT 안에서 파일 작성자의 SQL을 실행시키므로 데이터 쿼리 전에 거절한다.
+         * 안전 pragma는 재귀 CTE와 printf 같은 일반 함수를 막지 못해 무한 반복과 거대 메모리 할당이 가능하다. 실제 Anki 컬렉션에는 이 객체들이 없다.
+         */
+        private fun verifySchema(connection: SQLiteConnection) {
+            val hasExecutableObject = connection.prepare(EXECUTABLE_SCHEMA_QUERY).use { it.step() && it.getLong(0) > 0 }
+            if (hasExecutableObject) throw ImportParseException(ImportParseErrorKind.CORRUPT_FILE, "unexpected schema object")
+            QUERIED_TABLES.forEach { table ->
+                val hasGeneratedColumn =
+                    connection.prepare(GENERATED_COLUMN_QUERY).use { statement ->
+                        statement.bindText(1, table)
+                        statement.step() && statement.getLong(0) > 0
+                    }
+                if (hasGeneratedColumn) throw ImportParseException(ImportParseErrorKind.CORRUPT_FILE, "generated column in $table")
+            }
         }
 
         private fun checkIntegrity(connection: SQLiteConnection) {

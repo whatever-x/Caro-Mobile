@@ -5,6 +5,8 @@ import com.whatever.caro.core.importparser.model.ParsedTable
 import com.whatever.caro.feature.importer.source.ImportSourceReader
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.withContext
 import okio.ByteString
 import okio.FileSystem
 import okio.Path
@@ -55,6 +57,7 @@ internal class FakeImportSourceReader(
 
         data class Suspends(
             val gate: CompletableDeferred<ParsedTable>,
+            val ignoresCancellation: Boolean,
         ) : Reply
     }
 
@@ -72,7 +75,11 @@ internal class FakeImportSourceReader(
     fun fails(error: Throwable): FakeImportSourceReader = apply { replies.addLast(Reply.Fails(error)) }
 
     fun suspends(): CompletableDeferred<ParsedTable> =
-        CompletableDeferred<ParsedTable>().also { gate -> replies.addLast(Reply.Suspends(gate)) }
+        CompletableDeferred<ParsedTable>().also { gate -> replies.addLast(Reply.Suspends(gate, ignoresCancellation = false)) }
+
+    /** 블로킹 파서 단계처럼 취소 요청을 받고도 게이트가 열릴 때까지 계속 도는 읽기를 만든다. */
+    fun suspendsIgnoringCancellation(): CompletableDeferred<ParsedTable> =
+        CompletableDeferred<ParsedTable>().also { gate -> replies.addLast(Reply.Suspends(gate, ignoresCancellation = true)) }
 
     override suspend fun readFile(
         path: Path,
@@ -115,14 +122,18 @@ internal class FakeImportSourceReader(
             null -> fallbackRead() ?: error("대본에 없는 읽기 호출이다. calls=${recordedCalls.size}")
             is Reply.Returns -> reply.table
             is Reply.Fails -> throw reply.error
-            is Reply.Suspends -> awaitGate(reply.gate)
+            is Reply.Suspends -> awaitGate(reply)
         }
 
-    private suspend fun awaitGate(gate: CompletableDeferred<ParsedTable>): ParsedTable =
-        try {
-            gate.await()
-        } catch (cancellation: CancellationException) {
-            cancelledReads += 1
-            throw cancellation
+    private suspend fun awaitGate(reply: Reply.Suspends): ParsedTable =
+        if (reply.ignoresCancellation) {
+            withContext(NonCancellable) { reply.gate.await() }
+        } else {
+            try {
+                reply.gate.await()
+            } catch (cancellation: CancellationException) {
+                cancelledReads += 1
+                throw cancellation
+            }
         }
 }

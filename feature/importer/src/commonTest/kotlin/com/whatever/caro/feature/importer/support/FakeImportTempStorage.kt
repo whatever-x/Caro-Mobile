@@ -9,7 +9,7 @@ import kotlin.random.Random
 /**
  * ImportTempStorage가 final 클래스라 대역 대신 테스트마다 따로 만든 샌드박스 디렉터리를 가리키게 한다.
  * 실제 caro-import를 건드리지 않고 지운 파일과 남은 파일을 눈으로 확인할 수 있다.
- * 오래됨 기준을 0으로 두어, 다른 화면의 디렉터리는 만들어 둔 즉시 오래된 것으로 본다.
+ * 오래됨 기준을 0으로 두어, 다른 화면의 디렉터리는 만들어 둔 즉시 오래된 것으로 본다. 실제 시스템 선택기 디렉터리는 건드리지 않게 비운다.
  */
 internal class FakeImportTempStorage private constructor(
     private val fileSystem: FileSystem,
@@ -17,7 +17,7 @@ internal class FakeImportTempStorage private constructor(
 ) {
     private val base: Path = sandbox / "caro-import"
     val root: Path = base / "session-own"
-    val storage: ImportTempStorage = ImportTempStorage(fileSystem, root, staleAfterMillis = 0L)
+    val storage: ImportTempStorage = ImportTempStorage(fileSystem, root, staleAfterMillis = 0L, inboxDirectory = null)
     val fileCopy: ImportFileCopy = ImportFileCopy(fileSystem)
 
     fun regularFiles(): List<Path> =

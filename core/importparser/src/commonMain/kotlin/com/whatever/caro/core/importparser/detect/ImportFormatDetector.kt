@@ -33,10 +33,11 @@ internal object ImportFormatDetector {
         extension: String,
         fileBytes: Long,
         options: ParseOptions,
+        checkCancelled: () -> Unit,
     ): DetectedSource {
         val head = fileSystem.read(path) { readByteString(minOf(fileBytes, ZIP_SIGNATURE.size.toLong())) }
         return when {
-            head == ZIP_SIGNATURE -> detectZip(ZipArchive.open(fileSystem, path, fileBytes, options.archiveLimits))
+            head == ZIP_SIGNATURE -> detectZip(ZipArchive.open(fileSystem, path, fileBytes, options.archiveLimits, checkCancelled))
 
             head.startsWith(OLE_SIGNATURE) -> unsupported("OLE container (.xls or encrypted .xlsx)")
 

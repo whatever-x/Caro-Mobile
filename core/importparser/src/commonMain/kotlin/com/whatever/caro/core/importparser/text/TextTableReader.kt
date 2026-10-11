@@ -59,6 +59,7 @@ internal class TextTableReader(
     ): Scan {
         var htmlSignal = false
         var cells = 0
+        var chars = 0L
 
         fun take(): List<String>? =
             reader.nextRecord()?.let { raw ->
@@ -66,6 +67,8 @@ internal class TextTableReader(
                 raw.filterIndexed { index, _ -> index !in header.metaColumns }.also { values ->
                     cells += values.count { it.isNotEmpty() }
                     if (cells > options.maxCells) throw contentTooLong("table over ${options.maxCells} cells")
+                    chars += values.sumOf { it.length }
+                    if (chars > options.maxTotalChars) throw contentTooLong("table over ${options.maxTotalChars} chars")
                 }
             }
 

@@ -1,8 +1,10 @@
 package com.whatever.caro.feature.importer.source
 
+import com.whatever.caro.core.importparser.ArchiveLimits
 import com.whatever.caro.core.importparser.SpreadsheetDateStyle
 import com.whatever.caro.core.model.importing.ImportLimits
 import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.longs.shouldBeLessThan
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
@@ -48,6 +50,21 @@ class ParseOptionsFactoryTest : FunSpec() {
             val options = buildParseOptions(limits = ImportLimitsConfig(), dateStyle = DATE_STYLE)
 
             options.legacyKoreanDecoder.shouldNotBeNull()
+        }
+
+        test("압축 파일 상한은 저사양 기기 메모리에 맞춰 서버 기본값보다 낮다") {
+            val limits = buildParseOptions(limits = ImportLimitsConfig(), dateStyle = DATE_STYLE).archiveLimits
+
+            limits.maxEntryBytes shouldBe 192L * 1024 * 1024
+            limits.maxTotalBytes shouldBe 256L * 1024 * 1024
+            limits.maxEntryBytes shouldBeLessThan ArchiveLimits.DEFAULT_MAX_ENTRY_BYTES
+            limits.maxTotalBytes shouldBeLessThan ArchiveLimits.DEFAULT_MAX_TOTAL_BYTES
+        }
+
+        test("표 하나가 보관할 글자 수 합계 상한을 2천만 자로 둔다") {
+            val options = buildParseOptions(limits = ImportLimitsConfig(), dateStyle = DATE_STYLE)
+
+            options.maxTotalChars shouldBe 20_000_000L
         }
 
         test("dateStyle은 넘긴 앱 언어 값을 따른다") {

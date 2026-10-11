@@ -39,6 +39,30 @@ class ImportDisplayTextTest : FunSpec() {
             }
         }
 
+        context("선택기가 준 파일 이름 정리") {
+            test("방향 제어 문자를 지워 확장자를 다르게 보이게 하지 못한다") {
+                sanitizeDisplayName("deck\u202Egpj.apkg") shouldBe "deckgpj.apkg"
+                sanitizeDisplayName("\u200Fdeck\u200E.apkg") shouldBe "deck.apkg"
+                sanitizeDisplayName("a\u202Ab\u202Cc\u2066d\u2069.txt") shouldBe "abcd.txt"
+            }
+
+            test("줄바꿈과 널 같은 제어 문자를 지운다") {
+                sanitizeDisplayName("de\nck\u0000.apkg") shouldBe "deck.apkg"
+                sanitizeDisplayName("de\u007Fck.apkg") shouldBe "deck.apkg"
+            }
+
+            test("정상 이름은 한글과 공백을 포함해 그대로 둔다") {
+                sanitizeDisplayName("영어 단어 (1).apkg") shouldBe "영어 단어 (1).apkg"
+            }
+
+            test("아주 긴 이름은 확장자를 남기고 120자로 줄인다") {
+                val name = sanitizeDisplayName("a".repeat(5_000) + ".apkg")
+
+                name.length shouldBe 120
+                name.endsWith("….apkg") shouldBe true
+            }
+        }
+
         context("항목 미리 자르기") {
             test("셀은 200자까지 그대로 둔다") {
                 truncateCell("c".repeat(200)) shouldBe "c".repeat(200)

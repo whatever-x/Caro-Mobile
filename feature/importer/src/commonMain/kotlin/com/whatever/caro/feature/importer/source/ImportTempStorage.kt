@@ -1,5 +1,6 @@
 package com.whatever.caro.feature.importer.source
 
+import com.whatever.caro.feature.importer.platform.platformInboxDirectory
 import okio.FileSystem
 import okio.IOException
 import okio.Path
@@ -7,8 +8,11 @@ import kotlin.random.Random
 
 private const val SESSION_PREFIX = "session-"
 
-// 겹쳐 열린 다른 화면이 쓰는 디렉터리를 지우지 않도록 충분히 오래된 것만 지운다.
+// 같은 프로세스에서 겹쳐 열린 다른 화면이 쓰는 디렉터리를 지우지 않도록 충분히 오래된 것만 지운다.
 private const val STALE_AFTER_MILLIS = 60L * 60 * 1000
+
+// 이전 프로세스가 만든 세션은 그것을 쓰는 화면이 있을 수 없으므로, 세션 이름에 프로세스 표식을 넣어 시간과 상관없이 지운다.
+private val PROCESS_TAG = Random.nextLong().toULong().toString(radix = 16)
 
 /**
  * 선택한 원본 사본과 파서의 작업 디렉터리를 [root] 한 곳에 모은다. 화면마다 [root]가 달라, 한 화면의 정리가 겹쳐 열린 다른 화면의 파일을 지우지 않는다.
@@ -18,6 +22,8 @@ internal class ImportTempStorage(
     private val fileSystem: FileSystem = FileSystem.SYSTEM,
     private val root: Path = DEFAULT_ROOT / newSessionName(),
     private val staleAfterMillis: Long = STALE_AFTER_MILLIS,
+    private val processTag: String = PROCESS_TAG,
+    private val inboxDirectory: Path? = platformInboxDirectory(),
 ) {
     /** 정리 실패 때문에 가져오기를 막지 않는다. 남은 파일은 다음 정리에서 지운다. */
     fun clearAll() {
@@ -31,6 +37,7 @@ internal class ImportTempStorage(
     /**
      * 앱이 종료되며 정리하지 못한 이전 화면의 디렉터리를 지운다. [root]는 건드리지 않는다.
      * 앱의 시계와 파일 시각이 어긋날 수 있어(iOS 시뮬레이터에서 확인) 방금 만든 [root]의 수정 시각을 현재로 쓴다.
+     * 시스템 선택기가 둔 사본은 프로세스를 구분할 수 없어 같은 기준 시간을 적용한다.
      */
     fun clearStale() {
         val parent = root.parent ?: return
@@ -41,12 +48,27 @@ internal class ImportTempStorage(
                 .listOrNull(parent)
                 .orEmpty()
                 .filter { child -> child != root && child.name.startsWith(SESSION_PREFIX) }
-                .filter { child -> fileSystem.metadataOrNull(child)?.lastModifiedAtMillis?.let { now - it >= staleAfterMillis } == true }
+                .filter { child -> !child.name.startsWith("$SESSION_PREFIX$processTag-") || isStale(child, now) }
                 .forEach { child -> fileSystem.deleteRecursively(child, mustExist = false) }
+            clearStaleInbox(now)
         } catch (_: IOException) {
             return
         }
     }
+
+    private fun clearStaleInbox(now: Long) {
+        val inbox = inboxDirectory ?: return
+        fileSystem
+            .listOrNull(inbox)
+            .orEmpty()
+            .filter { child -> isStale(child, now) }
+            .forEach { child -> fileSystem.deleteRecursively(child, mustExist = false) }
+    }
+
+    private fun isStale(
+        path: Path,
+        now: Long,
+    ): Boolean = fileSystem.metadataOrNull(path)?.lastModifiedAtMillis?.let { now - it >= staleAfterMillis } == true
 
     fun newFile(): Path {
         fileSystem.createDirectories(root)
@@ -66,4 +88,4 @@ internal class ImportTempStorage(
     }
 }
 
-private fun newSessionName(): String = "$SESSION_PREFIX${Random.nextLong().toULong().toString(radix = 16)}"
+private fun newSessionName(): String = "$SESSION_PREFIX$PROCESS_TAG-${Random.nextLong().toULong().toString(radix = 16)}"

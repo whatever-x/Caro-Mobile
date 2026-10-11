@@ -28,6 +28,7 @@ data class ParseOptions(
     val maxColumns: Int = DEFAULT_MAX_COLUMNS,
     val maxFieldChars: Int = DEFAULT_MAX_FIELD_CHARS,
     val maxCells: Int = DEFAULT_MAX_CELLS,
+    val maxTotalChars: Long = DEFAULT_MAX_TOTAL_CHARS,
 ) {
     init {
         require(maxRows > 0) { "maxRows must be positive: $maxRows" }
@@ -36,6 +37,7 @@ data class ParseOptions(
         require(maxColumns > 0) { "maxColumns must be positive: $maxColumns" }
         require(maxFieldChars > 0) { "maxFieldChars must be positive: $maxFieldChars" }
         require(maxCells > 0) { "maxCells must be positive: $maxCells" }
+        require(maxTotalChars > 0) { "maxTotalChars must be positive: $maxTotalChars" }
     }
 
     companion object {
@@ -44,6 +46,9 @@ data class ParseOptions(
 
         /** 저사양 기기 메모리를 지키려고 표 하나가 만들 행 값 칸 수를 제한한다. 10,001행이면 행마다 약 200칸까지다. */
         const val DEFAULT_MAX_CELLS = 2_000_000
+
+        /** 값 하나는 [DEFAULT_MAX_FIELD_CHARS]로 막혀도 값 수만큼 곱해지므로, 표 하나가 보관할 글자 수의 합계를 따로 제한한다. */
+        const val DEFAULT_MAX_TOTAL_CHARS = 20_000_000L
     }
 }
 
@@ -53,11 +58,13 @@ data class ArchiveLimits(
     val maxEntryBytes: Long = DEFAULT_MAX_ENTRY_BYTES,
     val maxCompressionRatio: Long = DEFAULT_MAX_COMPRESSION_RATIO,
     val maxTotalBytes: Long = DEFAULT_MAX_TOTAL_BYTES,
+    val maxCentralDirectoryBytes: Long = DEFAULT_MAX_CENTRAL_DIRECTORY_BYTES,
 ) {
     init {
         require(maxEntries > 0) { "maxEntries must be positive: $maxEntries" }
         require(maxEntryBytes > 0) { "maxEntryBytes must be positive: $maxEntryBytes" }
         require(maxCompressionRatio > 0) { "maxCompressionRatio must be positive: $maxCompressionRatio" }
+        require(maxCentralDirectoryBytes > 0) { "maxCentralDirectoryBytes must be positive: $maxCentralDirectoryBytes" }
     }
 
     companion object {
@@ -65,6 +72,9 @@ data class ArchiveLimits(
         const val DEFAULT_MAX_ENTRY_BYTES = 512L * 1024 * 1024
         const val DEFAULT_MAX_COMPRESSION_RATIO = 100L
         const val DEFAULT_MAX_TOTAL_BYTES = 1024L * 1024 * 1024
+
+        /** Okio가 중앙 디렉터리를 통째로 메모리에 올리므로 항목 수와 별개로 바이트 크기도 막는다. 미디어가 많은 Anki 패키지도 이 안에 든다. */
+        const val DEFAULT_MAX_CENTRAL_DIRECTORY_BYTES = 8L * 1024 * 1024
     }
 }
 

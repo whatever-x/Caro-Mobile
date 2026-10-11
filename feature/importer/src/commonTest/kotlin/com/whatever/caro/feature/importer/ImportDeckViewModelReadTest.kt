@@ -207,6 +207,40 @@ class ImportDeckViewModelReadTest : FunSpec() {
             }
         }
 
+        test("제공자가 준 이름의 방향 제어 문자와 긴 이름은 정리한 뒤 확장자 판정과 읽기, 오버레이에 쓴다") {
+            runTest(rig.dispatcher) {
+                val reader = FakeImportSourceReader()
+                reader.suspends()
+                val harness = rig.create(reader = reader)
+
+                harness.pick(FakePickedImportFile.ofSize("deck\u202E.apkg", size = 100))
+                advanceUntilIdle()
+
+                harness.state.loading shouldBe ImportLoading.Parsing("deck.apkg")
+                harness.reader.calls
+                    .single()
+                    .sourceName shouldBe "deck.apkg"
+            }
+        }
+
+        test("아주 긴 이름도 확장자를 남겨 지원하는 파일로 읽는다") {
+            runTest(rig.dispatcher) {
+                val reader = FakeImportSourceReader()
+                reader.suspends()
+                val harness = rig.create(reader = reader)
+
+                harness.pick(FakePickedImportFile.ofSize("a".repeat(5_000) + ".xlsx", size = 100))
+                advanceUntilIdle()
+
+                val sourceName =
+                    harness.reader.calls
+                        .single()
+                        .sourceName
+                sourceName.length shouldBe 120
+                sourceName.endsWith(".xlsx") shouldBe true
+            }
+        }
+
         test("복사와 첫 읽기 동안 Parsing 오버레이에 파일 이름을 담고 선택기는 닫힌다") {
             runTest(rig.dispatcher) {
                 val reader = FakeImportSourceReader()

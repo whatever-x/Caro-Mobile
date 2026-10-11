@@ -14,8 +14,6 @@ import com.whatever.caro.core.importparser.model.ParsedRow
 import com.whatever.caro.core.importparser.model.ParsedSubdeck
 import com.whatever.caro.core.importparser.model.ParsedTable
 import com.whatever.caro.core.importparser.model.countWarning
-import kotlinx.coroutines.currentCoroutineContext
-import kotlinx.coroutines.ensureActive
 import okio.FileSystem
 import okio.Path
 import okio.use
@@ -95,6 +93,7 @@ internal class ApkgReader(
         val noteDecks = HashMap<Long, Long>()
         database.query("SELECT nid, did, odid FROM cards ORDER BY nid, ord") { statement ->
             while (statement.step()) {
+                archive.ensureActive()
                 val noteId = statement.getLong(0)
                 if (noteId in noteDecks) continue
                 val originalDeck = statement.getLong(2)
@@ -127,11 +126,15 @@ internal class ApkgReader(
     ): List<ParsedNoteType> {
         val counts = LinkedHashMap<Long, Int>()
         database.query("SELECT mid, count(*) FROM notes GROUP BY mid ORDER BY mid") { statement ->
-            while (statement.step()) counts[statement.getLong(0)] = statement.getLong(1).toInt()
+            while (statement.step()) {
+                archive.ensureActive()
+                counts[statement.getLong(0)] = statement.getLong(1).toInt()
+            }
         }
         val selectedCounts = HashMap<Long, Int>()
         database.query("SELECT id, mid FROM notes") { statement ->
             while (statement.step()) {
+                archive.ensureActive()
                 val subdeckId = noteDecks[statement.getLong(0)]?.toString() ?: ParsedSubdeck.NO_DECK_ID
                 if (subdeckId !in selection) continue
                 val typeId = statement.getLong(1)
@@ -163,8 +166,11 @@ internal class ApkgReader(
         var mismatches = 0
         var imageOcclusion = 0
         var cells = 0
+        var chars = 0L
         database.query("SELECT id, mid, flds, length(flds) FROM notes ORDER BY id") { statement ->
             while (rows.size < options.maxRows && statement.step()) {
+                // 선택에서 빠지는 노트가 계속 이어져도 취소를 알아차리도록 행마다 확인한다.
+                archive.ensureActive()
                 val type = model.noteTypes[statement.getLong(1)] ?: continue
                 val subdeckId = noteDecks[statement.getLong(0)]?.toString()
                 if ((subdeckId ?: ParsedSubdeck.NO_DECK_ID) !in selection) continue
@@ -174,14 +180,16 @@ internal class ApkgReader(
                     continue
                 }
                 // 값 문자열을 만들기 전에 길이로 거른다. 한 노트가 수백 MB면 읽는 순간 메모리가 넘친다.
-                if (statement.getLong(3) > options.maxFieldChars) throw contentTooLong("note over ${options.maxFieldChars} chars")
+                val noteChars = statement.getLong(3)
+                if (noteChars > options.maxFieldChars) throw contentTooLong("note over ${options.maxFieldChars} chars")
+                chars += noteChars
+                if (chars > options.maxTotalChars) throw contentTooLong("table over ${options.maxTotalChars} chars")
                 cells += type.fieldNames.size
                 if (cells > options.maxCells) throw contentTooLong("table over ${options.maxCells} cells")
                 val values = statement.getText(2).split(FIELD_SEPARATOR)
                 if (values.size != type.fieldNames.size) mismatches++
                 val fields = type.fieldNames.withIndex().associate { (index, name) -> name to values.getOrElse(index) { "" } }
                 rows += ParsedRow(statement.getLong(1).toString(), subdeckId, fields)
-                if (rows.size % CANCEL_CHECK_INTERVAL == 0) currentCoroutineContext().ensureActive()
             }
         }
         // 선택한 노트가 상한 행을 넘으면 나머지는 읽지 않는다. 텍스트와 같이 상한 행에 닿으면 상한 초과로 본다.
@@ -193,6 +201,5 @@ internal class ApkgReader(
     private companion object {
         const val COLLECTION_FILE = "collection.sqlite"
         const val FIELD_SEPARATOR = '\u001f'
-        const val CANCEL_CHECK_INTERVAL = 256
     }
 }

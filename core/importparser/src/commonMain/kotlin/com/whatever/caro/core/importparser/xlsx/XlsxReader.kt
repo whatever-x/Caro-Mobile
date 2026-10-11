@@ -60,14 +60,32 @@ internal class XlsxReader(
     ): SheetRows {
         val numberFormat = XlsxNumberFormat(workbook.date1904, options.dateStyle)
         val sheetReader =
-            XlsxSheetReader(readCellFormatIds(archive, workbook.stylesPart), numberFormat, options.maxColumns, options.maxCells)
+            XlsxSheetReader(
+                readCellFormatIds(archive, workbook.stylesPart),
+                numberFormat,
+                options.maxColumns,
+                options.maxCells,
+                options.maxFieldChars,
+                options.maxTotalChars,
+            )
         // 제목 행이 있으면 데이터 행을 maxRows개 남기려고 한 행을 더 읽는다.
         val rawRows = sheetReader.readRows(archive, part, limit = options.maxRows + 1)
         currentCoroutineContext().ensureActive()
         val needed = rawRows.flatMapTo(HashSet()) { row -> row.values.filterIsInstance<XlsxCell.Shared>().map { it.index } }
-        val sharedStrings = readSharedStrings(archive, workbook.sharedStringsPart, needed)
+        val sharedStrings = readSharedStrings(archive, workbook.sharedStringsPart, needed, options.maxFieldChars, options.maxTotalChars)
         val readLimit = options.maxRows + 1
-        return SheetRows(rawRows.mapNotNull { row -> toSheetRow(row, sharedStrings) }, readLimitReached = rawRows.size >= readLimit)
+        // 같은 공유 문자열을 여러 칸이 참조하면 칸 수만큼 글자가 늘어나므로 풀어낸 글자 수로 센다.
+        var chars = 0L
+        val rows =
+            rawRows.mapNotNull { row ->
+                toSheetRow(row, sharedStrings)?.also { sheetRow ->
+                    chars += sheetRow.values.sumOf { value -> value.length }
+                    if (chars > options.maxTotalChars) {
+                        throw ImportParseException(ImportParseErrorKind.CONTENT_TOO_LONG, "sheet over ${options.maxTotalChars} chars")
+                    }
+                }
+            }
+        return SheetRows(rows, readLimitReached = rawRows.size >= readLimit)
     }
 
     /** 값이 있는 마지막 열까지만 칸을 만든다. 모든 칸이 비면 빈 행이라 건너뛴다. */
