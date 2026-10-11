@@ -31,6 +31,18 @@ internal class RenderedNode(
             (bounds.left.toInt() until bounds.right.toInt()).count { x -> pixels[x, y] == color }
         }
 
+    fun sameImageAs(other: RenderedNode): Boolean {
+        val width = bounds.width.toInt()
+        val height = bounds.height.toInt()
+        if (width != other.bounds.width.toInt() || height != other.bounds.height.toInt()) return false
+        return (0 until height).all { dy ->
+            (0 until width).all { dx ->
+                pixels[bounds.left.toInt() + dx, bounds.top.toInt() + dy] ==
+                    other.pixels[other.bounds.left.toInt() + dx, other.bounds.top.toInt() + dy]
+            }
+        }
+    }
+
     private companion object {
         const val SURFACE_SAMPLE_RATIO = 0.1f
     }

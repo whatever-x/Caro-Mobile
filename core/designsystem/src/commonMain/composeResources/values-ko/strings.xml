@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <resources>
+    <!-- common -->
+    <string name="checkbox_state_partially_selected">일부 선택됨</string>
     <!-- app -->
     <string name="app_exit_dialog_title">앱을 종료하시겠습니까?</string>
     <string name="app_exit_dialog_button_exit">종료</string>

@@ -33,6 +33,15 @@ private fun com.whatever.caro.core.designsystem.animation.animatedSlideOffsetY(a
     - onAnimationFinish: STABLE (function type)
 
 @Composable
+public fun com.whatever.caro.core.designsystem.components.CaroCheckbox(state: androidx.compose.ui.state.ToggleableState, onClick: kotlin.Function0<kotlin.Unit>?, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - state: STABLE (class with no mutable properties)
+    - onClick: STABLE (function type)
+    - modifier: STABLE (marked @Stable or @Immutable)
+
+@Composable
 public fun com.whatever.caro.core.designsystem.components.CaroCtaButton(enabled: kotlin.Boolean, text: kotlin.String, onClick: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier, style: com.whatever.caro.core.designsystem.components.CaroCtaButtonStyle, disabledReason: kotlin.String?): kotlin.Unit
   skippable: true
   restartable: true
