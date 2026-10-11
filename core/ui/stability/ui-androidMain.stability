@@ -87,6 +87,15 @@ public fun com.whatever.caro.core.ui.image.ConfigureCaroImageLoader(config: com.
     - config: STABLE (marked @Stable or @Immutable)
 
 @Composable
+public fun com.whatever.caro.core.ui.loading.CaroLoadingCard(message: kotlin.String, modifier: androidx.compose.ui.Modifier, detail: kotlin.String?): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - message: STABLE (String is immutable)
+    - modifier: STABLE (marked @Stable or @Immutable)
+    - detail: STABLE (class with no mutable properties)
+
+@Composable
 public fun com.whatever.caro.core.ui.loading.CaroLoadingOverlay(modifier: androidx.compose.ui.Modifier): kotlin.Unit
   skippable: true
   restartable: true
@@ -107,6 +116,20 @@ private fun com.whatever.caro.core.ui.loading.LoadingInteractionBlocker(): kotli
   skippable: true
   restartable: true
   params:
+
+@Composable
+internal fun com.whatever.caro.core.ui.loading.ScreenLoadingLottie(modifier: androidx.compose.ui.Modifier): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - modifier: STABLE (marked @Stable or @Immutable)
+
+@Composable
+public fun com.whatever.caro.core.ui.loading.rememberDelayedVisible(active: kotlin.Boolean): kotlin.Boolean
+  skippable: true
+  restartable: true
+  params:
+    - active: STABLE (primitive type)
 
 @Composable
 public fun com.whatever.caro.core.ui.swipe.rememberSwipeGestureState(): com.whatever.caro.core.ui.swipe.SwipeGestureState
