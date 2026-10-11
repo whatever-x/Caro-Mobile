@@ -149,13 +149,43 @@ internal fun previewBlockReason(
         }
     }
 
-/** 상한을 넘어도 글을 자르지 않는다. 자르면 알리지 않은 채 카드가 사라진다. */
+/** 상한을 넘어도 글을 자르지 않는다. 자르면 알리지 않은 채 카드가 사라진다. [isOverflowed]는 [nextPasteOverflowed]가 정한 값이다. */
 internal fun pasteBlockReason(
     text: String,
     maxPasteChars: Int,
+    isOverflowed: Boolean,
 ): PasteBlockReason? =
     when {
         text.isEmpty() -> PasteBlockReason.Empty
-        text.length > maxPasteChars -> PasteBlockReason.TooLong
+        isOverflowed || text.length > maxPasteChars -> PasteBlockReason.TooLong
         else -> null
     }
+
+/**
+ * 상한을 넘겨 붙인 글은 입력칸에 보관할 때 이미 뒤가 잘려 있다.
+ * 일부를 지워 상한 이하로 돌아와도 잘린 뒷부분은 돌아오지 않으므로, 비우거나 다른 글로 바꾸기 전까지 넘친 것으로 둔다.
+ * 지우기만 한 편집인지는 [previous]에서 한 구간을 뺀 글인지로 가린다.
+ */
+internal fun nextPasteOverflowed(
+    previous: String,
+    wasOverflowed: Boolean,
+    edited: String,
+    maxPasteChars: Int,
+): Boolean =
+    when {
+        edited.length > maxPasteChars -> true
+        !wasOverflowed || edited.isEmpty() -> false
+        else -> isOnlyDeletion(previous, edited)
+    }
+
+private fun isOnlyDeletion(
+    original: String,
+    edited: String,
+): Boolean {
+    if (edited.length > original.length) return false
+    var prefix = 0
+    while (prefix < edited.length && edited[prefix] == original[prefix]) prefix++
+    var suffix = 0
+    while (suffix < edited.length - prefix && edited[edited.length - 1 - suffix] == original[original.length - 1 - suffix]) suffix++
+    return prefix + suffix == edited.length
+}

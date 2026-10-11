@@ -459,12 +459,13 @@ private fun com.whatever.caro.feature.importer.step.PasteGuideLine(text: kotlin.
     - text: STABLE (String is immutable)
 
 @Composable
-internal fun com.whatever.caro.feature.importer.step.PasteStep(text: kotlin.String, maxPasteChars: kotlin.Int, onTextChange: kotlin.Function1<kotlin.String, kotlin.Unit>, onNext: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+internal fun com.whatever.caro.feature.importer.step.PasteStep(text: kotlin.String, maxPasteChars: kotlin.Int, isOverflowed: kotlin.Boolean, onTextChange: kotlin.Function1<kotlin.String, kotlin.Unit>, onNext: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
   skippable: true
   restartable: true
   params:
     - text: STABLE (String is immutable)
     - maxPasteChars: STABLE (primitive type)
+    - isOverflowed: STABLE (primitive type)
     - onTextChange: STABLE (function type)
     - onNext: STABLE (function type)
     - modifier: STABLE (marked @Stable or @Immutable)

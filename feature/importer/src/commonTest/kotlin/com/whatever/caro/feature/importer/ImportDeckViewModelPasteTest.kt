@@ -82,6 +82,70 @@ class ImportDeckViewModelPasteTest : FunSpec() {
             }
         }
 
+        test("넘친 붙여넣기에서 한 글자를 지워 상한 이하로 돌아와도 [다음]은 막힌다") {
+            runTest(rig.dispatcher) {
+                val harness = rig.create(limits = limits)
+                harness.send(ImportDeckIntent.ClickPaste)
+                harness.send(ImportDeckIntent.UpdatePasteText(OVER_LIMIT_TEXT))
+                advanceUntilIdle()
+
+                harness.send(ImportDeckIntent.UpdatePasteText(AT_LIMIT_TEXT))
+                harness.send(ImportDeckIntent.ClickPasteNext(ImportViewModelHarness.PASTE_SOURCE_NAME, SpreadsheetDateStyle.YEAR_MONTH_DAY))
+                advanceUntilIdle()
+
+                harness.state.pasteText shouldBe AT_LIMIT_TEXT
+                harness.state.isPasteOverflowed shouldBe true
+                harness.state.step shouldBe ImportStep.Paste
+                harness.reader.calls.shouldBeEmpty()
+            }
+        }
+
+        test("넘친 붙여넣기에서 가운데 글자를 지워도 [다음]은 막힌다") {
+            runTest(rig.dispatcher) {
+                val harness = rig.create(limits = limits)
+                harness.send(ImportDeckIntent.ClickPaste)
+                harness.send(ImportDeckIntent.UpdatePasteText(OVER_LIMIT_TEXT))
+                advanceUntilIdle()
+
+                harness.send(ImportDeckIntent.UpdatePasteText("1234578901"))
+                harness.send(ImportDeckIntent.ClickPasteNext(ImportViewModelHarness.PASTE_SOURCE_NAME, SpreadsheetDateStyle.YEAR_MONTH_DAY))
+                advanceUntilIdle()
+
+                harness.reader.calls.shouldBeEmpty()
+            }
+        }
+
+        test("넘친 붙여넣기를 비우면 막힘이 풀리고 새로 붙여 넣은 글을 읽는다") {
+            runTest(rig.dispatcher) {
+                val reader = FakeImportSourceReader().returns(ImportTestTables.text(sourceName = ImportViewModelHarness.PASTE_SOURCE_NAME))
+                val harness = rig.create(reader = reader, limits = limits)
+                harness.send(ImportDeckIntent.ClickPaste)
+                harness.send(ImportDeckIntent.UpdatePasteText(OVER_LIMIT_TEXT))
+                harness.send(ImportDeckIntent.UpdatePasteText(""))
+                harness.send(ImportDeckIntent.UpdatePasteText("a\tb"))
+                harness.send(ImportDeckIntent.ClickPasteNext(ImportViewModelHarness.PASTE_SOURCE_NAME, SpreadsheetDateStyle.YEAR_MONTH_DAY))
+                advanceUntilIdle()
+
+                harness.state.isPasteOverflowed shouldBe false
+                harness.reader.calls.size shouldBe 1
+            }
+        }
+
+        test("넘친 붙여넣기를 짧은 글로 통째로 바꾸면 막힘이 풀린다") {
+            runTest(rig.dispatcher) {
+                val reader = FakeImportSourceReader().returns(ImportTestTables.text(sourceName = ImportViewModelHarness.PASTE_SOURCE_NAME))
+                val harness = rig.create(reader = reader, limits = limits)
+                harness.send(ImportDeckIntent.ClickPaste)
+                harness.send(ImportDeckIntent.UpdatePasteText(OVER_LIMIT_TEXT))
+                harness.send(ImportDeckIntent.UpdatePasteText("a\tb"))
+                harness.send(ImportDeckIntent.ClickPasteNext(ImportViewModelHarness.PASTE_SOURCE_NAME, SpreadsheetDateStyle.YEAR_MONTH_DAY))
+                advanceUntilIdle()
+
+                harness.state.isPasteOverflowed shouldBe false
+                harness.reader.calls.size shouldBe 1
+            }
+        }
+
         test("비어 있는 붙여넣기는 [다음]을 막는다") {
             runTest(rig.dispatcher) {
                 val harness = rig.create(limits = limits)

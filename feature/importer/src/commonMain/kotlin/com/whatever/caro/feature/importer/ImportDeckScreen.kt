@@ -103,6 +103,7 @@ internal fun ImportDeckScreen(
                             PasteStep(
                                 text = state.pasteText,
                                 maxPasteChars = ImportLimits.MAX_PASTE_CHARS,
+                                isOverflowed = state.isPasteOverflowed,
                                 onTextChange = { onIntent(ImportDeckIntent.UpdatePasteText(it)) },
                                 onNext = { onIntent(ImportDeckIntent.ClickPasteNext(sourceName = pasteSourceName, dateStyle = dateStyle)) },
                             )

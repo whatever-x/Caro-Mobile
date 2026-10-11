@@ -196,24 +196,80 @@ class ImportSelectionRulesTest : FunSpec() {
 
         context("붙여넣기 입력 검사") {
             test("비어 있으면 다음을 막는다") {
-                pasteBlockReason("", maxPasteChars = 10) shouldBe PasteBlockReason.Empty
+                pasteBlockReason("", maxPasteChars = 10, isOverflowed = false) shouldBe PasteBlockReason.Empty
             }
 
             test("상한 글자 수까지는 통과한다") {
-                pasteBlockReason("a".repeat(10), maxPasteChars = 10) shouldBe null
+                pasteBlockReason("a".repeat(10), maxPasteChars = 10, isOverflowed = false) shouldBe null
             }
 
             test("상한보다 한 글자 많으면 막는다") {
-                pasteBlockReason("a".repeat(11), maxPasteChars = 10) shouldBe PasteBlockReason.TooLong
+                pasteBlockReason("a".repeat(11), maxPasteChars = 10, isOverflowed = false) shouldBe PasteBlockReason.TooLong
             }
 
             test("기본 상한 1,000,000자는 통과한다") {
-                pasteBlockReason("a".repeat(ImportLimits.MAX_PASTE_CHARS), ImportLimits.MAX_PASTE_CHARS) shouldBe null
+                pasteBlockReason("a".repeat(ImportLimits.MAX_PASTE_CHARS), ImportLimits.MAX_PASTE_CHARS, isOverflowed = false) shouldBe null
             }
 
             test("기본 상한보다 한 글자 많은 1,000,001자는 막는다") {
-                pasteBlockReason("a".repeat(ImportLimits.MAX_PASTE_CHARS + 1), ImportLimits.MAX_PASTE_CHARS) shouldBe
+                pasteBlockReason("a".repeat(ImportLimits.MAX_PASTE_CHARS + 1), ImportLimits.MAX_PASTE_CHARS, isOverflowed = false) shouldBe
                     PasteBlockReason.TooLong
+            }
+
+            test("넘친 적이 있으면 상한 이하로 돌아와도 막는다") {
+                pasteBlockReason("a".repeat(10), maxPasteChars = 10, isOverflowed = true) shouldBe PasteBlockReason.TooLong
+            }
+
+            test("비어 있으면 넘친 적이 있어도 비어 있음이 먼저다") {
+                pasteBlockReason("", maxPasteChars = 10, isOverflowed = true) shouldBe PasteBlockReason.Empty
+            }
+        }
+
+        context("넘친 붙여넣기 유지 판정") {
+            val overflowed = "0123456789A"
+
+            test("상한을 넘는 입력은 넘친 것이다") {
+                nextPasteOverflowed(previous = "", wasOverflowed = false, edited = overflowed, maxPasteChars = 10) shouldBe true
+            }
+
+            test("넘친 적 없고 상한 이하면 넘치지 않은 것이다") {
+                nextPasteOverflowed(previous = "abc", wasOverflowed = false, edited = "abcd", maxPasteChars = 10) shouldBe false
+            }
+
+            test("넘친 뒤 끝 글자를 하나 지우면 계속 넘친 것이다") {
+                nextPasteOverflowed(overflowed, wasOverflowed = true, edited = "0123456789", maxPasteChars = 10) shouldBe true
+            }
+
+            test("넘친 뒤 첫 글자를 하나 지우면 계속 넘친 것이다") {
+                nextPasteOverflowed(overflowed, wasOverflowed = true, edited = "123456789A", maxPasteChars = 10) shouldBe true
+            }
+
+            test("넘친 뒤 가운데 글자를 하나 지우면 계속 넘친 것이다") {
+                nextPasteOverflowed(overflowed, wasOverflowed = true, edited = "012346789A", maxPasteChars = 10) shouldBe true
+            }
+
+            test("넘친 뒤 연속한 구간을 지워도 계속 넘친 것이다") {
+                nextPasteOverflowed(overflowed, wasOverflowed = true, edited = "01A", maxPasteChars = 10) shouldBe true
+            }
+
+            test("같은 글자가 이어진 곳에서 하나를 지워도 계속 넘친 것이다") {
+                nextPasteOverflowed("aaaaaaaaaaa", wasOverflowed = true, edited = "aaaaaaaaaa", maxPasteChars = 10) shouldBe true
+            }
+
+            test("넘친 뒤 비우면 풀린다") {
+                nextPasteOverflowed(overflowed, wasOverflowed = true, edited = "", maxPasteChars = 10) shouldBe false
+            }
+
+            test("넘친 뒤 다른 글로 바꾸면 풀린다") {
+                nextPasteOverflowed(overflowed, wasOverflowed = true, edited = "새 글", maxPasteChars = 10) shouldBe false
+            }
+
+            test("넘친 뒤 지우고 새 글자를 넣은 입력은 지우기만 한 것이 아니므로 풀린다") {
+                nextPasteOverflowed(overflowed, wasOverflowed = true, edited = "01Z", maxPasteChars = 10) shouldBe false
+            }
+
+            test("넘친 뒤 다시 상한을 넘기면 계속 넘친 것이다") {
+                nextPasteOverflowed(overflowed, wasOverflowed = true, edited = "새 글을 아주 길게 붙여 넣은 입력", maxPasteChars = 10) shouldBe true
             }
         }
     }

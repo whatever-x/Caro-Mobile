@@ -18,6 +18,7 @@ import com.whatever.caro.feature.importer.logic.isReadFailure
 import com.whatever.caro.feature.importer.logic.isSelectableSubdeck
 import com.whatever.caro.feature.importer.logic.isSheetEmpty
 import com.whatever.caro.feature.importer.logic.mappingBlockReason
+import com.whatever.caro.feature.importer.logic.nextPasteOverflowed
 import com.whatever.caro.feature.importer.logic.pasteBlockReason
 import com.whatever.caro.feature.importer.logic.pickFailedDialog
 import com.whatever.caro.feature.importer.logic.previewBlockReason
@@ -243,7 +244,13 @@ class ImportDeckViewModel internal constructor(
         if (currentState.step != ImportStep.Paste) return
         // 상한을 1자 넘긴 값까지만 두어도 너무 김 판정은 같고, 거대한 클립보드 글이 레이아웃과 메모리를 잡지 않는다.
         // 서로게이트 쌍 가운데서 자르면 길이가 상한 이하로 돌아가 잘린 글이 통과하므로, 쌍을 보존하지 않고 그대로 자른다.
-        reduce { copy(pasteText = text.take(limits.maxPasteChars + 1)) }
+        // 자른 글은 일부를 지워 상한 이하로 돌아와도 뒷부분이 없으므로 넘친 표시를 따로 남긴다.
+        reduce {
+            copy(
+                pasteText = text.take(limits.maxPasteChars + 1),
+                isPasteOverflowed = nextPasteOverflowed(pasteText, isPasteOverflowed, text, limits.maxPasteChars),
+            )
+        }
     }
 
     private suspend fun onFilePicked(intent: ImportDeckIntent.FilePicked) {
@@ -276,7 +283,11 @@ class ImportDeckViewModel internal constructor(
 
     private fun onClickPasteNext(intent: ImportDeckIntent.ClickPasteNext) {
         val state = currentState
-        if (state.step != ImportStep.Paste || pasteBlockReason(state.pasteText, limits.maxPasteChars) != null) return
+        if (state.step != ImportStep.Paste ||
+            pasteBlockReason(state.pasteText, limits.maxPasteChars, state.isPasteOverflowed) != null
+        ) {
+            return
+        }
         val paste = ImportReadSource.Paste(state.pasteText, intent.sourceName, intent.dateStyle)
         source = paste
         reduce { copy(loading = ImportLoading.Parsing(fileName = null)) }

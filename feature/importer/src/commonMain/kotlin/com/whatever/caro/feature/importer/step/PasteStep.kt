@@ -42,6 +42,7 @@ import org.jetbrains.compose.resources.stringResource
 internal fun PasteStep(
     text: String,
     maxPasteChars: Int,
+    isOverflowed: Boolean,
     onTextChange: (String) -> Unit,
     onNext: () -> Unit,
     modifier: Modifier = Modifier,
@@ -58,7 +59,7 @@ internal fun PasteStep(
     val hideGuide = shouldHidePasteGuide(isImeVisible, with(density) { inputHeightWithGuide.toDp() })
 
     val fieldLabel = stringResource(Res.string.import_subtitle_paste)
-    val blockReason = pasteBlockReason(text, maxPasteChars)
+    val blockReason = pasteBlockReason(text, maxPasteChars, isOverflowed)
     val tooLongReason =
         if (blockReason == PasteBlockReason.TooLong) {
             stringResource(Res.string.import_reason_paste_too_long, maxPasteChars.formatWithComma())

@@ -52,6 +52,7 @@ class PasteStepTest {
     private fun show(
         text: String = "",
         maxPasteChars: Int = 1_000,
+        isOverflowed: Boolean = false,
     ) {
         composeRule.setContent {
             CaroTheme {
@@ -60,6 +61,7 @@ class PasteStepTest {
                     PasteStep(
                         text = text,
                         maxPasteChars = maxPasteChars,
+                        isOverflowed = isOverflowed,
                         onTextChange = { typed += it },
                         onNext = { nextClicks += 1 },
                         modifier = Modifier.fillMaxSize(),
@@ -112,6 +114,14 @@ class PasteStepTest {
         show(text = text, maxPasteChars = 10)
 
         field().assertTextEquals(text)
+    }
+
+    @Test
+    fun `넘친 적이 있으면 글자 수가 상한 이하여도 다음 버튼이 꺼지고 이유 줄이 보인다`() {
+        show(text = "가".repeat(10), maxPasteChars = 10, isOverflowed = true)
+
+        nextButton().assertIsNotEnabled()
+        composeRule.onNodeWithText(tooLongReason("10")).assertIsDisplayed()
     }
 
     @Test
