@@ -62,9 +62,105 @@ class ParserBudgetTest : FunSpec() {
 
             test("최신 노트 유형 config가 크기 상한을 넘으면 멈춘다").config(enabled = nativeArchiveLibrariesLoadable) {
                 val path = temp("huge-config.apkg")
-                TestAnki.modern(path, fieldCount = 1, notes = listOf("a"), noteTypeConfigSql = "zeroblob(${9 * 1024 * 1024})")
+                TestAnki.modern(path, fieldCount = 1, notes = listOf("a"), noteTypeConfigSql = "zeroblob($OVER_METADATA_BYTES)")
 
                 shouldThrow<ImportParseException> { parse(path, Fixtures.options()) }.kind shouldBe ImportParseErrorKind.CONTENT_TOO_LONG
+            }
+        }
+
+        context("Anki 컬렉션 메타데이터 길이") {
+            mapOf(
+                "fields.name" to "UPDATE fields SET name = ${nulPrefixed(1_000)} WHERE ord = 0",
+                "notetypes.name" to "UPDATE notetypes SET name = ${nulPrefixed(1_000)}",
+                "decks.name" to "UPDATE decks SET name = ${nulPrefixed(1_000)}",
+            ).forEach { (column, update) ->
+                test("최신 ${column}이 NUL로 시작해 length()가 0이어도 바이트 길이가 상한의 3배를 넘으면 멈춘다")
+                    .config(enabled = nativeArchiveLibrariesLoadable) {
+                        val path = temp("nul-$column.apkg")
+                        TestAnki.modern(path, fieldCount = 1, notes = listOf("a"), extraSql = listOf(update))
+
+                        shouldThrow<ImportParseException> { parse(path, Fixtures.options(maxFieldChars = 100)) }.kind shouldBe
+                            ImportParseErrorKind.CONTENT_TOO_LONG
+                    }
+            }
+
+            test("최신 한글 이름은 글자 수가 상한과 같으면 읽고 상한을 넘으면 멈춘다").config(enabled = nativeArchiveLibrariesLoadable) {
+                val options = Fixtures.options(maxFieldChars = 100)
+                val within = temp("korean-names-within.apkg")
+                TestAnki.modern(within, fieldCount = 1, notes = listOf("a"), extraSql = renameAll("가".repeat(100)))
+                val over = temp("korean-names-over.apkg")
+                TestAnki.modern(over, fieldCount = 1, notes = listOf("a"), extraSql = renameAll("가".repeat(101)))
+
+                parse(within, options).noteTypes.single().name shouldBe "가".repeat(100)
+                shouldThrow<ImportParseException> { parse(over, options) }.kind shouldBe ImportParseErrorKind.CONTENT_TOO_LONG
+            }
+
+            test("최신 한글 노트 유형과 여러 항목, 덱 경로를 그대로 읽는다").config(enabled = nativeArchiveLibrariesLoadable) {
+                val path = temp("korean-modern.apkg")
+                TestAnki.modern(
+                    path,
+                    fieldCount = 3,
+                    notes = listOf("질문\u001f답\u001f메모"),
+                    extraSql =
+                        listOf(
+                            "UPDATE notetypes SET name = '한글 기본'",
+                            "UPDATE decks SET name = '한글' || char(31) || '하위'",
+                            "UPDATE fields SET name = CASE ord WHEN 0 THEN '앞면' WHEN 1 THEN '뒷면' ELSE '메모' END",
+                        ),
+                )
+
+                val table = parse(path, Fixtures.options())
+
+                table.noteTypes.single().name shouldBe "한글 기본"
+                table.noteTypes.single().fieldNames shouldBe listOf("앞면", "뒷면", "메모")
+                table.subdecks.single().path shouldBe "한글::하위"
+                table.rows.single().fields shouldBe mapOf("앞면" to "질문", "뒷면" to "답", "메모" to "메모")
+            }
+
+            test("구버전 한글 노트 유형과 여러 항목, 덱 경로를 그대로 읽는다").config(enabled = nativeArchiveLibrariesLoadable) {
+                val path = temp("korean-legacy.apkg")
+                TestAnki.legacy(
+                    path,
+                    fieldCount = 3,
+                    notes = listOf("질문\u001f답\u001f메모"),
+                    extraSql =
+                        listOf(
+                            """UPDATE col SET models = '{"1":{"name":"한글 기본","type":0,"flds":[{"name":"앞면","ord":0},{"name":"뒷면","ord":1},{"name":"메모","ord":2}]}}'""",
+                            """UPDATE col SET decks = '{"1":{"name":"한글::하위"}}'""",
+                        ),
+                )
+
+                val table = parse(path, Fixtures.options())
+
+                table.noteTypes.single().name shouldBe "한글 기본"
+                table.noteTypes.single().fieldNames shouldBe listOf("앞면", "뒷면", "메모")
+                table.subdecks.single().path shouldBe "한글::하위"
+                table.rows.single().fields shouldBe mapOf("앞면" to "질문", "뒷면" to "답", "메모" to "메모")
+            }
+
+            listOf("models", "decks").forEach { column ->
+                test("구버전 $column JSON이 크기 상한을 넘으면 문자열을 만들기 전에 멈춘다").config(enabled = nativeArchiveLibrariesLoadable) {
+                    val path = temp("huge-$column.apkg")
+                    val padding = "printf('%.*c', $OVER_METADATA_BYTES, ' ')"
+                    TestAnki.legacy(
+                        path,
+                        fieldCount = 1,
+                        notes = listOf("a"),
+                        extraSql = listOf("UPDATE col SET $column = $column || $padding"),
+                    )
+
+                    shouldThrow<ImportParseException> { parse(path, Fixtures.options()) }.kind shouldBe
+                        ImportParseErrorKind.CONTENT_TOO_LONG
+                }
+
+                test("구버전 $column JSON이 NUL로 시작해도 바이트 크기가 상한을 넘으면 멈춘다").config(enabled = nativeArchiveLibrariesLoadable) {
+                    val path = temp("nul-huge-$column.apkg")
+                    val update = "UPDATE col SET $column = CAST(zeroblob($OVER_METADATA_BYTES) AS TEXT)"
+                    TestAnki.legacy(path, fieldCount = 1, notes = listOf("a"), extraSql = listOf(update))
+
+                    shouldThrow<ImportParseException> { parse(path, Fixtures.options()) }.kind shouldBe
+                        ImportParseErrorKind.CONTENT_TOO_LONG
+                }
             }
         }
 
@@ -276,7 +372,10 @@ class ParserBudgetTest : FunSpec() {
             }
         }
 
-    // 값 앞에 내장 NUL(1글자)을 붙이고 길이를 [lengths]로 정한 노트를 만든다. SQLite length()는 NUL 앞까지만 세어 0이 된다.
+    // 내장 NUL(1글자) 뒤에 [length]글자를 붙인 TEXT 값 식. SQLite length()는 NUL 앞까지만 세어 0이 된다.
+    private fun nulPrefixed(length: Int): String = "CAST(x'00' AS TEXT) || printf('%.*c', $length, 'x')"
+
+    // 값 앞에 내장 NUL(1글자)을 붙이고 길이를 [lengths]로 정한 노트를 만든다.
     private fun nulNotesSql(vararg lengths: Int): List<String> =
         listOf(
             "CREATE TABLE notes (id INTEGER, mid INTEGER, flds TEXT)",
@@ -284,10 +383,13 @@ class ParserBudgetTest : FunSpec() {
         ) +
             lengths.flatMapIndexed { index, length ->
                 listOf(
-                    "INSERT INTO notes VALUES (${index + 1}, 1, CAST(x'00' AS TEXT) || printf('%.*c', $length, 'x'))",
+                    "INSERT INTO notes VALUES (${index + 1}, 1, ${nulPrefixed(length)})",
                     "INSERT INTO cards VALUES (${index + 1}, 1, 0, 0)",
                 )
             }
+
+    private fun renameAll(name: String): List<String> =
+        listOf("fields", "notetypes", "decks").map { table -> "UPDATE $table SET name = '$name'" }
 
     private fun inlineCell(
         reference: String,
@@ -313,4 +415,9 @@ class ParserBudgetTest : FunSpec() {
         text: String,
         options: ParseOptions,
     ) = ImportParser(Fixtures.fileSystem).parseText(text, "p", options)
+
+    private companion object {
+        // 운영 코드의 메타데이터 값 상한(8MiB)을 넘어야 거절 경로를 확인할 수 있다.
+        const val OVER_METADATA_BYTES = 9 * 1024 * 1024
+    }
 }

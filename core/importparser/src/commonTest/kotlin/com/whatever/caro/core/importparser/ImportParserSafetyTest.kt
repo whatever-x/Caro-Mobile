@@ -98,6 +98,34 @@ class ImportParserSafetyTest : FunSpec() {
             Fixtures.parse("apkg/legacy2_anki21_main.apkg", options).rows.size shouldBe MAIN_NOTES
             Fixtures.parse("apkg/legacy_anki2_genanki_main.apkg", options).rows.size shouldBe MAIN_NOTES
         }
+
+        test("무결성 검사를 켜면 두 테이블이 같은 페이지를 가리키는 컬렉션을 손상 파일로 멈춘다").config(enabled = nativeArchiveLibrariesLoadable) {
+            Fixtures.fileSystem.createDirectories(Fixtures.tempRoot)
+            val path = Fixtures.tempRoot / "${TEST_INPUT_PREFIX}shared-page.apkg"
+            TestAnki.legacy(
+                path,
+                fieldCount = 1,
+                notes = emptyList(),
+                notesAndCardsSql =
+                    listOf(
+                        "CREATE TABLE notes (id INTEGER, mid INTEGER, flds TEXT)",
+                        "INSERT INTO notes VALUES (1, 1, 'a')",
+                        "CREATE TABLE cards (nid INTEGER, did INTEGER, odid INTEGER, ord INTEGER)",
+                        "INSERT INTO cards VALUES (1, 1, 0, 0)",
+                        "PRAGMA writable_schema=ON",
+                        "UPDATE sqlite_master SET rootpage = (SELECT rootpage FROM sqlite_master WHERE name = 'notes') WHERE name = 'cards'",
+                        "PRAGMA writable_schema=OFF",
+                    ),
+            )
+
+            val options = Fixtures.options(verifyIntegrity = true)
+            shouldThrow<ImportParseException> {
+                ImportParser(
+                    Fixtures.fileSystem,
+                ).parseFile(path, "shared-page.apkg", options)
+            }.kind shouldBe
+                ImportParseErrorKind.CORRUPT_FILE
+        }
     }
 
     private suspend fun parseBytes(

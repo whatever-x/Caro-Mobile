@@ -33,6 +33,9 @@ internal class AnkiDatabase private constructor(
         private const val EXECUTABLE_SCHEMA_QUERY =
             "SELECT (SELECT count(*) FROM sqlite_master WHERE type IN ('view', 'trigger')) + " +
                 "(SELECT count(*) FROM pragma_table_list WHERE type = 'virtual')"
+
+        // quick_check 메시지에는 스키마의 테이블, 인덱스 이름이 들어가 길이를 알 수 없으므로 문자열로 읽지 않고 SQLite 안에서 'ok'와 비교한다.
+        private const val QUICK_CHECK_OK_QUERY = "SELECT quick_check = 'ok' FROM pragma_quick_check LIMIT 1"
         private const val GENERATED_COLUMN_QUERY = "SELECT count(*) FROM pragma_table_xinfo(?) WHERE hidden IN (2, 3)"
         private val QUERIED_TABLES = listOf("col", "notes", "cards", "notetypes", "fields", "decks")
 
@@ -119,8 +122,8 @@ internal class AnkiDatabase private constructor(
         }
 
         private fun checkIntegrity(connection: SQLiteConnection) {
-            val result = connection.prepare("PRAGMA quick_check").use { if (it.step()) it.getText(0) else "" }
-            if (result != "ok") throw ImportParseException(ImportParseErrorKind.CORRUPT_FILE, "quick_check failed")
+            val passed = connection.prepare(QUICK_CHECK_OK_QUERY).use { it.step() && it.getLong(0) == 1L }
+            if (!passed) throw ImportParseException(ImportParseErrorKind.CORRUPT_FILE, "quick_check failed")
         }
 
         private fun uriPath(path: Path): String =

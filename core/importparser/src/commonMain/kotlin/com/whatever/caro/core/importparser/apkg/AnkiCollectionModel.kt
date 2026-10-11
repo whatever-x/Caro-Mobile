@@ -30,33 +30,35 @@ internal data class AnkiCollectionModel(
         private const val STOCK_KIND_IMAGE_OCCLUSION = 6L
         private const val DECK_PATH_SEPARATOR = "::"
         private const val MODERN_DECK_SEPARATOR = '\u001f'
-        private const val MAX_NOTE_TYPE_CONFIG_BYTES = 8L * 1024 * 1024
 
-        /** 항목 수가 [maxColumns]를 넘는 노트 유형이 있으면 노트마다 그만큼의 값 맵이 생기므로 읽는 중에 멈춘다. */
+        // 노트 유형 config blob과 구버전 models, decks JSON은 값 하나를 통째로 읽어 파싱하므로 읽기 전에 막는 상한이다.
+        private const val MAX_METADATA_VALUE_BYTES = 8L * 1024 * 1024
+
+        /**
+         * 항목 수가 [maxColumns]를 넘는 노트 유형이 있으면 노트마다 그만큼의 값 맵이 생기므로 읽는 중에 멈춘다.
+         * 이름 열은 [maxNameBytes]를 넘으면 문자열을 만들기 전에 멈춘다.
+         */
         fun readModern(
             database: AnkiDatabase,
             maxColumns: Int,
+            maxNameBytes: Long,
         ): AnkiCollectionModel {
             val fieldNames = HashMap<Long, MutableList<String>>()
             // 내보내기가 없는 노트 유형의 fields 행을 남기므로 노트 유형 id로 묶는다.
-            database.query("SELECT ntid, name FROM fields ORDER BY ntid, ord") { statement ->
+            database.query("SELECT ntid, name, octet_length(name) FROM fields ORDER BY ntid, ord") { statement ->
                 while (statement.step()) {
                     val names = fieldNames.getOrPut(statement.getLong(0)) { mutableListOf() }
                     if (names.size >= maxColumns) throw tooManyFields(maxColumns)
+                    requireWithin(statement.getLong(2), maxNameBytes, "field name")
                     names += statement.getText(1)
                 }
             }
             val noteTypes = HashMap<Long, AnkiNoteType>()
-            database.query("SELECT id, name, config, octet_length(config) FROM notetypes") { statement ->
+            database.query("SELECT id, name, config, octet_length(config), octet_length(name) FROM notetypes") { statement ->
                 while (statement.step()) {
                     val id = statement.getLong(0)
-                    // getBlob은 값 전체를 힙에 올리므로 올리기 전에 크기로 거른다.
-                    if (statement.getLong(3) > MAX_NOTE_TYPE_CONFIG_BYTES) {
-                        throw ImportParseException(
-                            ImportParseErrorKind.CONTENT_TOO_LONG,
-                            "note type config over $MAX_NOTE_TYPE_CONFIG_BYTES bytes",
-                        )
-                    }
+                    requireWithin(statement.getLong(3), MAX_METADATA_VALUE_BYTES, "note type config")
+                    requireWithin(statement.getLong(4), maxNameBytes, "note type name")
                     val config = ProtobufVarints.read(if (statement.isNull(2)) ByteArray(0) else statement.getBlob(2))
                     noteTypes[id] =
                         AnkiNoteType(
@@ -68,8 +70,9 @@ internal data class AnkiCollectionModel(
                 }
             }
             val deckPaths = HashMap<Long, String>()
-            database.query("SELECT id, name FROM decks") { statement ->
+            database.query("SELECT id, name, octet_length(name) FROM decks") { statement ->
                 while (statement.step()) {
+                    requireWithin(statement.getLong(2), maxNameBytes, "deck name")
                     deckPaths[statement.getLong(0)] = statement.getText(1).replace(MODERN_DECK_SEPARATOR.toString(), DECK_PATH_SEPARATOR)
                 }
             }
@@ -81,8 +84,10 @@ internal data class AnkiCollectionModel(
             maxColumns: Int,
         ): AnkiCollectionModel {
             val (models, decks) =
-                database.query("SELECT models, decks FROM col") { statement ->
+                database.query("SELECT models, decks, octet_length(models), octet_length(decks) FROM col") { statement ->
                     if (!statement.step()) error("col row missing")
+                    requireWithin(statement.getLong(2), MAX_METADATA_VALUE_BYTES, "col models")
+                    requireWithin(statement.getLong(3), MAX_METADATA_VALUE_BYTES, "col decks")
                     statement.getText(0) to statement.getText(1)
                 }
             val noteTypes =
@@ -114,6 +119,15 @@ internal data class AnkiCollectionModel(
                 isCloze = model.number("type") == KIND_CLOZE.toInt(),
                 isImageOcclusion = model.number("originalStockKind") == STOCK_KIND_IMAGE_OCCLUSION.toInt(),
             )
+        }
+
+        // 값 문자열을 만들기 전에 거른다. length()는 내장 NUL에서 세기를 멈추므로 [byteLength]는 octet_length로 구한 값이어야 한다.
+        private fun requireWithin(
+            byteLength: Long,
+            maxBytes: Long,
+            what: String,
+        ) {
+            if (byteLength > maxBytes) throw ImportParseException(ImportParseErrorKind.CONTENT_TOO_LONG, "$what over $maxBytes bytes")
         }
 
         private fun tooManyFields(maxColumns: Int) =
