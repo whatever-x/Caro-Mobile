@@ -42,7 +42,7 @@ internal class ImportPreviewBuilder {
                 cardCount = cards.size,
                 excludedCount = excluded,
                 emptyReplacedCount = cards.sumOf { card -> card.frontReplaced.toCount() + card.backReplaced.toCount() },
-                truncatedCount = cards.sumOf { card -> card.frontTruncated.toCount() + card.backTruncated.toCount() },
+                truncatedCount = cards.count { card -> card.frontTruncated || card.backTruncated },
                 mediaRemovedCount = cards.sumOf { card -> card.mediaRemoved },
             )
         // 파서가 행 상한에서 읽기를 멈췄으면 읽지 않은 행이 있으므로 제외 카드로 장수가 줄어도 상한 초과로 본다.
@@ -106,12 +106,14 @@ internal class ImportPreviewBuilder {
     }
 }
 
-/** 첫 항목을 앞면(빈칸 유형은 빈칸 문장), 나머지를 뒷면(빈칸 유형은 추가 설명)에 둔다. */
+/**
+ * 첫 항목을 앞면(빈칸 유형은 빈칸 문장), 나머지를 뒷면(빈칸 유형은 추가 설명)에 둔다.
+ * Image Occlusion 유형은 이미지가 핵심이라 텍스트로 옮길 수 없으므로 연결 대상에서 뺀다.
+ */
 internal fun defaultFieldMappings(table: ParsedTable): Map<String, FieldMapping> =
-    table.noteTypes.associate { type ->
-        type.id to
-            defaultMapping(type)
-    }
+    table.noteTypes
+        .filterNot { type -> type.isImageOcclusion }
+        .associate { type -> type.id to defaultMapping(type) }
 
 private fun defaultMapping(type: ParsedNoteType): FieldMapping =
     FieldMapping(

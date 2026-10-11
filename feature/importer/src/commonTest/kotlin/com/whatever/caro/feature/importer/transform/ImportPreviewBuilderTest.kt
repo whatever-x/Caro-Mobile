@@ -6,6 +6,7 @@ import com.whatever.caro.core.importparser.model.ParseWarning
 import com.whatever.caro.core.importparser.model.ParsedNoteType
 import com.whatever.caro.core.importparser.model.ParsedRow
 import com.whatever.caro.core.importparser.model.ParsedTable
+import com.whatever.caro.core.model.card.CardContent
 import com.whatever.caro.core.model.importing.FieldMapping
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
@@ -64,6 +65,69 @@ class ImportPreviewBuilderTest : FunSpec() {
             card.frontTruncated shouldBe true
             card.back.length shouldBe 500
             card.backTruncated shouldBe true
+        }
+
+        test("앞뒤 면이 모두 잘린 카드는 잘림 수를 1로 센다") {
+            val table = textTable(listOf("a", "b"), listOf("a".repeat(501), "b".repeat(501)))
+
+            builder.build(table, defaultFieldMappings(table), EMPTY).stats.truncatedCount shouldBe 1
+        }
+
+        test("잘림 수는 잘린 면이 하나라도 있는 카드의 수다") {
+            val table =
+                textTable(
+                    listOf("a", "b"),
+                    listOf("a".repeat(501), "b".repeat(501)),
+                    listOf("c".repeat(501), "뒤"),
+                    listOf("앞", "뒤"),
+                )
+
+            builder.build(table, defaultFieldMappings(table), EMPTY).stats.truncatedCount shouldBe 2
+        }
+
+        test("Image Occlusion 유형은 기본 연결에서 빠지고 다른 유형은 남는다") {
+            val table =
+                textTable(listOf("a", "b")).copy(
+                    format = ImportFormat.APKG,
+                    noteTypes =
+                        listOf(
+                            ParsedNoteType("basic", "Basic", listOf("Front", "Back"), isCloze = false, noteCount = 1),
+                            ParsedNoteType(
+                                "occlusion",
+                                "Image Occlusion",
+                                listOf("Occlusion", "Image"),
+                                isCloze = true,
+                                noteCount = 1,
+                                isImageOcclusion = true,
+                            ),
+                        ),
+                )
+
+            defaultFieldMappings(table).keys shouldBe setOf("basic")
+        }
+
+        test("카드의 앞면과 뒷면을 그대로 CardContent로 옮긴다") {
+            val card =
+                ImportCard(
+                    sourceIndex = 7,
+                    front = "앞면\n둘째 줄",
+                    back = "뒷면",
+                    frontReplaced = false,
+                    backReplaced = false,
+                    frontTruncated = false,
+                    backTruncated = false,
+                    mediaRemoved = 2,
+                )
+
+            card.toCardContent() shouldBe CardContent(front = "앞면\n둘째 줄", back = "뒷면")
+        }
+
+        test("빈 면 문구와 잘린 값도 그대로 CardContent로 옮긴다") {
+            val table = textTable(listOf("a", "b"), listOf("", "x".repeat(501)))
+
+            val card = builder.build(table, defaultFieldMappings(table), EMPTY).cards.single()
+
+            card.toCardContent() shouldBe CardContent(front = EMPTY, back = "x".repeat(500))
         }
 
         test("제외한 노트 유형의 행은 카드도 제외 수도 만들지 않는다") {

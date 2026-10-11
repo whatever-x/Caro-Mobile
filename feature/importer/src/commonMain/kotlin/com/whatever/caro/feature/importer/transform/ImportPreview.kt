@@ -1,6 +1,7 @@
 package com.whatever.caro.feature.importer.transform
 
 import com.whatever.caro.core.importparser.model.ParseWarning
+import com.whatever.caro.core.model.card.CardContent
 import kotlinx.collections.immutable.ImmutableList
 
 /** 저장할 카드 한 장. [sourceIndex]는 `ParsedTable.rows` 안의 위치이고 원본 순서를 지키는 데 쓴다. */
@@ -14,6 +15,8 @@ internal data class ImportCard(
     val backTruncated: Boolean,
     val mediaRemoved: Int,
 )
+
+internal fun ImportCard.toCardContent(): CardContent = CardContent(front = front, back = back)
 
 internal data class ImportPreviewStats(
     val cardCount: Int,

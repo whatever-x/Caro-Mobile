@@ -36,6 +36,15 @@ class ImportPreviewFixtureTest : FunSpec() {
                 }
             }
         }
+
+        test("modern_image_occlusion 기본 스냅샷의 기본 연결에는 Image Occlusion 유형이 없고 Basic 유형은 남는다") {
+            val table = ImportFixtures.snapshot("apkg/modern_image_occlusion.apkg", "default")
+            val occlusionIds = table.noteTypes.filter { type -> type.isImageOcclusion }.map { type -> type.id }
+            val otherIds = table.noteTypes.filterNot { type -> type.isImageOcclusion }.map { type -> type.id }
+
+            occlusionIds.size shouldBe 1
+            defaultFieldMappings(table).keys shouldBe otherIds.toSet()
+        }
     }
 
     private fun hasPreviewExpectation(expected: JsonObject): Boolean =

@@ -9,4 +9,7 @@ object ImportLimits {
 
     /** 가져오기 카드 저장 1회 요청의 서버 상한. 일반 카드 생성의 요청당 200장과 다른 가져오기 전용 예외 값이다. */
     const val SERVER_CHUNK_MAX = 1_000
+
+    /** 붙여넣은 텍스트의 글자 수 상한. 넘으면 파싱 전에 막는다. */
+    const val MAX_PASTE_CHARS = 1_000_000
 }
