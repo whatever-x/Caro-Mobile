@@ -68,6 +68,18 @@ class ImportCopyTest :
             ImportStringsXml.valueOf(StringsLocale.Ko, "import_subtitle_sheet") shouldBe "가져올 시트를 골라 주세요"
         }
 
+        test("ko 줄 카드의 항목 줄은 열 이름과 값을 콜론으로 잇는다") {
+            val cell = ImportStringsXml.valueOf(StringsLocale.Ko, "import_label_table_cell")
+
+            ImportStringsXml.render(cell, "열 1", "学校") shouldBe "열 1: 学校"
+        }
+
+        test("en 줄 카드의 항목 줄도 열 이름과 값을 콜론으로 잇는다") {
+            val cell = ImportStringsXml.valueOf(StringsLocale.En, "import_label_table_cell")
+
+            ImportStringsXml.render(cell, "Column 1", "学校") shouldBe "Column 1: 学校"
+        }
+
         test("ko 항목이 없는 노트 유형 부제에는 항목 수가 없다") {
             val subtitle = ImportStringsXml.valueOf(StringsLocale.Ko, "import_label_note_type_count")
 

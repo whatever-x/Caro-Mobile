@@ -299,6 +299,7 @@
 	<string name="import_hint_table_more_columns">You can choose the remaining columns when mapping items.</string>
 	<string name="import_label_column">Column %1$s</string>
 	<string name="import_label_table_row">Row %1$s</string>
+	<string name="import_label_table_cell">%1$s: %2$s</string>
 	<!-- import mapping -->
 	<string name="import_title_mapping">Map items</string>
 	<string name="import_subtitle_mapping">Choose the items for the front and back</string>

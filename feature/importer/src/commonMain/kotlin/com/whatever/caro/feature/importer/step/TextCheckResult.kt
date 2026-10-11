@@ -43,6 +43,7 @@ import caromobile.core.designsystem.generated.resources.import_a11y_table_row
 import caromobile.core.designsystem.generated.resources.import_hint_table_more_columns
 import caromobile.core.designsystem.generated.resources.import_label_column
 import caromobile.core.designsystem.generated.resources.import_label_split_result
+import caromobile.core.designsystem.generated.resources.import_label_table_cell
 import caromobile.core.designsystem.generated.resources.import_label_table_info
 import caromobile.core.designsystem.generated.resources.import_label_table_info_truncated
 import caromobile.core.designsystem.generated.resources.import_label_table_row
@@ -357,7 +358,7 @@ private fun RowCard(
         )
         headerLabels.zip(cells).forEach { (label, cell) ->
             Text(
-                text = "$label: $cell",
+                text = stringResource(Res.string.import_label_table_cell, label, cell),
                 style = CaroTheme.typography.label1,
                 color = CaroTheme.color.text.primary,
                 maxLines = CELL_MAX_LINES,

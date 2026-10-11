@@ -75,6 +75,7 @@ private val importSelectStepCopy: Map<String, String> =
         "import_hint_table_more_columns" to "나머지 열은 항목 연결에서 고를 수 있어요.",
         "import_label_column" to "열 %1\$s",
         "import_label_table_row" to "%1\$s행",
+        "import_label_table_cell" to "%1\$s: %2\$s",
     )
 
 private val importMappingCopy: Map<String, String> =

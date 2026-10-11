@@ -3,7 +3,9 @@ package com.whatever.caro.feature.importer.step
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.SemanticsActions
@@ -26,12 +28,14 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.text.TextLayoutResult
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.whatever.caro.core.designsystem.themes.CaroTheme
 import com.whatever.caro.core.importparser.model.ParsedTable
 import com.whatever.caro.feature.importer.component.isHeading
 import io.kotest.matchers.collections.shouldContain
+import io.kotest.matchers.floats.shouldBeLessThanOrEqual
 import io.kotest.matchers.ints.shouldBeGreaterThan
 import io.kotest.matchers.ints.shouldBeLessThan
 import io.kotest.matchers.ints.shouldBeLessThanOrEqual
@@ -64,20 +68,24 @@ class SheetStepTest {
         hasHeaderRow: Boolean = true,
         maxCards: Int = 10_000,
         height: Dp = 700.dp,
+        fontScale: Float = 1f,
     ) {
         composeRule.setContent {
-            CaroTheme {
-                Box(modifier = Modifier.size(393.dp, height)) {
-                    SheetStep(
-                        table = table,
-                        sheetIndex = sheetIndex,
-                        hasHeaderRow = hasHeaderRow,
-                        maxCards = maxCards,
-                        onSelectSheet = { index -> selectedIndexes += index },
-                        onChangeHeaderRow = { checked -> headerChanges += checked },
-                        onNext = { nextClicks += 1 },
-                        modifier = Modifier.fillMaxSize(),
-                    )
+            val baseDensity = LocalDensity.current
+            CompositionLocalProvider(LocalDensity provides Density(density = baseDensity.density, fontScale = fontScale)) {
+                CaroTheme {
+                    Box(modifier = Modifier.size(393.dp, height)) {
+                        SheetStep(
+                            table = table,
+                            sheetIndex = sheetIndex,
+                            hasHeaderRow = hasHeaderRow,
+                            maxCards = maxCards,
+                            onSelectSheet = { index -> selectedIndexes += index },
+                            onChangeHeaderRow = { checked -> headerChanges += checked },
+                            onNext = { nextClicks += 1 },
+                            modifier = Modifier.fillMaxSize(),
+                        )
+                    }
                 }
             }
         }
@@ -98,6 +106,8 @@ class SheetStepTest {
         fetchSemanticsNode().config[SemanticsActions.GetTextLayoutResult].action?.invoke(results)
         return results.single()
     }
+
+    private fun textNode(text: String): SemanticsNodeInteraction = composeRule.onNodeWithText(text, useUnmergedTree = true)
 
     private fun manySheetsTable(count: Int): ParsedTable =
         SelectionStepTables.xlsx(sheets = List(count) { index -> "시트 ${index + 1}" to 100 })
@@ -312,6 +322,34 @@ class SheetStepTest {
         val layout = longSheetNameNode().textLayout()
 
         listOf(layout.lineCount, layout.isLineEllipsized(1)) shouldBe listOf(2, true)
+    }
+
+    @Test
+    fun `글자 130퍼센트 미만에서는 행 수가 시트 이름과 같은 줄에 놓인다`() {
+        show(fontScale = 1.25f)
+        val name = textNode("N5 단어").fetchSemanticsNode().boundsInRoot
+        val rowCount = textNode("820행").fetchSemanticsNode().boundsInRoot
+
+        (name.top < rowCount.bottom && rowCount.top < name.bottom) shouldBe true
+    }
+
+    @Test
+    fun `글자 130퍼센트에서는 행 수가 시트 이름 아래 줄로 내려간다`() {
+        show(fontScale = 1.3f)
+        val name = textNode("N5 단어").fetchSemanticsNode().boundsInRoot
+        val rowCount = textNode("820행").fetchSemanticsNode().boundsInRoot
+
+        // 줄 경계의 반올림 오차 1px는 허용한다.
+        name.bottom shouldBeLessThanOrEqual (rowCount.top + 1f)
+    }
+
+    @Test
+    fun `최대 글자 크기에서도 행 수는 시트 이름 아래 줄이다`() {
+        show(fontScale = 2f)
+        val name = textNode("N5 단어").fetchSemanticsNode().boundsInRoot
+        val rowCount = textNode("820행").fetchSemanticsNode().boundsInRoot
+
+        name.bottom shouldBeLessThanOrEqual (rowCount.top + 1f)
     }
 
     @Test

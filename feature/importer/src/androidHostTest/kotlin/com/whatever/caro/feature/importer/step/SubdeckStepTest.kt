@@ -435,6 +435,34 @@ class SubdeckStepTest {
     }
 
     @Test
+    fun `글자 130퍼센트 미만에서는 장수가 하위 덱 이름과 같은 줄에 놓인다`() {
+        show(fontScale = 1.25f)
+        val name = textNode("단어").fetchSemanticsNode().boundsInRoot
+        val count = textNode("1,204장").fetchSemanticsNode().boundsInRoot
+
+        (name.top < count.bottom && count.top < name.bottom) shouldBe true
+    }
+
+    @Test
+    fun `글자 130퍼센트에서는 장수가 하위 덱 이름 아래 줄로 내려간다`() {
+        show(fontScale = 1.3f)
+        val name = textNode("단어").fetchSemanticsNode().boundsInRoot
+        val count = textNode("1,204장").fetchSemanticsNode().boundsInRoot
+
+        // 줄 경계의 반올림 오차 1px는 허용한다.
+        name.bottom shouldBeLessThanOrEqual (count.top + 1f)
+    }
+
+    @Test
+    fun `글자 130퍼센트에서 전체 선택 줄의 장수도 이름 아래 줄로 내려간다`() {
+        show(table = threeSubdeckTable(), selectedIds = persistentSetOf("1", "2"), fontScale = 1.3f)
+        val name = textNode(SELECT_ALL).fetchSemanticsNode().boundsInRoot
+        val count = textNode("2,034장").fetchSemanticsNode().boundsInRoot
+
+        name.bottom shouldBeLessThanOrEqual (count.top + 1f)
+    }
+
+    @Test
     fun `글자 130퍼센트에서는 라벨과 합계와 상한이 위아래로 쌓인다`() {
         show(table = threeSubdeckTable(), selectedIds = persistentSetOf("1", "2"), fontScale = 1.3f)
 
