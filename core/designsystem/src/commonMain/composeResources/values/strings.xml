@@ -48,7 +48,7 @@
 	<string name="deck_field_placeholder_description">Words used often in daily life</string>
 	<string name="deck_field_required">*</string>
 	<string name="deck_tip_label">TIP</string>
-	<string name="deck_tip_max_cards">You can add up to 200 cards per deck.</string>
+	<string name="deck_tip_max_cards">You can add up to 200 cards at a time.</string>
 	<string name="deck_button_create">Create</string>
 	<string name="deck_snackbar_create_error">Failed to create the deck. Please try again.</string>
 	<string name="deck_snackbar_create_success">Deck created successfully.</string>
@@ -109,7 +109,7 @@
 	<string name="card_field_placeholder_back">Enter the text for the back.</string>
 	<string name="card_content_description_swap">Swap front and back</string>
 	<string name="card_tip_label">TIP</string>
-	<string name="card_tip_max_cards">You can add up to 200 cards per deck.</string>
+	<string name="card_tip_max_cards">You can add up to 200 cards at a time.</string>
 	<string name="card_tip_split_by_topic">Splitting decks by topic makes reviewing much
 		easier.</string>
 	<string name="card_counter_added">%1$d added</string>
@@ -119,7 +119,7 @@
 	<string name="card_button_save">Save</string>
 	<string name="card_button_update">Update</string>
 	<string name="card_save_error">Failed to save cards. Please try again.</string>
-	<string name="card_max_cards_reached">A deck can contain up to 200 cards.</string>
+	<string name="card_max_cards_reached">You can add up to 200 cards at a time. Save them, then keep adding.</string>
 	<string name="card_update_error">Failed to update the card. Please try again.</string>
 	<string name="card_list_error">Failed to load cards. Please try again.</string>
 	<string name="card_title_edit">Edit Cards</string>

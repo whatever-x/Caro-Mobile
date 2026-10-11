@@ -47,7 +47,7 @@
     <string name="deck_field_placeholder_description">일상에서 많이 쓰는 단어</string>
     <string name="deck_field_required">*</string>
     <string name="deck_tip_label">TIP</string>
-    <string name="deck_tip_max_cards">한 덱에 최대 200장의 카드를 담을 수 있어요.</string>
+    <string name="deck_tip_max_cards">카드는 한 번에 200장까지 추가할 수 있어요.</string>
     <string name="deck_button_create">만들기</string>
     <string name="deck_snackbar_create_error">덱 만들기에 실패했어요. 잠시 후 다시 시도해주세요.</string>
     <string name="deck_snackbar_create_success">덱 생성이 완료되었습니다.</string>
@@ -108,7 +108,7 @@
     <string name="card_field_placeholder_back">뒷 면에 들어갈 텍스트를 입력하세요.</string>
     <string name="card_content_description_swap">앞면과 뒷면 바꾸기</string>
     <string name="card_tip_label">TIP</string>
-    <string name="card_tip_max_cards">한 덱에 최대 200장의 카드를 담을 수 있어요.</string>
+    <string name="card_tip_max_cards">카드는 한 번에 200장까지 추가할 수 있어요.</string>
     <string name="card_tip_split_by_topic">주제별로 덱을 나누면 복습이 훨씬 쉬워져요.</string>
     <string name="card_counter_added">%1$d장 추가됨</string>
     <string name="card_content_description_remove">카드 삭제</string>
@@ -117,7 +117,7 @@
     <string name="card_button_save">저장하기</string>
     <string name="card_button_update">수정하기</string>
     <string name="card_save_error">카드 저장에 실패했어요. 다시 시도해 주세요.</string>
-    <string name="card_max_cards_reached">한 덱에는 카드 200장까지 추가할 수 있어요.</string>
+    <string name="card_max_cards_reached">한 번에 200장까지 추가할 수 있어요. 저장한 뒤 이어서 추가해 주세요.</string>
     <string name="card_update_error">카드 수정에 실패했어요. 다시 시도해 주세요.</string>
     <string name="card_list_error">카드를 불러오지 못했어요. 다시 시도해 주세요.</string>
     <string name="card_title_edit">카드 편집</string>
