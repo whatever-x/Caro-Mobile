@@ -11,6 +11,7 @@ data class HomeState(
     val decks: ImmutableList<Deck> = persistentListOf(),
     val isLoading: Boolean = true,
     val hasLoadError: Boolean = false,
+    val isCreateDeckBottomSheetVisible: Boolean = false,
 ) : UiState {
     val isLoadedContentVisible: Boolean
         get() = isLoading.not()

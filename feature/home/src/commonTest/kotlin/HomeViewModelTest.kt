@@ -87,7 +87,26 @@ class HomeViewModelTest : FunSpec() {
             }
         }
 
-        test("ClickCreateDeckButton 은 NavigateToCreateDeck 을 방출한다") {
+        test("초기 상태에서는 만들기 방식 선택 시트가 숨겨져 있다") {
+            runTest(testDispatcher) {
+                val viewModel = viewModelWith()
+
+                viewModel.state.value.isCreateDeckBottomSheetVisible shouldBe false
+            }
+        }
+
+        test("ClickCreateDeckButton 은 만들기 방식 선택 시트를 보이게 한다") {
+            runTest(testDispatcher) {
+                val viewModel = viewModelWith()
+
+                viewModel.intent(HomeIntent.ClickCreateDeckButton)
+                advanceUntilIdle()
+
+                viewModel.state.value.isCreateDeckBottomSheetVisible shouldBe true
+            }
+        }
+
+        test("ClickCreateDeckButton 은 이동 side effect 를 방출하지 않는다") {
             runTest(testDispatcher) {
                 val viewModel = viewModelWith()
 
@@ -95,8 +114,108 @@ class HomeViewModelTest : FunSpec() {
                     viewModel.intent(HomeIntent.ClickCreateDeckButton)
                     advanceUntilIdle()
 
-                    awaitItem() shouldBe HomeSideEffect.NavigateToCreateDeck
+                    expectNoEvents()
                 }
+            }
+        }
+
+        test("DismissCreateDeckBottomSheet 는 만들기 방식 선택 시트를 숨긴다") {
+            runTest(testDispatcher) {
+                val viewModel = viewModelWith()
+                viewModel.intent(HomeIntent.ClickCreateDeckButton)
+                advanceUntilIdle()
+
+                viewModel.intent(HomeIntent.DismissCreateDeckBottomSheet)
+                advanceUntilIdle()
+
+                viewModel.state.value.isCreateDeckBottomSheetVisible shouldBe false
+            }
+        }
+
+        test("DismissCreateDeckBottomSheet 는 이동 side effect 를 방출하지 않는다") {
+            runTest(testDispatcher) {
+                val viewModel = viewModelWith()
+                viewModel.intent(HomeIntent.ClickCreateDeckButton)
+                advanceUntilIdle()
+
+                viewModel.sideEffect.test {
+                    viewModel.intent(HomeIntent.DismissCreateDeckBottomSheet)
+                    advanceUntilIdle()
+
+                    expectNoEvents()
+                }
+            }
+        }
+
+        test("시트에서 ClickCreateDeck 을 누르면 시트를 숨긴다") {
+            runTest(testDispatcher) {
+                val viewModel = viewModelWith()
+                viewModel.intent(HomeIntent.ClickCreateDeckButton)
+                advanceUntilIdle()
+
+                viewModel.intent(HomeIntent.ClickCreateDeck)
+                advanceUntilIdle()
+
+                viewModel.state.value.isCreateDeckBottomSheetVisible shouldBe false
+            }
+        }
+
+        test("시트에서 ClickCreateDeck 을 누르면 NavigateToCreateDeck 을 한 번만 방출한다") {
+            runTest(testDispatcher) {
+                val viewModel = viewModelWith()
+                viewModel.intent(HomeIntent.ClickCreateDeckButton)
+                advanceUntilIdle()
+
+                viewModel.sideEffect.test {
+                    viewModel.intent(HomeIntent.ClickCreateDeck)
+                    advanceUntilIdle()
+
+                    awaitItem() shouldBe HomeSideEffect.NavigateToCreateDeck
+                    expectNoEvents()
+                }
+            }
+        }
+
+        test("시트에서 ClickImportDeck 을 누르면 시트를 숨긴다") {
+            runTest(testDispatcher) {
+                val viewModel = viewModelWith()
+                viewModel.intent(HomeIntent.ClickCreateDeckButton)
+                advanceUntilIdle()
+
+                viewModel.intent(HomeIntent.ClickImportDeck)
+                advanceUntilIdle()
+
+                viewModel.state.value.isCreateDeckBottomSheetVisible shouldBe false
+            }
+        }
+
+        test("시트에서 ClickImportDeck 을 누르면 NavigateToImportDeck 을 한 번만 방출한다") {
+            runTest(testDispatcher) {
+                val viewModel = viewModelWith()
+                viewModel.intent(HomeIntent.ClickCreateDeckButton)
+                advanceUntilIdle()
+
+                viewModel.sideEffect.test {
+                    viewModel.intent(HomeIntent.ClickImportDeck)
+                    advanceUntilIdle()
+
+                    awaitItem() shouldBe HomeSideEffect.NavigateToImportDeck
+                    expectNoEvents()
+                }
+            }
+        }
+
+        test("Initialize 는 열려 있는 만들기 방식 선택 시트를 닫지 않는다") {
+            runTest(testDispatcher) {
+                val viewModel = viewModelWith()
+                viewModel.intent(HomeIntent.ClickCreateDeckButton)
+                advanceUntilIdle()
+
+                // 앱이 백그라운드에서 돌아오면 홈이 다시 불러오므로 그때 사용자가 보던 시트가 사라지면 안 된다.
+                viewModel.intent(HomeIntent.Initialize)
+                advanceUntilIdle()
+
+                viewModel.state.value.isCreateDeckBottomSheetVisible shouldBe true
             }
         }
 

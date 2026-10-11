@@ -53,6 +53,7 @@ import com.whatever.caro.core.designsystem.themes.CaroTheme
 import com.whatever.caro.core.model.deck.Deck
 import com.whatever.caro.core.model.deck.DeckState
 import com.whatever.caro.core.ui.loading.CaroLoadingOverlayBox
+import com.whatever.caro.feature.home.component.CreateDeckSheet
 import com.whatever.caro.feature.home.component.Deck
 import com.whatever.caro.feature.home.mvi.HomeIntent
 import com.whatever.caro.feature.home.mvi.HomeState
@@ -260,6 +261,13 @@ internal fun HomeScreen(
                     )
                 }
             }
+        }
+        if (state.isCreateDeckBottomSheetVisible) {
+            CreateDeckSheet(
+                onCreateDeck = { onIntent(HomeIntent.ClickCreateDeck) },
+                onImportDeck = { onIntent(HomeIntent.ClickImportDeck) },
+                onDismissRequest = { onIntent(HomeIntent.DismissCreateDeckBottomSheet) },
+            )
         }
     }
 }

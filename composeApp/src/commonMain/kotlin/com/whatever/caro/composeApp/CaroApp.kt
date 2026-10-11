@@ -55,6 +55,7 @@ import com.whatever.caro.core.navigator.entries.EditCardEntry
 import com.whatever.caro.core.navigator.entries.EditDeckEntry
 import com.whatever.caro.core.navigator.entries.EditProfileEntry
 import com.whatever.caro.core.navigator.entries.HomeEntry
+import com.whatever.caro.core.navigator.entries.ImportDeckEntry
 import com.whatever.caro.core.navigator.entries.LearningEntry
 import com.whatever.caro.core.navigator.entries.LoginEntry
 import com.whatever.caro.core.navigator.entries.SettingEntry
@@ -104,6 +105,7 @@ fun CaroApp(
                             subclass(SettingEntry::class, SettingEntry.serializer())
                             subclass(EditDeckEntry::class, EditDeckEntry.serializer())
                             subclass(LearningEntry::class, LearningEntry.serializer())
+                            subclass(ImportDeckEntry::class, ImportDeckEntry.serializer())
                         }
                     }
             }

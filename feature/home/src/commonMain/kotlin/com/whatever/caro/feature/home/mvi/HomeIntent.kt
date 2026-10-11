@@ -12,11 +12,15 @@ sealed interface HomeIntent : UiIntent {
 
     data object ClickCreateDeckButton : HomeIntent
 
+    data object DismissCreateDeckBottomSheet : HomeIntent
+
     data class ClickDeckButton(
         val deck: Deck,
     ) : HomeIntent
 
     data object ClickCreateDeck : HomeIntent
+
+    data object ClickImportDeck : HomeIntent
 
     data class ClickStartLearning(
         val deckId: Long,

@@ -20,6 +20,27 @@ private fun com.whatever.caro.feature.home.HomeStreakBanner(state: com.whatever.
     - state: STABLE (class with no mutable properties)
 
 @Composable
+internal fun com.whatever.caro.feature.home.component.CreateDeckSheet(onCreateDeck: kotlin.Function0<kotlin.Unit>, onImportDeck: kotlin.Function0<kotlin.Unit>, onDismissRequest: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - onCreateDeck: STABLE (function type)
+    - onImportDeck: STABLE (function type)
+    - onDismissRequest: STABLE (function type)
+    - modifier: STABLE (marked @Stable or @Immutable)
+
+@Composable
+private fun com.whatever.caro.feature.home.component.CreateDeckSheetItem(title: kotlin.String, body: kotlin.String, icon: org.jetbrains.compose.resources.DrawableResource, onClick: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - title: STABLE (String is immutable)
+    - body: STABLE (String is immutable)
+    - icon: STABLE (marked @Stable or @Immutable)
+    - onClick: STABLE (function type)
+    - modifier: STABLE (marked @Stable or @Immutable)
+
+@Composable
 private fun com.whatever.caro.feature.home.component.CtaButton(state: com.whatever.caro.core.model.deck.DeckState, onClick: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
   skippable: true
   restartable: true
