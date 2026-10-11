@@ -22,8 +22,8 @@ internal object ImportSaveScreenshotScenario {
     const val DECK_INFO_PREFILLED_ID = "importer.deck_info.prefilled"
     const val SAVING_PROGRESS_ID = "importer.saving.progress"
 
-    private const val DECK_NAME = "JLPT N5 단어"
-    private const val TOTAL_CARDS = 1_512
+    const val DECK_NAME = "JLPT N5 단어"
+    const val TOTAL_CARDS = 1_512
 
     // 덱 정보는 카드 장수만 읽으므로 카드 목록은 비워 둔다.
     private val PREVIEW =
