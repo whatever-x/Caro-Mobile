@@ -441,6 +441,7 @@
 	<string name="import_sheet_import_title">Import cards</string>
 	<string name="import_sheet_import_body">Create a deck from Anki, Quizlet or Excel</string>
 	<!-- import accessibility -->
+	<string name="import_a11y_back">Back</string>
 	<string name="import_a11y_field_selected">%1$s, selected, %2$s position %3$s</string>
 	<string name="import_a11y_field_unavailable">Unavailable</string>
 	<string name="import_a11y_pick_fields">Choose items for %1$s, %3$s of %2$s selected</string>

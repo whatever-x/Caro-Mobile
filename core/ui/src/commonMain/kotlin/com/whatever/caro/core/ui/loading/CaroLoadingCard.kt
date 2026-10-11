@@ -31,10 +31,10 @@ fun CaroLoadingCard(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         ScreenLoadingLottie()
-        Spacer(modifier = Modifier.height(CaroTheme.spacing.m))
+        Spacer(modifier = Modifier.height(CaroTheme.spacing.l))
         Text(
             text = message,
-            style = CaroTheme.typography.body1,
+            style = CaroTheme.typography.heading2,
             color = CaroTheme.color.text.primary,
             textAlign = TextAlign.Center,
         )

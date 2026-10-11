@@ -7,6 +7,7 @@ plugins {
     id("caro.koin")
     id("caro.kmp.test")
     id("caro.kover")
+    id("caro.screenshot")
 }
 
 // 연결 후 처리 테스트는 파서 모듈의 fixture를 함께 쓴다. iOS 시뮬레이터 테스트의 작업 디렉터리가 모듈 경로가 아니므로 절대 경로 상수로 넘긴다.
@@ -49,6 +50,7 @@ kotlin {
         commonMain.dependencies {
             implementation(projects.core.model)
             implementation(projects.core.importparser)
+            implementation(projects.core.util)
         }
         commonTest {
             kotlin.srcDir(generateFixtureRoot)
