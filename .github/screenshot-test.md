@@ -1,6 +1,6 @@
 # Screenshot Test
 
-`scripts/screenshot/scenarios.json` registers the screenshot scenarios across feature modules (currently 14). Each fixed `commonTest` scenario is rendered by Android `androidHostTest` and iOS `iosSimulatorArm64Test`, without a ViewModel or API.
+`scripts/screenshot/scenarios.json` registers the screenshot scenarios across feature modules (currently 25). Each fixed `commonTest` scenario is rendered by Android `androidHostTest` and iOS `iosSimulatorArm64Test`, without a ViewModel or API.
 
 ## Local runs
 
