@@ -12,9 +12,14 @@ import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertIsNotFocused
 import androidx.compose.ui.test.click
 import androidx.compose.ui.test.getUnclippedBoundsInRoot
+import androidx.compose.ui.test.hasAnyAncestor
+import androidx.compose.ui.test.hasClickAction
+import androidx.compose.ui.test.hasScrollAction
+import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.isDialog
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performTouchInput
 import com.whatever.caro.core.designsystem.themes.CaroTheme
@@ -37,10 +42,11 @@ class CaroFullTextDialogTest {
     private fun showDialog(
         sections: List<CaroFullTextSection>,
         onDismiss: () -> Unit = {},
+        closeLabel: String? = null,
     ) {
         composeRule.setContent {
             CaroTheme {
-                CaroFullTextDialog(sections = sections, onDismiss = onDismiss)
+                CaroFullTextDialog(sections = sections, onDismiss = onDismiss, closeLabel = closeLabel)
             }
         }
         composeRule.waitForIdle()
@@ -58,6 +64,14 @@ class CaroFullTextDialogTest {
             .top.value
 
     private fun headingNodes() = composeRule.onAllNodes(SemanticsMatcher.keyIsDefined(SemanticsProperties.Heading))
+
+    private fun closeButton(): SemanticsNodeInteraction = composeRule.onNode(hasText(CLOSE_LABEL) and hasClickAction())
+
+    private fun scrollerHeightDp(): Float =
+        composeRule
+            .onNode(hasScrollAction() and hasAnyAncestor(isDialog()))
+            .getUnclippedBoundsInRoot()
+            .let { bounds -> (bounds.bottom - bounds.top).value }
 
     private fun SemanticsNodeInteraction.assertIsHeading(): SemanticsNodeInteraction =
         assert(SemanticsMatcher.keyIsDefined(SemanticsProperties.Heading))
@@ -200,12 +214,78 @@ class CaroFullTextDialogTest {
         composeRule.onNodeWithText(BACK_BODY).assertIsDisplayed()
     }
 
+    @Test
+    fun `닫기 문구를 주면 닫기 버튼을 보여준다`() {
+        showDialog(FRONT_AND_BACK, closeLabel = CLOSE_LABEL)
+
+        closeButton().assertIsDisplayed()
+    }
+
+    @Test
+    fun `닫기 문구가 없으면 닫기 버튼이 없다`() {
+        showFrontAndBack()
+
+        composeRule.onNodeWithText(CLOSE_LABEL).assertDoesNotExist()
+    }
+
+    @Test
+    fun `닫기 버튼을 누르면 onDismiss를 한 번 호출한다`() {
+        var dismissCount = 0
+        showDialog(FRONT_AND_BACK, onDismiss = { dismissCount += 1 }, closeLabel = CLOSE_LABEL)
+
+        closeButton().performClick()
+        composeRule.waitForIdle()
+
+        dismissCount shouldBe 1
+    }
+
+    @Test
+    fun `닫기 버튼이 있어도 열리면 첫 제목에 포커스를 둔다`() {
+        showDialog(FRONT_AND_BACK, closeLabel = CLOSE_LABEL)
+
+        composeRule.onNodeWithText(FRONT_TITLE).assertIsFocused()
+    }
+
+    @Test
+    fun `닫기 버튼이 있고 내용이 짧으면 내용 높이만큼만 차지한다`() {
+        showDialog(FRONT_AND_BACK, closeLabel = CLOSE_LABEL)
+
+        scrollerHeightDp() shouldBeLessThan SHORT_CONTENT_LIMIT_DP
+    }
+
+    @Test
+    fun `닫기 버튼이 있고 내용이 길면 구역만 스크롤되고 닫기 버튼은 계속 보인다`() {
+        showDialog(
+            listOf(
+                CaroFullTextSection(title = FRONT_TITLE, body = LONG_BODY),
+                CaroFullTextSection(title = BACK_TITLE, body = BACK_BODY),
+            ),
+            closeLabel = CLOSE_LABEL,
+        )
+
+        closeButton().assertIsDisplayed()
+        composeRule.onNodeWithText(BACK_BODY).assertIsNotDisplayed()
+    }
+
+    @Test
+    fun `닫기 버튼이 있어도 다이얼로그 밖을 누르면 onDismiss를 한 번 호출한다`() {
+        var dismissCount = 0
+        showDialog(FRONT_AND_BACK, onDismiss = { dismissCount += 1 }, closeLabel = CLOSE_LABEL)
+
+        composeRule.onNode(isDialog()).performTouchInput { click(Offset(OUTSIDE_TAP_PX, OUTSIDE_TAP_PX)) }
+        composeRule.waitForIdle()
+
+        dismissCount shouldBe 1
+    }
+
     private companion object {
         const val FRONT_TITLE = "앞면"
         const val BACK_TITLE = "뒷면"
         const val FRONT_BODY = "apple"
         const val BACK_BODY = "사과"
         const val BODY_ONLY = "제목 없는 전체 글"
+        const val CLOSE_LABEL = "닫기"
+        const val SHORT_CONTENT_LIMIT_DP = 300f
         const val LONG_BODY_LINES = 300
         const val OUTSIDE_TAP_PX = 4f
         val LONG_BODY = List(LONG_BODY_LINES) { "긴 본문 $it 줄" }.joinToString(separator = "\n")

@@ -19,7 +19,9 @@ import caromobile.core.designsystem.generated.resources.import_title_source
 import caromobile.core.designsystem.generated.resources.import_title_subdeck
 import caromobile.core.designsystem.generated.resources.import_title_text_check
 import caromobile.core.designsystem.generated.resources.import_value_empty_field
+import caromobile.core.designsystem.generated.resources.import_value_file_description
 import caromobile.core.designsystem.generated.resources.import_value_paste_deck_name
+import caromobile.core.designsystem.generated.resources.import_value_paste_description
 import com.whatever.caro.core.designsystem.themes.CaroTheme
 import com.whatever.caro.core.model.importing.ImportLimits
 import com.whatever.caro.feature.importer.component.ImportCreatingDeckOverlay
@@ -30,10 +32,12 @@ import com.whatever.caro.feature.importer.logic.resolveDelimiter
 import com.whatever.caro.feature.importer.logic.spreadsheetDateStyleFor
 import com.whatever.caro.feature.importer.mvi.ImportDeckIntent
 import com.whatever.caro.feature.importer.mvi.ImportDeckState
+import com.whatever.caro.feature.importer.mvi.ImportDialog
 import com.whatever.caro.feature.importer.mvi.ImportLoading
 import com.whatever.caro.feature.importer.mvi.ImportStep
 import com.whatever.caro.feature.importer.step.MappingStep
 import com.whatever.caro.feature.importer.step.PasteStep
+import com.whatever.caro.feature.importer.step.PreviewStep
 import com.whatever.caro.feature.importer.step.SheetStep
 import com.whatever.caro.feature.importer.step.SourceStep
 import com.whatever.caro.feature.importer.step.SubdeckStep
@@ -52,6 +56,9 @@ internal fun ImportDeckScreen(
     val previewKey = rememberInputKey(state.preview)
     val pasteSourceName = stringResource(Res.string.import_value_paste_deck_name)
     val emptySideText = stringResource(Res.string.import_value_empty_field)
+    // 파일 이름은 ViewModel이 120자로 줄여 {file} 자리에 넣는다.
+    val fileDescriptionTemplate = stringResource(Res.string.import_value_file_description, "{file}")
+    val pasteDescription = stringResource(Res.string.import_value_paste_description)
     val dateStyle = spreadsheetDateStyleFor(Locale.current.language)
 
     ImportCreatingDeckOverlay(isCreating = state.step == ImportStep.CreatingDeck) {
@@ -153,7 +160,22 @@ internal fun ImportDeckScreen(
                         }
 
                         ImportStep.Preview -> {
-                            Unit
+                            val table = state.table
+                            val preview = state.preview
+                            if (table != null && preview != null) {
+                                PreviewStep(
+                                    preview = preview,
+                                    format = table.format,
+                                    isPaste = state.isPaste,
+                                    filter = state.previewFilter,
+                                    detailCard = (state.dialog as? ImportDialog.CardDetail)?.card,
+                                    maxCards = ImportLimits.MAX_CARDS,
+                                    onSelectFilter = { filter -> onIntent(ImportDeckIntent.SelectPreviewFilter(filter)) },
+                                    onClickCard = { card -> onIntent(ImportDeckIntent.ClickCard(card)) },
+                                    onDismissDetail = { onIntent(ImportDeckIntent.DismissDialog) },
+                                    onNext = { onIntent(ImportDeckIntent.ClickPreviewNext(fileDescriptionTemplate, pasteDescription)) },
+                                )
+                            }
                         }
 
                         ImportStep.DeckInfo, ImportStep.CreatingDeck -> {
