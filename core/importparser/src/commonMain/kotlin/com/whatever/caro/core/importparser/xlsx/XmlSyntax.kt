@@ -19,8 +19,8 @@ internal object XmlEntities {
         val out = StringBuilder(raw.length)
         var index = 0
         while (index < raw.length) {
-            val end = if (raw[index] == '&') raw.indexOf(';', index) else -1
-            val replacement = if (end > index && end - index <= MAX_ENTITY_LENGTH) resolve(raw.substring(index + 1, end)) else null
+            val end = if (raw[index] == '&') entityEnd(raw, index) else -1
+            val replacement = if (end > index) resolve(raw.substring(index + 1, end)) else null
             if (replacement == null) {
                 out.append(raw[index])
                 index++
@@ -30,6 +30,18 @@ internal object XmlEntities {
             }
         }
         return out.toString()
+    }
+
+    // ';'를 문자열 끝까지 찾으면 종결자 없는 '&'가 이어질 때 입력 길이의 제곱에 비례하는 시간이 든다.
+    private fun entityEnd(
+        raw: String,
+        start: Int,
+    ): Int {
+        val last = minOf(raw.lastIndex, start + MAX_ENTITY_LENGTH)
+        for (position in start + 1..last) {
+            if (raw[position] == ';') return position
+        }
+        return -1
     }
 
     private fun resolve(name: String): String? =

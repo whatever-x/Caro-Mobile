@@ -15,6 +15,7 @@ import com.whatever.caro.core.importparser.text.decodeStrictUtf8
 import com.whatever.caro.core.importparser.xlsx.XlsxNumberFormat
 import com.whatever.caro.core.importparser.xlsx.XlsxSheetReader
 import com.whatever.caro.core.importparser.xlsx.XmlPullReader
+import com.whatever.caro.core.importparser.xlsx.forEachEvent
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.collections.shouldBeEmpty
@@ -279,6 +280,22 @@ class ParserHardeningTest : FunSpec() {
                     )
 
                 shouldThrow<CancellationException> { archive.open("xl/worksheets/sheet1.xml").readUtf8() }
+            }
+
+            test("XML 이벤트를 읽는 반복문은 이벤트마다 취소를 확인한다") {
+                val path = temp("cancel-events.xlsx")
+                TestZip.xlsx(path, TestZip.sheet("<row r=\"1\"/>".repeat(200)))
+                var checks = 0
+                val archive =
+                    ZipArchive.open(
+                        Fixtures.fileSystem,
+                        path,
+                        Fixtures.fileSystem.metadata(path).size ?: error("size unknown"),
+                        ArchiveLimits(),
+                        checkCancelled = { if (++checks > 50) throw CancellationException("stop") },
+                    )
+
+                shouldThrow<CancellationException> { archive.forEachEvent("xl/worksheets/sheet1.xml") { } }
             }
 
             test("Anki 행을 읽는 SQLite 반복문도 취소되면 다음 행에서 멈추고 임시 파일을 남기지 않는다").config(enabled = nativeArchiveLibrariesLoadable) {

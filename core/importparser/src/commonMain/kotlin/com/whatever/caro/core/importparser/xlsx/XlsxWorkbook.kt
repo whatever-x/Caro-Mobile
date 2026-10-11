@@ -93,6 +93,9 @@ internal inline fun ZipArchive.forEachEvent(
 ) {
     open(part).use { source ->
         val reader = XmlPullReader(source)
-        while (true) action(reader.next() ?: break)
+        while (true) {
+            ensureActive()
+            action(reader.next() ?: break)
+        }
     }
 }
