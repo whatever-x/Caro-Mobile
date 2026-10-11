@@ -3,6 +3,7 @@ plugins {
     id("caro.kmp.ios")
     id("caro.kmp.android")
     id("caro.cmp")
+    id("caro.kmp.test")
 }
 
 kotlin {
@@ -19,6 +20,15 @@ kotlin {
             implementation(libs.coil.mp)
             implementation(libs.compottie.lite)
             implementation(libs.jetbrains.androidx.navigation3.event)
+        }
+
+        getByName("androidHostTest") {
+            dependencies {
+                implementation(libs.robolectric)
+                implementation(libs.compose.ui.test.junit4)
+                runtimeOnly(libs.compose.ui.test.manifest)
+                runtimeOnly(libs.junit.vintage.engine)
+            }
         }
     }
 }
