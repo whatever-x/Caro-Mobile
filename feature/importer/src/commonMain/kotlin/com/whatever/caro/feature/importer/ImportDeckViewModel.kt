@@ -3,29 +3,41 @@ package com.whatever.caro.feature.importer
 import com.whatever.caro.core.importparser.SpreadsheetDateStyle
 import com.whatever.caro.core.importparser.model.ImportFormat
 import com.whatever.caro.core.importparser.model.ParsedTable
+import com.whatever.caro.core.model.deck.DeckInputLimits
 import com.whatever.caro.core.viewmodel.BaseViewModel
 import com.whatever.caro.core.viewmodel.ExceptionFilter
 import com.whatever.caro.feature.importer.logic.classifyPick
+import com.whatever.caro.feature.importer.logic.deckInfoPrefill
+import com.whatever.caro.feature.importer.logic.importableNoteTypes
 import com.whatever.caro.feature.importer.logic.isEmptyImport
 import com.whatever.caro.feature.importer.logic.isIgnoredWhileBusy
 import com.whatever.caro.feature.importer.logic.isReadFailure
 import com.whatever.caro.feature.importer.logic.isSelectableSubdeck
 import com.whatever.caro.feature.importer.logic.isSheetEmpty
+import com.whatever.caro.feature.importer.logic.mappingBlockReason
 import com.whatever.caro.feature.importer.logic.pasteBlockReason
 import com.whatever.caro.feature.importer.logic.pickFailedDialog
+import com.whatever.caro.feature.importer.logic.previewBlockReason
 import com.whatever.caro.feature.importer.logic.readFailureDialog
+import com.whatever.caro.feature.importer.logic.selectionStep
 import com.whatever.caro.feature.importer.logic.summarizeSubdeckSelection
+import com.whatever.caro.feature.importer.logic.takeWithoutSplittingSurrogate
 import com.whatever.caro.feature.importer.logic.toggleAllSubdecks
+import com.whatever.caro.feature.importer.logic.toggleField
 import com.whatever.caro.feature.importer.mvi.ImportDeckIntent
 import com.whatever.caro.feature.importer.mvi.ImportDeckSideEffect
 import com.whatever.caro.feature.importer.mvi.ImportDeckState
 import com.whatever.caro.feature.importer.mvi.ImportDialog
 import com.whatever.caro.feature.importer.mvi.ImportDismissPolicy
 import com.whatever.caro.feature.importer.mvi.ImportLoading
+import com.whatever.caro.feature.importer.mvi.ImportPreviewFilter
 import com.whatever.caro.feature.importer.mvi.ImportSelection
 import com.whatever.caro.feature.importer.mvi.ImportStep
+import com.whatever.caro.feature.importer.mvi.SavingProgress
 import com.whatever.caro.feature.importer.platform.PickResult
 import com.whatever.caro.feature.importer.platform.PickedImportFile
+import com.whatever.caro.feature.importer.save.DeckCreationResult
+import com.whatever.caro.feature.importer.save.ImportSaveCoordinatorFactory
 import com.whatever.caro.feature.importer.source.ImportCopyResult
 import com.whatever.caro.feature.importer.source.ImportDispatchers
 import com.whatever.caro.feature.importer.source.ImportFileCopy
@@ -33,6 +45,7 @@ import com.whatever.caro.feature.importer.source.ImportLimitsConfig
 import com.whatever.caro.feature.importer.source.ImportReadSource
 import com.whatever.caro.feature.importer.source.ImportSourceReader
 import com.whatever.caro.feature.importer.source.ImportTempStorage
+import com.whatever.caro.feature.importer.transform.ImportPreviewBuilder
 import com.whatever.caro.feature.importer.transform.defaultFieldMappings
 import kotlinx.collections.immutable.toPersistentMap
 import kotlinx.collections.immutable.toPersistentSet
@@ -43,17 +56,28 @@ import kotlinx.coroutines.withContext
 
 private const val APKG_EXTENSION = "apkg"
 
+// 이름이나 설명 값을 거절한 서버 코드. 그 밖의 거절은 입력을 고쳐도 소용없어 안내 문구가 다르다.
+private val DECK_INPUT_ERROR_CODES = setOf("C001", "C002")
+
 class ImportDeckViewModel internal constructor(
     private val sourceReader: ImportSourceReader,
     private val tempStorage: ImportTempStorage,
     private val fileCopy: ImportFileCopy,
     private val limits: ImportLimitsConfig,
     private val dispatchers: ImportDispatchers,
+    private val saveCoordinatorFactory: ImportSaveCoordinatorFactory,
     exceptionFilter: ExceptionFilter,
 ) : BaseViewModel<ImportDeckState, ImportDeckIntent, ImportDeckSideEffect>(ImportDeckState(), exceptionFilter) {
     private var source: ImportReadSource? = null
     private var readJob: Job? = null
     private var generation = 0
+    private val previewBuilder = ImportPreviewBuilder()
+
+    // 선택 단계에서 돌아왔을 때 고친 연결을 이어 쓸지 가리는 기준이다. 연결을 만든 시점의 노트 유형별 항목 이름을 둔다.
+    private var mappedFieldNames: Map<String, List<String>> = emptyMap()
+
+    // 덱 정보 미리 채움은 읽은 원본마다 한 번이다. 새로 읽으면 다시 채워야 하므로 읽기 성공 시점에 내린다.
+    private var isDeckInfoPrefilled = false
 
     init {
         // 비동기로 지우면 첫 복사와 겹칠 수 있어, 생성 시점에 이전 실행이 남긴 파일을 동기로 지운다.
@@ -76,6 +100,15 @@ class ImportDeckViewModel internal constructor(
             is ImportDeckIntent.SelectDelimiter -> onSelectDelimiter(intent.delimiter)
             is ImportDeckIntent.ChangeHeaderRow -> onChangeHeaderRow(intent.hasHeaderRow)
             ImportDeckIntent.ClickSelectionNext -> onClickSelectionNext()
+            is ImportDeckIntent.ToggleNoteType -> onToggleNoteType(intent.noteTypeId)
+            is ImportDeckIntent.ToggleField -> onToggleField(intent)
+            is ImportDeckIntent.ClickMappingNext -> onClickMappingNext(intent.emptySideText)
+            is ImportDeckIntent.SelectPreviewFilter -> onSelectPreviewFilter(intent.filter)
+            is ImportDeckIntent.ClickPreviewNext -> onClickPreviewNext(intent)
+            is ImportDeckIntent.UpdateDeckName -> onUpdateDeckName(intent.name)
+            is ImportDeckIntent.UpdateDeckDescription -> onUpdateDeckDescription(intent.description)
+            ImportDeckIntent.ClickCreateDeck -> onClickCreateDeck()
+            ImportDeckIntent.RetryCreateDeck -> onRetryCreateDeck()
             ImportDeckIntent.ConfirmDiscard -> onConfirmDiscard()
             else -> Unit
         }
@@ -111,6 +144,9 @@ class ImportDeckViewModel internal constructor(
             ImportStep.Paste -> reduce { copy(step = ImportStep.Source, isPaste = false) }
             ImportStep.TextCheck -> if (state.isPaste) leaveReadResult() else reduce { copy(dialog = ImportDialog.DiscardConfirm) }
             ImportStep.SubdeckSelect, ImportStep.SheetSelect -> reduce { copy(dialog = ImportDialog.DiscardConfirm) }
+            ImportStep.Mapping -> state.table?.let { table -> reduce { copy(step = selectionStep(table.format)) } }
+            ImportStep.Preview -> reduce { copy(step = ImportStep.Mapping, preview = null, previewFilter = ImportPreviewFilter.All) }
+            ImportStep.DeckInfo -> reduce { copy(step = ImportStep.Preview) }
             else -> Unit
         }
     }
@@ -296,8 +332,8 @@ class ImportDeckViewModel internal constructor(
         val table = state.table ?: return
         when {
             state.step == ImportStep.SubdeckSelect -> rereadSubdecks(table, state.selection)
-            state.step == ImportStep.SheetSelect && !isSheetEmpty(table, state.selection.sheetIndex) -> moveToMapping(table)
-            state.step == ImportStep.TextCheck -> moveToMapping(table)
+            state.step == ImportStep.SheetSelect && !isSheetEmpty(table, state.selection.sheetIndex) -> enterMapping(table)
+            state.step == ImportStep.TextCheck -> enterMapping(table)
         }
     }
 
@@ -312,16 +348,7 @@ class ImportDeckViewModel internal constructor(
         reduce { copy(loading = ImportLoading.Reparsing(read.name)) }
         startRead(
             read = { read.read(sourceReader, dispatchers, subdeckIds = selection.subdeckIds) },
-            onRead = { reread ->
-                reduce {
-                    copy(
-                        loading = null,
-                        step = ImportStep.Mapping,
-                        table = reread,
-                        mappings = defaultFieldMappings(reread).toPersistentMap(),
-                    )
-                }
-            },
+            onRead = ::enterMapping,
         )
     }
 
@@ -347,8 +374,114 @@ class ImportDeckViewModel internal constructor(
         )
     }
 
-    private fun moveToMapping(table: ParsedTable) {
-        reduce { copy(step = ImportStep.Mapping, mappings = defaultFieldMappings(table).toPersistentMap()) }
+    /** 항목 이름이 달라진 유형에 옛 연결을 쓰면 없는 항목을 가리켜 빈 카드가 되므로, 유형별 항목 이름이 모두 같을 때만 고친 연결을 이어 쓴다. */
+    private fun enterMapping(table: ParsedTable) {
+        val fieldNames = importableNoteTypes(table).associate { type -> type.id to type.fieldNames }
+        val keepEdits = currentState.mappings.isNotEmpty() && fieldNames == mappedFieldNames
+        mappedFieldNames = fieldNames
+        reduce {
+            copy(
+                loading = null,
+                step = ImportStep.Mapping,
+                table = table,
+                mappings = if (keepEdits) mappings else defaultFieldMappings(table).toPersistentMap(),
+            )
+        }
+    }
+
+    private fun onToggleNoteType(noteTypeId: String) {
+        val state = currentState
+        val mapping = state.mappings[noteTypeId]
+        if (state.step != ImportStep.Mapping || mapping == null) return
+        reduce { copy(mappings = mappings.put(noteTypeId, mapping.copy(excluded = !mapping.excluded))) }
+    }
+
+    private fun onToggleField(intent: ImportDeckIntent.ToggleField) {
+        val state = currentState
+        val mapping = state.mappings[intent.noteTypeId]
+        if (state.step != ImportStep.Mapping || mapping == null) return
+        val toggled = toggleField(mapping, intent.target, intent.fieldName).mapping
+        reduce { copy(mappings = mappings.put(intent.noteTypeId, toggled)) }
+    }
+
+    private fun onClickMappingNext(emptySideText: String) {
+        val state = currentState
+        val table = state.table ?: return
+        if (state.step != ImportStep.Mapping || mappingBlockReason(table, state.mappings) != null) return
+        reduce { copy(loading = ImportLoading.BuildingPreview) }
+        val ticket = nextTicket()
+        readJob =
+            launch {
+                val preview =
+                    withContext(dispatchers.default) {
+                        previewBuilder.build(table, state.mappings, emptySideText, limits.maxCards)
+                    }
+                if (ticket == generation) {
+                    reduce { copy(loading = null, step = ImportStep.Preview, preview = preview, previewFilter = ImportPreviewFilter.All) }
+                }
+            }
+    }
+
+    private fun onSelectPreviewFilter(filter: ImportPreviewFilter) {
+        if (currentState.step != ImportStep.Preview) return
+        reduce { copy(previewFilter = filter) }
+    }
+
+    private fun onClickPreviewNext(intent: ImportDeckIntent.ClickPreviewNext) {
+        val state = currentState
+        val table = state.table ?: return
+        val preview = state.preview ?: return
+        if (state.step != ImportStep.Preview || previewBlockReason(preview, table.format, state.isPaste) != null) return
+        if (isDeckInfoPrefilled) {
+            reduce { copy(step = ImportStep.DeckInfo) }
+            return
+        }
+        val prefill = deckInfoPrefill(table, state.isPaste, state.selection, intent.fileDescriptionTemplate, intent.pasteDescription)
+        isDeckInfoPrefilled = true
+        reduce { copy(step = ImportStep.DeckInfo, deckName = prefill.name, deckDescription = prefill.description) }
+    }
+
+    private fun onUpdateDeckName(name: String) {
+        if (currentState.step != ImportStep.DeckInfo) return
+        reduce { copy(deckName = name.takeWithoutSplittingSurrogate(DeckInputLimits.NAME_MAX)) }
+    }
+
+    private fun onUpdateDeckDescription(description: String) {
+        if (currentState.step != ImportStep.DeckInfo) return
+        reduce { copy(deckDescription = description.takeWithoutSplittingSurrogate(DeckInputLimits.DESC_MAX)) }
+    }
+
+    private suspend fun onClickCreateDeck() {
+        val state = currentState
+        if (state.step != ImportStep.DeckInfo || !state.isDeckInfoConfirmEnabled) return
+        createDeck()
+    }
+
+    private suspend fun onRetryCreateDeck() {
+        if (currentState.dialog != ImportDialog.DeckCreateFailed) return
+        reduce { copy(dialog = null) }
+        createDeck()
+    }
+
+    /** 단계를 먼저 바꿔 연달아 누른 입력을 [isIgnoredWhileBusy]가 막게 한다. 자동으로 다시 보내지 않는다. */
+    private suspend fun createDeck() {
+        val state = currentState
+        val cardCount = state.preview?.cards?.size ?: return
+        reduce { copy(step = ImportStep.CreatingDeck) }
+        when (val result = saveCoordinatorFactory.create().createDeck(state.deckName, state.deckDescription)) {
+            is DeckCreationResult.Created -> {
+                reduce { copy(step = ImportStep.Saving, saving = SavingProgress(deckName = state.deckName, totalCards = cardCount)) }
+            }
+
+            is DeckCreationResult.Failed -> {
+                reduce { copy(step = ImportStep.DeckInfo, dialog = ImportDialog.DeckCreateFailed) }
+            }
+
+            is DeckCreationResult.Rejected -> {
+                reduce { copy(step = ImportStep.DeckInfo) }
+                postSideEffect(rejectionSideEffect(result.code))
+            }
+        }
     }
 
     /**
@@ -359,14 +492,15 @@ class ImportDeckViewModel internal constructor(
         read: suspend () -> ParsedTable?,
         onRead: (ParsedTable) -> Unit,
     ) {
-        readJob?.cancel()
-        generation += 1
-        val ticket = generation
+        val ticket = nextTicket()
         readJob =
             launch {
                 try {
                     val table = read() ?: return@launch
-                    if (ticket == generation) onRead(table)
+                    if (ticket == generation) {
+                        isDeckInfoPrefilled = false
+                        onRead(table)
+                    }
                 } catch (cancellation: CancellationException) {
                     throw cancellation
                 } catch (error: Exception) {
@@ -375,10 +509,16 @@ class ImportDeckViewModel internal constructor(
             }
     }
 
-    private fun cancelRead() {
+    /** 이전 읽기나 미리보기 계산을 취소하고, 늦게 끝난 결과를 버리는 데 쓸 새 번호를 돌려준다. */
+    private fun nextTicket(): Int {
         readJob?.cancel()
-        readJob = null
         generation += 1
+        return generation
+    }
+
+    private fun cancelRead() {
+        nextTicket()
+        readJob = null
     }
 
     private fun failRead(dialog: ImportDialog) {
@@ -391,6 +531,9 @@ class ImportDeckViewModel internal constructor(
         launch(dispatchers.io) { tempStorage.clearAll() }
     }
 }
+
+private fun rejectionSideEffect(code: String): ImportDeckSideEffect =
+    if (code in DECK_INPUT_ERROR_CODES) ImportDeckSideEffect.ShowDeckInputError else ImportDeckSideEffect.ShowDeckCreateError
 
 /** 붙여넣기는 입력을 유지한 채 붙여넣기 단계로, 파일은 처음 단계로 돌아간다. */
 private fun ImportDeckState.backToEntry(): ImportDeckState =

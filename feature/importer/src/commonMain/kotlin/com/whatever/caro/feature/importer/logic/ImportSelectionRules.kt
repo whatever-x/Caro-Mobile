@@ -105,9 +105,9 @@ internal fun sheetRowLabel(
         else -> SheetRowLabel.Rows(sheet.rowCount)
     }
 
-/** 고른 범위에 노트가 있는 유형에서 Image Occlusion을 뺀다. 고른 범위를 모르면(null) 전체 노트 수로 본다. */
+/** 항목 연결 목록의 유형에서 Image Occlusion을 뺀다. */
 internal fun importableNoteTypes(table: ParsedTable): List<ParsedNoteType> =
-    table.noteTypes.filter { type -> !type.isImageOcclusion && (type.selectedNoteCount ?: type.noteCount) > 0 }
+    mappingListNoteTypes(table).filterNot { type -> type.isImageOcclusion }
 
 internal fun mappingBlockReason(
     table: ParsedTable,

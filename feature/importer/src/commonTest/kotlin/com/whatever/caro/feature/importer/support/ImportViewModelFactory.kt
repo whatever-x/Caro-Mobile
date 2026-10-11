@@ -1,5 +1,7 @@
 package com.whatever.caro.feature.importer.support
 
+import com.whatever.caro.core.data.repository.card.CardRepository
+import com.whatever.caro.core.data.repository.deck.DeckRepository
 import com.whatever.caro.core.importparser.ImportParser
 import com.whatever.caro.core.importparser.SpreadsheetDateStyle
 import com.whatever.caro.core.viewmodel.ExceptionFilter
@@ -8,9 +10,12 @@ import com.whatever.caro.feature.importer.mvi.ImportDeckIntent
 import com.whatever.caro.feature.importer.mvi.ImportDeckState
 import com.whatever.caro.feature.importer.platform.PickResult
 import com.whatever.caro.feature.importer.platform.PickedImportFile
+import com.whatever.caro.feature.importer.save.ImportSaveCoordinator
+import com.whatever.caro.feature.importer.save.ImportSaveCoordinatorFactory
 import com.whatever.caro.feature.importer.source.ImportDispatchers
 import com.whatever.caro.feature.importer.source.ImportLimitsConfig
 import com.whatever.caro.feature.importer.source.ParserImportSourceReader
+import dev.mokkery.mock
 import io.kotest.core.spec.style.FunSpec
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -24,6 +29,8 @@ internal class ImportViewModelHarness(
     val viewModel: ImportDeckViewModel,
     val reader: FakeImportSourceReader,
     val tempStorage: FakeImportTempStorage,
+    val deckRepository: DeckRepository,
+    val cardRepository: CardRepository,
 ) {
     val state: ImportDeckState get() = viewModel.state.value
 
@@ -60,6 +67,9 @@ internal object ImportViewModelFactory {
         reader: FakeImportSourceReader = FakeImportSourceReader(),
         tempStorage: FakeImportTempStorage = FakeImportTempStorage.create(),
         limits: ImportLimitsConfig = ImportLimitsConfig(),
+        deckRepository: DeckRepository = mock<DeckRepository>(),
+        cardRepository: CardRepository = mock<CardRepository>(),
+        defaultDispatcher: CoroutineDispatcher = dispatcher,
     ): ImportViewModelHarness =
         ImportViewModelHarness(
             viewModel =
@@ -68,11 +78,14 @@ internal object ImportViewModelFactory {
                     tempStorage = tempStorage.storage,
                     fileCopy = tempStorage.fileCopy,
                     limits = limits,
-                    dispatchers = ImportDispatchers(io = dispatcher, default = dispatcher),
+                    dispatchers = ImportDispatchers(io = dispatcher, default = defaultDispatcher),
+                    saveCoordinatorFactory = ImportSaveCoordinatorFactory { ImportSaveCoordinator(deckRepository, cardRepository) },
                     exceptionFilter = ExceptionFilter.None,
                 ),
             reader = reader,
             tempStorage = tempStorage,
+            deckRepository = deckRepository,
+            cardRepository = cardRepository,
         )
 }
 
@@ -98,9 +111,12 @@ internal class ImportViewModelRig {
         reader: FakeImportSourceReader = FakeImportSourceReader(),
         tempStorage: FakeImportTempStorage = FakeImportTempStorage.create(),
         limits: ImportLimitsConfig = ImportLimitsConfig(),
+        deckRepository: DeckRepository = mock<DeckRepository>(),
+        cardRepository: CardRepository = mock<CardRepository>(),
+        defaultDispatcher: CoroutineDispatcher = dispatcher,
     ): ImportViewModelHarness {
         sandboxes += tempStorage
-        return ImportViewModelFactory.create(dispatcher, reader, tempStorage, limits)
+        return ImportViewModelFactory.create(dispatcher, reader, tempStorage, limits, deckRepository, cardRepository, defaultDispatcher)
     }
 
     /** 텍스트와 xlsx를 실제 파서로 읽는 리더다. Android 호스트에는 Anki용 네이티브가 없어 apkg는 이 리더로 읽지 않는다. */

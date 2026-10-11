@@ -10,6 +10,7 @@ import com.whatever.caro.feature.importer.mvi.ImportDeckIntent
 import com.whatever.caro.feature.importer.mvi.ImportDeckState
 import com.whatever.caro.feature.importer.mvi.ImportDialog
 import com.whatever.caro.feature.importer.mvi.ImportLoading
+import com.whatever.caro.feature.importer.mvi.ImportStep
 import kotlinx.collections.immutable.PersistentSet
 
 /**
@@ -37,6 +38,14 @@ internal fun isEmptyImport(table: ParsedTable): Boolean =
         ImportFormat.APKG -> table.subdecks.isEmpty() && noDeckCount(table) == 0
         ImportFormat.XLSX -> table.sheets.all { sheet -> sheet.rowCount <= 0 }
         ImportFormat.TEXT -> table.noteTypes.isEmpty()
+    }
+
+/** 항목 연결에서 뒤로 가면 닿는 선택 단계다. 붙여넣기도 텍스트 형식이라 텍스트 확인으로 간다. */
+internal fun selectionStep(format: ImportFormat): ImportStep =
+    when (format) {
+        ImportFormat.APKG -> ImportStep.SubdeckSelect
+        ImportFormat.XLSX -> ImportStep.SheetSelect
+        ImportFormat.TEXT -> ImportStep.TextCheck
     }
 
 /** 파서가 던진 오류만 종류를 가리고, 그 밖의 읽기 실패는 파일을 읽지 못했다는 문구가 나오는 종류로 보낸다. */
