@@ -30,6 +30,11 @@ val generateFixtureRoot =
 kotlin {
     android {
         namespace = "com.whatever.caro.core.importparser"
+
+        optimization {
+            consumerKeepRules.publish = true
+            consumerKeepRules.file("consumer-rules.pro")
+        }
     }
 
     // 후속 서버 파싱이 같은 파서를 jvm 아티팩트로 재사용하므로 jvm 타깃을 둔다. 바이트코드는 앱 Android 타깃과 같은 17로 고정한다.
