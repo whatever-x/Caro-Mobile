@@ -31,6 +31,7 @@ internal enum class CauseLine {
 }
 
 internal data class SaveDialogBody(
+    val saved: Int,
     val savedLine: SavedCountLine,
     val causeLine: CauseLine,
 )
@@ -62,17 +63,17 @@ internal fun saveDialogBody(dialog: ImportDialog): SaveDialogBody? =
     when (dialog) {
         is ImportDialog.Paused -> {
             val cause = if (dialog.reason == PauseReason.NETWORK) CauseLine.CheckNetwork else CauseLine.TryLater
-            SaveDialogBody(savedCountLine(dialog.saved), cause)
+            SaveDialogBody(dialog.saved, savedCountLine(dialog.saved), cause)
         }
 
         is ImportDialog.PartialFailure -> {
             val cause = if (dialog.saved == 0) CauseLine.RetryOrViewEmptyDeck else CauseLine.RetryOrViewDeck
-            SaveDialogBody(savedCountLine(dialog.saved), cause)
+            SaveDialogBody(dialog.saved, savedCountLine(dialog.saved), cause)
         }
 
         is ImportDialog.KeyConflict -> {
             val cause = if (dialog.saved == 0) CauseLine.EmptyDeckDeletable else CauseLine.ViewDeck
-            SaveDialogBody(savedCountLine(dialog.saved), cause)
+            SaveDialogBody(dialog.saved, savedCountLine(dialog.saved), cause)
         }
 
         else -> {

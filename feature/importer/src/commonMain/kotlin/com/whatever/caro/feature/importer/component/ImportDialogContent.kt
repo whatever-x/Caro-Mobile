@@ -56,12 +56,14 @@ import caromobile.core.designsystem.generated.resources.import_dialog_unsupporte
 import caromobile.core.designsystem.generated.resources.import_dialog_unsupported_xls
 import caromobile.core.designsystem.generated.resources.import_dialog_unsupported_xlsx
 import com.whatever.caro.core.util.NumberFormatter.formatWithComma
+import com.whatever.caro.feature.importer.logic.CauseLine
 import com.whatever.caro.feature.importer.logic.ParseErrorBody
 import com.whatever.caro.feature.importer.logic.ParseErrorTitle
+import com.whatever.caro.feature.importer.logic.SavedCountLine
 import com.whatever.caro.feature.importer.logic.parseErrorCopy
+import com.whatever.caro.feature.importer.logic.saveDialogBody
 import com.whatever.caro.feature.importer.mvi.ImportDeckIntent
 import com.whatever.caro.feature.importer.mvi.ImportDialog
-import com.whatever.caro.feature.importer.mvi.PauseReason
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import org.jetbrains.compose.resources.StringResource
@@ -150,34 +152,17 @@ internal fun importDialogContent(dialog: ImportDialog): ImportDialogContent? =
         }
 
         is ImportDialog.Paused -> {
-            val cause =
-                when (dialog.reason) {
-                    PauseReason.NETWORK -> Res.string.import_dialog_cause_check_network
-                    PauseReason.LATER -> Res.string.import_dialog_cause_try_later
-                }
-            retryOrViewDeckContent(Res.string.import_dialog_paused_title, dialog.saved, cause)
+            retryOrViewDeckContent(Res.string.import_dialog_paused_title, dialog)
         }
 
         is ImportDialog.PartialFailure -> {
-            val cause =
-                if (dialog.saved == 0) {
-                    Res.string.import_dialog_cause_retry_or_view_empty_deck
-                } else {
-                    Res.string.import_dialog_cause_retry_or_view_deck
-                }
-            retryOrViewDeckContent(Res.string.import_dialog_partial_failure_title, dialog.saved, cause)
+            retryOrViewDeckContent(Res.string.import_dialog_partial_failure_title, dialog)
         }
 
         is ImportDialog.KeyConflict -> {
-            val cause =
-                if (dialog.saved == 0) {
-                    Res.string.import_dialog_cause_empty_deck_deletable
-                } else {
-                    Res.string.import_dialog_cause_view_deck
-                }
             ImportDialogContent(
                 title = stringResource(Res.string.import_dialog_key_conflict_title),
-                body = savedCardsLine(dialog.saved) + "\n" + stringResource(cause),
+                body = saveBodyText(dialog),
                 buttons =
                     persistentListOf(
                         button(Res.string.import_dialog_button_view_deck, ImportDialogButtonStyle.Brand, ImportDeckIntent.ClickViewDeck),
@@ -218,12 +203,11 @@ private fun confirmContent(
 @Composable
 private fun retryOrViewDeckContent(
     title: StringResource,
-    saved: Int,
-    cause: StringResource,
+    dialog: ImportDialog,
 ): ImportDialogContent =
     ImportDialogContent(
         title = stringResource(title),
-        body = savedCardsLine(saved) + "\n" + stringResource(cause),
+        body = saveBodyText(dialog),
         buttons =
             persistentListOf(
                 button(Res.string.import_dialog_button_retry, ImportDialogButtonStyle.Brand, ImportDeckIntent.RetrySave),
@@ -235,12 +219,26 @@ private fun retryOrViewDeckContent(
             ),
     )
 
+/** 저장 중단 대화상자의 본문. 어떤 문장을 고를지는 [saveDialogBody]가 정하고 여기서는 문구 자원으로만 바꾼다. */
 @Composable
-private fun savedCardsLine(saved: Int): String =
-    if (saved == 0) {
-        stringResource(Res.string.import_dialog_saved_none)
-    } else {
-        stringResource(Res.string.import_dialog_saved_cards, saved.formatWithComma())
+private fun saveBodyText(dialog: ImportDialog): String {
+    val body = checkNotNull(saveDialogBody(dialog)) { "저장 장수를 담지 않는 대화상자다: $dialog" }
+    val savedLine =
+        when (body.savedLine) {
+            SavedCountLine.SavedCards -> stringResource(Res.string.import_dialog_saved_cards, body.saved.formatWithComma())
+            SavedCountLine.NoCardsSaved -> stringResource(Res.string.import_dialog_saved_none)
+        }
+    return savedLine + "\n" + stringResource(body.causeLine.resource())
+}
+
+private fun CauseLine.resource(): StringResource =
+    when (this) {
+        CauseLine.CheckNetwork -> Res.string.import_dialog_cause_check_network
+        CauseLine.TryLater -> Res.string.import_dialog_cause_try_later
+        CauseLine.RetryOrViewDeck -> Res.string.import_dialog_cause_retry_or_view_deck
+        CauseLine.RetryOrViewEmptyDeck -> Res.string.import_dialog_cause_retry_or_view_empty_deck
+        CauseLine.ViewDeck -> Res.string.import_dialog_cause_view_deck
+        CauseLine.EmptyDeckDeletable -> Res.string.import_dialog_cause_empty_deck_deletable
     }
 
 @Composable

@@ -122,42 +122,42 @@ class SaveOutcomeRulesTest : FunSpec() {
         context("저장 중단 대화상자 본문") {
             test("네트워크 일시 정지는 저장한 장수와 네트워크 확인 문장이다") {
                 saveDialogBody(ImportDialog.Paused(saved = 1_000, reason = PauseReason.NETWORK)) shouldBe
-                    SaveDialogBody(SavedCountLine.SavedCards, CauseLine.CheckNetwork)
+                    SaveDialogBody(saved = 1_000, SavedCountLine.SavedCards, CauseLine.CheckNetwork)
             }
 
             test("처리 시간 초과 같은 일시 정지는 잠시 뒤 다시 시도하라는 문장이다") {
                 saveDialogBody(ImportDialog.Paused(saved = 1_000, reason = PauseReason.LATER)) shouldBe
-                    SaveDialogBody(SavedCountLine.SavedCards, CauseLine.TryLater)
+                    SaveDialogBody(saved = 1_000, SavedCountLine.SavedCards, CauseLine.TryLater)
             }
 
             test("저장 0장인 네트워크 일시 정지는 저장한 카드가 없다는 문장과 네트워크 확인 문장이다") {
                 saveDialogBody(ImportDialog.Paused(saved = 0, reason = PauseReason.NETWORK)) shouldBe
-                    SaveDialogBody(SavedCountLine.NoCardsSaved, CauseLine.CheckNetwork)
+                    SaveDialogBody(saved = 0, SavedCountLine.NoCardsSaved, CauseLine.CheckNetwork)
             }
 
             test("저장 0장인 잠시 뒤 일시 정지는 저장한 카드가 없다는 문장과 잠시 뒤 문장이다") {
                 saveDialogBody(ImportDialog.Paused(saved = 0, reason = PauseReason.LATER)) shouldBe
-                    SaveDialogBody(SavedCountLine.NoCardsSaved, CauseLine.TryLater)
+                    SaveDialogBody(saved = 0, SavedCountLine.NoCardsSaved, CauseLine.TryLater)
             }
 
             test("일부 저장 실패는 다시 시도하거나 저장한 카드로 덱을 볼 수 있다는 문장이다") {
                 saveDialogBody(ImportDialog.PartialFailure(saved = 1_000)) shouldBe
-                    SaveDialogBody(SavedCountLine.SavedCards, CauseLine.RetryOrViewDeck)
+                    SaveDialogBody(saved = 1_000, SavedCountLine.SavedCards, CauseLine.RetryOrViewDeck)
             }
 
             test("저장 0장인 일부 저장 실패는 다시 시도하거나 빈 덱을 볼 수 있다는 문장이다") {
                 saveDialogBody(ImportDialog.PartialFailure(saved = 0)) shouldBe
-                    SaveDialogBody(SavedCountLine.NoCardsSaved, CauseLine.RetryOrViewEmptyDeck)
+                    SaveDialogBody(saved = 0, SavedCountLine.NoCardsSaved, CauseLine.RetryOrViewEmptyDeck)
             }
 
             test("키 충돌은 저장한 카드로 덱을 볼 수 있다는 문장이다") {
                 saveDialogBody(ImportDialog.KeyConflict(saved = 1_000)) shouldBe
-                    SaveDialogBody(SavedCountLine.SavedCards, CauseLine.ViewDeck)
+                    SaveDialogBody(saved = 1_000, SavedCountLine.SavedCards, CauseLine.ViewDeck)
             }
 
             test("저장 0장인 키 충돌은 빈 덱을 덱 상세에서 지울 수 있다는 문장이다") {
                 saveDialogBody(ImportDialog.KeyConflict(saved = 0)) shouldBe
-                    SaveDialogBody(SavedCountLine.NoCardsSaved, CauseLine.EmptyDeckDeletable)
+                    SaveDialogBody(saved = 0, SavedCountLine.NoCardsSaved, CauseLine.EmptyDeckDeletable)
             }
 
             test("저장 장수를 담지 않는 대화상자는 본문 규칙이 없다") {
