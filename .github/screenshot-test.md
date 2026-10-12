@@ -1,10 +1,10 @@
-# Screenshot Test
+# 스크린샷 테스트
 
-`scripts/screenshot/scenarios.json` registers the screenshot scenarios across feature modules (currently 14). Each fixed `commonTest` scenario is rendered by Android `androidHostTest` and iOS `iosSimulatorArm64Test`, without a ViewModel or API.
+`scripts/screenshot/scenarios.json`은 피처 모듈의 스크린샷 시나리오를 등록합니다(현재 14개). 고정된 `commonTest` 시나리오를 Android의 `androidHostTest`와 iOS의 `iosSimulatorArm64Test`에서 렌더링하며, ViewModel이나 API를 사용하지 않습니다.
 
-## Local runs
+## 로컬 실행
 
-Prepare the usual `local.properties` build values, then run:
+빌드에 필요한 `local.properties` 값을 준비한 뒤 실행합니다.
 
 ```bash
 ./gradlew recordRoborazziAndroidHostTest
@@ -13,40 +13,64 @@ Prepare the usual `local.properties` build values, then run:
 ./gradlew compareRoborazziIosSimulatorArm64
 ```
 
-Root task names execute across all feature modules with that task. The record tasks write local baselines; compare tasks compare against those files. Local Xcode 27 may require SwiftPM's native build system due to `spmForKmp` compatibility. CI pins Xcode 26.6.
+루트 태스크는 해당 태스크가 있는 모든 피처 모듈에서 실행됩니다. 기록 태스크는 로컬 기준 이미지를 생성하고, 비교 태스크는 그 이미지와 현재 화면을 비교합니다. 로컬 Xcode 27에서는 `spmForKmp` 호환성 때문에 SwiftPM의 네이티브 빌드 시스템이 필요할 수 있습니다. CI는 Xcode 26.6을 사용합니다.
 
-PNG files in `feature/*/build/outputs/roborazzi/<target>/` are ignored build output. Do not commit them to feature branches. Roborazzi writes JSON results to `build/test-results/roborazzi/<target>/results-summary.json` and an HTML report to `build/reports/roborazzi/<target>/index.html` in each module.
+`feature/*/build/outputs/roborazzi/<target>/`의 PNG는 Git에서 제외되는 빌드 산출물입니다. 피처 브랜치에 커밋하지 않습니다. Roborazzi는 각 모듈의 `build/test-results/roborazzi/<target>/results-summary.json`에 JSON 결과를, `build/reports/roborazzi/<target>/index.html`에 HTML 보고서를 생성합니다.
 
-## GitHub Actions flow
+## GitHub Actions 실행 흐름
 
-The workflows use Roborazzi Gradle tasks, Bash/`jq`, Artifact actions and the comment actions from the [official PR comment sample](https://github.com/takahirom/roborazzi-compare-on-github-comment-sample). No Python scripts or Pillow dependency are used.
+워크플로는 Roborazzi Gradle 태스크, Bash/`jq`, 아티팩트 액션과 [공식 PR 댓글 예제](https://github.com/takahirom/roborazzi-compare-on-github-comment-sample)의 댓글 액션을 사용합니다. PR 검증·렌더링·게시 로직은 워크플로 안에서 실행하며, 별도 Python이나 셸 스크립트는 필요하지 않습니다.
 
-1. **Screenshot Golden** (`screenshot-golden.yml`): on a `develop` push, records Android/iOS screenshots, validates PNG names against `scenarios.json`, and uploads complete Golden artifacts for 90 days. Each artifact includes its scenario registry.
-2. **Screenshot PR** (`screenshot-pr.yml`): on a PR targeting `develop`, downloads a successful Golden run whose head SHA exactly matches the PR base SHA. It restores those images into each module's Roborazzi output directory and runs `compareRoborazziAndroidHostTest` / `compareRoborazziIosSimulatorArm64`. The workflow validates every registered scenario's JSON result and collects only changed/new images. Roborazzi HTML/JSON diagnostics are uploaded separately, including on failure where available.
-3. **Screenshot Comment** (`screenshot-comment.yml`): triggered by a successful PR comparison through `workflow_run`. It verifies the report files and that the PR is still open with the same head/base SHA, publishes images to `screenshots/pr-<number>`, and uses `peter-evans/find-comment` / `peter-evans/create-or-update-comment` to maintain one marker comment. The actions are pinned to commit SHAs.
-4. **Slack Notify Screenshot Result** (in `screenshot-comment.yml`): runs after comparison completes and the publisher finishes or skips, including comparison/publication failures. Reuses `SLACK_WEBHOOK_URL` and reports the overall screenshot CI result, Android/iOS job results, failed step names, and PR/job/artifact links. Slack Block Kit headers/dividers separate results, failure reasons, and log links; a primary button opens the PR, or the comparison run if no PR identity is available. Message aggregation and the v4.0.0 Slack action payload live directly in the workflow; no separate shell or jq files are required. Partial reruns use each platform's latest result up to the notified attempt. Cancelled/skipped results are distinct from failures; pixel differences remain report-only. This notification covers screenshot CI, independently of the existing Caro Mobile CI notification.
+1. **Screenshot Golden** (`screenshot-golden.yml`): `develop`에 push할 때 Android/iOS 스크린샷을 기록합니다. PNG 이름을 `scenarios.json`과 대조하고, 전체 기준 이미지(Golden)를 아티팩트로 업로드해 90일간 보관합니다. 각 아티팩트에는 시나리오 목록도 포함됩니다.
+2. **Screenshot PR** (`screenshot-pr.yml`): `develop` 대상의 열린 PR을 `workflow_dispatch`로 수동 검사합니다. PR의 head/base SHA와 병합 커밋을 고정하고 병합 커밋의 두 부모를 검증한 뒤 요청 메타데이터를 보관합니다. PR의 base SHA와 실행의 head SHA가 정확히 일치하는 성공한 Golden 실행을 찾아 다운로드합니다. 기준 이미지를 각 모듈의 Roborazzi 출력 디렉토리에 복원하고 `compareRoborazziAndroidHostTest` / `compareRoborazziIosSimulatorArm64`를 실행합니다. 등록된 모든 시나리오의 JSON 결과를 검증하고 변경·추가된 이미지만 수집합니다. Roborazzi HTML/JSON 진단 자료는 별도로 업로드하며, 실패 시에도 생성된 자료가 있으면 보관합니다.
+3. **Screenshot Comment** (`screenshot-comment.yml`): 수동 비교가 완료되면 `workflow_run`으로 실행됩니다. 먼저 `screenshot-context` 아티팩트를 읽어 비교 실패 시에도 대상 PR을 식별합니다. 이미지 게시는 비교 성공 시에만 수행합니다. 보고서 파일을 검증하고 PR이 동일한 head/base SHA로 열려 있는지 확인한 뒤, `screenshots/pr-<number>`에 이미지를 게시합니다. `peter-evans/find-comment` / `peter-evans/create-or-update-comment`로 식별 마커가 있는 댓글 하나를 유지합니다. 액션 버전은 커밋 SHA로 고정합니다.
+4. **Slack Notify Screenshot Result** (`screenshot-comment.yml` 내부): 비교가 완료되고 게시 단계가 끝나거나 생략되면 실행됩니다. 비교·게시 실패도 알림 대상입니다. 기존 `SLACK_WEBHOOK_URL`을 사용해 전체 스크린샷 CI 결과, Android/iOS 작업 결과, 실패한 단계 이름, PR·작업·아티팩트 링크를 전송합니다. Slack Block Kit의 제목과 구분선으로 결과·실패 원인·로그 링크를 나누고, 기본 버튼으로 PR을 엽니다. PR을 식별할 수 없으면 비교 실행을 엽니다. 메시지 집계와 v4.0.0 Slack 액션의 전송 데이터는 워크플로에 작성되어 있어 별도 셸·jq 파일은 필요하지 않습니다. 일부 작업만 재실행하면 알림 대상 실행 차수까지 각 플랫폼의 최신 결과를 사용합니다. 취소·생략은 실패와 구분하며, 픽셀 차이는 보고만 합니다. 이 알림은 기존 Caro Mobile CI 알림과 별도로 스크린샷 CI 결과를 전달합니다.
 
-The message aggregation step includes an inline self-check for partial reruns, publication failure, cancellation and button fallback before exporting message outputs.
+메시지 집계 단계는 출력값을 내보내기 전에 부분 재실행, 게시 실패, 취소, PR이 없을 때의 버튼 링크를 자체 검사합니다.
 
-## Report behavior
+## 보고서 동작
 
-- Existing scenario changed: show the exact PR-base Golden (`_before.png`) and Roborazzi's `_actual.png` in separate Before/After columns. The workflow copies the original files without cropping or recomposing images; no Diff image is published by the new publisher.
-- New scenario: show only its `_actual.png` (After).
-- Removed scenario: list its removal as text, using the Golden and PR registries.
-- No changes: skip branch publication and new comment creation; replace an existing screenshot comment with “시각적 변경 없음”.
+- 기존 시나리오 변경: 정확한 PR base SHA의 Golden을 `_before.png`로 복사하고 Roborazzi의 `_actual.png`와 함께 Before/After 열에 표시합니다. 원본을 자르거나 합성하지 않습니다.
+- 새 시나리오: 변경 후 이미지인 `_actual.png`만 표시합니다.
+- 삭제된 시나리오: Golden과 PR의 시나리오 목록을 비교해 삭제 내역을 텍스트로 표시합니다.
+- 변경 없음: 이미지 브랜치 게시와 새 댓글 생성을 생략합니다. 기존 스크린샷 댓글이 있으면 “시각적 변경 없음”으로 갱신합니다.
 
-The comparison workflow uploads `screenshot-before-after-android/ios` for the new publisher. It also retains the existing `screenshot-report-android/ios` artifacts so the current default-branch publisher continues to work before this change is merged. These legacy artifacts and Roborazzi diagnostics may still contain `_compare.png`; the new publisher downloads only the Before/After artifacts. Both report formats retain the same summary and 90-day retention.
+`screenshot-before-after-android/ios` 아티팩트에 게시용 원본과 요약을 보관합니다. 기존 `screenshot-report-android/ios` 아티팩트와 Roborazzi 진단 자료도 유지하며, `_compare.png`는 이 자료에만 포함됩니다. 게시 작업은 Before/After 아티팩트만 사용합니다.
 
-Pixel differences are report-only. Build, rendering, missing/expired Golden, missing registered results/images, invalid reports and publication errors fail CI. A missing Golden must never be silently replaced by a different commit's images.
+픽셀 차이 자체는 보고만 하며 CI를 실패시키지 않습니다. 빌드·렌더링 실패, Golden 누락·만료, 등록된 결과·이미지 누락, 잘못된 보고서, 게시 오류는 CI 실패로 처리합니다. Golden이 없을 때 다른 커밋의 이미지로 대체하지 않습니다.
 
-Companion branches contain only report images and have independent Git history. Repeated reports overwrite the same PR-specific branch; image links use the published commit SHA to avoid displaying cached results. These branches are not merged into `develop` and are currently retained without automatic deletion.
+이미지 게시용 브랜치는 보고서 이미지만 포함하며 독립된 Git 이력을 사용합니다. 반복 실행은 같은 PR 전용 브랜치를 덮어씁니다. 이미지 링크에는 게시 커밋 SHA를 사용해 캐시된 이전 결과가 표시되지 않도록 합니다. 이 브랜치는 `develop`에 병합하지 않으며 현재 자동 삭제 없이 유지합니다.
 
-## Activation and permissions
+## 적용 조건과 권한
 
-`workflow_run` workflows must exist on the repository's default branch. The comment workflow starts after this PR is merged into `develop`; this PR can validate comparison artifacts, while actual branch/comment publication requires a subsequent PR run after the workflow is installed.
+`workflow_run` 워크플로는 저장소 기본 브랜치에 있어야 합니다. 수동 실행 및 댓글 워크플로를 기본 브랜치인 `develop`에 반영해야 합니다. 병합 전 로컬 검사만으로 실제 수동 실행·렌더링·게시·Slack 수신을 검증할 수는 없습니다.
 
-Before/After comments likewise require the updated publisher on the default branch and a subsequent comparison using the updated producer. Older PR branches must incorporate this workflow change before rerunning: a run without the Before/After artifacts fails publication rather than falling back to a Diff image. Before merge, this PR still uses the default branch's existing comment format.
+PR 비교는 읽기 권한으로 고정된 PR 병합 커밋을 체크아웃합니다. `workflow_run.head_sha`는 수동 실행 브랜치의 SHA이므로 PR head 식별에 사용하지 않습니다. 별도 게시 작업은 쓰기 권한으로 기본 브랜치의 워크플로를 실행하며, PR이나 다운로드한 아티팩트의 코드·스크립트를 실행하지 않습니다. 게시는 같은 저장소의 PR로 제한합니다. 포크 PR은 비교와 아티팩트 생성은 가능하지만 이미지·댓글을 게시하지 않습니다.
 
-PR comparison has read permissions. The separate publisher has write permissions and runs the default-branch workflow, without executing code or scripts from the PR or downloaded artifacts. Publication is limited to same-repository PRs; fork PRs can compare and produce artifacts but do not publish images/comments.
+Slack 알림은 `develop`에서 수동 실행한 작업을 대상으로 기본 브랜치에서 실행합니다. 포크 PR도 상태·로그 링크는 알리지만 이미지와 PR 댓글은 게시하지 않습니다. 실제 알림을 확인하려면 수정한 워크플로를 기본 브랜치에 먼저 반영해야 합니다. 추가 Slack 시크릿은 필요하지 않습니다.
 
-Slack notifications also run from the default branch and are limited to same-repository PRs. Install the updated workflow on the default branch before expecting live notifications. No additional Slack secret is required.
+## 수동 실행
+
+PR 생성·업데이트만으로 스크린샷 비교를 시작하지 않습니다. 정확한 base SHA의 기준 이미지를 조회할 수 있도록 Golden 생성은 모든 `develop` push에서 계속 실행합니다.
+
+GitHub CLI로 실행할 때는 검사할 PR의 head/base SHA를 함께 입력합니다. `gh pr view <PR_NUMBER> --repo whatever-x/Caro-Mobile --json headRefOid,baseRefOid`로 현재 값을 확인할 수 있습니다. 실행 중 PR이 바뀌면 게시를 생략합니다.
+
+```bash
+request_id=$(uuidgen)
+gh workflow run screenshot-pr.yml --repo whatever-x/Caro-Mobile --ref develop \
+  -f pr_number=168 \
+  -f expected_head_sha=<head-sha> \
+  -f expected_base_sha=<base-sha> \
+  -f request_id="$request_id"
+gh run list --repo whatever-x/Caro-Mobile --workflow screenshot-pr.yml \
+  --event workflow_dispatch --branch develop --limit 100 --json databaseId,displayTitle,url \
+  | jq --arg title "Screenshot PR #168 · $request_id" '.[] | select(.displayTitle == $title)'
+```
+
+아직 실행 목록에 나타나지 않으면 나중에 다시 조회합니다. 확인 없이 중복 실행하지 않습니다. `gh run watch <RUN_ID> --repo whatever-x/Caro-Mobile --exit-status`로 완료 여부를 확인합니다. 별도의 `Screenshot Comment` 실행 제목은 `Screenshot result · source <RUN_ID> · attempt <run_attempt>`입니다. 원본 실행 ID와 실행 차수가 일치하는지 확인한 뒤 이미지·댓글·Slack 전달 결과를 보고합니다. 비교 실행 차수는 `gh api repos/whatever-x/Caro-Mobile/actions/runs/<RUN_ID> --jq .run_attempt`로 확인하고, 게시 실행은 `gh run list --repo whatever-x/Caro-Mobile --workflow screenshot-comment.yml --json databaseId,displayTitle,url,conclusion`로 조회합니다.
+
+사용자는 GitHub에서 `develop`을 선택하고 **Actions → Screenshot PR → Run workflow**에 PR 번호만 입력해 실행할 수 있습니다. 예상 head/base SHA는 선택 사항이지만 입력할 때는 둘 다 제공해야 합니다. 둘 다 생략하면 준비 단계에서 현재 PR의 SHA를 고정합니다. 요청 ID도 선택 사항이며 생략하면 실행 ID를 사용합니다.
+
+준비 단계는 잘못된 입력, 닫힌 PR, 다른 대상 브랜치, 예상 SHA 불일치, 병합 커밋 조회 불가, 병합 부모 불일치를 거부합니다. 비교 단계는 체크아웃한 SHA를 검증하고 고정된 병합 커밋을 사용합니다. Golden이 없거나 만료되면 다른 SHA로 대체하지 않고 실패합니다.
+
+비교가 실패해도 준비 단계의 요청 메타데이터로 대상 PR을 식별합니다. 게시 작업은 원본 실행 ID와 두 플랫폼의 보고서가 메타데이터에 일치하는지 검증한 뒤, 이미지·댓글을 쓰기 전에 현재 PR을 다시 확인합니다. 변경되었거나 닫힌 PR과 포크 PR은 게시를 생략합니다. Slack에서는 비교 실패·게시 실패·게시 생략을 구분합니다. 유효한 메타데이터 생성 전에 실패하면 실행 링크를 제공합니다. 동시 실행 그룹은 비교는 PR별, 게시는 원본 실행별로 구분하므로 서로 다른 PR의 실행을 취소하지 않습니다.
