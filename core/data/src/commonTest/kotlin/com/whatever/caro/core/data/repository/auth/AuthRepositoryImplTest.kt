@@ -34,6 +34,7 @@ class AuthRepositoryImplTest : FunSpec() {
             fcmTokenRepository: FcmTokenRepository =
                 mock {
                     everySuspend { unregisterToken() } returns Unit
+                    everySuspend { resumeRegistration() } returns Unit
                 },
         ) = AuthRepositoryImpl(
             remoteAuthDataSource = remoteAuthDataSource,
@@ -48,6 +49,8 @@ class AuthRepositoryImplTest : FunSpec() {
                 val fcm =
                     object : FcmTokenRepository {
                         override suspend fun syncTokens(tokens: kotlinx.coroutines.flow.Flow<String>) = Unit
+
+                        override suspend fun resumeRegistration() = Unit
 
                         override suspend fun unregisterToken() {
                             operations.add("fcm")

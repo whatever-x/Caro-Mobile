@@ -34,6 +34,7 @@ internal class AuthRepositoryImpl(
             accessToken = response.accessToken,
             refreshToken = response.refreshToken,
         )
+        fcmTokenRepository.resumeRegistration()
         localAuthDataSource.saveRegistrationComplete(response.isRegistrationComplete)
         return response.isRegistrationComplete
     }
@@ -87,6 +88,7 @@ internal class AuthRepositoryImpl(
             accessToken = response.accessToken,
             refreshToken = response.refreshToken,
         )
+        fcmTokenRepository.resumeRegistration()
         localAuthDataSource.saveRegistrationComplete(true)
         return response.toAuthSession()
     }

@@ -23,6 +23,10 @@ internal class FcmTokenRepositoryImpl(
     private var registeredToken: String? = null
     private var registrationPaused = false
 
+    override suspend fun resumeRegistration() {
+        registrationMutex.withLock { registrationPaused = false }
+    }
+
     override suspend fun unregisterToken() {
         registrationMutex.withLock {
             registrationPaused = true

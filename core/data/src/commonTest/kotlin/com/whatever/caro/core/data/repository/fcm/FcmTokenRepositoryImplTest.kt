@@ -1,13 +1,20 @@
 package com.whatever.caro.core.data.repository.fcm
 
+import com.whatever.caro.core.data.repository.auth.AuthRepositoryImpl
 import com.whatever.caro.core.datastore.datasource.LocalAuthDataSource
+import com.whatever.caro.core.model.auth.SocialLoginType
+import com.whatever.caro.core.remote.datasource.auth.AuthDataSource
+import com.whatever.caro.core.remote.datasource.auth.NonAuthDataSource
 import com.whatever.caro.core.remote.datasource.notification.NotificationDataSource
+import com.whatever.caro.core.remote.dto.auth.response.SocialLoginResponse
+import com.whatever.caro.core.remote.dto.auth.response.TokenResponse
 import com.whatever.caro.core.remote.dto.notification.request.RegisterDeviceTokenRequest
 import com.whatever.caro.core.remote.dto.notification.response.TestPushResponse
 import dev.mokkery.answering.calls
 import dev.mokkery.answering.returns
 import dev.mokkery.every
 import dev.mokkery.everySuspend
+import dev.mokkery.matcher.any
 import dev.mokkery.mock
 import io.kotest.assertions.throwables.shouldNotThrowAny
 import io.kotest.assertions.throwables.shouldThrow
@@ -28,6 +35,57 @@ import kotlinx.coroutines.test.runTest
 @OptIn(ExperimentalCoroutinesApi::class)
 class FcmTokenRepositoryImplTest : FunSpec() {
     init {
+        listOf("소셜 로그인", "가입 완료").forEach { loginPath ->
+            test("로그아웃의 null을 수집하지 않아도 $loginPath 후 FCM 등록을 재개한다") {
+                runTest {
+                    val session = MutableStateFlow<String?>("old-access")
+                    var savedAccess = "old-access"
+                    val requests = mutableListOf<RegisterDeviceTokenRequest>()
+                    val local =
+                        mock<LocalAuthDataSource> {
+                            every { observeRegisteredAccessToken() } returns session
+                            everySuspend { fetchAccessToken() } calls { savedAccess }
+                            everySuspend { clear() } calls { session.value = null }
+                            everySuspend { saveTokens("new-access", "refresh") } calls { savedAccess = "new-access" }
+                            everySuspend { saveRegistrationComplete(true) } calls { session.value = savedAccess }
+                        }
+                    val remote =
+                        mock<NotificationDataSource> {
+                            everySuspend { registerToken(any()) } calls { requests.add(it.arg(0)) }
+                            everySuspend { unregisterToken(any()) } returns Unit
+                        }
+                    val fcm = FcmTokenRepositoryImpl(remote, local)
+                    val auth =
+                        AuthRepositoryImpl(
+                            remoteAuthDataSource =
+                                mock<AuthDataSource> {
+                                    everySuspend { logout() } returns Unit
+                                    everySuspend { completeRegistration(any()) } returns TokenResponse("new-access", "refresh")
+                                },
+                            remoteNonAuthDataSource =
+                                mock<NonAuthDataSource> {
+                                    everySuspend { socialLogin(any()) } returns SocialLoginResponse("new-access", "refresh", true)
+                                },
+                            localAuthDataSource = local,
+                            fcmTokenRepository = fcm,
+                        )
+                    backgroundScope.launch { fcm.syncTokens(MutableStateFlow("fcm-token")) }
+                    runCurrent()
+                    requests.map { it.token } shouldBe listOf("fcm-token")
+
+                    auth.logout()
+                    if (loginPath == "소셜 로그인") {
+                        auth.loginWithSocial(SocialLoginType.GOOGLE, "id-token")
+                    } else {
+                        auth.completeRegistration("caro", true)
+                    }
+                    runCurrent()
+
+                    requests.map { it.token } shouldBe listOf("fcm-token", "fcm-token")
+                }
+            }
+        }
+
         test("토큰 갱신 응답이 실패해도 기존 토큰과 새 토큰 모두 삭제한다") {
             runTest {
                 val tokens = MutableStateFlow("first")
