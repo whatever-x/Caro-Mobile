@@ -45,35 +45,4 @@ class MessagingEventBusTest :
                 MessagingEventBus.tokenFlow.value shouldBe "c"
             }
         }
-
-        test("publishMessage 후 messages.receive()로 메시지를 받는다") {
-            runTest {
-                val message = CloudMessage(anyValue = "TestValue")
-                MessagingEventBus.publishMessage(message)
-
-                MessagingEventBus.messages.receive() shouldBe message
-            }
-        }
-
-        test("publishMessage 호출마다 receive로 새 메시지를 받을 수 있다") {
-            runTest {
-                val first = CloudMessage(anyValue = "TestValue-1")
-                MessagingEventBus.publishMessage(first)
-                MessagingEventBus.messages.receive() shouldBe first
-
-                val second = CloudMessage(anyValue = "TestValue-2")
-                MessagingEventBus.publishMessage(second)
-                MessagingEventBus.messages.receive() shouldBe second
-            }
-        }
-
-        test("CONFLATED Channel은 burst에도 publishMessage가 실패하지 않고 최신만 보관한다") {
-            runTest {
-                repeat(100) { i ->
-                    MessagingEventBus.publishMessage(CloudMessage(anyValue = "TestValue-$i"))
-                }
-
-                MessagingEventBus.messages.receive() shouldBe CloudMessage(anyValue = "TestValue-99")
-            }
-        }
     })

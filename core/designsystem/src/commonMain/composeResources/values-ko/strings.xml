@@ -33,6 +33,10 @@
     <string name="profile_snackbar_random_nickname_error">닉네임 생성에 실패했어요. 다시 시도해 주세요.</string>
     <string name="profile_snackbar_update_nickname_error">닉네임 변경에 실패했어요. 다시 시도해 주세요.</string>
     <string name="profile_snackbar_network_error">네트워크 연결을 확인해 주세요.</string>
+    <string name="profile_cancel_dialog_title">회원가입을 취소하시겠습니까?</string>
+    <string name="profile_cancel_dialog_body">로그인 화면으로 돌아갑니다.</string>
+    <string name="profile_cancel_dialog_button_leave">취소하기</string>
+    <string name="profile_cancel_dialog_button_stay">계속하기</string>
     <!-- deck -->
     <string name="deck_title_create">덱 만들기</string>
     <string name="deck_content_description_back">뒤로 가기</string>

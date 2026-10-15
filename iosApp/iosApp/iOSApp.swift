@@ -1,5 +1,6 @@
 import SwiftUI
 import UIKit
+import UserNotifications
 import ComposeApp
 
 class CaroAppDelegate: NSObject, UIApplicationDelegate {
@@ -7,7 +8,11 @@ class CaroAppDelegate: NSObject, UIApplicationDelegate {
         _ application: UIApplication,
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
     ) -> Bool {
-        IosMessagingAttacherKt.attachMessaging(application: application)
+        IosMessagingAttacherKt.attachMessaging()
+        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { _, error in
+            if let error { print("Notification authorization failed: \(error)") }
+            DispatchQueue.main.async { application.registerForRemoteNotifications() }
+        }
         return true
     }
 
@@ -16,6 +21,10 @@ class CaroAppDelegate: NSObject, UIApplicationDelegate {
         didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data
     ) {
         IosMessagingAttacherKt.applyApnsToken(deviceToken: deviceToken)
+    }
+
+    func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
+        print("APNs registration failed: \(error)")
     }
 }
 

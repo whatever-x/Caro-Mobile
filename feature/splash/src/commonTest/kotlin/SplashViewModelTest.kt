@@ -55,11 +55,34 @@ class SplashViewModelTest : FunSpec() {
             }
         }
 
+        test("닉네임 설정을 마치지 않은 세션이면 NavigateCreateProfile sideEffect를 발행한다") {
+            runTest(testDispatcher) {
+                val authRepository =
+                    mock<AuthRepository> {
+                        everySuspend { refreshToken() } returns Unit
+                        everySuspend { isRegistrationComplete() } returns false
+                    }
+                val viewModel =
+                    SplashViewModel(
+                        authRepository = authRepository,
+                        exceptionFilter = ExceptionFilter.None,
+                    )
+
+                viewModel.sideEffect.test {
+                    viewModel.intent(SplashIntent.Initialize)
+                    advanceUntilIdle()
+
+                    awaitItem() shouldBe SplashSideEffect.NavigateCreateProfile
+                }
+            }
+        }
+
         test("Initialize 완료 시 isInitializing 이 false 로 갱신된다") {
             runTest(testDispatcher) {
                 val authRepository =
                     mock<AuthRepository> {
                         everySuspend { refreshToken() } returns Unit
+                        everySuspend { isRegistrationComplete() } returns true
                     }
                 val viewModel =
                     SplashViewModel(

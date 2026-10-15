@@ -8,7 +8,7 @@ class BuildKonfigSettingPlugin : Plugin<Settings> {
             val cli = gradle.startParameter
                 .projectProperties["buildkonfig.flavor"]
 
-            val inferred = inferFromTasks(
+            val inferred = inferVariantFromTasks(
                 gradle.startParameter.taskNames,
             )
 
@@ -26,39 +26,35 @@ class BuildKonfigSettingPlugin : Plugin<Settings> {
         }
     }
 
-    private fun inferFromTasks(taskNames: List<String>): String? {
+    private fun inferVariantFromTasks(taskNames: List<String>): String? {
         val tasks = taskNames.map {
             it.substringAfterLast(":")
         }
 
-        val flavors = buildSet {
-            if (tasks.any { it.containsVariant("Dev") }) {
-                add("dev")
-            }
-
-            if (tasks.any { it.containsVariant("Qa") }) {
-                add("qa")
-            }
-
-            if (tasks.any { it.containsVariant("Prod") }) {
-                add("prod")
+        val variants = buildSet {
+            listOf("Dev", "Qa", "Prod").forEach { flavor ->
+                listOf("Debug", "Release").forEach { buildType ->
+                    val variant = flavor + buildType
+                    if (tasks.any { it.containsVariant(variant) }) {
+                        add(flavor.lowercase() + buildType)
+                    }
+                }
             }
         }
 
-        return when (flavors.size) {
+        return when (variants.size) {
             0 -> null
 
-            1 -> flavors.single()
+            1 -> variants.single()
 
             else -> error(
-                "Multiple BuildKonfig flavors detected: $flavors. " +
+                "Multiple BuildKonfig variants detected: $variants. " +
                         "Specify one explicitly with " +
-                        "-Pbuildkonfig.flavor=<dev|qa|prod>"
+                        "-Pbuildkonfig.flavor=<devDebug|devRelease|qaDebug|qaRelease|prodDebug|prodRelease>"
             )
         }
     }
 
-    private fun String.containsVariant(flavor: String): Boolean =
-        contains("${flavor}Debug", ignoreCase = true) ||
-                contains("${flavor}Release", ignoreCase = true)
+    private fun String.containsVariant(variant: String): Boolean =
+        contains(variant, ignoreCase = true)
 }

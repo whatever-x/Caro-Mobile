@@ -49,11 +49,32 @@ iosApp/iosApp.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/*
 !iosApp/iosApp.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
 
 # Swagger Skil
-.claude/skills/swagger-sync/.swagger-credentials
+.agents/skills/swagger-sync/.swagger-credentials
 openapi.json
 openapitools.json
 cookies.txt
 build/generated/
 
-# Design/spec docs (generated locally, not tracked)
-docs/
+# Share project guides; keep other local docs artifacts ignored.
+/docs/**
+!/docs/architecture/
+!/docs/ci/
+!/docs/collaboration/
+!/docs/development/
+!/docs/AGENTS.md
+!/docs/architecture/convention-plugins.md
+!/docs/architecture/data-layer.md
+!/docs/architecture/dependency-injection.md
+!/docs/architecture/feature-ui.md
+!/docs/architecture/modules-platform.md
+!/docs/architecture/navigation.md
+!/docs/ci/checks.md
+!/docs/ci/screenshot-test.md
+!/docs/collaboration/git-workflow.md
+!/docs/development/build.md
+!/docs/development/testing.md
+!/docs/index.md
+
+# Local agent configuration; shared sources live in .agents/.
+/.codex/
+/.claude/

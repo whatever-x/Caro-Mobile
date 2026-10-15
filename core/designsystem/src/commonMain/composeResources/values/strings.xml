@@ -34,6 +34,10 @@
 	<string name="profile_snackbar_random_nickname_error">Failed to generate a nickname. Please try again.</string>
 	<string name="profile_snackbar_update_nickname_error">Failed to change your nickname. Please try again.</string>
 	<string name="profile_snackbar_network_error">No network connection. Please check your connection.</string>
+	<string name="profile_cancel_dialog_title">Cancel sign-up?</string>
+	<string name="profile_cancel_dialog_body">You will return to the login screen.</string>
+	<string name="profile_cancel_dialog_button_leave">Cancel sign-up</string>
+	<string name="profile_cancel_dialog_button_stay">Keep going</string>
 	<!-- deck create -->
 	<string name="deck_title_create">Create Deck</string>
 	<string name="deck_content_description_back">Go back</string>

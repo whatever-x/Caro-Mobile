@@ -42,7 +42,6 @@ import com.whatever.caro.core.designsystem.modifier.noRippleClickable
 import com.whatever.caro.core.designsystem.themes.CaroTheme
 import com.whatever.caro.core.model.auth.SocialLoginType
 import com.whatever.caro.feature.setting.component.MenuSection
-import com.whatever.caro.feature.setting.model.AppConfig
 import com.whatever.caro.feature.setting.model.SettingMenu
 import com.whatever.caro.feature.setting.mvi.SettingIntent
 import com.whatever.caro.feature.setting.mvi.SettingState
@@ -91,6 +90,7 @@ private val secondMenu =
 @Composable
 internal fun SettingScreen(
     state: SettingState,
+    appVersion: String,
     onIntent: (SettingIntent) -> Unit,
 ) {
     val onEnabledIntent: (SettingIntent) -> Unit = { intent ->
@@ -157,7 +157,7 @@ internal fun SettingScreen(
                 text =
                     stringResource(
                         Res.string.setting_description_app_version,
-                        AppConfig.appVersion,
+                        appVersion,
                     ),
                 style = CaroTheme.typography.caption1.medium,
                 color = CaroTheme.color.text.tertiary,
@@ -282,6 +282,7 @@ private fun SettingScreenPreview() {
                     emailAddress = "rsw1452@gmail.com",
                     socialLoginType = SocialLoginType.GOOGLE,
                 ),
+            appVersion = "1.0.0",
             onIntent = {},
         )
     }

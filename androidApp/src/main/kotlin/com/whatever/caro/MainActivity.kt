@@ -1,7 +1,6 @@
 package com.whatever.caro
 
 import android.Manifest
-import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
 import android.graphics.Color
@@ -13,7 +12,6 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.whatever.caro.composeApp.CaroApp
-import com.whatever.caro.core.messaging.IntentMessagingPublisher
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -35,17 +33,11 @@ class MainActivity : ComponentActivity() {
                 ),
         )
 
-        IntentMessagingPublisher.publishFromIntent(intent)
         requestNotificationPermissionIfNeeded()
 
         setContent {
             CaroApp()
         }
-    }
-
-    override fun onNewIntent(intent: Intent) {
-        super.onNewIntent(intent)
-        IntentMessagingPublisher.publishFromIntent(intent)
     }
 
     /**

@@ -50,6 +50,7 @@ class AuthRepositoryImplTest : FunSpec() {
                 val localAuthDataSource =
                     mock<LocalAuthDataSource> {
                         everySuspend { saveTokens(any(), any()) } returns Unit
+                        everySuspend { saveRegistrationComplete(any()) } returns Unit
                     }
                 val repository =
                     repositoryWith(
@@ -87,6 +88,7 @@ class AuthRepositoryImplTest : FunSpec() {
                 val localAuthDataSource =
                     mock<LocalAuthDataSource> {
                         everySuspend { saveTokens(any(), any()) } returns Unit
+                        everySuspend { saveRegistrationComplete(any()) } returns Unit
                     }
                 val repository =
                     repositoryWith(
@@ -103,6 +105,7 @@ class AuthRepositoryImplTest : FunSpec() {
                 result shouldBe false
                 verifySuspend {
                     localAuthDataSource.saveTokens(accessToken = "access", refreshToken = "refresh")
+                    localAuthDataSource.saveRegistrationComplete(false)
                 }
             }
         }
@@ -245,6 +248,7 @@ class AuthRepositoryImplTest : FunSpec() {
                 val localAuthDataSource =
                     mock<LocalAuthDataSource> {
                         everySuspend { saveTokens(any(), any()) } returns Unit
+                        everySuspend { saveRegistrationComplete(any()) } returns Unit
                     }
                 val repository =
                     repositoryWith(
@@ -267,7 +271,30 @@ class AuthRepositoryImplTest : FunSpec() {
                         ),
                     )
                     localAuthDataSource.saveTokens(accessToken = "access", refreshToken = "refresh")
+                    localAuthDataSource.saveRegistrationComplete(true)
                 }
+            }
+        }
+
+        test("isRegistrationComplete는 저장된 가입 완료 여부를 반환한다") {
+            runTest {
+                val localAuthDataSource =
+                    mock<LocalAuthDataSource> {
+                        everySuspend { fetchRegistrationComplete() } returns false
+                    }
+
+                repositoryWith(localAuthDataSource = localAuthDataSource).isRegistrationComplete() shouldBe false
+            }
+        }
+
+        test("isRegistrationComplete는 저장된 값이 없으면 true를 반환한다") {
+            runTest {
+                val localAuthDataSource =
+                    mock<LocalAuthDataSource> {
+                        everySuspend { fetchRegistrationComplete() } returns null
+                    }
+
+                repositoryWith(localAuthDataSource = localAuthDataSource).isRegistrationComplete() shouldBe true
             }
         }
 

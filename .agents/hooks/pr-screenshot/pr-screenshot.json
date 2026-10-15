@@ -1,0 +1,17 @@
+{
+  "description": "Caro-Mobile PR 생성 후 스크린샷 검사 필요성을 판단하도록 에이전트에 안내하는 훅. gh pr create의 대상 PR URL을 감지하고, 실제 diff·시나리오로 UI 영향을 확인한 뒤 영향이 있거나 불확실하면 사용자에게 테스트·결과 댓글 생성 여부를 묻게 한다. 훅은 직접 CI를 실행하지 않으며 사용자 승인 후 에이전트가 수동 실행한다. 이 파일은 배포용 원본이며 도구의 프로젝트 로컬 또는 사용자 영역에는 hooks 항목만 등록한다.",
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "^Bash$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq -c '# ponytail: observes gh pr create only; add tool matchers when other creation paths are used.\nselect(.hook_event_name == \"PostToolUse\" and .tool_name == \"Bash\") |\nselect((.tool_input.command // \"\") | test(\"\\\\bgh\\\\s+pr\\\\s+create\\\\b\") and (contains(\"--dry-run\") | not)) |\n.tool_response as $result |\nselect(if ($result | type) == \"object\" then\n  ($result.exit_code // $result.exitCode // $result.metadata.exit_code // 0) == 0 and ($result.session_id == null) and ($result.interrupted != true) and ($result.backgroundTaskId == null)\nelse true end) |\n($result | if type == \"string\" then . else tojson end) as $output |\nselect($output | test(\"(?i)(process exited with code|exit code:)[[:space:]]*[1-9][0-9]*\") | not) |\n[$output | scan(\"https://github.com/whatever-x/Caro-Mobile/pull/[1-9][0-9]*(?![0-9A-Za-z/?#_-])\")] | unique |\nselect(length > 0) |\n{hookSpecificOutput: {hookEventName: \"PostToolUse\", additionalContext:\n  (\"PR 생성 결과 URL을 gh pr view로 확인하고 AGENTS.md와 docs/index.md를 읽고 .agents/hooks/pr-screenshot/pr-screenshot.md의 사용자 확인 기준을 적용하세요: \" + join(\", \") +\n   \".\\n\\n실제 diff와 시나리오로 UI 영향을 판단하세요.\\nUI 영향 또는 불확실성이 있으면 근거·head/base SHA·커버 범위를 제시하고 사용자에게 스크린샷 테스트·결과 댓글 생성 여부를 반드시 물으세요.\\n명확한 비 UI 변경은 생략 이유를 보고하세요.\\n미응답은 승인이 아닙니다.\\n해당 PR의 실행을 이미 명시적으로 요청받았다면 중복 확인하지 마세요.\\n승인 후 gh workflow run으로 실행하세요.\")}}'",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  }
+}

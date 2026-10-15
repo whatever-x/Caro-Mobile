@@ -32,6 +32,7 @@ internal class AuthRepositoryImpl(
             accessToken = response.accessToken,
             refreshToken = response.refreshToken,
         )
+        localAuthDataSource.saveRegistrationComplete(response.isRegistrationComplete)
         return response.isRegistrationComplete
     }
 
@@ -79,8 +80,11 @@ internal class AuthRepositoryImpl(
             accessToken = response.accessToken,
             refreshToken = response.refreshToken,
         )
+        localAuthDataSource.saveRegistrationComplete(true)
         return response.toAuthSession()
     }
+
+    override suspend fun isRegistrationComplete(): Boolean = localAuthDataSource.fetchRegistrationComplete() ?: true
 
     override suspend fun refreshToken() {
         val accessToken = localAuthDataSource.fetchAccessToken()

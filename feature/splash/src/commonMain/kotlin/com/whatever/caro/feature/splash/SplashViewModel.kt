@@ -37,8 +37,13 @@ class SplashViewModel(
         delay(MINIMUM_SPLASH_DURATION_MILLIS)
         // TODO : 서버에서 세션 확인 API 만들어지면 변경
         authRepository.refreshToken()
+        val isRegistrationComplete = authRepository.isRegistrationComplete()
         reduce { copy(isInitializing = false) }
-        postSideEffect(SplashSideEffect.NavigateHome)
+        if (isRegistrationComplete) {
+            postSideEffect(SplashSideEffect.NavigateHome)
+        } else {
+            postSideEffect(SplashSideEffect.NavigateCreateProfile)
+        }
     }
 
     private suspend fun ensureNotificationPermission(controller: PermissionsController) {

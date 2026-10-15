@@ -45,6 +45,7 @@ import com.whatever.caro.core.ui.snackbar.SnackBarMessage
 import com.whatever.caro.core.ui.snackbar.SnackbarController
 import com.whatever.caro.feature.setting.SettingScreen
 import com.whatever.caro.feature.setting.SettingViewModel
+import com.whatever.caro.feature.setting.model.AppConfig
 import com.whatever.caro.feature.setting.model.SnackbarType
 import com.whatever.caro.feature.setting.model.WebViewType
 import com.whatever.caro.feature.setting.mvi.SettingIntent
@@ -145,6 +146,7 @@ fun SettingRoute(
 
     SettingScreen(
         state = state,
+        appVersion = AppConfig.appVersion,
         onIntent = viewModel::intent,
     )
     if (state.accountDeleteDialogVisible) {
