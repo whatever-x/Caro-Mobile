@@ -1,4 +1,5 @@
 name: Screenshot Comment
+run-name: 'Screenshot result · source ${{ github.event.workflow_run.id }} · attempt ${{ github.event.workflow_run.run_attempt }}'
 
 on:
   workflow_run:
@@ -8,16 +9,19 @@ on:
 permissions: {}
 
 concurrency:
-  group: screenshot-comment-${{ github.event.workflow_run.head_branch }}
+  group: screenshot-comment-${{ github.event.workflow_run.id }}
   cancel-in-progress: true
 
 jobs:
   publish:
     name: PR image report
     if: >-
-      github.event.workflow_run.event == 'pull_request' &&
-      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'workflow_dispatch' &&
+      github.event.workflow_run.head_branch == 'develop' &&
       github.event.workflow_run.head_repository.full_name == github.repository
+    outputs:
+      pr_number: ${{ steps.context.outputs.pr_number }}
+      current: ${{ steps.comment-current.outputs.current || steps.current.outputs.current }}
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     permissions:
@@ -26,24 +30,41 @@ jobs:
       pull-requests: write
     env:
       GH_TOKEN: ${{ github.token }}
-      RUN_HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
     steps:
-      - uses: actions/checkout@v6
-        with:
-          persist-credentials: false
       - uses: actions/download-artifact@v6
+        with:
+          name: screenshot-context
+          path: build/screenshot-context
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ github.token }}
+      - name: Validate request identity
+        id: context
+        env:
+          SOURCE_RUN_ID: ${{ github.event.workflow_run.id }}
+        run: |
+          metadata=build/screenshot-context/context.json
+          test -f "$metadata" && test ! -L "$metadata"
+          jq -e --argjson run "$SOURCE_RUN_ID" '
+            .run_id == $run and (.pr_number | type == "number" and . > 0 and . == floor) and
+            all(.head_sha, .base_sha; type == "string" and test("^[a-f0-9]{40}$"))
+          ' "$metadata" > /dev/null
+          jq -r '{pr_number, head_sha, base_sha} | to_entries[] | "\(.key)=\(.value)"' "$metadata" >> "$GITHUB_OUTPUT"
+      - uses: actions/download-artifact@v6
+        if: github.event.workflow_run.conclusion == 'success'
         with:
           name: screenshot-before-after-android
           path: build/screenshot-publish/android
           run-id: ${{ github.event.workflow_run.id }}
           github-token: ${{ github.token }}
       - uses: actions/download-artifact@v6
+        if: github.event.workflow_run.conclusion == 'success'
         with:
           name: screenshot-before-after-ios
           path: build/screenshot-publish/ios
           run-id: ${{ github.event.workflow_run.id }}
           github-token: ${{ github.token }}
       - name: Validate report files and PR identity
+        if: github.event.workflow_run.conclusion == 'success'
         id: report
         shell: bash
         run: |
@@ -51,10 +72,9 @@ jobs:
           for platform in android ios; do
             directory="build/screenshot-publish/$platform"
             summary="$directory/summary.json"
-            jq -e --arg platform "$platform" --arg head "$RUN_HEAD_SHA" '
-              .platform == $platform and .head_sha == $head and
-              (.base_sha | type == "string" and test("^[a-f0-9]{40}$")) and
-              (.pr_number | type == "number" and . > 0 and . == floor) and
+            jq -e --arg platform "$platform" --slurpfile context build/screenshot-context/context.json '
+              .pr_number == $context[0].pr_number and .base_sha == $context[0].base_sha and
+              .head_sha == $context[0].head_sha and .platform == $platform and
               (.total | type == "number" and . > 0 and . == floor) and
               all(.changed, .added, .removed; type == "array" and
                 all(.[]; type == "string" and test("^[A-Za-z0-9][A-Za-z0-9._-]*/[A-Za-z0-9][A-Za-z0-9._-]*$"))) and
@@ -63,22 +83,29 @@ jobs:
             diff -u <(jq -r '"summary.json", (.changed[] | . + "_before.png", . + "_actual.png"), (.added[] + "_actual.png")' "$summary" | sort) \
               <(find "$directory" -type f | sed "s|^$directory/||" | sort)
           done
-          jq -s -e '.[0].pr_number == .[1].pr_number and .[0].base_sha == .[1].base_sha and .[0].head_sha == .[1].head_sha' \
-            build/screenshot-publish/{android,ios}/summary.json > /dev/null
           number=$(jq -r '.pr_number' build/screenshot-publish/android/summary.json)
           base=$(jq -r '.base_sha' build/screenshot-publish/android/summary.json)
-          gh api "repos/$GITHUB_REPOSITORY/pulls/$number" > build/screenshot-pr.json
-          jq -e --arg head "$RUN_HEAD_SHA" --arg base "$base" --arg repo "$GITHUB_REPOSITORY" '
-            .state == "open" and .head.sha == $head and .base.sha == $base and
-            .head.repo.full_name == $repo and .base.ref == "develop"' build/screenshot-pr.json > /dev/null
           images=$(find build/screenshot-publish -type f -name '*.png' | wc -l)
           changes=$(jq -s '[.[] | .changed[], .added[], .removed[]] | length' build/screenshot-publish/{android,ios}/summary.json)
           echo "number=$number" >> "$GITHUB_OUTPUT"
           echo "base=$base" >> "$GITHUB_OUTPUT"
           echo "has-images=$([[ "$images" -gt 0 ]] && echo true || echo false)" >> "$GITHUB_OUTPUT"
           echo "has-changes=$([[ "$changes" -gt 0 ]] && echo true || echo false)" >> "$GITHUB_OUTPUT"
+      - name: Revalidate PR before publication
+        if: github.event.workflow_run.conclusion == 'success'
+        id: current
+        run: |
+          number=$(jq -r .pr_number build/screenshot-context/context.json)
+          current=$(gh api "repos/$GITHUB_REPOSITORY/pulls/$number" |
+            jq --slurpfile context build/screenshot-context/context.json --arg repo "$GITHUB_REPOSITORY" '
+              $context[0] as $c |
+              .number == $c.pr_number and .state == "open" and .base.ref == "develop" and
+              .head.sha == $c.head_sha and .base.sha == $c.base_sha and .head.repo.full_name == $repo
+            ')
+          echo "current=$current" >> "$GITHUB_OUTPUT"
+          if [[ "$current" != true ]]; then echo "::notice::PR changed, closed or from a fork; publication skipped."; fi
       - name: Publish changed images to companion branch
-        if: steps.report.outputs.has-images == 'true'
+        if: steps.current.outputs.current == 'true' && steps.report.outputs.has-images == 'true'
         id: images
         env:
           PR_NUMBER: ${{ steps.report.outputs.number }}
@@ -99,6 +126,7 @@ jobs:
           git -C "$checkout" push --force origin "HEAD:refs/heads/screenshots/pr-$PR_NUMBER"
           echo "sha=$(git -C "$checkout" rev-parse HEAD)" >> "$GITHUB_OUTPUT"
       - name: Generate comment Markdown
+        if: steps.current.outputs.current == 'true'
         env:
           IMAGE_SHA: ${{ steps.images.outputs.sha }}
           BASE_SHA: ${{ steps.report.outputs.base }}
@@ -122,14 +150,28 @@ jobs:
             fi
           } > build/screenshot-comment.md
       - name: Find screenshot comment
+        if: steps.current.outputs.current == 'true'
         uses: peter-evans/find-comment@b30e6a3c0ed37e7c023ccd3f1db5c6c0b0c23aad # v4
         id: comment
         with:
           issue-number: ${{ steps.report.outputs.number }}
           comment-author: github-actions[bot]
           body-includes: '<!-- caro-screenshot-report -->'
+      - name: Revalidate PR before comment
+        if: steps.current.outputs.current == 'true'
+        id: comment-current
+        run: |
+          number=$(jq -r .pr_number build/screenshot-context/context.json)
+          current=$(gh api "repos/$GITHUB_REPOSITORY/pulls/$number" |
+            jq --slurpfile context build/screenshot-context/context.json --arg repo "$GITHUB_REPOSITORY" '
+              $context[0] as $c |
+              .number == $c.pr_number and .state == "open" and .base.ref == "develop" and
+              .head.sha == $c.head_sha and .base.sha == $c.base_sha and .head.repo.full_name == $repo
+            ')
+          echo "current=$current" >> "$GITHUB_OUTPUT"
+          if [[ "$current" != true ]]; then echo "::notice::PR changed, closed or from a fork; publication skipped."; fi
       - name: Create or update screenshot comment
-        if: steps.report.outputs.has-changes == 'true' || steps.comment.outputs.comment-id != ''
+        if: steps.comment-current.outputs.current == 'true' && (steps.report.outputs.has-changes == 'true' || steps.comment.outputs.comment-id != '')
         uses: peter-evans/create-or-update-comment@71345be0265236311c031f5c7866368bd1eff043 # v4
         with:
           issue-number: ${{ steps.report.outputs.number }}
@@ -139,10 +181,11 @@ jobs:
 
   slack-notify:
     name: Slack Notify Screenshot Result
-    needs: [publish]
+    needs: publish
     if: >-
       always() &&
-      github.event.workflow_run.event == 'pull_request' &&
+      github.event.workflow_run.event == 'workflow_dispatch' &&
+      github.event.workflow_run.head_branch == 'develop' &&
       github.event.workflow_run.head_repository.full_name == github.repository
     runs-on: ubuntu-24.04
     timeout-minutes: 5
@@ -154,12 +197,16 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           RUN_ID: ${{ github.event.workflow_run.id }}
-          RUN_HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
           PUBLISH_RESULT: ${{ needs.publish.result }}
+          PR_NUMBER: ${{ needs.publish.outputs.pr_number }}
+          CURRENT: ${{ needs.publish.outputs.current }}
+          COMPARE_RESULT: ${{ github.event.workflow_run.conclusion }}
         run: |
           gh api --paginate --slurp "repos/$GITHUB_REPOSITORY/actions/runs/$RUN_ID/jobs?filter=all&per_page=100" > "$RUNNER_TEMP/screenshot-jobs.json"
-          gh api "repos/$GITHUB_REPOSITORY/commits/$RUN_HEAD_SHA/pulls?per_page=100" \
-            --jq '[.[] | select(.head.repo.full_name == env.GITHUB_REPOSITORY and .base.ref == "develop")]' > "$RUNNER_TEMP/screenshot-prs.json"
+          if [[ "$PUBLISH_RESULT" == success && ( "$COMPARE_RESULT" != success || "$CURRENT" == false ) ]]; then
+            PUBLISH_RESULT=skipped
+          fi
+          jq -n --arg number "$PR_NUMBER" 'if $number == "" then [] else [{number: ($number | tonumber)}] end' > "$RUNNER_TEMP/screenshot-prs.json"
           jq --slurpfile event "$GITHUB_EVENT_PATH" \
             --slurpfile prs "$RUNNER_TEMP/screenshot-prs.json" \
             --arg publish "$PUBLISH_RESULT" \
@@ -175,11 +222,12 @@ jobs:
           group_by(.name) | map(max_by([.run_attempt, .id])) as $jobs |
           (if $run.conclusion != "success" then $run.conclusion
            elif $publish == "cancelled" then "cancelled"
+           elif $publish == "skipped" then "skipped"
            elif $publish == "success" and
              all("android", "ios"; . as $platform |
                any($jobs[]; .name == "Compare / " + $platform and .conclusion == "success")) then "success"
            else "failure" end) as $result |
-          ($run.pull_requests[0] // $prs[0] // null) as $pr |
+          ($prs[0] // null) as $pr |
           (if $pr then $pr.html_url // ($run.repository.html_url + "/pull/" + ($pr.number | tostring)) else null end) as $pr_url |
           (if $pr then "PR #\($pr.number)" else ($run.head_branch[0:80] | escape) end) as $identity |
           ($identity + " 스크린샷 CI " + ($result | status_label)) as $title |
@@ -193,10 +241,13 @@ jobs:
             "*\(.name) — \(.job.conclusion | status_label)*\n" +
             ([.job.steps[]? | select(.conclusion == "failure" or .conclusion == "timed_out") | .name | escape] |
              if length > 0 then join("\n") else "실패 단계는 작업 로그에서 확인해 주세요." end)] +
+           [$jobs[] | select(.name != "Compare / android" and .name != "Compare / ios" and .conclusion == "failure") |
+            "*\(.name | escape) 실패*\n" + ([.steps[]? | select(.conclusion == "failure") | .name | escape] | join("\n"))] +
            [if $publish == "failure" then "*PR 이미지 리포트 게시 실패*" else empty end] | join("\n\n")) as $reasons |
           ([$platforms[] | select(.job.html_url) | "<\(.job.html_url)|\(.name) 로그>"] +
            ["<\($publisher_url)|리포트 게시 로그>", "<\($run.html_url)|전체 CI / 진단 아티팩트>"] | join(" · ")) as $links |
           (if $result == "success" then "*완료 내용*\nAndroid/iOS 테스트와 PR 이미지 리포트 게시 완료"
+           elif $result == "skipped" then "*게시 생략*\nPR 변경·종료 또는 fork PR로 이미지 게시를 생략했습니다."
            elif $reasons != "" then "*실패 사유*\n" + $reasons
            else "*완료 상태*\n" + ($result | status_label) end) as $details |
           {title: $title, results: ("*플랫폼별 결과*\n" + $results), details: $details,
@@ -207,17 +258,19 @@ jobs:
           # Small self-check stays with the workflow logic.
           . as $pages |
           {conclusion: "success", run_attempt: 2, head_branch: "build/test", html_url: "https://github.com/example/repo/actions/runs/1",
-           repository: {html_url: "https://github.com/example/repo"}, pull_requests: [{number: 123}]} as $sample |
+           repository: {html_url: "https://github.com/example/repo"}, pull_requests: [{number: 999}]} as $sample |
           [{jobs: [
             {id: 1, run_attempt: 1, name: "Compare / android", conclusion: "success"},
             {id: 2, run_attempt: 1, name: "Compare / ios", conclusion: "failure"},
             {id: 3, run_attempt: 2, name: "Compare / ios", conclusion: "success"},
             {id: 4, run_attempt: 3, name: "Compare / ios", conclusion: "failure"}
           ]}] as $jobs |
-          if ($jobs | message($sample; []; "success"; "https://github.com/example/repo/actions/runs/2") |
+          if ($jobs | message($sample; [{number: 123}]; "success"; "https://github.com/example/repo/actions/runs/2") |
                 (.title | contains("성공")) and .button_url == "https://github.com/example/repo/pull/123") and
-             ($jobs | message($sample; []; "failure"; "https://github.com/example/repo/actions/runs/2") |
+             ($jobs | message($sample; [{number: 123}]; "failure"; "https://github.com/example/repo/actions/runs/2") |
                 (.title | contains("실패")) and (.details | contains("리포트 게시 실패"))) and
+             ($jobs | message($sample; [{number: 123}]; "skipped"; "https://github.com/example/repo/actions/runs/2") |
+                (.title | contains("건너뜀")) and (.details | contains("게시 생략"))) and
              ($jobs | message($sample + {pull_requests: []}; []; "cancelled"; "https://github.com/example/repo/actions/runs/2") |
                 (.title | contains("취소")) and .button_text == "전체 CI 바로가기 ↗")
           then $pages | message($event[0].workflow_run; $prs[0]; $publish; $publisher_url)

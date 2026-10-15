@@ -1,19 +1,92 @@
 name: Screenshot PR
 
+run-name: 'Screenshot PR #${{ inputs.pr_number }} · ${{ inputs.request_id || github.run_id }}'
+
 on:
-  pull_request:
-    branches: [develop]
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: 'Open PR targeting develop'
+        required: true
+        type: string
+      expected_head_sha:
+        description: 'Expected PR head SHA (provide with expected_base_sha)'
+        type: string
+      expected_base_sha:
+        description: 'Expected PR base SHA (provide with expected_head_sha)'
+        type: string
+      request_id:
+        description: 'Optional unique request ID (letters, digits, dot, underscore, hyphen)'
+        type: string
 
 permissions:
   contents: read
   actions: read
+  pull-requests: read
 
 concurrency:
-  group: screenshot-pr-${{ github.event.pull_request.number }}
+  group: screenshot-pr-${{ inputs.pr_number }}
   cancel-in-progress: true
 
 jobs:
+  prepare:
+    name: Resolve screenshot request
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    outputs:
+      pr_number: ${{ steps.context.outputs.pr_number }}
+      head_sha: ${{ steps.context.outputs.head_sha }}
+      base_sha: ${{ steps.context.outputs.base_sha }}
+      merge_sha: ${{ steps.context.outputs.merge_sha }}
+    steps:
+      - name: Resolve PR and validate merge parents
+        id: context
+        env:
+          GH_TOKEN: ${{ github.token }}
+          DISPATCH_REF: ${{ github.ref }}
+          PR_NUMBER: ${{ inputs.pr_number }}
+          EXPECTED_HEAD_SHA: ${{ inputs.expected_head_sha }}
+          EXPECTED_BASE_SHA: ${{ inputs.expected_base_sha }}
+          REQUEST_ID: ${{ inputs.request_id || github.run_id }}
+        run: |
+          test "$DISPATCH_REF" = refs/heads/develop
+          if ! [[ "$PR_NUMBER" =~ ^[1-9][0-9]*$ && "$REQUEST_ID" =~ ^[A-Za-z0-9._-]{1,100}$ ]]; then
+            echo "::error::PR number must be a positive integer and request ID must use 1-100 letters, digits, dots, underscores or hyphens."
+            exit 1
+          fi
+          gh api "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER" > "$RUNNER_TEMP/pr.json"
+          mkdir -p build/screenshot-context
+          jq --arg request "$REQUEST_ID" --argjson run "$GITHUB_RUN_ID" '
+            {pr_number: .number, head_sha: .head.sha, base_sha: .base.sha,
+             merge_sha: .merge_commit_sha, request_id: $request, run_id: $run}
+          ' "$RUNNER_TEMP/pr.json" > build/screenshot-context/context.json
+          jq -e --arg head "$EXPECTED_HEAD_SHA" --arg base "$EXPECTED_BASE_SHA" '
+            .state == "open" and .base.ref == "develop" and
+            (.head.sha | test("^[a-f0-9]{40}$")) and (.base.sha | test("^[a-f0-9]{40}$")) and
+            (($head == "" and $base == "") or (.head.sha == $head and .base.sha == $base)) and
+            (.merge_commit_sha | type == "string" and test("^[a-f0-9]{40}$"))
+          ' "$RUNNER_TEMP/pr.json" > /dev/null || {
+            echo "::error::PR must be open, target develop and match the expected SHAs, with a valid merge commit."
+            exit 1
+          }
+          merge=$(jq -r .merge_commit_sha "$RUNNER_TEMP/pr.json")
+          gh api "repos/$GITHUB_REPOSITORY/git/commits/$merge" |
+            jq -e --slurpfile pr "$RUNNER_TEMP/pr.json" '
+              [.parents[].sha] == [$pr[0].base.sha, $pr[0].head.sha]
+            ' > /dev/null
+          jq -r '{pr_number, head_sha, base_sha, merge_sha} | to_entries[] | "\(.key)=\(.value)"' \
+            build/screenshot-context/context.json >> "$GITHUB_OUTPUT"
+      - name: Preserve request identity even on validation failure
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: screenshot-context
+          path: build/screenshot-context/context.json
+          if-no-files-found: warn
+          retention-days: 90
+
   compare:
+    needs: prepare
     name: Compare / ${{ matrix.platform }}
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 45
@@ -33,12 +106,19 @@ jobs:
             runner: macos-26
     steps:
       - uses: actions/checkout@v6
+        with:
+          ref: ${{ needs.prepare.outputs.merge_sha }}
+          persist-credentials: false
+      - name: Verify checked out PR merge commit
+        env:
+          MERGE_SHA: ${{ needs.prepare.outputs.merge_sha }}
+        run: test "$(git rev-parse HEAD)" = "$MERGE_SHA"
       - name: Download Golden for exact PR base SHA
         shell: bash
         timeout-minutes: 12
         env:
           GH_TOKEN: ${{ github.token }}
-          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          BASE_SHA: ${{ needs.prepare.outputs.base_sha }}
           PLATFORM: ${{ matrix.platform }}
         run: |
           deadline=$((SECONDS + 600))
@@ -138,9 +218,9 @@ jobs:
         env:
           TARGET: ${{ matrix.target }}
           PLATFORM: ${{ matrix.platform }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
-          BASE_SHA: ${{ github.event.pull_request.base.sha }}
-          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          PR_NUMBER: ${{ needs.prepare.outputs.pr_number }}
+          BASE_SHA: ${{ needs.prepare.outputs.base_sha }}
+          HEAD_SHA: ${{ needs.prepare.outputs.head_sha }}
         run: |
           # Keep the legacy artifact compatible with the default-branch publisher until merge.
           mkdir -p build/screenshot-report build/screenshot-before-after
