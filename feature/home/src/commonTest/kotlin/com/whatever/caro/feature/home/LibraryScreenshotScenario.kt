@@ -7,6 +7,7 @@ import com.whatever.caro.core.model.library.LibraryDeck
 import com.whatever.caro.core.model.library.LibraryDetail
 import com.whatever.caro.feature.home.library.LibraryPreviewScreen
 import com.whatever.caro.feature.home.library.LibraryScreen
+import com.whatever.caro.feature.home.library.mvi.LibraryPreviewIntent
 import com.whatever.caro.feature.home.library.mvi.LibraryPreviewState
 import com.whatever.caro.feature.home.library.mvi.LibraryState
 import com.whatever.caro.feature.home.library.mvi.toUiContent
@@ -25,6 +26,17 @@ internal object LibraryScreenshotScenario {
             ),
         )
 
+    private val englishDetail =
+        detail.copy(
+            deck =
+                deck.copy(
+                    name = "Essential English vocabulary for work and travel",
+                    description = "Everyday words for work, travel, and daily life.",
+                    cardCount = 1,
+                ),
+            cards = detail.cards.take(1),
+        )
+
     @Composable
     fun Preview(narrow: Boolean = false) {
         val content = if (narrow) detail.copy(deck = deck.copy(name = "아주 긴 제목의 단어 학습용 제공 덱 이름을 표시하는 예시", description = "")) else detail
@@ -34,5 +46,20 @@ internal object LibraryScreenshotScenario {
     @Composable
     fun List() {
         CaroTheme { LibraryScreen(LibraryState(persistentListOf(deck), loading = false, loaded = true)) {} }
+    }
+
+    @Composable
+    fun EnglishPreview() {
+        CaroTheme { LibraryPreviewScreen(LibraryPreviewState(englishDetail.toUiContent(), loading = false)) {} }
+    }
+
+    @Composable
+    fun EnglishError(onIntent: (LibraryPreviewIntent) -> Unit) {
+        CaroTheme {
+            LibraryPreviewScreen(
+                LibraryPreviewState(englishDetail.toUiContent(), loading = false, showAddError = true),
+                onIntent,
+            )
+        }
     }
 }

@@ -39,6 +39,26 @@ class LibraryScreenAndroidTest {
     }
 
     @Test
+    @Config(qualifiers = "en-rUS-w320dp-h700dp-xxhdpi")
+    fun englishPreviewOnNarrowScreen() {
+        composeRule.setContent { LibraryScreenshotScenario.EnglishPreview() }
+        composeRule.onNodeWithText("Add to my decks").assertIsDisplayed()
+        composeRule.onNodeWithText("Cards: 1").assertIsDisplayed()
+        composeRule.onRoot().captureRoboImage("library.preview.english.narrow.png")
+    }
+
+    @Test
+    @Config(qualifiers = "en-rUS-w320dp-h700dp-xxhdpi")
+    fun englishErrorOnlyClosesPopup() {
+        val intents = mutableListOf<LibraryPreviewIntent>()
+        composeRule.setContent { LibraryScreenshotScenario.EnglishError { intents.add(it) } }
+        composeRule.onNodeWithText("Couldn't add deck").assertIsDisplayed()
+        composeRule.onRoot().captureRoboImage("library.preview.english.error.png")
+        composeRule.onNodeWithText("OK").performClick()
+        assertEquals(listOf(LibraryPreviewIntent.DismissError), intents)
+    }
+
+    @Test
     @Config(qualifiers = "ko-rKR-w320dp-h700dp-xxhdpi")
     fun narrowLongTitle() {
         composeRule.setContent { LibraryScreenshotScenario.Preview(narrow = true) }
