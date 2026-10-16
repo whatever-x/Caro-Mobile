@@ -62,8 +62,6 @@ import com.whatever.caro.core.navigator.entries.SplashEntry
 import com.whatever.caro.core.ui.image.ConfigureCaroImageLoader
 import com.whatever.caro.core.ui.snackbar.SnackbarController
 import io.github.aakira.napier.Napier
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.filter
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
 import org.jetbrains.compose.resources.stringResource
@@ -112,10 +110,7 @@ fun CaroApp(
     val backStack = rememberNavBackStack(savedStateConfiguration, SplashEntry)
 
     LaunchedEffect(messagingClient, fcmTokenRepository) {
-        messagingClient.tokenFlow
-            .filter(String::isNotBlank)
-            .distinctUntilChanged()
-            .collect(fcmTokenRepository::syncToken)
+        fcmTokenRepository.syncTokens(messagingClient.tokenFlow)
     }
 
     LaunchedEffect(navDispatcher) {
