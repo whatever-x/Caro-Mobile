@@ -34,6 +34,7 @@ import caromobile.core.designsystem.generated.resources.app_exit_dialog_button_c
 import caromobile.core.designsystem.generated.resources.app_exit_dialog_button_exit
 import caromobile.core.designsystem.generated.resources.app_exit_dialog_title
 import com.whatever.caro.core.data.repository.fcm.FcmTokenRepository
+import com.whatever.caro.core.datastore.datasource.LocalNotificationDataSource
 import com.whatever.caro.core.designsystem.components.CaroDialog
 import com.whatever.caro.core.designsystem.components.CaroDialogButton
 import com.whatever.caro.core.designsystem.components.CaroSnackBarHost
@@ -60,8 +61,10 @@ import com.whatever.caro.core.navigator.entries.LoginEntry
 import com.whatever.caro.core.navigator.entries.SettingEntry
 import com.whatever.caro.core.navigator.entries.SplashEntry
 import com.whatever.caro.core.ui.image.ConfigureCaroImageLoader
+import com.whatever.caro.core.ui.notification.rememberNotificationPermissionController
 import com.whatever.caro.core.ui.snackbar.SnackbarController
 import io.github.aakira.napier.Napier
+import kotlinx.coroutines.CancellationException
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
 import org.jetbrains.compose.resources.stringResource
@@ -81,6 +84,17 @@ fun CaroApp(
     fcmTokenRepository: FcmTokenRepository = koinInject(),
 ) {
     ConfigureCaroImageLoader()
+
+    val localNotificationDataSource = koinInject<LocalNotificationDataSource>()
+    val notificationPermissionController = rememberNotificationPermissionController()
+    LaunchedEffect(localNotificationDataSource, notificationPermissionController) {
+        try {
+            requestInitialNotificationPermission(localNotificationDataSource, notificationPermissionController)
+        } catch (exception: Exception) {
+            if (exception is CancellationException) throw exception
+            Napier.w { "Initial notification permission request failed" }
+        }
+    }
 
     val savedStateConfiguration =
         remember {
