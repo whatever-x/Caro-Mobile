@@ -1,11 +1,12 @@
 name: iOS Worker Benchmark 185
-run-name: 'iOS worker benchmark #185 · fixed cache · ${{ github.sha }}'
+run-name: 'iOS worker benchmark #185 · same runner · ${{ github.sha }}'
 'on':
   push:
     branches:
     - build/185-ios-worker-benchmark
     paths:
     - .github/workflows/ios-worker-benchmark.yml
+    - .github/scripts/ios-worker-benchmark.py
   workflow_dispatch: {}
 permissions:
   contents: read
@@ -14,38 +15,14 @@ env:
   SOURCE_SHA: 36397502b3086acb10883c0c2c2fdbe817c5894f
   GOLDEN_RUN: '38759977731'
   FROZEN_CACHE_KEY: caro-worker-185-38850133315-1
-  MEASUREMENT_IMAGE_VERSION: 20260907.0351.1
 defaults:
   run:
     shell: bash
 jobs:
   measure:
-    name: Worker ${{ matrix.workers }} / sample ${{ matrix.sample }}
+    name: Nine samples on one runner
     runs-on: macos-26
-    timeout-minutes: 45
-    strategy:
-      fail-fast: false
-      max-parallel: 3
-      matrix:
-        include:
-        - workers: default
-          sample: 1
-        - workers: '1'
-          sample: 1
-        - workers: '2'
-          sample: 1
-        - workers: '1'
-          sample: 2
-        - workers: '2'
-          sample: 2
-        - workers: default
-          sample: 2
-        - workers: '2'
-          sample: 3
-        - workers: default
-          sample: 3
-        - workers: '1'
-          sample: 3
+    timeout-minutes: 180
     steps:
     - uses: actions/checkout@v6
       with:
@@ -86,185 +63,113 @@ jobs:
           ~/caro-worker-cache
         key: ${{ env.FROZEN_CACHE_KEY }}
         fail-on-cache-miss: true
-    - name: Verify exact cache and runner identity
+    - name: Prepare snapshot on this runner
       env:
-        BENCHMARK_PHASE: measure
+        GH_TOKEN: ${{ github.token }}
       run: |-
-        python3 - <<'PYTHON'
-        import hashlib, json, os, platform, subprocess
-        from pathlib import Path
-        roots=[Path.home()/'.gradle/caches',Path.home()/'.gradle/wrapper',Path.home()/'.konan']
-        hash_all=hashlib.sha256(); count=0; size=0
-        for root in roots:
-            for path in sorted(root.rglob('*')):
-                if path.is_file() and not path.is_symlink():
-                    file_hash=hashlib.sha256()
-                    with path.open('rb') as stream:
-                        for chunk in iter(lambda: stream.read(1024*1024), b''): file_hash.update(chunk)
-                    digest=file_hash.hexdigest()
-                    label=str(path.relative_to(Path.home()))
-                    hash_all.update((label+'\0'+digest+'\n').encode())
-                    count+=1; size+=path.stat().st_size
-        identity={'sha256':hash_all.hexdigest(),'files':count,'bytes':size,
-         'image_os':os.environ.get('ImageOS'),'image_version':os.environ.get('ImageVersion'),
-         'arch':platform.machine(),'os':subprocess.check_output(['sw_vers','-productVersion'],text=True).strip(),
-         'cpu':subprocess.check_output(['sysctl','-n','hw.ncpu'],text=True).strip(),
-         'memory':subprocess.check_output(['sysctl','-n','hw.memsize'],text=True).strip(),
-         'xcode':subprocess.check_output(['xcodebuild','-version'],text=True).strip(),
-         'sdk':subprocess.check_output(['xcrun','--sdk','iphonesimulator','--show-sdk-version'],text=True).strip()}
-        folder=Path.home()/'caro-worker-cache'; folder.mkdir(exist_ok=True)
-        expected=folder/'identity.json'
-        if os.environ.get('BENCHMARK_PHASE')=='measure':
-            seed=json.loads(expected.read_text())
-            expected_identity=dict(seed, image_version=os.environ['MEASUREMENT_IMAGE_VERSION'])
-            assert identity==expected_identity, {'expected':expected_identity,'actual':identity}
-            output=Path('build/worker-benchmark'); output.mkdir(parents=True,exist_ok=True)
-            (output/'cache-identity.json').write_text(json.dumps(identity,indent=2)+'\n')
-        else:
-            expected.write_text(json.dumps(identity,indent=2)+'\n')
-        print(json.dumps(identity,indent=2))
-        PYTHON
-    - name: Validate scenarios and restore Golden images
-      shell: bash
-      env:
-        TARGET: iosSimulatorArm64
-      run: |
-        for manifest in build/screenshot-baseline/scenarios.json scripts/screenshot/scenarios.json; do
-          jq -e 'type == "object" and length > 0 and all(to_entries[];
-            (.key | test("^[A-Za-z0-9][A-Za-z0-9._-]*$")) and
-            (.value | type == "array" and length > 0 and length == (unique | length) and
-              all(.[]; type == "string" and test("^[A-Za-z0-9][A-Za-z0-9._-]*$") and
-                (test("_(actual|compare)$") | not))))' "$manifest" > /dev/null
-        done
-        test -z "$(find build/screenshot-baseline -type l -print)"
-        diff -u <(jq -r 'to_entries[] | .key as $module | .value[] | $module + "/" + . + ".png"' build/screenshot-baseline/scenarios.json | sort) \
-          <(find build/screenshot-baseline -type f -name '*.png' | sed 's|^build/screenshot-baseline/||' | sort)
-        while IFS=$'\t' read -r module scenario; do
-          destination="feature/$module/build/outputs/roborazzi/$TARGET"
-          mkdir -p "$destination"
-          cp "build/screenshot-baseline/$module/$scenario.png" "$destination/"
-        done < <(jq -r 'to_entries[] | .key as $module | .value[] | [$module, .] | @tsv' build/screenshot-baseline/scenarios.json)
-    - name: Configure offline screenshot fixtures
-      run: |
-        cat > local.properties <<'EOF'
-        CARO_DEV_SERVER=https://example.invalid/
-        CARO_QA_SERVER=https://example.invalid/
-        CARO_PROD_SERVER=https://example.invalid/
-        GOOGLE_WEB_CLIENT_ID=screenshot-test
-        EOF
-    - name: Measure real screenshot comparison
-      env:
-        WORKERS: ${{ matrix.workers }}
-        SAMPLE: ${{ matrix.sample }}
-        CACHE_KEY: ${{ steps.frozen.outputs.cache-matched-key }}
-      run: |-
-        mkdir -p build/worker-benchmark
-        cat > "$RUNNER_TEMP/worker-benchmark.init.gradle" <<'INIT'
-        gradle.settingsEvaluated {
-            println("BENCHMARK_WORKERS_MAX=" + gradle.startParameter.maxWorkerCount)
-        }
-        INIT
-        cat > "$RUNNER_TEMP/worker-benchmark.py" <<'PYTHON'
-        import json, os, subprocess, time
-        from pathlib import Path
-        scenarios=json.loads(Path('scripts/screenshot/scenarios.json').read_text())
-        command=['./gradlew','compareRoborazziIosSimulatorArm64']
-        for module in sorted(scenarios):
-            command += [f':feature:{module}:iosSimulatorArm64Test','--rerun']
-        command += ['--stacktrace','--profile','--console=plain','--init-script',os.environ['RUNNER_TEMP']+'/worker-benchmark.init.gradle']
-        if os.environ['WORKERS']!='default': command += ['--max-workers='+os.environ['WORKERS']]
-        started=time.time()
-        # time reports the Gradle client's maximum RSS, not aggregate build-tree memory.
-        with Path('build/worker-benchmark/time.txt').open('w') as resource:
-            process=subprocess.Popen(['/usr/bin/time','-l']+command,stdout=subprocess.PIPE,stderr=resource,text=True)
-            with Path('build/worker-benchmark/gradle.log').open('w') as log:
-                for line in process.stdout:
-                    print(line,end='',flush=True); log.write(line)
-            result=process.wait()
-        record={'workers':os.environ['WORKERS'],'sample':int(os.environ['SAMPLE']),
-         'source_sha':os.environ['SOURCE_SHA'],'workflow_sha':os.environ['GITHUB_SHA'],
-         'golden_run':os.environ['GOLDEN_RUN'],'cache_key':os.environ['CACHE_KEY'],
-         'started_epoch':started,'finished_epoch':time.time(),'exit_code':result,'command':command}
-        record['elapsed_seconds']=record['finished_epoch']-started
-        Path('build/worker-benchmark/measurement.json').write_text(json.dumps(record,indent=2)+'\n')
-        print(Path('build/worker-benchmark/time.txt').read_text())
-        raise SystemExit(result)
-        PYTHON
-        python3 "$RUNNER_TEMP/worker-benchmark.py"
-    - name: Validate all 14 fresh screenshot results
-      shell: bash
-      env:
-        TARGET: iosSimulatorArm64
-        PLATFORM: ios
-        PR_NUMBER: '0'
-        BASE_SHA: 36397502b3086acb10883c0c2c2fdbe817c5894f
-        HEAD_SHA: 36397502b3086acb10883c0c2c2fdbe817c5894f
-      run: |
-        # Keep the legacy artifact compatible with the default-branch publisher until merge.
-        mkdir -p build/screenshot-report build/screenshot-before-after
-        : > build/screenshot-results.jsonl
-        while IFS= read -r module; do
-          source="feature/$module/build/outputs/roborazzi/$TARGET"
-          results="feature/$module/build/test-results/roborazzi/$TARGET/results-summary.json"
-          ids=$(jq -c --arg module "$module" '.[$module]' scripts/screenshot/scenarios.json)
-          jq -e --argjson ids "$ids" '
-            (.results | type == "array") and
-            ([.results[].golden_file_path | split("/")[-1]] | sort) == ($ids | map(. + ".png") | sort) and
-            all(.results[]; .type == "changed" or .type == "added" or .type == "unchanged")' "$results" > /dev/null
-          while IFS=$'\t' read -r scenario kind; do
-            if jq -e --arg module "$module" --arg scenario "$scenario" '(.[$module] // []) | index($scenario) != null' \
-              build/screenshot-baseline/scenarios.json > /dev/null; then
-              test "$kind" != added
-            else
-              test "$kind" = added
-            fi
-            case "$kind" in
-              changed) image="${scenario}_compare.png" ;;
-              added) image="${scenario}_actual.png" ;;
-              unchanged) continue ;;
-            esac
-            test -f "$source/$image" && test ! -L "$source/$image"
-            mkdir -p "build/screenshot-report/$module"
-            cp "$source/$image" "build/screenshot-report/$module/"
-            mkdir -p "build/screenshot-before-after/$module"
-            actual="$source/${scenario}_actual.png"
-            test -f "$actual" && test ! -L "$actual"
-            cp "$actual" "build/screenshot-before-after/$module/"
-            if [[ "$kind" == changed ]]; then
-              before="build/screenshot-baseline/$module/$scenario.png"
-              test -f "$before" && test ! -L "$before"
-              cp "$before" "build/screenshot-before-after/$module/${scenario}_before.png"
-            fi
-          done < <(jq -r '.results[] | [(.golden_file_path | split("/")[-1] | rtrimstr(".png")), .type] | @tsv' "$results")
-          jq -c --arg module "$module" '.results[] | {scenario: ($module + "/" + (.golden_file_path | split("/")[-1] | rtrimstr(".png"))), type}' \
-            "$results" >> build/screenshot-results.jsonl
-        done < <(jq -r 'keys[]' scripts/screenshot/scenarios.json)
-        removed=$(jq -n --slurpfile golden build/screenshot-baseline/scenarios.json --slurpfile current scripts/screenshot/scenarios.json '
-          def scenarios: to_entries[] | .key as $module | .value[] | $module + "/" + .;
-          [$golden[0] | scenarios] - [$current[0] | scenarios]')
-        jq -s --arg platform "$PLATFORM" --argjson pr_number "$PR_NUMBER" --arg base_sha "$BASE_SHA" --arg head_sha "$HEAD_SHA" --argjson removed "$removed" '
-          {platform: $platform, pr_number: $pr_number, base_sha: $base_sha, head_sha: $head_sha, total: length,
-           changed: [.[] | select(.type == "changed") | .scenario],
-           added: [.[] | select(.type == "added") | .scenario], removed: $removed}' \
-          build/screenshot-results.jsonl > build/screenshot-report/summary.json
-        cat build/screenshot-report/summary.json
-        cp build/screenshot-report/summary.json build/screenshot-before-after/summary.json
-    - name: Verify real rendering tasks executed
-      run: |-
-        while IFS= read -r module; do
-          grep -Fx "> Task :feature:$module:iosSimulatorArm64Test" build/worker-benchmark/gradle.log
-        done < <(jq -r 'keys[]' scripts/screenshot/scenarios.json)
-        cat build/screenshot-report/summary.json >> "$GITHUB_STEP_SUMMARY"
-    - name: Upload measurement and profiles
+        gh api "repos/$GITHUB_REPOSITORY/contents/.github/scripts/ios-worker-benchmark.py?ref=$GITHUB_SHA" \
+          --jq .content | base64 --decode > "$RUNNER_TEMP/ios-worker-benchmark.py"
+        python3 "$RUNNER_TEMP/ios-worker-benchmark.py" prepare
+    - name: Measure worker default / sample 1
+      run: python3 "$RUNNER_TEMP/ios-worker-benchmark.py" sample default 1
+    - name: Upload worker default / sample 1
       if: always()
       uses: actions/upload-artifact@v6
       with:
-        name: worker-${{ matrix.workers }}-sample-${{ matrix.sample }}
+        name: sequential-worker-default-sample-1
+        path: ${{ runner.temp }}/caro-worker-sequential/worker-default-sample-1/
+        if-no-files-found: warn
+        retention-days: 90
+    - name: Measure worker 1 / sample 1
+      run: python3 "$RUNNER_TEMP/ios-worker-benchmark.py" sample 1 1
+    - name: Upload worker 1 / sample 1
+      if: always()
+      uses: actions/upload-artifact@v6
+      with:
+        name: sequential-worker-1-sample-1
+        path: ${{ runner.temp }}/caro-worker-sequential/worker-1-sample-1/
+        if-no-files-found: warn
+        retention-days: 90
+    - name: Measure worker 2 / sample 1
+      run: python3 "$RUNNER_TEMP/ios-worker-benchmark.py" sample 2 1
+    - name: Upload worker 2 / sample 1
+      if: always()
+      uses: actions/upload-artifact@v6
+      with:
+        name: sequential-worker-2-sample-1
+        path: ${{ runner.temp }}/caro-worker-sequential/worker-2-sample-1/
+        if-no-files-found: warn
+        retention-days: 90
+    - name: Measure worker 1 / sample 2
+      run: python3 "$RUNNER_TEMP/ios-worker-benchmark.py" sample 1 2
+    - name: Upload worker 1 / sample 2
+      if: always()
+      uses: actions/upload-artifact@v6
+      with:
+        name: sequential-worker-1-sample-2
+        path: ${{ runner.temp }}/caro-worker-sequential/worker-1-sample-2/
+        if-no-files-found: warn
+        retention-days: 90
+    - name: Measure worker 2 / sample 2
+      run: python3 "$RUNNER_TEMP/ios-worker-benchmark.py" sample 2 2
+    - name: Upload worker 2 / sample 2
+      if: always()
+      uses: actions/upload-artifact@v6
+      with:
+        name: sequential-worker-2-sample-2
+        path: ${{ runner.temp }}/caro-worker-sequential/worker-2-sample-2/
+        if-no-files-found: warn
+        retention-days: 90
+    - name: Measure worker default / sample 2
+      run: python3 "$RUNNER_TEMP/ios-worker-benchmark.py" sample default 2
+    - name: Upload worker default / sample 2
+      if: always()
+      uses: actions/upload-artifact@v6
+      with:
+        name: sequential-worker-default-sample-2
+        path: ${{ runner.temp }}/caro-worker-sequential/worker-default-sample-2/
+        if-no-files-found: warn
+        retention-days: 90
+    - name: Measure worker 2 / sample 3
+      run: python3 "$RUNNER_TEMP/ios-worker-benchmark.py" sample 2 3
+    - name: Upload worker 2 / sample 3
+      if: always()
+      uses: actions/upload-artifact@v6
+      with:
+        name: sequential-worker-2-sample-3
+        path: ${{ runner.temp }}/caro-worker-sequential/worker-2-sample-3/
+        if-no-files-found: warn
+        retention-days: 90
+    - name: Measure worker default / sample 3
+      run: python3 "$RUNNER_TEMP/ios-worker-benchmark.py" sample default 3
+    - name: Upload worker default / sample 3
+      if: always()
+      uses: actions/upload-artifact@v6
+      with:
+        name: sequential-worker-default-sample-3
+        path: ${{ runner.temp }}/caro-worker-sequential/worker-default-sample-3/
+        if-no-files-found: warn
+        retention-days: 90
+    - name: Measure worker 1 / sample 3
+      run: python3 "$RUNNER_TEMP/ios-worker-benchmark.py" sample 1 3
+    - name: Upload worker 1 / sample 3
+      if: always()
+      uses: actions/upload-artifact@v6
+      with:
+        name: sequential-worker-1-sample-3
+        path: ${{ runner.temp }}/caro-worker-sequential/worker-1-sample-3/
+        if-no-files-found: warn
+        retention-days: 90
+    - name: Verify all nine samples
+      run: python3 "$RUNNER_TEMP/ios-worker-benchmark.py" summarize
+    - name: Upload environment and measurements
+      if: always()
+      uses: actions/upload-artifact@v6
+      with:
+        name: sequential-worker-summary
         path: |-
-          build/worker-benchmark/
-          build/reports/profile/
-          build/screenshot-report/
-          feature/*/build/test-results/roborazzi/iosSimulatorArm64/
-          feature/*/build/reports/roborazzi/iosSimulatorArm64/
-        if-no-files-found: error
+          ${{ runner.temp }}/caro-worker-sequential/environment.json
+          ${{ runner.temp }}/caro-worker-sequential/fingerprint.json
+          ${{ runner.temp }}/caro-worker-sequential/measurements.json
+        if-no-files-found: warn
         retention-days: 90
