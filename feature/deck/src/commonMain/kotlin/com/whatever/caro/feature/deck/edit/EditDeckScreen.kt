@@ -42,6 +42,7 @@ import com.whatever.caro.core.designsystem.components.CaroTextField
 import com.whatever.caro.core.designsystem.components.CaroTopBar
 import com.whatever.caro.core.designsystem.modifier.noRippleClickable
 import com.whatever.caro.core.designsystem.themes.CaroTheme
+import com.whatever.caro.core.ui.keyboard.rememberImeReadyAwaiter
 import com.whatever.caro.core.ui.loading.CaroLoadingOverlayBox
 import com.whatever.caro.feature.deck.component.CtaButton
 import com.whatever.caro.feature.deck.component.DeckTipSection
@@ -61,7 +62,11 @@ internal fun EditDeckScreen(
     val nameFocusRequester = remember { FocusRequester() }
     val descriptionFocusRequester = remember { FocusRequester() }
 
+    val awaitImeReady = rememberImeReadyAwaiter()
+
     LaunchedEffect(Unit) {
+        // 바텀시트에서 진입하면 IME 제어권이 아직 없으므로 확보 후 포커스를 요청한다.
+        awaitImeReady()
         nameFocusRequester.requestFocus()
     }
 
