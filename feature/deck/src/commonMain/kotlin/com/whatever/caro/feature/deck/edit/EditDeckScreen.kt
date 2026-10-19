@@ -21,9 +21,13 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import caromobile.core.designsystem.generated.resources.Res
@@ -63,11 +67,13 @@ internal fun EditDeckScreen(
     val descriptionFocusRequester = remember { FocusRequester() }
 
     val awaitImeReady = rememberImeReadyAwaiter()
+    var isInputFocused by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         // 바텀시트에서 진입하면 IME 제어권이 아직 없으므로 확보 후 포커스를 요청한다.
         awaitImeReady()
-        nameFocusRequester.requestFocus()
+        // 대기 중 사용자가 직접 선택한 입력란이 있으면 그 포커스를 유지한다.
+        if (!isInputFocused) nameFocusRequester.requestFocus()
     }
 
     CaroLoadingOverlayBox(isLoading = state.isLoading) {
@@ -103,6 +109,7 @@ internal fun EditDeckScreen(
                     Modifier
                         .fillMaxWidth()
                         .weight(1f)
+                        .onFocusChanged { isInputFocused = it.hasFocus }
                         .verticalScroll(rememberScrollState())
                         .padding(
                             horizontal = CaroTheme.spacing.xl,
