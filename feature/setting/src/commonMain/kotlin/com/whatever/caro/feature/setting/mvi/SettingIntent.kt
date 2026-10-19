@@ -3,6 +3,22 @@ package com.whatever.caro.feature.setting.mvi
 import com.whatever.caro.core.viewmodel.contract.UiIntent
 
 sealed interface SettingIntent : UiIntent {
+    data object ClickNotificationToggle : SettingIntent
+
+    data class NotificationPermissionResult(
+        val granted: Boolean,
+    ) : SettingIntent
+
+    data class NotificationPermissionRefreshed(
+        val granted: Boolean,
+    ) : SettingIntent
+
+    data object DismissNotificationPermissionDialog : SettingIntent
+
+    data object OpenNotificationSettings : SettingIntent
+
+    data object NotificationPermissionFailed : SettingIntent
+
     data object Initialize : SettingIntent
 
     data object ClickNicknameChange : SettingIntent

@@ -3,6 +3,7 @@ package com.whatever.caro.core.remote.network.plugins
 import com.whatever.caro.core.remote.auth.AuthTokenProvider
 import io.ktor.client.plugins.api.Send
 import io.ktor.client.plugins.api.createClientPlugin
+import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.headers
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
@@ -12,6 +13,7 @@ import kotlinx.coroutines.sync.withLock
 
 internal class AuthInterceptorConfig {
     lateinit var tokenProvider: AuthTokenProvider
+    var refreshOnUnauthorized: (HttpRequestBuilder) -> Boolean = { true }
 }
 
 internal val AuthInterceptorPlugin =
@@ -31,7 +33,7 @@ internal val AuthInterceptorPlugin =
             }
 
             var call = proceed(request)
-            if (call.response.status != HttpStatusCode.Unauthorized) {
+            if (call.response.status != HttpStatusCode.Unauthorized || !pluginConfig.refreshOnUnauthorized(request)) {
                 return@on call
             }
 
