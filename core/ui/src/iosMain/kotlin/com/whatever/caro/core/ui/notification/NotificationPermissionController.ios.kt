@@ -32,10 +32,13 @@ private class IosNotificationPermissionController : NotificationPermissionContro
     private val center = UNUserNotificationCenter.currentNotificationCenter()
     private val mutex = Mutex()
 
-    override suspend fun isGranted(): Boolean {
-        val status = authorizationStatus()
-        return status == UNAuthorizationStatusAuthorized || status == UNAuthorizationStatusProvisional
-    }
+    override suspend fun isGranted(): Boolean =
+        withContext(Dispatchers.Main.immediate) {
+            val status = authorizationStatus()
+            val granted = status == UNAuthorizationStatusAuthorized || status == UNAuthorizationStatusProvisional
+            if (granted) UIApplication.sharedApplication.registerForRemoteNotifications()
+            granted
+        }
 
     override suspend fun request(): Boolean =
         withContext(Dispatchers.Main.immediate) {
@@ -55,9 +58,7 @@ private class IosNotificationPermissionController : NotificationPermissionContro
                         }
                     }
                 }
-                isGranted().also { granted ->
-                    if (granted) UIApplication.sharedApplication.registerForRemoteNotifications()
-                }
+                isGranted()
             }
         }
 

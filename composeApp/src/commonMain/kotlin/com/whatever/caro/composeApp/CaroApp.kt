@@ -17,12 +17,15 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigationevent.NavigationEventInfo
@@ -65,6 +68,7 @@ import com.whatever.caro.core.ui.notification.rememberNotificationPermissionCont
 import com.whatever.caro.core.ui.snackbar.SnackbarController
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.launch
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
 import org.jetbrains.compose.resources.stringResource
@@ -87,12 +91,29 @@ fun CaroApp(
 
     val localNotificationDataSource = koinInject<LocalNotificationDataSource>()
     val notificationPermissionController = rememberNotificationPermissionController()
+    var notificationStartupComplete by remember { mutableStateOf(false) }
+    val notificationScope = rememberCoroutineScope()
+    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
+        if (notificationStartupComplete) {
+            notificationScope.launch {
+                try {
+                    fcmTokenRepository.updateNotificationPermission(notificationPermissionController.isGranted())
+                } catch (exception: Exception) {
+                    if (exception is CancellationException) throw exception
+                    Napier.w { "Notification permission refresh failed" }
+                }
+            }
+        }
+    }
     LaunchedEffect(localNotificationDataSource, notificationPermissionController) {
         try {
             requestInitialNotificationPermission(localNotificationDataSource, notificationPermissionController)
+            fcmTokenRepository.updateNotificationPermission(notificationPermissionController.isGranted())
         } catch (exception: Exception) {
             if (exception is CancellationException) throw exception
             Napier.w { "Initial notification permission request failed" }
+        } finally {
+            notificationStartupComplete = true
         }
     }
 

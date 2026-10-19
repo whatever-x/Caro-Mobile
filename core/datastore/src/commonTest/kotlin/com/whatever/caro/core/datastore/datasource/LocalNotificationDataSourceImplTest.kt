@@ -10,6 +10,7 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.test.runTest
@@ -18,6 +19,42 @@ import okio.IOException
 
 class LocalNotificationDataSourceImplTest : FunSpec() {
     init {
+        test("기기 선택은 미설정과 OFF를 구분하고 인증 삭제 및 재생성 후 유지한다") {
+            runTest {
+                val store = NotificationMemoryDataStore()
+                val source = LocalNotificationDataSourceImpl(store)
+                source.observeNotificationEnabled().first() shouldBe null
+                source.saveNotificationEnabled(false)
+                LocalAuthDataSourceImpl(store).clear()
+                LocalNotificationDataSourceImpl(store).observeNotificationEnabled().first() shouldBe false
+                source.saveNotificationEnabled(true)
+                source.observeNotificationEnabled().first() shouldBe true
+            }
+        }
+
+        test("마지막 등록 토큰은 재생성 후 조회하고 삭제 후 정리한다") {
+            runTest {
+                val store = NotificationMemoryDataStore()
+                val source = LocalNotificationDataSourceImpl(store)
+                source.fetchRegisteredToken() shouldBe null
+                source.saveRegisteredToken("registered")
+                LocalNotificationDataSourceImpl(store).fetchRegisteredToken() shouldBe "registered"
+                source.saveRegisteredToken(null)
+                source.fetchRegisteredToken() shouldBe null
+            }
+        }
+
+        test("선택 저장 실패는 이전 OFF를 보존한다") {
+            runTest {
+                val store = NotificationMemoryDataStore()
+                val source = LocalNotificationDataSourceImpl(store)
+                source.saveNotificationEnabled(false)
+                store.failure = IOException("disk full")
+                shouldThrow<IOException> { source.saveNotificationEnabled(true) }
+                source.observeNotificationEnabled().first() shouldBe false
+            }
+        }
+
         test("최초 요청을 소비하면 source 재생성 후에도 다시 요청하지 않는다") {
             runTest {
                 val store = NotificationMemoryDataStore()

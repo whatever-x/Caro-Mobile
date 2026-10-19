@@ -8,4 +8,10 @@ interface FcmTokenRepository {
     suspend fun resumeRegistration()
 
     suspend fun unregisterToken()
+
+    fun observeNotificationEnabled(): Flow<Boolean>
+
+    fun updateNotificationPermission(granted: Boolean)
+
+    suspend fun setNotificationEnabled(enabled: Boolean)
 }

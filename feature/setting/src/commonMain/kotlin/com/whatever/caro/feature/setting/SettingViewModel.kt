@@ -1,6 +1,7 @@
 package com.whatever.caro.feature.setting
 
 import com.whatever.caro.core.data.repository.auth.AuthRepository
+import com.whatever.caro.core.data.repository.fcm.FcmTokenRepository
 import com.whatever.caro.core.data.repository.profile.ProfileRepository
 import com.whatever.caro.core.data.util.suspendRunCatching
 import com.whatever.caro.core.viewmodel.BaseViewModel
@@ -16,14 +17,78 @@ class SettingViewModel(
     private val authRepository: AuthRepository,
     private val profileRepository: ProfileRepository,
     exceptionFilter: ExceptionFilter,
+    private val fcmTokenRepository: FcmTokenRepository,
 ) : BaseViewModel<SettingState, SettingIntent, SettingSideEffect>(
         initialState = SettingState(),
         exceptionFilter = exceptionFilter,
     ) {
     private var initializeGeneration = 0L
+    private var pendingNotificationOn = false
+    private var waitingForNotificationSettings = false
+
+    init {
+        launch {
+            suspendRunCatching {
+                fcmTokenRepository.observeNotificationEnabled().collect { enabled ->
+                    reduce { copy(notificationEnabled = enabled) }
+                }
+            }.onFailure { notificationError() }
+        }
+    }
 
     override suspend fun handleIntent(intent: SettingIntent) {
         when (intent) {
+            SettingIntent.ClickNotificationToggle -> {
+                if (currentState.isNotificationLoading || currentState.isDeletingAccount) return
+                reduce { copy(isNotificationLoading = true) }
+                if (currentState.notificationEnabled) {
+                    changeNotification(false)
+                } else {
+                    pendingNotificationOn = true
+                    postSideEffect(SettingSideEffect.RequestNotificationPermission)
+                }
+            }
+
+            is SettingIntent.NotificationPermissionResult -> {
+                fcmTokenRepository.updateNotificationPermission(intent.granted)
+                if (!pendingNotificationOn || waitingForNotificationSettings) return
+                if (intent.granted) {
+                    pendingNotificationOn = false
+                    changeNotification(true)
+                } else {
+                    reduce { copy(isNotificationLoading = false, notificationPermissionDialogVisible = true) }
+                }
+            }
+
+            is SettingIntent.NotificationPermissionRefreshed -> {
+                fcmTokenRepository.updateNotificationPermission(intent.granted)
+                if (waitingForNotificationSettings) {
+                    waitingForNotificationSettings = false
+                    pendingNotificationOn = false
+                    if (intent.granted) changeNotification(true) else reduce { copy(isNotificationLoading = false) }
+                }
+            }
+
+            SettingIntent.DismissNotificationPermissionDialog -> {
+                pendingNotificationOn = false
+                waitingForNotificationSettings = false
+                reduce { copy(notificationPermissionDialogVisible = false, isNotificationLoading = false) }
+            }
+
+            SettingIntent.OpenNotificationSettings -> {
+                if (!pendingNotificationOn || waitingForNotificationSettings) return
+                waitingForNotificationSettings = true
+                reduce { copy(notificationPermissionDialogVisible = false, isNotificationLoading = true) }
+                postSideEffect(SettingSideEffect.OpenNotificationSettings)
+            }
+
+            SettingIntent.NotificationPermissionFailed -> {
+                pendingNotificationOn = false
+                waitingForNotificationSettings = false
+                reduce { copy(isNotificationLoading = false, notificationPermissionDialogVisible = false) }
+                notificationError()
+            }
+
             SettingIntent.ClickLogOut -> {
                 logout()
             }
@@ -76,6 +141,22 @@ class SettingViewModel(
         }
     }
 
+    private suspend fun changeNotification(enabled: Boolean) {
+        try {
+            fcmTokenRepository.setNotificationEnabled(enabled)
+        } catch (exception: CancellationException) {
+            throw exception
+        } catch (_: Exception) {
+            notificationError()
+        } finally {
+            reduce { copy(isNotificationLoading = false) }
+        }
+    }
+
+    private fun notificationError() {
+        postSideEffect(SettingSideEffect.ShowSnackbar(SnackbarType.NOTIFICATION_CHANGE_ERROR))
+    }
+
     private suspend fun initialize() {
         val generation = ++initializeGeneration
         reduce { copy(isLoading = true) }
@@ -120,7 +201,7 @@ class SettingViewModel(
     }
 
     private suspend fun logout() {
-        if (currentState.isLoading) return
+        if (currentState.isLoading || currentState.isNotificationLoading) return
         reduce { copy(isLoading = true) }
         try {
             authRepository.logout()

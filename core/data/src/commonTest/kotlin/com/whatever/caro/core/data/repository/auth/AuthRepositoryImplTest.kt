@@ -50,6 +50,12 @@ class AuthRepositoryImplTest : FunSpec() {
                     object : FcmTokenRepository {
                         override suspend fun syncTokens(tokens: kotlinx.coroutines.flow.Flow<String>) = Unit
 
+                        override fun observeNotificationEnabled(): kotlinx.coroutines.flow.Flow<Boolean> = error("unused")
+
+                        override fun updateNotificationPermission(granted: Boolean) = Unit
+
+                        override suspend fun setNotificationEnabled(enabled: Boolean) = error("unused")
+
                         override suspend fun resumeRegistration() = Unit
 
                         override suspend fun unregisterToken() {

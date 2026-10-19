@@ -15,6 +15,15 @@ class InitialNotificationPermissionTest : FunSpec() {
                 var requested = false
                 val source =
                     object : LocalNotificationDataSource {
+                        override fun observeNotificationEnabled(): kotlinx.coroutines.flow.Flow<Boolean?> =
+                            kotlinx.coroutines.flow.flowOf(null)
+
+                        override suspend fun saveNotificationEnabled(enabled: Boolean) = error("unused")
+
+                        override suspend fun fetchRegisteredToken(): String? = null
+
+                        override suspend fun saveRegisteredToken(token: String?) = error("unused")
+
                         override suspend fun consumeInitialPermissionRequest(): Boolean = (!requested).also { requested = true }
                     }
                 val permission = RecordingNotificationPermission()
@@ -31,6 +40,15 @@ class InitialNotificationPermissionTest : FunSpec() {
                 val permission = RecordingNotificationPermission()
                 val source =
                     object : LocalNotificationDataSource {
+                        override fun observeNotificationEnabled(): kotlinx.coroutines.flow.Flow<Boolean?> =
+                            kotlinx.coroutines.flow.flowOf(null)
+
+                        override suspend fun saveNotificationEnabled(enabled: Boolean) = error("unused")
+
+                        override suspend fun fetchRegisteredToken(): String? = null
+
+                        override suspend fun saveRegisteredToken(token: String?) = error("unused")
+
                         override suspend fun consumeInitialPermissionRequest(): Boolean = error("save failed")
                     }
 
@@ -45,6 +63,15 @@ class InitialNotificationPermissionTest : FunSpec() {
                 var requested = false
                 val source =
                     object : LocalNotificationDataSource {
+                        override fun observeNotificationEnabled(): kotlinx.coroutines.flow.Flow<Boolean?> =
+                            kotlinx.coroutines.flow.flowOf(null)
+
+                        override suspend fun saveNotificationEnabled(enabled: Boolean) = error("unused")
+
+                        override suspend fun fetchRegisteredToken(): String? = null
+
+                        override suspend fun saveRegisteredToken(token: String?) = error("unused")
+
                         override suspend fun consumeInitialPermissionRequest(): Boolean = (!requested).also { requested = true }
                     }
                 val permission = RecordingNotificationPermission(granted = false)
@@ -60,6 +87,15 @@ class InitialNotificationPermissionTest : FunSpec() {
             runTest {
                 val source =
                     object : LocalNotificationDataSource {
+                        override fun observeNotificationEnabled(): kotlinx.coroutines.flow.Flow<Boolean?> =
+                            kotlinx.coroutines.flow.flowOf(null)
+
+                        override suspend fun saveNotificationEnabled(enabled: Boolean) = error("unused")
+
+                        override suspend fun fetchRegisteredToken(): String? = null
+
+                        override suspend fun saveRegisteredToken(token: String?) = error("unused")
+
                         override suspend fun consumeInitialPermissionRequest(): Boolean = true
                     }
                 val permission = RecordingNotificationPermission(failure = CancellationException("cancel request"))

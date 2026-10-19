@@ -2,6 +2,7 @@ package com.whatever.caro.core.data.repository.fcm
 
 import com.whatever.caro.core.data.repository.auth.AuthRepositoryImpl
 import com.whatever.caro.core.datastore.datasource.LocalAuthDataSource
+import com.whatever.caro.core.datastore.datasource.LocalNotificationDataSource
 import com.whatever.caro.core.model.auth.SocialLoginType
 import com.whatever.caro.core.remote.datasource.auth.AuthDataSource
 import com.whatever.caro.core.remote.datasource.auth.NonAuthDataSource
@@ -23,9 +24,11 @@ import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
@@ -35,6 +38,187 @@ import kotlinx.coroutines.test.runTest
 @OptIn(ExperimentalCoroutinesApi::class)
 class FcmTokenRepositoryImplTest : FunSpec() {
     init {
+        test("기기 OFF는 계정 변경과 토큰 갱신 후에도 자동등록을 차단한다") {
+            runTest {
+                val preferences = MemoryNotificationPreferences(false)
+                val session = MutableStateFlow<String?>("first-user")
+                val tokens = MutableStateFlow("first-token")
+                val requests = mutableListOf<RegisterDeviceTokenRequest>()
+                val repository = repository(session, requests, preferences = preferences)
+                backgroundScope.launch { repository.syncTokens(tokens) }
+                runCurrent()
+                session.value = "second-user"
+                tokens.value = "second-token"
+                repository.resumeRegistration()
+                repository.updateNotificationPermission(true)
+                runCurrent()
+                requests shouldBe emptyList()
+                preferences.observeNotificationEnabled().first() shouldBe false
+            }
+        }
+
+        test("OFF 후 같은 토큰 ON은 등록 성공 후 선택을 저장한다") {
+            runTest {
+                val preferences = MemoryNotificationPreferences()
+                val requests = mutableListOf<RegisterDeviceTokenRequest>()
+                val deleted = mutableListOf<String>()
+                val repository = repository(MutableStateFlow("access"), requests, deleted, preferences = preferences)
+                backgroundScope.launch { repository.syncTokens(MutableStateFlow("token")) }
+                runCurrent()
+                repository.setNotificationEnabled(false)
+                preferences.observeNotificationEnabled().first() shouldBe false
+                deleted shouldBe listOf("token")
+                repository.setNotificationEnabled(true)
+                runCurrent()
+                requests.map { it.token } shouldBe listOf("token", "token")
+                preferences.observeNotificationEnabled().first() shouldBe true
+                repository.observeNotificationEnabled().first() shouldBe true
+            }
+        }
+
+        test("기기 OFF 삭제 실패는 이전 ON 선택과 재등록 가능 상태를 보존한다") {
+            runTest {
+                val preferences = MemoryNotificationPreferences(true)
+                val requests = mutableListOf<RegisterDeviceTokenRequest>()
+                var failDelete = true
+                val tokens = MutableStateFlow("first")
+                val repository =
+                    repository(MutableStateFlow("access"), requests, preferences = preferences, beforeDelete = {
+                        if (failDelete) error("delete failed")
+                    })
+                backgroundScope.launch { repository.syncTokens(tokens) }
+                runCurrent()
+                shouldThrow<IllegalStateException> { repository.setNotificationEnabled(false) }
+                preferences.observeNotificationEnabled().first() shouldBe true
+                failDelete = false
+                tokens.value = "second"
+                runCurrent()
+                requests.map { it.token } shouldBe listOf("first", "second")
+            }
+        }
+
+        test("권한 없는 동안 등록하지 않고 복원 후 저장된 ON만 등록한다") {
+            runTest {
+                val requests = mutableListOf<RegisterDeviceTokenRequest>()
+                val repository = repository(MutableStateFlow("access"), requests)
+                repository.updateNotificationPermission(false)
+                backgroundScope.launch { repository.syncTokens(MutableStateFlow("token")) }
+                runCurrent()
+                requests shouldBe emptyList()
+                repository.updateNotificationPermission(true)
+                runCurrent()
+                requests.map { it.token } shouldBe listOf("token")
+            }
+        }
+
+        test("토큰 대기 중 로그아웃하면 ON을 확정하거나 선택을 저장하지 않는다") {
+            runTest {
+                val preferences = MemoryNotificationPreferences(false)
+                val session = MutableStateFlow<String?>("access")
+                val requests = mutableListOf<RegisterDeviceTokenRequest>()
+                val tokens = MutableStateFlow("")
+                val repository = repository(session, requests, preferences = preferences)
+                backgroundScope.launch { repository.syncTokens(tokens) }
+                runCurrent()
+                val change =
+                    async {
+                        shouldThrow<IllegalStateException> { repository.setNotificationEnabled(true) }
+                    }
+                runCurrent()
+                repository.unregisterToken()
+                session.value = null
+                tokens.value = "new-token"
+                runCurrent()
+                change.await()
+                requests shouldBe emptyList()
+                preferences.observeNotificationEnabled().first() shouldBe false
+            }
+        }
+
+        test("토큰이 발급되지 않으면 제한 시간 후 실패하고 OFF를 유지한다") {
+            runTest {
+                val preferences = MemoryNotificationPreferences(false)
+                val repository = repository(MutableStateFlow("access"), mutableListOf(), preferences = preferences)
+                shouldThrow<IllegalStateException> { repository.setNotificationEnabled(true) }
+                preferences.observeNotificationEnabled().first() shouldBe false
+            }
+        }
+
+        test("등록 실패는 OFF 선택을 보존하고 앱 복귀는 실패한 자동등록을 재시도한다") {
+            runTest {
+                val requests = mutableListOf<RegisterDeviceTokenRequest>()
+                var fail = true
+                val repository = repository(MutableStateFlow("access"), requests) { if (fail) error("offline") }
+                backgroundScope.launch { repository.syncTokens(MutableStateFlow("token")) }
+                runCurrent()
+                repository.observeNotificationEnabled().first() shouldBe false
+                fail = false
+                repository.updateNotificationPermission(true)
+                runCurrent()
+                repository.observeNotificationEnabled().first() shouldBe true
+                requests.size shouldBe 1
+            }
+        }
+
+        test("ON 등록 뒤 선택 저장 실패는 다음 복귀에서 기존 OFF에 맞춰 삭제한다") {
+            runTest {
+                val preferences = MemoryNotificationPreferences(false)
+                val requests = mutableListOf<RegisterDeviceTokenRequest>()
+                val deleted = mutableListOf<String>()
+                val repository = repository(MutableStateFlow("access"), requests, deleted, preferences = preferences)
+                backgroundScope.launch { repository.syncTokens(MutableStateFlow("token")) }
+                runCurrent()
+                preferences.failSaveChoice = true
+                shouldThrow<IllegalStateException> { repository.setNotificationEnabled(true) }
+                preferences.observeNotificationEnabled().first() shouldBe false
+                repository.updateNotificationPermission(true)
+                runCurrent()
+                deleted shouldBe listOf("token")
+                repository.observeNotificationEnabled().first() shouldBe false
+            }
+        }
+
+        test("OFF 삭제 뒤 선택 저장 실패는 다음 복귀에서 기존 ON을 다시 등록한다") {
+            runTest {
+                val preferences = MemoryNotificationPreferences(true)
+                val requests = mutableListOf<RegisterDeviceTokenRequest>()
+                val repository = repository(MutableStateFlow("access"), requests, preferences = preferences)
+                backgroundScope.launch { repository.syncTokens(MutableStateFlow("token")) }
+                runCurrent()
+                preferences.failSaveChoice = true
+                shouldThrow<IllegalStateException> { repository.setNotificationEnabled(false) }
+                preferences.observeNotificationEnabled().first() shouldBe true
+                repository.updateNotificationPermission(true)
+                runCurrent()
+                requests.map { it.token } shouldBe listOf("token", "token")
+                repository.observeNotificationEnabled().first() shouldBe true
+            }
+        }
+
+        test("저장된 ON은 앱 재시작 자동등록 실패에도 화면에서 유지한다") {
+            runTest {
+                val preferences = MemoryNotificationPreferences(true)
+                val repository = repository(MutableStateFlow("access"), mutableListOf(), preferences = preferences) { error("offline") }
+                backgroundScope.launch { repository.syncTokens(MutableStateFlow("token")) }
+                runCurrent()
+                repository.observeNotificationEnabled().first() shouldBe true
+            }
+        }
+
+        test("성공한 토큰은 같은 권한으로 반복 복귀해도 다시 등록하지 않는다") {
+            runTest {
+                val requests = mutableListOf<RegisterDeviceTokenRequest>()
+                val repository = repository(MutableStateFlow("access"), requests)
+                backgroundScope.launch { repository.syncTokens(MutableStateFlow("token")) }
+                runCurrent()
+                repeat(3) {
+                    repository.updateNotificationPermission(true)
+                    runCurrent()
+                }
+                requests.map { it.token } shouldBe listOf("token")
+            }
+        }
+
         listOf("소셜 로그인", "가입 완료").forEach { loginPath ->
             test("로그아웃의 null을 수집하지 않아도 $loginPath 후 FCM 등록을 재개한다") {
                 runTest {
@@ -54,7 +238,12 @@ class FcmTokenRepositoryImplTest : FunSpec() {
                             everySuspend { registerToken(any()) } calls { requests.add(it.arg(0)) }
                             everySuspend { unregisterToken(any()) } returns Unit
                         }
-                    val fcm = FcmTokenRepositoryImpl(remote, local)
+                    val fcm =
+                        FcmTokenRepositoryImpl(
+                            remote,
+                            local,
+                            MemoryNotificationPreferences(),
+                        ).also { it.updateNotificationPermission(true) }
                     val auth =
                         AuthRepositoryImpl(
                             remoteAuthDataSource =
@@ -309,6 +498,7 @@ class FcmTokenRepositoryImplTest : FunSpec() {
         requests: MutableList<RegisterDeviceTokenRequest>,
         deleted: MutableList<String> = mutableListOf(),
         beforeDelete: suspend () -> Unit = {},
+        preferences: MemoryNotificationPreferences = MemoryNotificationPreferences(),
         beforeRegister: suspend () -> Unit = {},
     ): FcmTokenRepositoryImpl {
         val local =
@@ -330,6 +520,29 @@ class FcmTokenRepositoryImplTest : FunSpec() {
 
                 override suspend fun sendTestPush(): TestPushResponse = error("unused")
             }
-        return FcmTokenRepositoryImpl(remote, local)
+        return FcmTokenRepositoryImpl(remote, local, preferences).also { it.updateNotificationPermission(true) }
+    }
+}
+
+private class MemoryNotificationPreferences(
+    initial: Boolean? = null,
+) : LocalNotificationDataSource {
+    var failSaveChoice = false
+    private val enabled = MutableStateFlow(initial)
+    private var registeredToken: String? = null
+
+    override suspend fun consumeInitialPermissionRequest(): Boolean = error("unused")
+
+    override fun observeNotificationEnabled(): Flow<Boolean?> = enabled
+
+    override suspend fun saveNotificationEnabled(enabled: Boolean) {
+        check(!failSaveChoice) { "storage failed" }
+        this.enabled.value = enabled
+    }
+
+    override suspend fun fetchRegisteredToken(): String? = registeredToken
+
+    override suspend fun saveRegisteredToken(token: String?) {
+        registeredToken = token
     }
 }
