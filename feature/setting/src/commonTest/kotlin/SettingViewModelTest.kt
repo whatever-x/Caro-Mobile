@@ -152,6 +152,28 @@ class SettingViewModelTest : FunSpec() {
             }
         }
 
+        test("권한 요청이 취소되면 알림 로딩을 해제하고 다시 조작할 수 있다") {
+            runTest {
+                val repository =
+                    mock<FcmTokenRepository> {
+                        every { observeNotificationEnabled() } returns MutableStateFlow(false)
+                        every { updateNotificationPermission(any()) } returns Unit
+                    }
+                val viewModel = SettingViewModel(mock(), mock(), ExceptionFilter.None, repository)
+                viewModel.sideEffect.test {
+                    viewModel.intent(SettingIntent.ClickNotificationToggle)
+                    runCurrent()
+                    awaitItem() shouldBe SettingSideEffect.RequestNotificationPermission
+                    viewModel.intent(SettingIntent.DismissNotificationPermissionDialog)
+                    runCurrent()
+                    viewModel.state.value.isNotificationLoading shouldBe false
+                    viewModel.intent(SettingIntent.ClickNotificationToggle)
+                    runCurrent()
+                    awaitItem() shouldBe SettingSideEffect.RequestNotificationPermission
+                }
+            }
+        }
+
         test("앱 설정에서 허용하고 복귀하면 대기한 ON을 한번만 처리한다") {
             runTest {
                 val confirmed = MutableStateFlow(false)

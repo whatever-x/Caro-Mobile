@@ -113,8 +113,10 @@ fun SettingRoute(
                     scope.launch {
                         try {
                             viewModel.intent(SettingIntent.NotificationPermissionResult(permissionController.request()))
+                        } catch (exception: CancellationException) {
+                            viewModel.intent(SettingIntent.DismissNotificationPermissionDialog)
+                            throw exception
                         } catch (exception: Exception) {
-                            if (exception is CancellationException) throw exception
                             viewModel.intent(SettingIntent.NotificationPermissionFailed)
                         }
                     }
