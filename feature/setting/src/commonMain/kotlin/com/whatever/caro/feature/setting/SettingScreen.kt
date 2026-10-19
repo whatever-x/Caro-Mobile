@@ -33,6 +33,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import caromobile.core.designsystem.generated.resources.Res
 import caromobile.core.designsystem.generated.resources.ic_arrow_left_24
+import caromobile.core.designsystem.generated.resources.ic_bell_24
 import caromobile.core.designsystem.generated.resources.ic_file_text_24
 import caromobile.core.designsystem.generated.resources.ic_lock_24
 import caromobile.core.designsystem.generated.resources.ic_log_out_24
@@ -210,6 +211,11 @@ private fun NotificationRow(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(CaroTheme.spacing.s),
     ) {
+        Icon(
+            imageVector = vectorResource(Res.drawable.ic_bell_24),
+            tint = CaroTheme.color.icon.secondary,
+            contentDescription = null,
+        )
         Text(
             text = stringResource(Res.string.setting_notification_label),
             modifier = Modifier.weight(1f),
