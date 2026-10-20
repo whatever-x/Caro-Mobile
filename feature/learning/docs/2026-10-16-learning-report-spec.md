@@ -16,16 +16,18 @@
 
 학습한 양과 스스로 내린 평가를 기간·덱·카드 단위로 확인한다. 기존 학습 직후 결과 화면에 없던 과거 기록 탐색을 추가한다. 기대 가치는 학습 습관을 돌아보고 어려웠던 카드를 찾는 부담을 줄이는 것이다. 암기 향상을 검증한 기능으로 표현하지 않는다.
 
-- 이슈: https://github.com/whatever-x/Caro-Planning/issues/6
-- 담당자: `RyuSw-cs`. 개발 완료일: `2026-10-20`(사용자가 말한 ‘20일’을 이번 달로 해석해 전달·기록).
+- 이슈: https://github.com/whatever-x/Caro-Workflow/issues/12 (기존 Caro-Planning#6에서 2026-10-20 이전. 이후 진행·보드 추적은 Workflow#12)
+- 담당자: `RyuSw-cs`. 개발 완료일: `2026-10-21`(Workflow#12 본문과 보드 ‘완료 예정일’ 기준. 이전 초안의 2026-10-20을 대체).
 - 이번 종료점: Step3 설계. 제품 코드·마이그레이션·Planning 정책 변경·배포는 Step4 범위다.
-- 상태: 화면 시안의 ui-styling 검토·개발 명세 정리 완료. Step3 전체는 삭제 후 이력 처리의 사용자 답변 대기다. Figma 원본 대조와 공유 한계는 아래에 구분한다.
+- 상태: 화면 시안의 ui-styling 검토·개발 명세 정리 완료. Step3 전체는 삭제 후 이력 처리의 사용자 답변 대기다(2026-10-20 재개 시점에도 이슈 댓글·Planning에 답변 없음). Figma 원본 대조와 공유 한계는 아래에 구분한다.
 - 정본: 이 문서. 서버 상세: [Caro-Backend API 설계](https://github.com/whatever-x/Caro-Backend/blob/chore/learning-report-spec/src/main/kotlin/com/whatever/caro/study/docs/2026-10-16-learning-report-api.md).
 - 공유 브랜치: Mobile `docs/learning-report-spec`, Backend `chore/learning-report-spec`. 스펙·시안·서버 설계만 공유하며 기준 브랜치 병합과 제품 구현은 포함하지 않는다.
 
 ## 근거와 참조 고정
 
 2026-10-16에 다음 원격 기준 브랜치와 로컬 HEAD의 일치를 확인했다. Caro-Workflow `main`도 원격과 로컬이 같았다. `python3 scripts/sync_repos.py --check`는 frontend·backend 미러가 뒤처져 실패했다. 아래 별도 원본 clone을 직접 검증하고 읽었으며 미러를 최신이라고 간주하지 않는다.
+
+2026-10-20 재개: 원격 기준 브랜치 SHA가 아래 표와 모두 같다. 미러 검사는 같은 이유(frontend·backend 뒤처짐)로 다시 실패했다. 새 원본 clone으로 정책·코드를 재확인했으며 기준 변경이 없어 전체 조사는 반복하지 않고 삭제 경로·이슈·보드만 다시 점검했다.
 
 | 원본 | 기준 브랜치 | 전체 SHA |
 |---|---|---|
@@ -67,7 +69,8 @@
 - Backend `study/internal/web/StudyController.kt`: 기존은 특정 덱의 오늘 요약. 기간별 리포트 API는 신규 제안이다.
 - Backend `card/api/{card/CardApi,deck/DeckApi}.kt`, `card/internal/card/CardService.kt`: 현재 카드 내용은 소유자·활성 카드로 한정해 일괄 조회. 과거 카드 본문을 복원한다고 약속하지 않는다.
 - Backend `study/AGENTS.md`, `bff/AGENTS.md`, `common/AGENTS.md`: 모듈 API를 통한 조합, 인증과 기존 오류·버전 규약을 따른다.
-- Figma·Slack MCP 연결 도구가 없다. 이 이슈에는 Slack 스레드도 연결돼 있지 않다. 연결된 논의를 모두 읽었다고 보고하지 않는다.
+- Backend `card/internal/card/CardService.deleteCard`: 카드·노트 soft delete와 `CardsDeletedEvent`. `card/internal/deck/service/DeckService.deleteDeck`: 덱만 soft delete하고 `DeckDeletedEvent`를 받는 listener가 없다(`card/AGENTS.md`). 즉 삭제 덱의 카드는 `deletedAt`이 null인 채 남고, `ReviewLog`·`StudySession`을 지우는 일반 삭제 경로는 없다. 유지안은 저장 변경 없이 가능하다.
+- Figma·Slack MCP 연결 도구가 없다(2026-10-20 재확인). 이 이슈에는 Slack 스레드도 연결돼 있지 않다. 연결된 논의를 모두 읽었다고 보고하지 않는다.
 
 ## 범위와 대안
 
@@ -175,7 +178,7 @@
 | 최초 조회 실패 | 오류 안내·다시 시도. 성공 응답을 받기 전 빈 기록으로 바꾸지 않는다. |
 | 더 불러오기 실패 | 기존 목록 유지, 하단 재시도. 필터 변경 시 페이지 초기화. |
 | 인증 만료 | 기존 공통 인증 흐름으로 로그인 이동. 계정별 기록과 화면 상태 제거. |
-| 삭제된 내용 | 정책 답변 대기. 유지안에서는 이름/본문을 노출하지 않고 삭제 표시, 평가 횟수와 이력은 유지. |
+| 삭제된 내용 | 정책 답변 대기. 유지안에서는 이름/본문을 노출하지 않고 삭제 표시, 평가 횟수와 이력은 유지. 삭제 덱의 카드는 카드 자체가 살아 있어도 삭제 카드와 같이 본문을 숨긴다. |
 | 좁은 화면·큰 글자 | 숫자/라벨 줄바꿈 허용, 칩은 다음 줄, 화면 수평 스크롤 없음. 그래프와 동일한 숫자 요약을 제공. |
 
 ## 집계와 데이터 의미
@@ -217,7 +220,7 @@
 | `Bucket` | `startDate,endDate: LocalDate`, `reviewCount:int64`, `ratings:{easy,fair,again:int64}`. 선택 범위를 빈칸 없이 덮고 빈 구간도 반환. |
 | `DeckOption` | `deckId:int64`, `name:string|null`, `deleted:boolean`. 정렬은 deckId 내림차순. 이름 검색은 첫 범위에서 제외. FE가 첫 항목 ‘전체’(deckId=null)를 고정 삽입하며 서버는 가짜 덱 항목을 만들지 않는다. 페이지 로딩·오류·빈 덱 목록에서도 ‘전체’는 선택할 수 있다. |
 | `SessionRecord` | `sessionId,deckId:int64`, `deckName:string|null`, `deckDeleted:boolean`, `studyDate:LocalDate`, `timezone:string`, `status:ACTIVE|COMPLETED|STOPPED`, `counts:Counts`. history counts.studyDayCount는 평가 있으면 1. |
-| `CardLabel` | `cardId:int64`, `deleted:boolean`, `front,back:string|null`. 활성 카드는 현재 내용, 삭제 카드는 둘 다 null. |
+| `CardLabel` | `cardId:int64`, `deleted:boolean`, `front,back:string|null`. 활성 카드는 현재 내용, 삭제 카드와 삭제 덱에 속한 카드는 `deleted=true`, 둘 다 null. |
 | `CardRecord` | CardLabel 필드 + `reviewCount:int64`, `lastRating:EASY|FAIR|AGAIN`, `lastReviewedAt:Instant`, `lastStudyDate:LocalDate`. 모두 선택 범위 기준. |
 | `ReviewRecord` | `reviewId,sessionId:int64`, `rating:EASY|FAIR|AGAIN`, `studyDate:LocalDate`, `reviewedAt:Instant`, `timezone:string`, `reviewType:NEW|REVIEW`. |
 
@@ -263,7 +266,7 @@
 | AC05 | 내 전체 기록 — 사용자 요청 | lifetime·sessions | 전체 선택의 기간 변경에도 누적 동일. 개별 덱에서 누적 영역과 여백 없음. 전체 기간 보기에서 덱 유지. 20건 경계와 더 보기 중복/누락 없음. |
 | AC06 | 카드별 평가 — 사용자 요청 | cards·reviews | 선택 범위 마지막 평가, 평가 필터 의미 일치. 같은 시각의 로그도 id로 안정 정렬. 현재 본문과 과거 평가 구분. |
 | AC07 | 일일만·중단 평가 포함 — learning 정책 | DAILY+ReviewLog | 완료·미완료 DAILY의 저장 평가 포함, FULL_DECK·실패 제출·단순 카드 생성 제외. |
-| AC08 | 삭제 이력 — 결정 대기 | 모든 API·CardLabel | 유지안 채택 시 카드/덱 삭제 전후 횟수 동일, 본문·이름 null, 본인만 삭제 이력 접근. 제외안이면 집계·누적·cursor의 삭제 영향 재설계. |
+| AC08 | 삭제 이력 — 결정 대기 | 모든 API·CardLabel | 유지안 채택 시 카드/덱 삭제 전후 횟수 동일, 본문·이름 null, 본인만 삭제 이력 접근. 덱만 삭제한 경우에도 그 덱 카드의 본문이 응답에 없음. 제외안이면 집계·누적·cursor의 삭제 영향 재설계. |
 | AC09 | 학습일·휴식 — 기존 정책/설계 | sessionDate·restDates | 서로 다른 timezone으로 재접속해도 과거 날짜 유지. REST_DAY 실기록만 표시, 덱별 휴식 추정 안 함. |
 | AC10 | 본인 기록만 — account 정책 | 모든 GET·API 소유권 | 타인 deckId/cardId/cursor 변조로 정보 노출 안 됨. 없는 대상과 동일 404. 로그인 변경 후 이전 계정 수치 없음. |
 | AC11 | 상태·응답 역전 — interaction | MVI·페이지 목록 | 시트에서 여러 번 바꿔도 적용 전 리포트 API 호출 없음(덱 목록 추가 로딩 제외). 최종 적용은 덱·기간 한 쌍으로 필요한 리포트 API를 각각 한 번 요청. 연속 적용의 늦은 응답 폐기, 최초 실패와 빈 기록 구분, 추가 페이지 실패 시 기존 목록 보존. |
@@ -276,15 +279,17 @@ BE 검증 계획: study·bff WebMvc/서비스·repository 집계 테스트, 사�
 
 | 항목 | 현재 상태 | 결정/다음 행동 |
 |---|---|---|
-| 삭제 후 과거 기록 | 사용자에게 질문한 상태 | 권고는 평가 이력/통계 유지, 삭제된 본문·이름 숨김. 답변 전에는 AC08·소유권 세부를 확정하지 않는다. |
+| 삭제 후 과거 기록 | 사용자에게 질문한 상태. 2026-10-20에도 답변 없음 | A(권장) 평가 이력·통계 유지, 삭제된 덱 이름·카드 본문 숨김: 현재 soft delete 구조 그대로, 누적이 삭제로 줄지 않음. B 삭제분을 집계에서 제외: 모든 쿼리에 현재 카드·덱 삭제 조건 추가, 누적·기간 수치가 삭제 시점에 줄고 진행 중 cursor가 흔들림. C 삭제 시 로그도 파기: 새 삭제 경로·이벤트 처리 필요, ‘완료 카드 수는 줄이지 않는다’(`learning.md`)와 같은 기존 학습 보존 방향과 다름. 답변 전에는 AC08·소유권 세부를 확정하지 않는다. 결정 뒤 Planning `deck.md` ‘덱 삭제 시 학습 이력 정리’, `open-questions.md` 항목을 Step4에서 갱신한다. |
 | Figma 원본 대조 | 연결 도구 없음 | 실제 코드 토큰으로 와이어프레임 작성. Step4 시각 구현 전 원본 디자인 대조 필요. 원본 미열람을 검증 완료로 바꾸지 않는다. |
-| 이슈·보드 | 이슈 담당자는 반영됨. Project 쓰기 scope 없음 | 기존 완료일·Step3 보드 반영 대기. 실제 보드를 바꿨다고 보고하지 않는다. 다른 Status/우선순위는 유지. |
+| 이슈·보드 | Workflow#12로 이전. 2026-10-20 재조회: 담당자 RyuSw-cs, 완료 예정일 2026-10-21, 워크플로 단계 Step3 | 추가 반영 없음. 다른 Status(대기)·우선순위(P2)는 유지. |
 | Slack 공유 | 요청 없음, 연결 스레드 없음 | 미발송. 별도 채널·개인 계정 안내 생성 안 함. |
 | 설계 문서 공유 | 원본별 공유 브랜치 | Mobile 스펙·시안과 Backend API 설계를 각 원본 브랜치에서 확인한다. 이슈에 고정 커밋 링크를 연결한다. |
 
 ## Step4 전달과 완료 판정
 
 실제 수행한 설계 검사: 두 원본 설계 문서의 whitespace·상대 이미지 링크 확인, 다섯 PNG의 형식·크기 검사, AC01~AC13 및 신규 GET 5개 계약 존재 확인, 시안의 한글·수치·화면 잘림 직접 확인. 시안 예시의 일별 평가 합계와 평가 분포 합계도 144회로 일치한다. 후속 요청의 상단 텍스트·이름 옆 꺾쇠, 전체 첫 항목, 일반/덱별 진입과 전체 전용 누적을 시안·API·AC02/AC05/AC12에 함께 반영했다. 이슈 본문에 Step3 초안과 결정 대기를 반영하고 저장 결과를 재조회했다. 기준 원본의 제품 코드와 workflow 추적 파일에는 변경이 없다.
+
+2026-10-20 재개 검사: 원격 SHA 재확인, Planning `learning/deck/card/open-questions`의 삭제 관련 항목 재열람, Backend 카드·덱 삭제 경로 확인, 이슈·보드 필드 재조회, 두 문서의 `git diff --check`·상대 링크 확인. 삭제 덱 카드 본문 노출 위험을 `CardLabel`·화면 상태·AC08과 서버 설계에 반영했다.
 
 이 검사는 설계 산출물 검사다. API 동작·인증·DB 실행계획·제품 빌드·Android/iOS 실행·접근성 실기기 검증은 아직 수행하지 않았다. Figma 원본과의 픽셀 일치 또는 제품 테스트 통과를 의미하지 않는다.
 
