@@ -43,12 +43,11 @@ class StudyReportMapperTest : FunSpec() {
         )
 
     init {
-        test("toStudyReportSummary는 날짜와 수치, 전체 누적을 모델로 바꾼다") {
+        test("toStudyReportSummary는 날짜와 수치를 모델로 바꾼다") {
             val summary =
                 StudyReportSummaryResponse(
                     scope = ReportScopeResponseDto(deckId = null, deckName = null, deleted = false),
                     range = range,
-                    lifetime = counts,
                     selected = counts,
                     buckets =
                         listOf(
@@ -60,13 +59,13 @@ class StudyReportMapperTest : FunSpec() {
 
             summary.range.startDate shouldBe LocalDate(2026, 10, 15)
             summary.range.bucketUnit shouldBe ReportBucketUnit.DAY
-            summary.lifetime?.reviewCount shouldBe 144
+            summary.selected.reviewCount shouldBe 144
             summary.selected.ratings shouldBe ReportRatingCounts(easy = 82, fair = 38, again = 24)
             summary.buckets.size shouldBe 1
             summary.restDates shouldBe listOf(LocalDate(2026, 10, 17))
         }
 
-        test("덱을 고른 응답에는 전체 누적이 없다") {
+        test("삭제된 덱과 기록 없는 전체 기간 응답을 바꾼다") {
             val summary =
                 StudyReportSummaryResponse(
                     scope = ReportScopeResponseDto(deckId = 3, deckName = null, deleted = true),
@@ -76,7 +75,6 @@ class StudyReportMapperTest : FunSpec() {
                     restDates = null,
                 ).toStudyReportSummary()
 
-            summary.lifetime.shouldBeNull()
             summary.scope.deleted shouldBe true
             summary.range.startDate.shouldBeNull()
         }

@@ -2,6 +2,8 @@ package com.whatever.caro.feature.learning.report
 
 import com.whatever.caro.core.data.repository.report.StudyReportRepository
 import com.whatever.caro.core.data.util.suspendRunCatching
+import com.whatever.caro.core.model.report.ReportBucket
+import com.whatever.caro.core.model.report.ReportBucketUnit
 import com.whatever.caro.core.model.report.ReportDeckOption
 import com.whatever.caro.core.model.report.ReportPeriod
 import com.whatever.caro.core.viewmodel.BaseViewModel
@@ -9,9 +11,11 @@ import com.whatever.caro.core.viewmodel.ExceptionFilter
 import com.whatever.caro.feature.learning.report.mvi.LearningReportIntent
 import com.whatever.caro.feature.learning.report.mvi.LearningReportSideEffect
 import com.whatever.caro.feature.learning.report.mvi.LearningReportState
+import com.whatever.caro.feature.learning.report.mvi.ReportBackStep
 import com.whatever.caro.feature.learning.report.mvi.ReportDateEditorState
+import com.whatever.caro.feature.learning.report.mvi.ReportDeckSheetState
 import com.whatever.caro.feature.learning.report.mvi.ReportFilter
-import com.whatever.caro.feature.learning.report.mvi.ReportSheetState
+import com.whatever.caro.feature.learning.report.mvi.ReportMonthDetail
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.Job
@@ -22,8 +26,9 @@ import kotlinx.datetime.plus
 /**
  * 학습 리포트
  *
- * 일반 진입은 전체·최근 7일, 덱에서 들어오면 그 덱·최근 7일로 연다. 이전 선택을 저장해 다시 열지 않는다.
- * 조회 조건 시트에서 고른 값은 체크로 반영할 때만 리포트를 다시 불러온다. 새 조건을 반영하면 이전 요청은 취소한다.
+ * 일반 진입은 전체 덱, 덱에서 들어오면 그 덱으로 열고 기간은 모두 "전체"다. 이전 선택을 저장해 다시 열지 않는다.
+ * 기간 칩, 덱 선택, 기간 직접 설정은 고르는 즉시 다시 불러오고 새 조건을 반영하면 이전 요청은 취소한다.
+ * 월 막대는 주차 목록을 열고, 주차나 주 막대를 누르면 기간을 그 주로 바꾼다. 이렇게 바꾼 기간은 뒤로 가기로 한 단계씩 돌아간다.
  */
 class LearningReportViewModel(
     deckId: Long?,
@@ -38,8 +43,8 @@ class LearningReportViewModel(
                         deckId = deckId,
                         deckName = null,
                         deckDeleted = false,
-                        preset = ReportPeriodPreset.RECENT_7,
-                        period = ReportPeriods.presetPeriod(ReportPeriodPreset.RECENT_7, reportToday.today()),
+                        preset = ReportPeriodPreset.ALL,
+                        period = null,
                     ),
             ),
         exceptionFilter = exceptionFilter,
@@ -47,10 +52,11 @@ class LearningReportViewModel(
     private var summaryJob: Job? = null
     private var cardsJob: Job? = null
     private var decksJob: Job? = null
+    private var monthJob: Job? = null
     private var hasInitialized = false
 
     // 시트를 닫았다 다시 열어도 이미 불러온 덱 목록은 그대로 쓴다
-    private var cachedDecks: ReportSheetState? = null
+    private var cachedDecks: ReportDeckSheetState? = null
 
     override suspend fun handleIntent(intent: LearningReportIntent) {
         when (intent) {
@@ -62,7 +68,7 @@ class LearningReportViewModel(
             }
 
             LearningReportIntent.ClickBack -> {
-                postSideEffect(LearningReportSideEffect.NavigateBack)
+                goBack()
             }
 
             LearningReportIntent.ClickRetry -> {
@@ -115,37 +121,51 @@ class LearningReportViewModel(
                 loadCards(reset = currentState.cards.isEmpty())
             }
 
-            LearningReportIntent.OpenSheet -> {
-                openSheet()
+            is LearningReportIntent.SelectPreset -> {
+                selectPreset(intent.preset)
             }
 
-            LearningReportIntent.DismissSheet -> {
-                closeSheet()
+            is LearningReportIntent.ClickBar -> {
+                clickBar(intent.bucket)
             }
 
-            LearningReportIntent.ApplySheet -> {
-                applySheet()
+            is LearningReportIntent.ClickWeek -> {
+                val month = currentState.monthDetail?.bucket ?: return
+                drillDown(period = intent.week.period, openMonth = month)
             }
 
-            is LearningReportIntent.SelectDraftPreset -> {
-                selectDraftPreset(intent.preset)
+            LearningReportIntent.ClickMonthAll -> {
+                val month = currentState.monthDetail?.bucket ?: return
+                drillDown(period = month.toPeriod(), openMonth = month)
             }
 
-            LearningReportIntent.SelectDraftAllDecks -> {
-                updateDraft { copy(deckId = null, deckName = null, deckDeleted = false) }
+            LearningReportIntent.RetryMonthDetail -> {
+                currentState.monthDetail?.let { openMonth(it.bucket) }
             }
 
-            is LearningReportIntent.SelectDraftDeck -> {
-                updateDraft { copy(deckId = intent.deck.deckId, deckName = intent.deck.name, deckDeleted = intent.deck.deleted) }
+            LearningReportIntent.OpenDeckSheet -> {
+                openDeckSheet()
+            }
+
+            LearningReportIntent.DismissDeckSheet -> {
+                closeDeckSheet()
+            }
+
+            LearningReportIntent.SelectAllDecks -> {
+                selectDeck(deckId = null, deckName = null, deckDeleted = false)
+            }
+
+            is LearningReportIntent.SelectDeck -> {
+                selectDeck(deckId = intent.deck.deckId, deckName = intent.deck.name, deckDeleted = intent.deck.deleted)
             }
 
             LearningReportIntent.LoadMoreDecks -> {
-                val sheet = currentState.sheet ?: return
+                val sheet = currentState.deckSheet ?: return
                 if (sheet.isDecksLoading.not() && sheet.hasMoreDecks) loadDecks()
             }
 
-            LearningReportIntent.CloseDateEditor -> {
-                updateSheet { copy(dateEditor = null) }
+            LearningReportIntent.DismissDateEditor -> {
+                reduce { copy(dateEditor = null) }
             }
 
             is LearningReportIntent.ClickDate -> {
@@ -156,15 +176,130 @@ class LearningReportViewModel(
                 updateDateEditor { moveMonth(intent.offset) }
             }
 
+            is LearningReportIntent.SelectQuickRange -> {
+                val period = ReportPeriods.quickPeriod(intent.range, reportToday.today())
+                updateDateEditor {
+                    copy(
+                        startDate = period.startDate,
+                        endDate = period.endDate,
+                        visibleMonth = period.endDate.firstOfMonth(),
+                        quickRange = intent.range,
+                    )
+                }
+            }
+
             LearningReportIntent.ConfirmDateRange -> {
                 confirmDateRange()
             }
         }
     }
 
+    /**
+     * 주차 목록이 열려 있으면 닫고, 막대로 바꾼 기간이 있으면 그 전으로 돌아가고, 없으면 리포트를 닫는다.
+     */
+    private fun goBack() {
+        val state = currentState
+        val step = state.backSteps.lastOrNull()
+        when {
+            state.monthDetail != null -> {
+                closeMonth()
+            }
+
+            step != null -> {
+                reduce { copy(backSteps = backSteps.dropLast(1).toImmutableList()) }
+                showFilter(step.filter)
+                step.openMonth?.let(::openMonth)
+            }
+
+            else -> {
+                postSideEffect(LearningReportSideEffect.NavigateBack)
+            }
+        }
+    }
+
+    /**
+     * 사용자가 고른 조건을 반영한다. 막대로 쌓인 단계는 지운다.
+     */
     private fun applyFilter(filter: ReportFilter) {
+        reduce { copy(backSteps = persistentListOf()) }
+        showFilter(filter)
+    }
+
+    private fun showFilter(filter: ReportFilter) {
+        closeMonth()
         reduce { copy(filter = filter, cardRating = null) }
         loadReport()
+    }
+
+    private fun drillDown(
+        period: ReportPeriod,
+        openMonth: ReportBucket?,
+    ) {
+        val step = ReportBackStep(filter = currentState.filter, openMonth = openMonth)
+        reduce { copy(backSteps = (backSteps + step).toImmutableList()) }
+        showFilter(currentState.filter.copy(preset = ReportPeriodPreset.CUSTOM, period = period))
+    }
+
+    private fun selectPreset(preset: ReportPeriodPreset) {
+        val filter = currentState.filter
+        if (preset == ReportPeriodPreset.CUSTOM) {
+            val customPeriod = filter.period.takeIf { filter.preset == ReportPeriodPreset.CUSTOM }
+            val today = reportToday.today()
+            reduce {
+                copy(
+                    dateEditor =
+                        ReportDateEditorState(
+                            startDate = customPeriod?.startDate,
+                            endDate = customPeriod?.endDate,
+                            visibleMonth = (customPeriod?.endDate ?: today).firstOfMonth(),
+                            today = today,
+                        ),
+                )
+            }
+            return
+        }
+        if (preset == filter.preset) return
+        applyFilter(filter.copy(preset = preset, period = ReportPeriods.presetPeriod(preset, reportToday.today())))
+    }
+
+    private fun clickBar(bucket: ReportBucket) {
+        when (currentState.summary?.range?.bucketUnit) {
+            ReportBucketUnit.MONTH -> {
+                if (currentState.monthDetail?.bucket == bucket) closeMonth() else openMonth(bucket)
+            }
+
+            ReportBucketUnit.WEEK -> {
+                drillDown(period = bucket.toPeriod(), openMonth = null)
+            }
+
+            // 일 막대는 누를 수 없다
+            ReportBucketUnit.DAY, null -> {
+                Unit
+            }
+        }
+    }
+
+    private fun openMonth(bucket: ReportBucket) {
+        monthJob?.cancel()
+        val deckId = currentState.filter.deckId
+        val period = bucket.toPeriod()
+        reduce { copy(monthDetail = ReportMonthDetail(bucket = bucket)) }
+        monthJob =
+            launch {
+                suspendRunCatching { repository.getSummary(deckId = deckId, period = period) }
+                    .onSuccess { summary ->
+                        val weeks = ReportPeriods.splitWeeks(period, summary.buckets).toImmutableList()
+                        reduce { copy(monthDetail = monthDetail?.copy(weeks = weeks)) }
+                    }.onFailure { throwable ->
+                        reduce { copy(monthDetail = monthDetail?.copy(hasError = true)) }
+                        throw throwable
+                    }
+            }
+    }
+
+    private fun closeMonth() {
+        monthJob?.cancel()
+        reduce { copy(monthDetail = null) }
     }
 
     private fun loadReport() {
@@ -236,118 +371,98 @@ class LearningReportViewModel(
             }
     }
 
-    private fun openSheet() {
-        val cached = cachedDecks
-        val sheet =
-            cached?.copy(draft = currentState.filter, dateEditor = null, hasDecksError = false, isDecksLoading = false)
-                ?: ReportSheetState(draft = currentState.filter)
-        reduce { copy(sheet = sheet) }
+    private fun openDeckSheet() {
+        val sheet = cachedDecks?.copy(hasDecksError = false, isDecksLoading = false) ?: ReportDeckSheetState()
+        reduce { copy(deckSheet = sheet) }
         if (sheet.hasLoadedDecks.not()) loadDecks()
     }
 
-    private fun closeSheet() {
+    private fun closeDeckSheet() {
         decksJob?.cancel()
-        cachedDecks = currentState.sheet?.copy(isDecksLoading = false)
-        reduce { copy(sheet = null) }
+        cachedDecks = currentState.deckSheet?.copy(isDecksLoading = false)
+        reduce { copy(deckSheet = null) }
     }
 
-    private fun applySheet() {
-        val sheet = currentState.sheet ?: return
-        if (sheet.canApply.not()) return
-        val draft = sheet.draft
-        val current = currentState.filter
-        closeSheet()
-        // 같은 조건이면 닫기만 한다
-        if (draft.deckId == current.deckId && draft.period == current.period && draft.preset == current.preset) return
-        applyFilter(draft)
-    }
-
-    private fun selectDraftPreset(preset: ReportPeriodPreset) {
-        val sheet = currentState.sheet ?: return
-        val today = reportToday.today()
-        if (preset == ReportPeriodPreset.CUSTOM) {
-            val customPeriod = sheet.draft.period.takeIf { sheet.draft.preset == ReportPeriodPreset.CUSTOM }
-            val baseDate = customPeriod?.endDate ?: today
-            updateSheet {
-                copy(
-                    dateEditor =
-                        ReportDateEditorState(
-                            startDate = customPeriod?.startDate,
-                            endDate = customPeriod?.endDate,
-                            visibleMonth = LocalDate(baseDate.year, baseDate.month, 1),
-                            today = today,
-                        ),
-                )
-            }
-            return
-        }
-        updateDraft { copy(preset = preset, period = ReportPeriods.presetPeriod(preset, today)) }
+    /**
+     * 덱을 고르면 기간은 그대로 두고 바로 적용한다. 같은 덱이면 닫기만 한다.
+     */
+    private fun selectDeck(
+        deckId: Long?,
+        deckName: String?,
+        deckDeleted: Boolean,
+    ) {
+        closeDeckSheet()
+        val filter = currentState.filter
+        if (deckId == filter.deckId) return
+        applyFilter(filter.copy(deckId = deckId, deckName = deckName, deckDeleted = deckDeleted))
     }
 
     private fun confirmDateRange() {
-        val editor = currentState.sheet?.dateEditor ?: return
+        val editor = currentState.dateEditor ?: return
         val start = editor.startDate ?: return
         val end = editor.endDate ?: return
         if (ReportPeriods.isSelectable(start, end, editor.today).not()) return
-        updateSheet {
-            copy(
-                draft = draft.copy(preset = ReportPeriodPreset.CUSTOM, period = ReportPeriod(start, end)),
-                dateEditor = null,
-            )
-        }
+        reduce { copy(dateEditor = null) }
+        applyFilter(currentState.filter.copy(preset = ReportPeriodPreset.CUSTOM, period = ReportPeriod(start, end)))
     }
 
     private fun loadDecks() {
         decksJob?.cancel()
-        val cursor = currentState.sheet?.decksCursor
-        updateSheet { copy(isDecksLoading = true, hasDecksError = false) }
+        val cursor = currentState.deckSheet?.decksCursor
+        updateDeckSheet { copy(isDecksLoading = true, hasDecksError = false) }
         decksJob =
             launch {
                 suspendRunCatching { repository.getDeckOptions(cursor = cursor) }
                     .onSuccess { page ->
-                        updateSheet {
+                        updateDeckSheet {
                             copy(
-                                decks = (decks + page.items).distinctBy(ReportDeckOption::deckId).toImmutableList(),
+                                // 삭제한 덱은 목록에 두지 않는다
+                                decks =
+                                    (
+                                        decks +
+                                            page.items.filterNot(
+                                                ReportDeckOption::deleted,
+                                            )
+                                    ).distinctBy(ReportDeckOption::deckId).toImmutableList(),
                                 decksCursor = page.nextCursor,
                                 hasLoadedDecks = true,
                                 isDecksLoading = false,
                             )
                         }
                     }.onFailure { throwable ->
-                        updateSheet { copy(isDecksLoading = false, hasDecksError = true) }
+                        updateDeckSheet { copy(isDecksLoading = false, hasDecksError = true) }
                         throw throwable
                     }
             }
     }
 
-    private fun updateSheet(block: ReportSheetState.() -> ReportSheetState) {
-        reduce { copy(sheet = sheet?.block()) }
-    }
-
-    private fun updateDraft(block: ReportFilter.() -> ReportFilter) {
-        updateSheet { copy(draft = draft.block()) }
+    private fun updateDeckSheet(block: ReportDeckSheetState.() -> ReportDeckSheetState) {
+        reduce { copy(deckSheet = deckSheet?.block()) }
     }
 
     private fun updateDateEditor(block: ReportDateEditorState.() -> ReportDateEditorState) {
-        updateSheet { copy(dateEditor = dateEditor?.block()) }
+        reduce { copy(dateEditor = dateEditor?.block()) }
     }
 }
+
+private fun ReportBucket.toPeriod(): ReportPeriod = ReportPeriod(startDate = startDate, endDate = endDate)
+
+private fun LocalDate.firstOfMonth(): LocalDate = LocalDate(year, month, 1)
 
 private fun ReportDateEditorState.selectDate(date: LocalDate): ReportDateEditorState {
     if (date > today) return this
     val start = startDate
     return when {
-        start == null || endDate != null -> copy(startDate = date, endDate = null)
+        start == null || endDate != null -> copy(startDate = date, endDate = null, quickRange = null)
 
         // 시작일보다 앞선 날짜를 누르면 그 날짜부터 다시 고른다
-        date < start -> copy(startDate = date, endDate = null)
+        date < start -> copy(startDate = date, endDate = null, quickRange = null)
 
-        else -> copy(endDate = date)
+        else -> copy(endDate = date, quickRange = null)
     }
 }
 
 private fun ReportDateEditorState.moveMonth(offset: Int): ReportDateEditorState {
     val moved = visibleMonth.plus(DatePeriod(months = offset))
-    val todayMonth = LocalDate(today.year, today.month, 1)
-    return if (moved > todayMonth) this else copy(visibleMonth = moved)
+    return if (moved > today.firstOfMonth()) this else copy(visibleMonth = moved)
 }

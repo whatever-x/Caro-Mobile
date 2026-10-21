@@ -1,9 +1,12 @@
 package com.whatever.caro.feature.learning.report.mvi
 
 import com.whatever.caro.core.model.learning.StudyRating
+import com.whatever.caro.core.model.report.ReportBucket
 import com.whatever.caro.core.model.report.ReportDeckOption
 import com.whatever.caro.core.viewmodel.contract.UiIntent
 import com.whatever.caro.feature.learning.report.ReportPeriodPreset
+import com.whatever.caro.feature.learning.report.ReportQuickRange
+import com.whatever.caro.feature.learning.report.ReportWeek
 import kotlinx.datetime.LocalDate
 
 sealed interface LearningReportIntent : UiIntent {
@@ -29,27 +32,38 @@ sealed interface LearningReportIntent : UiIntent {
 
     data object RetryCards : LearningReportIntent
 
-    // 조회 조건 시트
-    data object OpenSheet : LearningReportIntent
-
-    data object DismissSheet : LearningReportIntent
-
-    data object ApplySheet : LearningReportIntent
-
-    data class SelectDraftPreset(
+    data class SelectPreset(
         val preset: ReportPeriodPreset,
     ) : LearningReportIntent
 
-    data object SelectDraftAllDecks : LearningReportIntent
+    // 차트
+    data class ClickBar(
+        val bucket: ReportBucket,
+    ) : LearningReportIntent
 
-    data class SelectDraftDeck(
+    data class ClickWeek(
+        val week: ReportWeek,
+    ) : LearningReportIntent
+
+    data object ClickMonthAll : LearningReportIntent
+
+    data object RetryMonthDetail : LearningReportIntent
+
+    // 덱 선택 시트
+    data object OpenDeckSheet : LearningReportIntent
+
+    data object DismissDeckSheet : LearningReportIntent
+
+    data object SelectAllDecks : LearningReportIntent
+
+    data class SelectDeck(
         val deck: ReportDeckOption,
     ) : LearningReportIntent
 
     data object LoadMoreDecks : LearningReportIntent
 
-    // 기간 직접 설정
-    data object CloseDateEditor : LearningReportIntent
+    // 기간 직접 설정 시트
+    data object DismissDateEditor : LearningReportIntent
 
     data class ClickDate(
         val date: LocalDate,
@@ -57,6 +71,10 @@ sealed interface LearningReportIntent : UiIntent {
 
     data class MoveMonth(
         val offset: Int,
+    ) : LearningReportIntent
+
+    data class SelectQuickRange(
+        val range: ReportQuickRange,
     ) : LearningReportIntent
 
     data object ConfirmDateRange : LearningReportIntent

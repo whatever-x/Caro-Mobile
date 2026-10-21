@@ -1,5 +1,6 @@
 import com.whatever.caro.core.data.repository.report.StudyReportRepository
 import com.whatever.caro.core.model.learning.StudyRating
+import com.whatever.caro.core.model.report.ReportBucket
 import com.whatever.caro.core.model.report.ReportBucketUnit
 import com.whatever.caro.core.model.report.ReportCardLabel
 import com.whatever.caro.core.model.report.ReportCardRecord
@@ -17,8 +18,10 @@ import com.whatever.caro.core.viewmodel.ExceptionFilter
 import com.whatever.caro.feature.learning.report.LearningReportViewModel
 import com.whatever.caro.feature.learning.report.ReportPeriodPreset
 import com.whatever.caro.feature.learning.report.ReportPeriods
+import com.whatever.caro.feature.learning.report.ReportQuickRange
 import com.whatever.caro.feature.learning.report.ReportToday
 import com.whatever.caro.feature.learning.report.mvi.LearningReportIntent
+import com.whatever.caro.feature.learning.report.mvi.LearningReportSideEffect
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.nulls.shouldBeNull
@@ -27,6 +30,7 @@ import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
@@ -55,7 +59,7 @@ class LearningReportViewModelTest : FunSpec() {
             exceptionFilter = ExceptionFilter.None,
         )
 
-        test("일반 진입은 전체와 오늘을 포함한 최근 7일로 불러온다") {
+        test("일반 진입은 전체 덱과 첫 학습일부터 오늘까지로 불러온다") {
             runTest {
                 val repository = FakeStudyReportRepository()
                 val viewModel = createViewModel(repository)
@@ -63,15 +67,15 @@ class LearningReportViewModelTest : FunSpec() {
                 viewModel.intent(LearningReportIntent.Initialize)
                 advanceUntilIdle()
 
-                repository.summaryRequests shouldBe listOf(null to recent7)
+                repository.summaryRequests shouldBe listOf(null to null)
                 repository.cardRequests.shouldBeEmpty()
+                viewModel.state.value.filter.preset shouldBe ReportPeriodPreset.ALL
                 viewModel.state.value.summary
                     .shouldNotBeNull()
-                viewModel.state.value.isSummaryLoading shouldBe false
             }
         }
 
-        test("덱에서 들어오면 그 덱의 리포트와 카드별 평가를 불러오고 덱 이름을 채운다") {
+        test("덱에서 들어오면 그 덱의 전체 기간 리포트와 카드별 평가를 불러오고 덱 이름을 채운다") {
             runTest {
                 val repository = FakeStudyReportRepository(scopeName = "영어 단어")
                 val viewModel = createViewModel(repository, deckId = 3L)
@@ -79,129 +83,199 @@ class LearningReportViewModelTest : FunSpec() {
                 viewModel.intent(LearningReportIntent.Initialize)
                 advanceUntilIdle()
 
-                repository.summaryRequests shouldBe listOf(3L to recent7)
-                repository.cardRequests shouldBe listOf(CardRequest(3L, recent7, null, null))
+                repository.summaryRequests shouldBe listOf(3L to null)
+                repository.cardRequests shouldBe listOf(CardRequest(3L, null, null, null))
                 viewModel.state.value.filter.deckName shouldBe "영어 단어"
                 viewModel.state.value.cards.size shouldBe 1
             }
         }
 
-        test("시트에서 고른 덱과 기간은 체크를 눌러야 한 번에 반영된다") {
+        test("기간 칩은 누르는 즉시 다시 불러오고 이미 고른 칩은 다시 불러오지 않는다") {
             runTest {
                 val repository = FakeStudyReportRepository()
                 val viewModel = createViewModel(repository)
                 viewModel.intent(LearningReportIntent.Initialize)
                 advanceUntilIdle()
 
-                viewModel.intent(LearningReportIntent.OpenSheet)
-                advanceUntilIdle()
-                viewModel.intent(LearningReportIntent.SelectDraftPreset(ReportPeriodPreset.RECENT_30))
-                viewModel.intent(LearningReportIntent.SelectDraftDeck(ReportDeckOption(deckId = 5L, name = "CS", deleted = false)))
+                viewModel.intent(LearningReportIntent.SelectPreset(ReportPeriodPreset.RECENT_7))
+                viewModel.intent(LearningReportIntent.SelectPreset(ReportPeriodPreset.RECENT_7))
                 advanceUntilIdle()
 
-                repository.summaryRequests.size shouldBe 1
-                viewModel.state.value.filter.deckId
-                    .shouldBeNull()
-
-                viewModel.intent(LearningReportIntent.ApplySheet)
-                advanceUntilIdle()
-
-                val recent30 = ReportPeriod(LocalDate(2026, 9, 22), today)
-                repository.summaryRequests shouldBe listOf(null to recent7, 5L to recent30)
-                viewModel.state.value.sheet
-                    .shouldBeNull()
-                viewModel.state.value.filter.preset shouldBe ReportPeriodPreset.RECENT_30
+                repository.summaryRequests shouldBe listOf(null to null, null to recent7)
             }
         }
 
-        test("시트를 취소하면 고른 값을 버리고 다시 불러오지 않는다") {
+        test("덱 선택은 기간을 두고 바로 적용하며, 같은 덱이면 닫기만 하고 삭제한 덱은 목록에 없다") {
             runTest {
                 val repository = FakeStudyReportRepository()
                 val viewModel = createViewModel(repository)
                 viewModel.intent(LearningReportIntent.Initialize)
                 advanceUntilIdle()
-
-                viewModel.intent(LearningReportIntent.OpenSheet)
-                viewModel.intent(LearningReportIntent.SelectDraftPreset(ReportPeriodPreset.RECENT_30))
-                viewModel.intent(LearningReportIntent.DismissSheet)
+                viewModel.intent(LearningReportIntent.SelectPreset(ReportPeriodPreset.RECENT_7))
                 advanceUntilIdle()
 
-                repository.summaryRequests.size shouldBe 1
-                viewModel.state.value.filter.period shouldBe recent7
-            }
-        }
+                viewModel.intent(LearningReportIntent.OpenDeckSheet)
+                advanceUntilIdle()
+                viewModel.state.value.deckSheet
+                    ?.decks
+                    ?.map { it.deckId } shouldBe listOf(5L)
 
-        test("같은 조건으로 체크하면 닫기만 하고 다시 불러오지 않는다") {
-            runTest {
-                val repository = FakeStudyReportRepository()
-                val viewModel = createViewModel(repository)
-                viewModel.intent(LearningReportIntent.Initialize)
+                viewModel.intent(LearningReportIntent.SelectDeck(ReportDeckOption(deckId = 5L, name = "CS", deleted = false)))
                 advanceUntilIdle()
 
-                viewModel.intent(LearningReportIntent.OpenSheet)
-                viewModel.intent(LearningReportIntent.ApplySheet)
-                advanceUntilIdle()
-
-                repository.summaryRequests.size shouldBe 1
-                viewModel.state.value.sheet
+                repository.summaryRequests.last() shouldBe (5L to recent7)
+                viewModel.state.value.deckSheet
                     .shouldBeNull()
+
+                viewModel.intent(LearningReportIntent.OpenDeckSheet)
+                viewModel.intent(LearningReportIntent.SelectDeck(ReportDeckOption(deckId = 5L, name = "CS", deleted = false)))
+                advanceUntilIdle()
+
+                repository.summaryRequests.size shouldBe 3
             }
         }
 
-        test("직접 설정은 미래 날짜를 고르지 않고, 완료해도 체크 전에는 불러오지 않는다") {
+        test("직접 설정은 미래 날짜를 고르지 않고, 완료하면 바로 적용한다") {
             runTest {
                 val repository = FakeStudyReportRepository()
                 val viewModel = createViewModel(repository)
                 viewModel.intent(LearningReportIntent.Initialize)
                 advanceUntilIdle()
 
-                viewModel.intent(LearningReportIntent.OpenSheet)
-                viewModel.intent(LearningReportIntent.SelectDraftPreset(ReportPeriodPreset.CUSTOM))
+                viewModel.intent(LearningReportIntent.SelectPreset(ReportPeriodPreset.CUSTOM))
                 viewModel.intent(LearningReportIntent.ClickDate(LocalDate(2026, 10, 1)))
                 viewModel.intent(LearningReportIntent.ClickDate(LocalDate(2026, 10, 22)))
                 advanceUntilIdle()
-                viewModel.state.value.sheet
-                    ?.dateEditor
+                viewModel.state.value.dateEditor
                     ?.endDate
                     .shouldBeNull()
+                repository.summaryRequests.size shouldBe 1
 
                 viewModel.intent(LearningReportIntent.ClickDate(LocalDate(2026, 10, 16)))
                 viewModel.intent(LearningReportIntent.ConfirmDateRange)
                 advanceUntilIdle()
 
                 val custom = ReportPeriod(LocalDate(2026, 10, 1), LocalDate(2026, 10, 16))
-                viewModel.state.value.sheet
-                    ?.draft
-                    ?.period shouldBe custom
-                viewModel.state.value.sheet
-                    ?.dateEditor
-                    .shouldBeNull()
-                repository.summaryRequests.size shouldBe 1
-
-                viewModel.intent(LearningReportIntent.ApplySheet)
-                advanceUntilIdle()
-
                 repository.summaryRequests.last() shouldBe (null to custom)
+                viewModel.state.value.dateEditor
+                    .shouldBeNull()
+                viewModel.state.value.filter.preset shouldBe ReportPeriodPreset.CUSTOM
             }
         }
 
-        test("직접 설정에서 기간을 고르지 않으면 체크를 눌러도 반영하지 않는다") {
+        test("빠른 선택은 날짜를 채우고, 날짜를 직접 바꾸면 빠른 선택이 풀린다") {
             runTest {
                 val repository = FakeStudyReportRepository()
                 val viewModel = createViewModel(repository)
                 viewModel.intent(LearningReportIntent.Initialize)
                 advanceUntilIdle()
 
-                viewModel.intent(LearningReportIntent.OpenSheet)
-                viewModel.intent(LearningReportIntent.SelectDraftPreset(ReportPeriodPreset.CUSTOM))
-                viewModel.intent(LearningReportIntent.CloseDateEditor)
+                viewModel.intent(LearningReportIntent.SelectPreset(ReportPeriodPreset.CUSTOM))
+                viewModel.intent(LearningReportIntent.SelectQuickRange(ReportQuickRange.THIS_WEEK))
                 advanceUntilIdle()
-                // 직접 설정을 열었다 닫아도 기존 선택(최근 7일)은 그대로다
-                viewModel.state.value.sheet
-                    ?.canApply shouldBe true
-                viewModel.state.value.sheet
-                    ?.draft
-                    ?.period shouldBe recent7
+
+                val editor =
+                    viewModel.state.value.dateEditor
+                        .shouldNotBeNull()
+                editor.startDate shouldBe LocalDate(2026, 10, 19)
+                editor.endDate shouldBe today
+                editor.quickRange shouldBe ReportQuickRange.THIS_WEEK
+
+                viewModel.intent(LearningReportIntent.ClickDate(LocalDate(2026, 10, 5)))
+                advanceUntilIdle()
+
+                viewModel.state.value.dateEditor
+                    ?.quickRange
+                    .shouldBeNull()
+            }
+        }
+
+        test("월 막대를 누르면 그 달을 다시 불러와 주차로 더하고, 같은 막대를 다시 누르면 닫는다") {
+            runTest {
+                val repository = FakeStudyReportRepository()
+                val viewModel = createViewModel(repository)
+                viewModel.intent(LearningReportIntent.Initialize)
+                advanceUntilIdle()
+
+                viewModel.intent(LearningReportIntent.ClickBar(october))
+                advanceUntilIdle()
+
+                repository.summaryRequests.last() shouldBe (null to octoberPeriod)
+                val weeks =
+                    viewModel.state.value.monthDetail
+                        ?.weeks
+                        .shouldNotBeNull()
+                weeks.map { it.number to it.reviewCount } shouldBe listOf(1 to 4L, 2 to 0L, 3 to 0L, 4 to 6L)
+                weeks.first().period shouldBe ReportPeriod(LocalDate(2026, 10, 1), LocalDate(2026, 10, 4))
+
+                viewModel.intent(LearningReportIntent.ClickBar(october))
+                advanceUntilIdle()
+
+                viewModel.state.value.monthDetail
+                    .shouldBeNull()
+            }
+        }
+
+        test("주차로 들어간 기간은 뒤로 가기로 한 단계씩 돌아가고, 돌아갈 단계가 없으면 리포트를 닫는다") {
+            runTest {
+                val repository = FakeStudyReportRepository()
+                val viewModel = createViewModel(repository)
+                viewModel.intent(LearningReportIntent.Initialize)
+                advanceUntilIdle()
+                viewModel.intent(LearningReportIntent.ClickBar(october))
+                advanceUntilIdle()
+                val week =
+                    viewModel.state.value.monthDetail
+                        ?.weeks!!
+                        .last()
+
+                viewModel.intent(LearningReportIntent.ClickWeek(week))
+                advanceUntilIdle()
+
+                repository.summaryRequests.last() shouldBe (null to week.period)
+                viewModel.state.value.filter.preset shouldBe ReportPeriodPreset.CUSTOM
+                viewModel.state.value.monthDetail
+                    .shouldBeNull()
+
+                // 주차 목록이 열린 그 달로 돌아간다
+                viewModel.intent(LearningReportIntent.ClickBack)
+                advanceUntilIdle()
+                viewModel.state.value.filter.period
+                    .shouldBeNull()
+                viewModel.state.value.monthDetail
+                    ?.bucket shouldBe october
+
+                // 목록만 닫는다
+                viewModel.intent(LearningReportIntent.ClickBack)
+                advanceUntilIdle()
+                viewModel.state.value.monthDetail
+                    .shouldBeNull()
+                viewModel.state.value.handlesBack shouldBe false
+
+                viewModel.intent(LearningReportIntent.ClickBack)
+                advanceUntilIdle()
+                viewModel.sideEffect.first() shouldBe LearningReportSideEffect.NavigateBack
+            }
+        }
+
+        test("기간 칩으로 바꾸면 막대로 쌓인 단계를 지운다") {
+            runTest {
+                val repository = FakeStudyReportRepository()
+                val viewModel = createViewModel(repository)
+                viewModel.intent(LearningReportIntent.Initialize)
+                advanceUntilIdle()
+                viewModel.intent(LearningReportIntent.ClickBar(october))
+                advanceUntilIdle()
+                viewModel.intent(LearningReportIntent.ClickMonthAll)
+                advanceUntilIdle()
+                repository.summaryRequests.last() shouldBe (null to octoberPeriod)
+                viewModel.state.value.backSteps.size shouldBe 1
+
+                viewModel.intent(LearningReportIntent.SelectPreset(ReportPeriodPreset.RECENT_7))
+                advanceUntilIdle()
+
+                viewModel.state.value.backSteps
+                    .shouldBeEmpty()
             }
         }
 
@@ -213,18 +287,15 @@ class LearningReportViewModelTest : FunSpec() {
                 viewModel.intent(LearningReportIntent.Initialize)
                 advanceUntilIdle()
 
-                viewModel.intent(LearningReportIntent.ClickAllPeriod)
+                viewModel.intent(LearningReportIntent.SelectPreset(ReportPeriodPreset.RECENT_7))
                 advanceUntilIdle()
                 gate.complete(Unit)
                 advanceUntilIdle()
 
-                viewModel.state.value.filter.period
-                    .shouldBeNull()
                 viewModel.state.value.summary
                     ?.range
-                    ?.startDate
-                    .shouldBeNull()
-                repository.summaryRequests shouldBe listOf(null to recent7, null to null)
+                    ?.startDate shouldBe recent7.startDate
+                repository.summaryRequests shouldBe listOf(null to null, null to recent7)
             }
         }
 
@@ -259,21 +330,47 @@ class LearningReportViewModelTest : FunSpec() {
                 advanceUntilIdle()
 
                 repository.summaryRequests.size shouldBe 1
-                repository.cardRequests.last() shouldBe CardRequest(3L, recent7, StudyRating.AGAIN, null)
+                repository.cardRequests.last() shouldBe CardRequest(3L, null, StudyRating.AGAIN, null)
             }
         }
 
-        test("최근 7일과 30일은 오늘을 포함하고 직접 설정은 하루부터 오늘까지 고를 수 있다") {
+        test("최근 7일과 빠른 선택은 오늘까지 포함하고 직접 설정은 하루부터 오늘까지 고를 수 있다") {
             ReportPeriods.presetPeriod(ReportPeriodPreset.RECENT_7, today) shouldBe recent7
-            ReportPeriods.presetPeriod(ReportPeriodPreset.RECENT_30, LocalDate(2026, 3, 1)) shouldBe
+            ReportPeriods.presetPeriod(ReportPeriodPreset.ALL, today).shouldBeNull()
+            ReportPeriods.quickPeriod(ReportQuickRange.THIS_WEEK, today) shouldBe ReportPeriod(LocalDate(2026, 10, 19), today)
+            ReportPeriods.quickPeriod(ReportQuickRange.THIS_WEEK, LocalDate(2026, 10, 19)) shouldBe
+                ReportPeriod(LocalDate(2026, 10, 19), LocalDate(2026, 10, 19))
+            ReportPeriods.quickPeriod(ReportQuickRange.THIS_MONTH, LocalDate(2026, 11, 1)) shouldBe
+                ReportPeriod(LocalDate(2026, 11, 1), LocalDate(2026, 11, 1))
+            ReportPeriods.quickPeriod(ReportQuickRange.RECENT_30, LocalDate(2026, 3, 1)) shouldBe
                 ReportPeriod(LocalDate(2026, 1, 31), LocalDate(2026, 3, 1))
             ReportPeriods.isSelectable(today, today, today) shouldBe true
             ReportPeriods.isSelectable(today, LocalDate(2026, 10, 20), today) shouldBe false
             ReportPeriods.isSelectable(LocalDate(2026, 10, 20), LocalDate(2026, 10, 22), today) shouldBe false
             ReportPeriods.isSelectable(null, today, today) shouldBe false
         }
+
+        test("주차는 월요일에 시작하고 잘린 달에서도 그 달 1일이 든 주를 1주차로 센다") {
+            // 2026.3.1은 일요일이라 1주차는 하루다
+            val march = ReportPeriod(LocalDate(2026, 3, 12), LocalDate(2026, 3, 31))
+            ReportPeriods.splitWeeks(march, emptyList()).map { it.number to it.period } shouldBe
+                listOf(
+                    3 to ReportPeriod(LocalDate(2026, 3, 12), LocalDate(2026, 3, 15)),
+                    4 to ReportPeriod(LocalDate(2026, 3, 16), LocalDate(2026, 3, 22)),
+                    5 to ReportPeriod(LocalDate(2026, 3, 23), LocalDate(2026, 3, 29)),
+                    6 to ReportPeriod(LocalDate(2026, 3, 30), LocalDate(2026, 3, 31)),
+                )
+        }
     }
 }
+
+private val octoberPeriod = ReportPeriod(LocalDate(2026, 10, 1), LocalDate(2026, 10, 21))
+private val october = ReportBucket(octoberPeriod.startDate, octoberPeriod.endDate, 10, ReportRatingCounts(5, 3, 2))
+
+private fun dayBucket(
+    date: LocalDate,
+    count: Long,
+) = ReportBucket(date, date, count, ReportRatingCounts(count, 0, 0))
 
 private data class CardRequest(
     val deckId: Long,
@@ -303,16 +400,38 @@ private class FakeStudyReportRepository(
         val counts = ReportCounts(3, 2, 1, ReportRatingCounts(1, 1, 1))
         return StudyReportSummary(
             scope = ReportScope(deckId = deckId, deckName = scopeName, deleted = false),
-            range = ReportRange(startDate = period?.startDate, endDate = LocalDate(2026, 10, 21), bucketUnit = ReportBucketUnit.DAY),
-            lifetime = if (deckId == null) counts else null,
+            range =
+                ReportRange(
+                    startDate = period?.startDate,
+                    endDate = LocalDate(2026, 10, 21),
+                    // 전체 기간은 월 단위 차트로 둔다
+                    bucketUnit = if (period == null) ReportBucketUnit.MONTH else ReportBucketUnit.DAY,
+                ),
             selected = counts,
-            buckets = emptyList(),
+            // 10월을 다시 불러오면 1주차(10.2)와 4주차(10.19, 10.21)에 기록이 있다
+            buckets =
+                if (period == octoberPeriod) {
+                    listOf(
+                        dayBucket(LocalDate(2026, 10, 2), 4),
+                        dayBucket(LocalDate(2026, 10, 19), 1),
+                        dayBucket(LocalDate(2026, 10, 21), 5),
+                    )
+                } else {
+                    emptyList()
+                },
             restDates = emptyList(),
         )
     }
 
     override suspend fun getDeckOptions(cursor: String?): ReportPage<ReportDeckOption> =
-        ReportPage(items = listOf(ReportDeckOption(deckId = 5L, name = "CS", deleted = false)), nextCursor = null)
+        ReportPage(
+            items =
+                listOf(
+                    ReportDeckOption(deckId = 5L, name = "CS", deleted = false),
+                    ReportDeckOption(deckId = 4L, name = null, deleted = true),
+                ),
+            nextCursor = null,
+        )
 
     override suspend fun getSessions(
         deckId: Long?,

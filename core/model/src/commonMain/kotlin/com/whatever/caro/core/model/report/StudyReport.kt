@@ -58,8 +58,6 @@ data class ReportScope(
 data class StudyReportSummary(
     val scope: ReportScope,
     val range: ReportRange,
-    /** "전체"를 고른 경우에만 있다 */
-    val lifetime: ReportCounts?,
     val selected: ReportCounts,
     val buckets: List<ReportBucket>,
     val restDates: List<LocalDate>,

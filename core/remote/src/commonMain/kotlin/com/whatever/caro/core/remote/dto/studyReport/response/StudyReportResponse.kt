@@ -9,8 +9,6 @@ import kotlinx.serialization.Serializable
 data class StudyReportSummaryResponse(
     val scope: ReportScopeResponseDto?,
     val range: ReportRangeResponseDto?,
-    /** 덱을 고르면 응답에 없다 */
-    val lifetime: ReportCountsResponseDto? = null,
     val selected: ReportCountsResponseDto?,
     val buckets: List<ReportBucketResponseDto>?,
     val restDates: List<String>?,

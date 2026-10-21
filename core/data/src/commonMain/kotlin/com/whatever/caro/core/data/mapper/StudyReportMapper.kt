@@ -57,7 +57,6 @@ internal fun StudyReportSummaryResponse.toStudyReportSummary(): StudyReportSumma
                 deleted = scope?.deleted ?: false,
             ),
         range = range.toReportRange("summary.range"),
-        lifetime = lifetime?.toReportCounts(),
         selected = selected?.toReportCounts() ?: invalid("summary.selected is null"),
         buckets = buckets.orEmpty().mapNotNull { it.toReportBucket() },
         restDates = restDates.orEmpty().mapNotNull { it.toLocalDateOrNull() },

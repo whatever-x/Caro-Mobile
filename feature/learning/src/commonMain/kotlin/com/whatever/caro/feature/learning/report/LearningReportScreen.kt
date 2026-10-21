@@ -23,6 +23,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.unit.dp
 import caromobile.core.designsystem.generated.resources.Res
 import caromobile.core.designsystem.generated.resources.ic_arrow_right_16
 import caromobile.core.designsystem.generated.resources.report_all_period_link
@@ -38,23 +39,24 @@ import caromobile.core.designsystem.generated.resources.report_error_description
 import caromobile.core.designsystem.generated.resources.report_error_title
 import caromobile.core.designsystem.generated.resources.report_filter_all
 import caromobile.core.designsystem.generated.resources.report_history_link
-import caromobile.core.designsystem.generated.resources.report_lifetime_title
 import caromobile.core.designsystem.generated.resources.report_load_more_error
 import caromobile.core.designsystem.generated.resources.report_retry
-import caromobile.core.designsystem.generated.resources.report_selected_title
 import caromobile.core.designsystem.generated.resources.report_title
 import com.whatever.caro.core.designsystem.modifier.noRippleClickable
 import com.whatever.caro.core.designsystem.themes.CaroTheme
 import com.whatever.caro.core.model.learning.StudyRating
 import com.whatever.caro.core.model.report.ReportCardRecord
+import com.whatever.caro.core.model.report.ReportPeriod
 import com.whatever.caro.core.model.report.StudyReportSummary
 import com.whatever.caro.feature.learning.report.components.ReportChart
 import com.whatever.caro.feature.learning.report.components.ReportChip
-import com.whatever.caro.feature.learning.report.components.ReportFilterSheet
-import com.whatever.caro.feature.learning.report.components.ReportLifetimeCard
+import com.whatever.caro.feature.learning.report.components.ReportDateSheet
+import com.whatever.caro.feature.learning.report.components.ReportDeckSheet
 import com.whatever.caro.feature.learning.report.components.ReportLinkRow
 import com.whatever.caro.feature.learning.report.components.ReportLoadMoreError
 import com.whatever.caro.feature.learning.report.components.ReportMessage
+import com.whatever.caro.feature.learning.report.components.ReportMonthDetailPanel
+import com.whatever.caro.feature.learning.report.components.ReportPeriodChips
 import com.whatever.caro.feature.learning.report.components.ReportPrimaryButton
 import com.whatever.caro.feature.learning.report.components.ReportRatingDistribution
 import com.whatever.caro.feature.learning.report.components.ReportRatingLabel
@@ -72,6 +74,7 @@ import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
 private const val LOAD_MORE_THRESHOLD = 3
+private val SectionSpacing = 28.dp
 
 @Composable
 internal fun LearningReportScreen(
@@ -102,17 +105,25 @@ internal fun LearningReportScreen(
                     top = CaroTheme.spacing.s,
                     bottom = CaroTheme.spacing.xl4,
                 ),
-            verticalArrangement = Arrangement.spacedBy(CaroTheme.spacing.xl3),
+            verticalArrangement = Arrangement.spacedBy(SectionSpacing),
         ) {
             item(key = "scope") {
-                ReportScopeHeader(
-                    deckId = state.filter.deckId,
-                    deckName = state.filter.deckName,
-                    deckDeleted = state.filter.deckDeleted,
-                    period = state.filter.period,
-                    isSheetOpen = state.sheet != null,
-                    onClick = { onIntent(LearningReportIntent.OpenSheet) },
-                )
+                val range = state.summary?.range
+                Column(verticalArrangement = Arrangement.spacedBy(CaroTheme.spacing.l)) {
+                    ReportScopeHeader(
+                        deckId = state.filter.deckId,
+                        deckName = state.filter.deckName,
+                        deckDeleted = state.filter.deckDeleted,
+                        // "전체"는 서버가 정한 첫 학습일부터 오늘까지를 보여준다
+                        period = state.filter.period ?: range?.startDate?.let { ReportPeriod(it, range.endDate) },
+                        isSheetOpen = state.deckSheet != null,
+                        onClick = { onIntent(LearningReportIntent.OpenDeckSheet) },
+                    )
+                    ReportPeriodChips(
+                        selected = state.filter.preset,
+                        onSelect = { onIntent(LearningReportIntent.SelectPreset(it)) },
+                    )
+                }
             }
             val summary = state.summary
             when {
@@ -133,19 +144,24 @@ internal fun LearningReportScreen(
         }
     }
 
-    state.sheet?.let { sheet ->
-        ReportFilterSheet(
+    state.deckSheet?.let { sheet ->
+        ReportDeckSheet(
             sheet = sheet,
-            onDismiss = { onIntent(LearningReportIntent.DismissSheet) },
-            onApply = { onIntent(LearningReportIntent.ApplySheet) },
-            onSelectPreset = { onIntent(LearningReportIntent.SelectDraftPreset(it)) },
-            onSelectAllDecks = { onIntent(LearningReportIntent.SelectDraftAllDecks) },
-            onSelectDeck = { onIntent(LearningReportIntent.SelectDraftDeck(it)) },
+            selectedDeckId = state.filter.deckId,
+            onDismiss = { onIntent(LearningReportIntent.DismissDeckSheet) },
+            onSelectAllDecks = { onIntent(LearningReportIntent.SelectAllDecks) },
+            onSelectDeck = { onIntent(LearningReportIntent.SelectDeck(it)) },
             onLoadMoreDecks = { onIntent(LearningReportIntent.LoadMoreDecks) },
-            onCloseDateEditor = { onIntent(LearningReportIntent.CloseDateEditor) },
+        )
+    }
+    state.dateEditor?.let { editor ->
+        ReportDateSheet(
+            editor = editor,
+            onDismiss = { onIntent(LearningReportIntent.DismissDateEditor) },
             onClickDate = { onIntent(LearningReportIntent.ClickDate(it)) },
             onMoveMonth = { onIntent(LearningReportIntent.MoveMonth(it)) },
-            onConfirmDateRange = { onIntent(LearningReportIntent.ConfirmDateRange) },
+            onSelectQuickRange = { onIntent(LearningReportIntent.SelectQuickRange(it)) },
+            onConfirm = { onIntent(LearningReportIntent.ConfirmDateRange) },
         )
     }
 }
@@ -155,9 +171,8 @@ private fun LazyListScope.summaryItems(
     summary: StudyReportSummary,
     onIntent: (LearningReportIntent) -> Unit,
 ) {
-    val lifetime = summary.lifetime
-    // "전체"인데 누적 기록도 없으면 시작 안내만 보여준다
-    if (state.isDeckReport.not() && lifetime != null && lifetime.reviewCount == 0L) {
+    // 전체 덱의 전체 기간에도 기록이 없으면 시작 안내만 보여준다
+    if (state.isDeckReport.not() && state.filter.period == null && summary.selected.reviewCount == 0L) {
         item(key = "empty-all") {
             ReportMessage(
                 title = stringResource(Res.string.report_empty_all_title),
@@ -166,15 +181,7 @@ private fun LazyListScope.summaryItems(
         }
         return
     }
-    if (lifetime != null) {
-        item(key = "lifetime") { ReportLifetimeCard(title = stringResource(Res.string.report_lifetime_title), counts = lifetime) }
-    }
-    item(key = "selected") {
-        Column(verticalArrangement = Arrangement.spacedBy(CaroTheme.spacing.m)) {
-            ReportSectionTitle(title = stringResource(Res.string.report_selected_title))
-            ReportStats(counts = summary.selected)
-        }
-    }
+    item(key = "selected") { ReportStats(counts = summary.selected) }
     if (summary.selected.reviewCount == 0L) {
         item(key = "empty-period") {
             Column(verticalArrangement = Arrangement.spacedBy(CaroTheme.spacing.l)) {
@@ -192,8 +199,26 @@ private fun LazyListScope.summaryItems(
         }
         return
     }
-    item(key = "chart") {
-        ReportChart(buckets = summary.buckets, unit = summary.range.bucketUnit, restDates = summary.restDates)
+    // 하루만 골랐거나 학습일이 하루뿐이면 막대 하나라 차트를 숨긴다
+    if (summary.range.startDate != summary.range.endDate && summary.selected.studyDayCount > 1) {
+        item(key = "chart") {
+            Column(verticalArrangement = Arrangement.spacedBy(CaroTheme.spacing.l)) {
+                ReportChart(
+                    buckets = summary.buckets,
+                    unit = summary.range.bucketUnit,
+                    selected = state.monthDetail?.bucket,
+                    onClickBar = { onIntent(LearningReportIntent.ClickBar(it)) },
+                )
+                state.monthDetail?.let { detail ->
+                    ReportMonthDetailPanel(
+                        detail = detail,
+                        onClickMonthAll = { onIntent(LearningReportIntent.ClickMonthAll) },
+                        onClickWeek = { onIntent(LearningReportIntent.ClickWeek(it)) },
+                        onRetry = { onIntent(LearningReportIntent.RetryMonthDetail) },
+                    )
+                }
+            }
+        }
     }
     item(key = "ratings") { ReportRatingDistribution(counts = summary.selected) }
     item(key = "history") {

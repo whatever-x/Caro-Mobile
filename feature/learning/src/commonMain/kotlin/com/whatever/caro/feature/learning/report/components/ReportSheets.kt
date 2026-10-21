@@ -5,7 +5,6 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -30,6 +29,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
@@ -40,7 +40,7 @@ import caromobile.core.designsystem.generated.resources.ic_arrow_left_24
 import caromobile.core.designsystem.generated.resources.ic_arrow_right_24
 import caromobile.core.designsystem.generated.resources.ic_check_24
 import caromobile.core.designsystem.generated.resources.ic_x_24
-import caromobile.core.designsystem.generated.resources.report_date_back
+import caromobile.core.designsystem.generated.resources.report_date_close
 import caromobile.core.designsystem.generated.resources.report_date_done
 import caromobile.core.designsystem.generated.resources.report_date_end
 import caromobile.core.designsystem.generated.resources.report_date_guide
@@ -48,30 +48,26 @@ import caromobile.core.designsystem.generated.resources.report_date_month
 import caromobile.core.designsystem.generated.resources.report_date_next_month
 import caromobile.core.designsystem.generated.resources.report_date_not_selected
 import caromobile.core.designsystem.generated.resources.report_date_prev_month
+import caromobile.core.designsystem.generated.resources.report_date_recent30
 import caromobile.core.designsystem.generated.resources.report_date_start
+import caromobile.core.designsystem.generated.resources.report_date_this_month
+import caromobile.core.designsystem.generated.resources.report_date_this_week
 import caromobile.core.designsystem.generated.resources.report_date_title
 import caromobile.core.designsystem.generated.resources.report_scope_all
-import caromobile.core.designsystem.generated.resources.report_scope_deleted_deck
-import caromobile.core.designsystem.generated.resources.report_sheet_apply
-import caromobile.core.designsystem.generated.resources.report_sheet_cancel
-import caromobile.core.designsystem.generated.resources.report_sheet_custom
-import caromobile.core.designsystem.generated.resources.report_sheet_deck
 import caromobile.core.designsystem.generated.resources.report_sheet_decks_error
-import caromobile.core.designsystem.generated.resources.report_sheet_period
-import caromobile.core.designsystem.generated.resources.report_sheet_recent30
-import caromobile.core.designsystem.generated.resources.report_sheet_recent7
 import caromobile.core.designsystem.generated.resources.report_sheet_title
 import com.whatever.caro.core.designsystem.modifier.noRippleClickable
 import com.whatever.caro.core.designsystem.themes.CaroTheme
 import com.whatever.caro.core.model.report.ReportDeckOption
-import com.whatever.caro.feature.learning.report.ReportPeriodPreset
+import com.whatever.caro.feature.learning.report.ReportQuickRange
 import com.whatever.caro.feature.learning.report.mvi.ReportDateEditorState
-import com.whatever.caro.feature.learning.report.mvi.ReportSheetState
+import com.whatever.caro.feature.learning.report.mvi.ReportDeckSheetState
 import kotlinx.datetime.DatePeriod
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.isoDayNumber
 import kotlinx.datetime.plus
+import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
@@ -80,52 +76,156 @@ private const val DAYS_PER_WEEK = 7
 private const val LOAD_MORE_THRESHOLD = 3
 
 /**
- * 조회 조건 시트. 상단, 기간, "전체"는 고정하고 덱 목록만 스크롤한다.
- * X, 바깥 터치, 뒤로 가기는 고른 값을 버린다. 기간 직접 설정이 열려 있으면 뒤로 가기는 그 화면만 닫는다.
+ * 덱 선택 시트. 첫 항목은 "전체"이고 덱 목록만 스크롤한다. 덱을 누르면 바로 적용하고 닫는다.
+ * 바깥 터치, 아래로 끌기, 뒤로 가기는 바꾸지 않고 닫는다.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun ReportFilterSheet(
-    sheet: ReportSheetState,
+internal fun ReportDeckSheet(
+    sheet: ReportDeckSheetState,
+    selectedDeckId: Long?,
     onDismiss: () -> Unit,
-    onApply: () -> Unit,
-    onSelectPreset: (ReportPeriodPreset) -> Unit,
     onSelectAllDecks: () -> Unit,
     onSelectDeck: (ReportDeckOption) -> Unit,
     onLoadMoreDecks: () -> Unit,
-    onCloseDateEditor: () -> Unit,
+) {
+    val listState = rememberLazyListState()
+    val shouldLoadMore by remember(sheet) {
+        derivedStateOf {
+            val lastVisible =
+                listState.layoutInfo.visibleItemsInfo
+                    .lastOrNull()
+                    ?.index ?: 0
+            sheet.hasMoreDecks && lastVisible >= listState.layoutInfo.totalItemsCount - LOAD_MORE_THRESHOLD
+        }
+    }
+    LaunchedEffect(shouldLoadMore) { if (shouldLoadMore) onLoadMoreDecks() }
+
+    ReportSheet(onDismiss = onDismiss) {
+        Column(
+            modifier = Modifier.fillMaxWidth().padding(horizontal = CaroTheme.spacing.xl2).padding(bottom = CaroTheme.spacing.xl3),
+            verticalArrangement = Arrangement.spacedBy(CaroTheme.spacing.s),
+        ) {
+            Text(
+                text = stringResource(Res.string.report_sheet_title),
+                modifier = Modifier.fillMaxWidth().padding(vertical = CaroTheme.spacing.m),
+                style = CaroTheme.typography.heading1,
+                color = CaroTheme.color.text.primary,
+                textAlign = TextAlign.Center,
+            )
+            DeckOptionRow(
+                name = stringResource(Res.string.report_scope_all),
+                isSelected = selectedDeckId == null,
+                onClick = onSelectAllDecks,
+            )
+            Spacer(modifier = Modifier.fillMaxWidth().height(1.dp).background(CaroTheme.color.divider.secondary))
+            LazyColumn(state = listState, modifier = Modifier.fillMaxWidth().heightIn(max = 360.dp)) {
+                items(items = sheet.decks, key = { it.deckId }) { deck ->
+                    DeckOptionRow(
+                        name = deck.name.orEmpty(),
+                        isSelected = selectedDeckId == deck.deckId,
+                        onClick = { onSelectDeck(deck) },
+                    )
+                }
+                if (sheet.hasDecksError) {
+                    item {
+                        ReportLoadMoreError(message = stringResource(Res.string.report_sheet_decks_error), onRetry = onLoadMoreDecks)
+                    }
+                }
+            }
+        }
+    }
+}
+
+/**
+ * 기간 직접 설정 시트. 처음 누른 날짜가 시작일, 다음 날짜가 종료일이다. "기간 선택 완료"는 바로 적용하고 닫는다.
+ * X, 바깥 터치, 뒤로 가기는 바꾸지 않고 닫는다.
+ */
+@Composable
+internal fun ReportDateSheet(
+    editor: ReportDateEditorState,
+    onDismiss: () -> Unit,
     onClickDate: (LocalDate) -> Unit,
     onMoveMonth: (Int) -> Unit,
-    onConfirmDateRange: () -> Unit,
+    onSelectQuickRange: (ReportQuickRange) -> Unit,
+    onConfirm: () -> Unit,
 ) {
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    ReportSheet(onDismiss = onDismiss) {
+        Column(
+            modifier = Modifier.fillMaxWidth().padding(horizontal = CaroTheme.spacing.xl2).padding(bottom = CaroTheme.spacing.xl3),
+            verticalArrangement = Arrangement.spacedBy(CaroTheme.spacing.xl),
+        ) {
+            Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                SheetIconButton(
+                    icon = Res.drawable.ic_x_24,
+                    description = stringResource(Res.string.report_date_close),
+                    onClick = onDismiss,
+                )
+                Text(
+                    text = stringResource(Res.string.report_date_title),
+                    modifier = Modifier.weight(1f),
+                    style = CaroTheme.typography.heading1,
+                    color = CaroTheme.color.text.primary,
+                    textAlign = TextAlign.Center,
+                )
+                Spacer(modifier = Modifier.size(ReportMinTouchSize))
+            }
+            Row(horizontalArrangement = Arrangement.spacedBy(CaroTheme.spacing.m)) {
+                DateField(
+                    label = stringResource(Res.string.report_date_start),
+                    date = editor.startDate,
+                    isActive = editor.startDate == null || editor.endDate != null,
+                    modifier = Modifier.weight(1f),
+                )
+                DateField(
+                    label = stringResource(Res.string.report_date_end),
+                    date = editor.endDate,
+                    isActive = editor.startDate != null && editor.endDate == null,
+                    modifier = Modifier.weight(1f),
+                )
+            }
+            Row(horizontalArrangement = Arrangement.spacedBy(CaroTheme.spacing.s)) {
+                listOf(
+                    ReportQuickRange.THIS_WEEK to Res.string.report_date_this_week,
+                    ReportQuickRange.THIS_MONTH to Res.string.report_date_this_month,
+                    ReportQuickRange.RECENT_30 to Res.string.report_date_recent30,
+                ).forEach { (range, label) ->
+                    ReportChip(
+                        text = stringResource(label),
+                        isSelected = editor.quickRange == range,
+                        onClick = { onSelectQuickRange(range) },
+                    )
+                }
+            }
+            Calendar(editor = editor, onClickDate = onClickDate, onMoveMonth = onMoveMonth)
+            Text(
+                text = stringResource(Res.string.report_date_guide),
+                style = CaroTheme.typography.caption1.regular,
+                color = CaroTheme.color.text.secondary,
+            )
+            ReportPrimaryButton(
+                text = stringResource(Res.string.report_date_done),
+                onClick = onConfirm,
+                enabled = editor.canConfirm,
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun ReportSheet(
+    onDismiss: () -> Unit,
+    content: @Composable () -> Unit,
+) {
     ModalBottomSheet(
-        onDismissRequest = { if (sheet.dateEditor != null) onCloseDateEditor() else onDismiss() },
-        sheetState = sheetState,
+        onDismissRequest = onDismiss,
+        sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
         shape = RoundedCornerShape(topStart = CaroTheme.spacing.xl2, topEnd = CaroTheme.spacing.xl2),
         containerColor = CaroTheme.color.surface.primary,
         dragHandle = { SheetHandle() },
     ) {
-        val editor = sheet.dateEditor
-        if (editor != null) {
-            ReportDateEditor(
-                editor = editor,
-                onBack = onCloseDateEditor,
-                onClickDate = onClickDate,
-                onMoveMonth = onMoveMonth,
-                onConfirm = onConfirmDateRange,
-            )
-        } else {
-            ReportFilterContent(
-                sheet = sheet,
-                onCancel = onDismiss,
-                onApply = onApply,
-                onSelectPreset = onSelectPreset,
-                onSelectAllDecks = onSelectAllDecks,
-                onSelectDeck = onSelectDeck,
-                onLoadMoreDecks = onLoadMoreDecks,
-            )
-        }
+        content()
     }
 }
 
@@ -143,121 +243,8 @@ private fun SheetHandle() {
 }
 
 @Composable
-private fun ReportFilterContent(
-    sheet: ReportSheetState,
-    onCancel: () -> Unit,
-    onApply: () -> Unit,
-    onSelectPreset: (ReportPeriodPreset) -> Unit,
-    onSelectAllDecks: () -> Unit,
-    onSelectDeck: (ReportDeckOption) -> Unit,
-    onLoadMoreDecks: () -> Unit,
-) {
-    val listState = rememberLazyListState()
-    val shouldLoadMore by remember(sheet) {
-        derivedStateOf {
-            val lastVisible =
-                listState.layoutInfo.visibleItemsInfo
-                    .lastOrNull()
-                    ?.index ?: 0
-            sheet.hasMoreDecks && lastVisible >= listState.layoutInfo.totalItemsCount - LOAD_MORE_THRESHOLD
-        }
-    }
-    LaunchedEffect(shouldLoadMore) { if (shouldLoadMore) onLoadMoreDecks() }
-
-    Column(
-        modifier = Modifier.fillMaxWidth().padding(horizontal = CaroTheme.spacing.xl2).padding(bottom = CaroTheme.spacing.xl3),
-        verticalArrangement = Arrangement.spacedBy(CaroTheme.spacing.xl),
-    ) {
-        SheetHeader(
-            title = stringResource(Res.string.report_sheet_title),
-            leading = {
-                SheetIconButton(
-                    icon = Res.drawable.ic_x_24,
-                    description = stringResource(Res.string.report_sheet_cancel),
-                    onClick = onCancel,
-                )
-            },
-            trailing = {
-                SheetIconButton(
-                    icon = Res.drawable.ic_check_24,
-                    description = stringResource(Res.string.report_sheet_apply),
-                    onClick = onApply,
-                    enabled = sheet.canApply,
-                )
-            },
-        )
-        Column(verticalArrangement = Arrangement.spacedBy(CaroTheme.spacing.m)) {
-            SheetSubtitle(stringResource(Res.string.report_sheet_period))
-            FlowRow(
-                horizontalArrangement = Arrangement.spacedBy(CaroTheme.spacing.s),
-                verticalArrangement = Arrangement.spacedBy(CaroTheme.spacing.s),
-            ) {
-                listOf(
-                    ReportPeriodPreset.RECENT_7 to Res.string.report_sheet_recent7,
-                    ReportPeriodPreset.RECENT_30 to Res.string.report_sheet_recent30,
-                    ReportPeriodPreset.CUSTOM to Res.string.report_sheet_custom,
-                ).forEach { (preset, label) ->
-                    ReportChip(
-                        text = stringResource(label),
-                        isSelected = sheet.draft.preset == preset,
-                        onClick = { onSelectPreset(preset) },
-                    )
-                }
-            }
-            Text(
-                text = sheet.draft.period.toRangeText(),
-                style = CaroTheme.typography.body2.medium,
-                color = CaroTheme.color.text.secondary,
-            )
-        }
-        Column(verticalArrangement = Arrangement.spacedBy(CaroTheme.spacing.s)) {
-            SheetSubtitle(stringResource(Res.string.report_sheet_deck))
-            DeckOptionRow(
-                name = stringResource(Res.string.report_scope_all),
-                isSelected = sheet.draft.deckId == null,
-                onClick = onSelectAllDecks,
-            )
-            Spacer(modifier = Modifier.fillMaxWidth().height(1.dp).background(CaroTheme.color.divider.secondary))
-            LazyColumn(state = listState, modifier = Modifier.fillMaxWidth().heightIn(max = 360.dp)) {
-                items(items = sheet.decks, key = { it.deckId }) { deck ->
-                    DeckOptionRow(
-                        name = deck.name ?: stringResource(Res.string.report_scope_deleted_deck),
-                        isSelected = sheet.draft.deckId == deck.deckId,
-                        onClick = { onSelectDeck(deck) },
-                    )
-                }
-                if (sheet.hasDecksError) {
-                    item {
-                        ReportLoadMoreError(message = stringResource(Res.string.report_sheet_decks_error), onRetry = onLoadMoreDecks)
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun SheetHeader(
-    title: String,
-    leading: @Composable () -> Unit,
-    trailing: @Composable () -> Unit,
-) {
-    Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-        leading()
-        Text(
-            text = title,
-            modifier = Modifier.weight(1f),
-            style = CaroTheme.typography.heading1,
-            color = CaroTheme.color.text.primary,
-            textAlign = TextAlign.Center,
-        )
-        trailing()
-    }
-}
-
-@Composable
 private fun SheetIconButton(
-    icon: org.jetbrains.compose.resources.DrawableResource,
+    icon: DrawableResource,
     description: String,
     onClick: () -> Unit,
     enabled: Boolean = true,
@@ -269,14 +256,9 @@ private fun SheetIconButton(
         Icon(
             painter = painterResource(icon),
             contentDescription = description,
-            tint = if (enabled) CaroTheme.color.icon.brand else CaroTheme.color.icon.disabled,
+            tint = if (enabled) CaroTheme.color.icon.primary else CaroTheme.color.icon.disabled,
         )
     }
-}
-
-@Composable
-private fun SheetSubtitle(text: String) {
-    Text(text = text, style = CaroTheme.typography.body2.semiBold, color = CaroTheme.color.text.secondary)
 }
 
 @Composable
@@ -350,60 +332,6 @@ private fun DeckOptionRow(
     }
 }
 
-/**
- * 기간 직접 설정. 처음 누른 날짜가 시작일, 다음 날짜가 종료일이다. "기간 선택 완료"는 조회 조건 시트로 돌아가기만 한다.
- */
-@Composable
-private fun ReportDateEditor(
-    editor: ReportDateEditorState,
-    onBack: () -> Unit,
-    onClickDate: (LocalDate) -> Unit,
-    onMoveMonth: (Int) -> Unit,
-    onConfirm: () -> Unit,
-) {
-    Column(
-        modifier = Modifier.fillMaxWidth().padding(horizontal = CaroTheme.spacing.xl2).padding(bottom = CaroTheme.spacing.xl3),
-        verticalArrangement = Arrangement.spacedBy(CaroTheme.spacing.xl),
-    ) {
-        SheetHeader(
-            title = stringResource(Res.string.report_date_title),
-            leading = {
-                SheetIconButton(
-                    icon = Res.drawable.ic_arrow_left_24,
-                    description = stringResource(Res.string.report_date_back),
-                    onClick = onBack,
-                )
-            },
-            trailing = { Spacer(modifier = Modifier.size(ReportMinTouchSize)) },
-        )
-        Row(horizontalArrangement = Arrangement.spacedBy(CaroTheme.spacing.m)) {
-            DateField(
-                label = stringResource(Res.string.report_date_start),
-                date = editor.startDate,
-                isActive = editor.startDate == null || editor.endDate != null,
-                modifier = Modifier.weight(1f),
-            )
-            DateField(
-                label = stringResource(Res.string.report_date_end),
-                date = editor.endDate,
-                isActive = editor.startDate != null && editor.endDate == null,
-                modifier = Modifier.weight(1f),
-            )
-        }
-        Calendar(editor = editor, onClickDate = onClickDate, onMoveMonth = onMoveMonth)
-        Text(
-            text = stringResource(Res.string.report_date_guide),
-            style = CaroTheme.typography.caption1.regular,
-            color = CaroTheme.color.text.secondary,
-        )
-        ReportPrimaryButton(
-            text = stringResource(Res.string.report_date_done),
-            onClick = onConfirm,
-            enabled = editor.canConfirm,
-        )
-    }
-}
-
 @Composable
 private fun DateField(
     label: String,
@@ -467,7 +395,7 @@ private fun Calendar(
                     text = stringResource(day.label()),
                     modifier = Modifier.width(CalendarDaySize),
                     style = CaroTheme.typography.caption1.regular,
-                    color = CaroTheme.color.text.tertiary,
+                    color = day.weekendColor() ?: CaroTheme.color.text.tertiary,
                     textAlign = TextAlign.Center,
                 )
             }
@@ -524,8 +452,19 @@ private fun CalendarDay(
                 when {
                     isEdge -> CaroTheme.color.text.inverse
                     isDisabled -> CaroTheme.color.text.disabled
-                    else -> CaroTheme.color.text.primary
+                    else -> date.dayOfWeek.weekendColor() ?: CaroTheme.color.text.primary
                 },
         )
     }
 }
+
+/**
+ * 달력의 토요일은 파란 글자, 일요일은 빨간 글자
+ */
+@Composable
+private fun DayOfWeek.weekendColor(): Color? =
+    when (this) {
+        DayOfWeek.SATURDAY -> CaroTheme.color.text.brand
+        DayOfWeek.SUNDAY -> CaroTheme.color.text.error
+        else -> null
+    }
