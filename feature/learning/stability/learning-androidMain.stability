@@ -103,11 +103,12 @@ internal fun com.whatever.caro.feature.learning.components.LearningCompletion(to
     - onClickBackToHome: STABLE (function type)
 
 @Composable
-internal fun com.whatever.caro.feature.learning.components.LearningErrorDialog(message: kotlin.String, onConfirm: kotlin.Function0<kotlin.Unit>): kotlin.Unit
+internal fun com.whatever.caro.feature.learning.components.LearningErrorDialog(message: kotlin.String, onRetry: kotlin.Function0<kotlin.Unit>, onConfirm: kotlin.Function0<kotlin.Unit>): kotlin.Unit
   skippable: true
   restartable: true
   params:
     - message: STABLE (String is immutable)
+    - onRetry: STABLE (function type)
     - onConfirm: STABLE (function type)
 
 @Composable
@@ -141,6 +142,375 @@ internal fun com.whatever.caro.feature.learning.components.LearningTopBar(curren
 
 @Composable
 private fun com.whatever.caro.feature.learning.feedbackColorArgb(): kotlin.Int
+  skippable: true
+  restartable: true
+  params:
+
+@Composable
+internal fun com.whatever.caro.feature.learning.report.LearningReportScreen(state: com.whatever.caro.feature.learning.report.mvi.LearningReportState, onIntent: kotlin.Function1<com.whatever.caro.feature.learning.report.mvi.LearningReportIntent, kotlin.Unit>): kotlin.Unit
+  skippable: false
+  restartable: true
+  params:
+    - state: UNSTABLE (has mutable properties or unstable members)
+    - onIntent: STABLE (function type)
+
+@Composable
+private fun com.whatever.caro.feature.learning.report.ReportCardRow(record: com.whatever.caro.core.model.report.ReportCardRecord, onClick: kotlin.Function0<kotlin.Unit>): kotlin.Unit
+  skippable: false
+  restartable: true
+  params:
+    - record: UNSTABLE (has mutable properties or unstable members)
+    - onClick: STABLE (function type)
+
+@Composable
+private fun com.whatever.caro.feature.learning.report.ReportError(onRetry: kotlin.Function0<kotlin.Unit>): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - onRetry: STABLE (function type)
+
+@Composable
+internal fun com.whatever.caro.feature.learning.report.card.CardReviewHistoryScreen(state: com.whatever.caro.feature.learning.report.card.mvi.CardReviewHistoryState, onIntent: kotlin.Function1<com.whatever.caro.feature.learning.report.card.mvi.CardReviewHistoryIntent, kotlin.Unit>): kotlin.Unit
+  skippable: false
+  restartable: true
+  params:
+    - state: UNSTABLE (has mutable properties or unstable members)
+    - onIntent: STABLE (function type)
+
+@Composable
+private fun com.whatever.caro.feature.learning.report.card.CurrentCard(card: com.whatever.caro.core.model.report.ReportCardLabel): kotlin.Unit
+  skippable: false
+  restartable: true
+  params:
+    - card: UNSTABLE (has mutable properties or unstable members)
+
+@Composable
+private fun com.whatever.caro.feature.learning.report.card.HistoryHeader(state: com.whatever.caro.feature.learning.report.card.mvi.CardReviewHistoryState, onAllPeriod: kotlin.Function0<kotlin.Unit>): kotlin.Unit
+  skippable: false
+  restartable: true
+  params:
+    - state: UNSTABLE (has mutable properties or unstable members)
+    - onAllPeriod: STABLE (function type)
+
+@Composable
+private fun com.whatever.caro.feature.learning.report.card.ReviewRow(review: com.whatever.caro.core.model.report.ReportReview, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+  skippable: false
+  restartable: true
+  params:
+    - review: UNSTABLE (has mutable properties or unstable members)
+    - modifier: STABLE (marked @Stable or @Immutable)
+
+@Composable
+private fun com.whatever.caro.feature.learning.report.components.Calendar(editor: com.whatever.caro.feature.learning.report.mvi.ReportDateEditorState, onClickDate: kotlin.Function1<kotlinx.datetime.LocalDate, kotlin.Unit>, onMoveMonth: kotlin.Function1<kotlin.Int, kotlin.Unit>): kotlin.Unit
+  skippable: false
+  restartable: true
+  params:
+    - editor: UNSTABLE (has mutable properties or unstable members)
+    - onClickDate: STABLE (function type)
+    - onMoveMonth: STABLE (function type)
+
+@Composable
+private fun com.whatever.caro.feature.learning.report.components.CalendarDay(date: kotlinx.datetime.LocalDate?, editor: com.whatever.caro.feature.learning.report.mvi.ReportDateEditorState, onClick: kotlin.Function1<kotlinx.datetime.LocalDate, kotlin.Unit>): kotlin.Unit
+  skippable: false
+  restartable: true
+  params:
+    - date: UNSTABLE (has mutable properties or unstable members)
+    - editor: UNSTABLE (has mutable properties or unstable members)
+    - onClick: STABLE (function type)
+
+@Composable
+private fun com.whatever.caro.feature.learning.report.components.ChartBar(bucket: com.whatever.caro.core.model.report.ReportBucket, label: kotlin.String, fraction: kotlin.Float, isDimmed: kotlin.Boolean, isSelected: kotlin.Boolean, onClick: kotlin.Function0<kotlin.Unit>?, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+  skippable: false
+  restartable: true
+  params:
+    - bucket: UNSTABLE (has mutable properties or unstable members)
+    - label: STABLE (String is immutable)
+    - fraction: STABLE (primitive type)
+    - isDimmed: STABLE (primitive type)
+    - isSelected: STABLE (primitive type)
+    - onClick: STABLE (function type)
+    - modifier: STABLE (marked @Stable or @Immutable)
+
+@Composable
+private fun com.whatever.caro.feature.learning.report.components.DateField(label: kotlin.String, date: kotlinx.datetime.LocalDate?, isActive: kotlin.Boolean, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+  skippable: false
+  restartable: true
+  params:
+    - label: STABLE (String is immutable)
+    - date: UNSTABLE (has mutable properties or unstable members)
+    - isActive: STABLE (primitive type)
+    - modifier: STABLE (marked @Stable or @Immutable)
+
+@Composable
+private fun com.whatever.caro.feature.learning.report.components.DeckOptionRow(name: kotlin.String, isSelected: kotlin.Boolean, onClick: kotlin.Function0<kotlin.Unit>): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - name: STABLE (String is immutable)
+    - isSelected: STABLE (primitive type)
+    - onClick: STABLE (function type)
+
+@Composable
+internal fun com.whatever.caro.feature.learning.report.components.ReportChart(buckets: kotlin.collections.List<com.whatever.caro.core.model.report.ReportBucket>, unit: com.whatever.caro.core.model.report.ReportBucketUnit, selected: com.whatever.caro.core.model.report.ReportBucket?, onClickBar: kotlin.Function1<com.whatever.caro.core.model.report.ReportBucket, kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+  skippable: false
+  restartable: true
+  params:
+    - buckets: RUNTIME (requires runtime check)
+    - unit: STABLE (class with no mutable properties)
+    - selected: UNSTABLE (has mutable properties or unstable members)
+    - onClickBar: STABLE (function type)
+    - modifier: STABLE (marked @Stable or @Immutable)
+
+@Composable
+internal fun com.whatever.caro.feature.learning.report.components.ReportChip(text: kotlin.String, isSelected: kotlin.Boolean, onClick: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - text: STABLE (String is immutable)
+    - isSelected: STABLE (primitive type)
+    - onClick: STABLE (function type)
+    - modifier: STABLE (marked @Stable or @Immutable)
+
+@Composable
+internal fun com.whatever.caro.feature.learning.report.components.ReportDateSheet(editor: com.whatever.caro.feature.learning.report.mvi.ReportDateEditorState, onDismiss: kotlin.Function0<kotlin.Unit>, onClickDate: kotlin.Function1<kotlinx.datetime.LocalDate, kotlin.Unit>, onMoveMonth: kotlin.Function1<kotlin.Int, kotlin.Unit>, onSelectQuickRange: kotlin.Function1<com.whatever.caro.feature.learning.report.ReportQuickRange, kotlin.Unit>, onConfirm: kotlin.Function0<kotlin.Unit>): kotlin.Unit
+  skippable: false
+  restartable: true
+  params:
+    - editor: UNSTABLE (has mutable properties or unstable members)
+    - onDismiss: STABLE (function type)
+    - onClickDate: STABLE (function type)
+    - onMoveMonth: STABLE (function type)
+    - onSelectQuickRange: STABLE (function type)
+    - onConfirm: STABLE (function type)
+
+@Composable
+internal fun com.whatever.caro.feature.learning.report.components.ReportDeckSheet(sheet: com.whatever.caro.feature.learning.report.mvi.ReportDeckSheetState, selectedDeckId: kotlin.Long?, onDismiss: kotlin.Function0<kotlin.Unit>, onSelectAllDecks: kotlin.Function0<kotlin.Unit>, onSelectDeck: kotlin.Function1<com.whatever.caro.core.model.report.ReportDeckOption, kotlin.Unit>, onLoadMoreDecks: kotlin.Function0<kotlin.Unit>): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - sheet: STABLE (class with no mutable properties)
+    - selectedDeckId: STABLE (class with no mutable properties)
+    - onDismiss: STABLE (function type)
+    - onSelectAllDecks: STABLE (function type)
+    - onSelectDeck: STABLE (function type)
+    - onLoadMoreDecks: STABLE (function type)
+
+@Composable
+internal fun com.whatever.caro.feature.learning.report.components.ReportLinkRow(text: kotlin.String, onClick: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - text: STABLE (String is immutable)
+    - onClick: STABLE (function type)
+    - modifier: STABLE (marked @Stable or @Immutable)
+
+@Composable
+internal fun com.whatever.caro.feature.learning.report.components.ReportLoadMoreError(message: kotlin.String, onRetry: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - message: STABLE (String is immutable)
+    - onRetry: STABLE (function type)
+    - modifier: STABLE (marked @Stable or @Immutable)
+
+@Composable
+internal fun com.whatever.caro.feature.learning.report.components.ReportMessage(title: kotlin.String, description: kotlin.String, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - title: STABLE (String is immutable)
+    - description: STABLE (String is immutable)
+    - modifier: STABLE (marked @Stable or @Immutable)
+
+@Composable
+internal fun com.whatever.caro.feature.learning.report.components.ReportMonthDetailPanel(detail: com.whatever.caro.feature.learning.report.mvi.ReportMonthDetail, onClickMonthAll: kotlin.Function0<kotlin.Unit>, onClickWeek: kotlin.Function1<com.whatever.caro.feature.learning.report.ReportWeek, kotlin.Unit>, onRetry: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+  skippable: false
+  restartable: true
+  params:
+    - detail: UNSTABLE (has mutable properties or unstable members)
+    - onClickMonthAll: STABLE (function type)
+    - onClickWeek: STABLE (function type)
+    - onRetry: STABLE (function type)
+    - modifier: STABLE (marked @Stable or @Immutable)
+
+@Composable
+internal fun com.whatever.caro.feature.learning.report.components.ReportPeriodChips(selected: com.whatever.caro.feature.learning.report.ReportPeriodPreset, onSelect: kotlin.Function1<com.whatever.caro.feature.learning.report.ReportPeriodPreset, kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - selected: STABLE (class with no mutable properties)
+    - onSelect: STABLE (function type)
+    - modifier: STABLE (marked @Stable or @Immutable)
+
+@Composable
+internal fun com.whatever.caro.feature.learning.report.components.ReportPrimaryButton(text: kotlin.String, onClick: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier, enabled: kotlin.Boolean): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - text: STABLE (String is immutable)
+    - onClick: STABLE (function type)
+    - modifier: STABLE (marked @Stable or @Immutable)
+    - enabled: STABLE (primitive type)
+
+@Composable
+internal fun com.whatever.caro.feature.learning.report.components.ReportRatingDistribution(counts: com.whatever.caro.core.model.report.ReportCounts, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+  skippable: false
+  restartable: true
+  params:
+    - counts: UNSTABLE (has mutable properties or unstable members)
+    - modifier: STABLE (marked @Stable or @Immutable)
+
+@Composable
+internal fun com.whatever.caro.feature.learning.report.components.ReportRatingLabel(rating: com.whatever.caro.core.model.learning.StudyRating, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - rating: STABLE (class with no mutable properties)
+    - modifier: STABLE (marked @Stable or @Immutable)
+
+@Composable
+internal fun com.whatever.caro.feature.learning.report.components.ReportScopeHeader(deckId: kotlin.Long?, deckName: kotlin.String?, deckDeleted: kotlin.Boolean, period: com.whatever.caro.core.model.report.ReportPeriod?, isSheetOpen: kotlin.Boolean, onClick: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+  skippable: false
+  restartable: true
+  params:
+    - deckId: STABLE (class with no mutable properties)
+    - deckName: STABLE (class with no mutable properties)
+    - deckDeleted: STABLE (primitive type)
+    - period: UNSTABLE (has mutable properties or unstable members)
+    - isSheetOpen: STABLE (primitive type)
+    - onClick: STABLE (function type)
+    - modifier: STABLE (marked @Stable or @Immutable)
+
+@Composable
+internal fun com.whatever.caro.feature.learning.report.components.ReportSectionTitle(title: kotlin.String, modifier: androidx.compose.ui.Modifier, caption: kotlin.String?): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - title: STABLE (String is immutable)
+    - modifier: STABLE (marked @Stable or @Immutable)
+    - caption: STABLE (class with no mutable properties)
+
+@Composable
+private fun com.whatever.caro.feature.learning.report.components.ReportSheet(onDismiss: kotlin.Function0<kotlin.Unit>, content: @[Composable] androidx.compose.runtime.internal.ComposableFunction0<kotlin.Unit>): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - onDismiss: STABLE (function type)
+    - content: STABLE (composable function type)
+
+@Composable
+internal fun com.whatever.caro.feature.learning.report.components.ReportSkeleton(modifier: androidx.compose.ui.Modifier): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - modifier: STABLE (marked @Stable or @Immutable)
+
+@Composable
+private fun com.whatever.caro.feature.learning.report.components.ReportStat(value: kotlin.String, label: kotlin.String, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - value: STABLE (String is immutable)
+    - label: STABLE (String is immutable)
+    - modifier: STABLE (marked @Stable or @Immutable)
+
+@Composable
+internal fun com.whatever.caro.feature.learning.report.components.ReportStats(counts: com.whatever.caro.core.model.report.ReportCounts, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+  skippable: false
+  restartable: true
+  params:
+    - counts: UNSTABLE (has mutable properties or unstable members)
+    - modifier: STABLE (marked @Stable or @Immutable)
+
+@Composable
+internal fun com.whatever.caro.feature.learning.report.components.ReportTopBar(title: kotlin.String, onBack: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - title: STABLE (String is immutable)
+    - onBack: STABLE (function type)
+    - modifier: STABLE (marked @Stable or @Immutable)
+
+@Composable
+private fun com.whatever.caro.feature.learning.report.components.SheetHandle(): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+
+@Composable
+private fun com.whatever.caro.feature.learning.report.components.SheetIconButton(icon: org.jetbrains.compose.resources.DrawableResource, description: kotlin.String, onClick: kotlin.Function0<kotlin.Unit>, enabled: kotlin.Boolean): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - icon: STABLE (marked @Stable or @Immutable)
+    - description: STABLE (String is immutable)
+    - onClick: STABLE (function type)
+    - enabled: STABLE (primitive type)
+
+@Composable
+private fun com.whatever.caro.feature.learning.report.components.WeekRow(week: com.whatever.caro.feature.learning.report.ReportWeek, fraction: kotlin.Float, onClick: kotlin.Function0<kotlin.Unit>): kotlin.Unit
+  skippable: false
+  restartable: true
+  params:
+    - week: UNSTABLE (has mutable properties or unstable members)
+    - fraction: STABLE (primitive type)
+    - onClick: STABLE (function type)
+
+@Composable
+internal fun com.whatever.caro.feature.learning.report.components.color(): androidx.compose.ui.graphics.Color
+  skippable: true
+  restartable: true
+  params:
+
+@Composable
+private fun com.whatever.caro.feature.learning.report.components.label(unit: com.whatever.caro.core.model.report.ReportBucketUnit, previous: com.whatever.caro.core.model.report.ReportBucket?): kotlin.String
+  skippable: false
+  restartable: true
+  params:
+    - unit: STABLE (class with no mutable properties)
+    - previous: UNSTABLE (has mutable properties or unstable members)
+
+@Composable
+internal fun com.whatever.caro.feature.learning.report.components.toRangeText(): kotlin.String
+  skippable: true
+  restartable: true
+  params:
+
+@Composable
+internal fun com.whatever.caro.feature.learning.report.components.toReportTimeText(): kotlin.String
+  skippable: true
+  restartable: true
+  params:
+
+@Composable
+private fun com.whatever.caro.feature.learning.report.components.weekendColor(): androidx.compose.ui.graphics.Color?
+  skippable: true
+  restartable: true
+  params:
+
+@Composable
+internal fun com.whatever.caro.feature.learning.report.history.LearningHistoryScreen(state: com.whatever.caro.feature.learning.report.history.mvi.LearningHistoryState, onIntent: kotlin.Function1<com.whatever.caro.feature.learning.report.history.mvi.LearningHistoryIntent, kotlin.Unit>): kotlin.Unit
+  skippable: false
+  restartable: true
+  params:
+    - state: UNSTABLE (has mutable properties or unstable members)
+    - onIntent: STABLE (function type)
+
+@Composable
+private fun com.whatever.caro.feature.learning.report.history.SessionRow(session: com.whatever.caro.core.model.report.ReportSession): kotlin.Unit
+  skippable: false
+  restartable: true
+  params:
+    - session: UNSTABLE (has mutable properties or unstable members)
+
+@Composable
+private fun com.whatever.caro.feature.learning.report.history.toHistoryDateText(): kotlin.String
+  skippable: true
+  restartable: true
+  params:
+
+@Composable
+private fun com.whatever.caro.feature.learning.toMessage(): kotlin.String
   skippable: true
   restartable: true
   params:
