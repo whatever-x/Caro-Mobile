@@ -46,6 +46,7 @@ import com.whatever.caro.core.model.auth.AuthSessionEventBus
 import com.whatever.caro.core.navigator.contract.NavCommand
 import com.whatever.caro.core.navigator.dispatcher.NavigationDispatcher
 import com.whatever.caro.core.navigator.entries.CardDetailEntry
+import com.whatever.caro.core.navigator.entries.CardReviewHistoryEntry
 import com.whatever.caro.core.navigator.entries.CreateCardEntry
 import com.whatever.caro.core.navigator.entries.CreateDeckEntry
 import com.whatever.caro.core.navigator.entries.CreateProfileEntry
@@ -56,6 +57,8 @@ import com.whatever.caro.core.navigator.entries.EditDeckEntry
 import com.whatever.caro.core.navigator.entries.EditProfileEntry
 import com.whatever.caro.core.navigator.entries.HomeEntry
 import com.whatever.caro.core.navigator.entries.LearningEntry
+import com.whatever.caro.core.navigator.entries.LearningHistoryEntry
+import com.whatever.caro.core.navigator.entries.LearningReportEntry
 import com.whatever.caro.core.navigator.entries.LoginEntry
 import com.whatever.caro.core.navigator.entries.SettingEntry
 import com.whatever.caro.core.navigator.entries.SplashEntry
@@ -104,6 +107,9 @@ fun CaroApp(
                             subclass(SettingEntry::class, SettingEntry.serializer())
                             subclass(EditDeckEntry::class, EditDeckEntry.serializer())
                             subclass(LearningEntry::class, LearningEntry.serializer())
+                            subclass(LearningReportEntry::class, LearningReportEntry.serializer())
+                            subclass(LearningHistoryEntry::class, LearningHistoryEntry.serializer())
+                            subclass(CardReviewHistoryEntry::class, CardReviewHistoryEntry.serializer())
                         }
                     }
             }

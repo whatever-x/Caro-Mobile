@@ -7,10 +7,13 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -22,6 +25,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import caromobile.core.designsystem.generated.resources.Res
@@ -37,9 +41,12 @@ import caromobile.core.designsystem.generated.resources.deck_detail_label_daily_
 import caromobile.core.designsystem.generated.resources.deck_detail_label_learning_card_count
 import caromobile.core.designsystem.generated.resources.deck_detail_label_learning_progress
 import caromobile.core.designsystem.generated.resources.deck_detail_title_daily_learning
+import caromobile.core.designsystem.generated.resources.ic_arrow_right_16
+import caromobile.core.designsystem.generated.resources.report_entry
 import com.whatever.caro.core.designsystem.modifier.noRippleClickable
 import com.whatever.caro.core.designsystem.themes.CaroTheme
 import com.whatever.caro.core.model.deck.DeckState
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -48,6 +55,7 @@ internal fun DeckDetailHeader(
     learningCardTotal: Int,
     learningProgress: Int,
     currentLearningStatus: DeckState,
+    onLearningReport: () -> Unit,
     onDailyStudy: () -> Unit,
     onAllStudy: () -> Unit,
     modifier: Modifier = Modifier,
@@ -67,10 +75,12 @@ internal fun DeckDetailHeader(
 
         if (currentLearningStatus == DeckState.REST_DAY) {
             UnavailableLearningMessage()
+            DeckReportLink(onClick = onLearningReport, modifier = Modifier.align(Alignment.End))
         } else {
             DailyLearningProgress(
                 learningCardTotal = learningCardTotal,
                 learningProgress = learningProgress,
+                onLearningReport = onLearningReport,
             )
 
             if (currentLearningStatus != DeckState.COMPLETE) {
@@ -188,6 +198,7 @@ private fun DeckStateBadge(
 private fun DailyLearningProgress(
     learningCardTotal: Int,
     learningProgress: Int,
+    onLearningReport: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -217,6 +228,7 @@ private fun DailyLearningProgress(
         }
 
         Row(
+            modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(CaroTheme.spacing.xs),
             verticalAlignment = Alignment.CenterVertically,
         ) {
@@ -249,6 +261,9 @@ private fun DailyLearningProgress(
                 color = CaroTheme.color.text.brand,
                 style = CaroTheme.typography.label2,
             )
+
+            Spacer(modifier = Modifier.weight(1f))
+            DeckReportLink(onClick = onLearningReport)
         }
     }
 }
@@ -375,6 +390,35 @@ private fun DeckDetailButton(
                     CaroTheme.color.text.brand
                 },
             style = CaroTheme.typography.heading2,
+        )
+    }
+}
+
+/**
+ * 이 덱의 학습 리포트로 가는 링크. 오늘의 학습 진행 정보 오른쪽에 둔다.
+ */
+@Composable
+internal fun DeckReportLink(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        modifier =
+            modifier
+                .heightIn(min = 48.dp)
+                .noRippleClickable(role = Role.Button, onClick = onClick),
+        horizontalArrangement = Arrangement.spacedBy(CaroTheme.spacing.xxs),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            text = stringResource(Res.string.report_entry),
+            color = CaroTheme.color.text.secondary,
+            style = CaroTheme.typography.caption1.regular,
+        )
+        Icon(
+            painter = painterResource(Res.drawable.ic_arrow_right_16),
+            contentDescription = null,
+            tint = CaroTheme.color.icon.secondary,
         )
     }
 }

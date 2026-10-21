@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -24,6 +25,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -40,6 +42,7 @@ import caromobile.core.designsystem.generated.resources.home_streak_broken_label
 import caromobile.core.designsystem.generated.resources.home_streak_not_started_description
 import caromobile.core.designsystem.generated.resources.home_streak_not_started_label
 import caromobile.core.designsystem.generated.resources.ic_add_24
+import caromobile.core.designsystem.generated.resources.ic_arrow_right_16
 import caromobile.core.designsystem.generated.resources.ic_logo_small
 import caromobile.core.designsystem.generated.resources.ic_setting_24
 import caromobile.core.designsystem.generated.resources.img_fire
@@ -47,6 +50,7 @@ import caromobile.core.designsystem.generated.resources.img_home_streak_active
 import caromobile.core.designsystem.generated.resources.img_home_streak_broken
 import caromobile.core.designsystem.generated.resources.img_home_streak_not_started
 import caromobile.core.designsystem.generated.resources.img_streak_broken
+import caromobile.core.designsystem.generated.resources.report_entry
 import com.whatever.caro.core.designsystem.components.CaroTopBar
 import com.whatever.caro.core.designsystem.modifier.noRippleClickable
 import com.whatever.caro.core.designsystem.themes.CaroTheme
@@ -153,7 +157,10 @@ internal fun HomeScreen(
                     overscrollEffect = null,
                 ) {
                     item {
-                        HomeStreakBanner(state = state)
+                        HomeStreakBanner(
+                            state = state,
+                            onLearningReport = { onIntent(HomeIntent.ClickLearningReport(deckId = null)) },
+                        )
                     }
 
                     itemsIndexed(
@@ -181,6 +188,9 @@ internal fun HomeScreen(
                                         deckId = deck.id,
                                     ),
                                 )
+                            },
+                            onLearningReportClick = {
+                                onIntent(HomeIntent.ClickLearningReport(deckId = deck.id))
                             },
                         )
                         if (index == state.decks.lastIndex) {
@@ -265,7 +275,10 @@ internal fun HomeScreen(
 }
 
 @Composable
-private fun HomeStreakBanner(state: HomeState) {
+private fun HomeStreakBanner(
+    state: HomeState,
+    onLearningReport: () -> Unit,
+) {
     val content = state.streakState.toBannerContent()
 
     Row(
@@ -292,28 +305,34 @@ private fun HomeStreakBanner(state: HomeState) {
                     color = CaroTheme.color.text.tertiary,
                 )
                 Spacer(modifier = Modifier.size(CaroTheme.spacing.m))
-                Row(
-                    modifier =
-                        Modifier
-                            .clip(RoundedCornerShape(50.dp))
-                            .background(CaroTheme.color.overlay.light)
-                            .padding(
-                                horizontal = CaroTheme.spacing.m,
-                                vertical = CaroTheme.spacing.xs,
-                            ),
-                    horizontalArrangement = Arrangement.spacedBy(CaroTheme.spacing.xs),
-                    verticalAlignment = Alignment.CenterVertically,
+                FlowRow(
+                    horizontalArrangement = Arrangement.spacedBy(CaroTheme.spacing.s),
+                    verticalArrangement = Arrangement.spacedBy(CaroTheme.spacing.s),
                 ) {
-                    Image(
-                        modifier = Modifier.size(18.dp),
-                        painter = painterResource(it.icon),
-                        contentDescription = null,
-                    )
-                    Text(
-                        text = it.label,
-                        style = CaroTheme.typography.body2.semiBold,
-                        color = it.labelColor,
-                    )
+                    Row(
+                        modifier =
+                            Modifier
+                                .clip(RoundedCornerShape(50.dp))
+                                .background(CaroTheme.color.overlay.light)
+                                .padding(
+                                    horizontal = CaroTheme.spacing.m,
+                                    vertical = CaroTheme.spacing.xs,
+                                ),
+                        horizontalArrangement = Arrangement.spacedBy(CaroTheme.spacing.xs),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Image(
+                            modifier = Modifier.size(18.dp),
+                            painter = painterResource(it.icon),
+                            contentDescription = null,
+                        )
+                        Text(
+                            text = it.label,
+                            style = CaroTheme.typography.body2.semiBold,
+                            color = it.labelColor,
+                        )
+                    }
+                    HomeLearningReportChip(onClick = onLearningReport)
                 }
             }
         }
@@ -492,6 +511,39 @@ private fun HomeScreenBrokenPreview() {
                         ),
                 ),
             onIntent = {},
+        )
+    }
+}
+
+/**
+ * 연속 학습 칩 옆의 전체 학습 리포트 진입점. 덱이 없어도 보여준다.
+ */
+@Composable
+private fun HomeLearningReportChip(onClick: () -> Unit) {
+    Row(
+        modifier =
+            Modifier
+                .clip(RoundedCornerShape(50.dp))
+                .background(CaroTheme.color.overlay.light)
+                .noRippleClickable(role = Role.Button, onClick = onClick)
+                .padding(
+                    start = CaroTheme.spacing.m,
+                    end = CaroTheme.spacing.s,
+                    top = CaroTheme.spacing.xs,
+                    bottom = CaroTheme.spacing.xs,
+                ),
+        horizontalArrangement = Arrangement.spacedBy(CaroTheme.spacing.xxs),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            text = stringResource(Res.string.report_entry),
+            style = CaroTheme.typography.body2.semiBold,
+            color = CaroTheme.color.text.inverse,
+        )
+        Icon(
+            painter = painterResource(Res.drawable.ic_arrow_right_16),
+            tint = CaroTheme.color.icon.inverse,
+            contentDescription = null,
         )
     }
 }

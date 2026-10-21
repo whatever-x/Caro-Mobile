@@ -10,6 +10,8 @@ import com.whatever.caro.core.data.repository.fcm.FcmTokenRepository
 import com.whatever.caro.core.data.repository.fcm.FcmTokenRepositoryImpl
 import com.whatever.caro.core.data.repository.profile.ProfileRepository
 import com.whatever.caro.core.data.repository.profile.ProfileRepositoryImpl
+import com.whatever.caro.core.data.repository.report.StudyReportRepository
+import com.whatever.caro.core.data.repository.report.StudyReportRepositoryImpl
 import com.whatever.caro.core.data.repository.streak.StreakRepository
 import com.whatever.caro.core.data.repository.streak.StreakRepositoryImpl
 import com.whatever.caro.core.data.repository.study.StudySessionRepository
@@ -27,4 +29,5 @@ val repositoryModule =
         single<DeckRepositoryImpl>() bind DeckRepository::class
         single<StreakRepositoryImpl>() bind StreakRepository::class
         single<StudySessionRepositoryImpl>() bind StudySessionRepository::class
+        single<StudyReportRepositoryImpl>() bind StudyReportRepository::class
     }

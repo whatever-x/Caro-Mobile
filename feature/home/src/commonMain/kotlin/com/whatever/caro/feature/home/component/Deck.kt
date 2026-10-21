@@ -22,6 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -36,8 +37,10 @@ import caromobile.core.designsystem.generated.resources.home_deck_card_total_cou
 import caromobile.core.designsystem.generated.resources.home_deck_rest_description1
 import caromobile.core.designsystem.generated.resources.home_deck_rest_description2
 import caromobile.core.designsystem.generated.resources.home_deck_rest_title
+import caromobile.core.designsystem.generated.resources.ic_arrow_right_16
 import caromobile.core.designsystem.generated.resources.ic_dot
 import caromobile.core.designsystem.generated.resources.img_card
+import caromobile.core.designsystem.generated.resources.report_entry
 import com.whatever.caro.core.designsystem.modifier.noRippleClickable
 import com.whatever.caro.core.designsystem.themes.CaroTheme
 import com.whatever.caro.core.model.deck.DeckState
@@ -55,6 +58,7 @@ internal fun Deck(
     state: DeckState,
     onDeckClick: () -> Unit,
     onStartLearningClick: () -> Unit,
+    onLearningReportClick: () -> Unit,
 ) {
     val progressSpace =
         when (state) {
@@ -139,6 +143,41 @@ internal fun Deck(
                 onClick = onStartLearningClick,
             )
         }
+        Spacer(modifier = Modifier.size(size = CaroTheme.spacing.m))
+        Box(
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .height(1.dp)
+                    .background(color = CaroTheme.color.divider.secondary),
+        )
+        DeckLearningReportLink(onClick = onLearningReportClick)
+    }
+}
+
+/**
+ * 이 덱의 학습 리포트로 가는 링크. 덱 아이템의 기존 구성 아래에 둔다.
+ */
+@Composable
+private fun DeckLearningReportLink(onClick: () -> Unit) {
+    Row(
+        modifier =
+            Modifier
+                .heightIn(min = 48.dp)
+                .noRippleClickable(role = Role.Button, onClick = onClick),
+        horizontalArrangement = Arrangement.spacedBy(space = CaroTheme.spacing.xxs),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            text = stringResource(Res.string.report_entry),
+            style = CaroTheme.typography.caption1.regular,
+            color = CaroTheme.color.text.secondary,
+        )
+        Icon(
+            painter = painterResource(resource = Res.drawable.ic_arrow_right_16),
+            tint = CaroTheme.color.icon.secondary,
+            contentDescription = null,
+        )
     }
 }
 
@@ -310,6 +349,7 @@ private fun NotStartedDeckItemPreview() {
             state = DeckState.NOT_STARTED,
             onDeckClick = {},
             onStartLearningClick = {},
+            onLearningReportClick = {},
         )
     }
 }
@@ -326,6 +366,7 @@ private fun LearningDeckItemPreview() {
             state = DeckState.LEARNING,
             onDeckClick = {},
             onStartLearningClick = {},
+            onLearningReportClick = {},
         )
     }
 }
@@ -342,6 +383,7 @@ private fun CompleteDeckItemPreview() {
             state = DeckState.COMPLETE,
             onDeckClick = {},
             onStartLearningClick = {},
+            onLearningReportClick = {},
         )
     }
 }
@@ -358,6 +400,7 @@ private fun RestDeckItemPreview() {
             state = DeckState.REST_DAY,
             onDeckClick = {},
             onStartLearningClick = {},
+            onLearningReportClick = {},
         )
     }
 }

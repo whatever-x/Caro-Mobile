@@ -57,6 +57,10 @@ class DeckDetailViewModel(
                 )
             }
 
+            DeckDetailIntent.ClickLearningReport -> {
+                postSideEffect(DeckDetailSideEffect.NavigateToLearningReport(deckId = currentState.deck.id))
+            }
+
             DeckDetailIntent.ClickDailyStudy -> {
                 postSideEffect(
                     DeckDetailSideEffect.NavigateToLearning(

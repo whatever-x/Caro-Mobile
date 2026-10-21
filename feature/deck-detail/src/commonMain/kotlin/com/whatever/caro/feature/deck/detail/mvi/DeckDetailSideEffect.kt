@@ -15,6 +15,10 @@ sealed interface DeckDetailSideEffect : UiSideEffect {
         val mode: LearningMode,
     ) : DeckDetailSideEffect
 
+    data class NavigateToLearningReport(
+        val deckId: Long,
+    ) : DeckDetailSideEffect
+
     data class NavigateToEditCardList(
         val deckId: Long,
     ) : DeckDetailSideEffect
