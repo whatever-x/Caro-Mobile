@@ -288,6 +288,7 @@ class LearningReportViewModel(
             launch {
                 suspendRunCatching { repository.getSummary(deckId = deckId, period = period) }
                     .onSuccess { summary ->
+                        // 한 달은 31일 이하라 서버가 항상 일 단위 막대로 응답한다.
                         val weeks = ReportPeriods.splitWeeks(period, summary.buckets).toImmutableList()
                         reduce { copy(monthDetail = monthDetail?.copy(weeks = weeks)) }
                     }.onFailure { throwable ->

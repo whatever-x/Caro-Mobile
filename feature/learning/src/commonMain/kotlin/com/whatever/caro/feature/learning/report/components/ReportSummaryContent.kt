@@ -54,7 +54,9 @@ import caromobile.core.designsystem.generated.resources.report_rating_title
 import caromobile.core.designsystem.generated.resources.report_rating_value
 import caromobile.core.designsystem.generated.resources.report_scope_all
 import caromobile.core.designsystem.generated.resources.report_scope_button_description
+import caromobile.core.designsystem.generated.resources.report_scope_collapsed
 import caromobile.core.designsystem.generated.resources.report_scope_deleted_deck
+import caromobile.core.designsystem.generated.resources.report_scope_expanded
 import caromobile.core.designsystem.generated.resources.report_sheet_custom
 import caromobile.core.designsystem.generated.resources.report_sheet_recent7
 import caromobile.core.designsystem.generated.resources.report_stat_card_label
@@ -110,6 +112,7 @@ internal fun ReportScopeHeader(
         }
     val rangeText = period.toRangeText()
     val description = stringResource(Res.string.report_scope_button_description, name, rangeText)
+    val sheetState = stringResource(if (isSheetOpen) Res.string.report_scope_expanded else Res.string.report_scope_collapsed)
     Column(modifier = modifier.fillMaxWidth()) {
         Row(
             modifier =
@@ -119,7 +122,7 @@ internal fun ReportScopeHeader(
                     .clearAndSetSemantics {
                         role = Role.DropdownList
                         contentDescription = description
-                        stateDescription = if (isSheetOpen) "expanded" else "collapsed"
+                        stateDescription = sheetState
                     },
             horizontalArrangement = Arrangement.spacedBy(CaroTheme.spacing.s),
             verticalAlignment = Alignment.CenterVertically,

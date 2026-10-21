@@ -2,6 +2,7 @@ package com.whatever.caro.feature.learning.report.card
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -10,7 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -68,7 +69,16 @@ internal fun CardReviewHistoryScreen(
             state.hasMore && lastVisible >= listState.layoutInfo.totalItemsCount - LOAD_MORE_THRESHOLD
         }
     }
-    LaunchedEffect(shouldLoadMore) { if (shouldLoadMore) onIntent(CardReviewHistoryIntent.LoadMore) }
+    LaunchedEffect(shouldLoadMore, state.isLoading) {
+        if (shouldLoadMore &&
+            state.isLoading.not()
+        ) {
+            onIntent(CardReviewHistoryIntent.LoadMore)
+        }
+    }
+
+    // 평가 행끼리는 붙이고 나머지 항목 사이만 띄운다.
+    val itemGap = Modifier.padding(top = CaroTheme.spacing.xl2)
 
     Column(modifier = Modifier.fillMaxSize().background(color = CaroTheme.color.background.primary)) {
         ReportTopBar(title = stringResource(Res.string.report_card_reviews_title), onBack = { onIntent(CardReviewHistoryIntent.ClickBack) })
@@ -82,23 +92,24 @@ internal fun CardReviewHistoryScreen(
                     top = CaroTheme.spacing.s,
                     bottom = CaroTheme.spacing.xl4,
                 ),
-            verticalArrangement = Arrangement.spacedBy(CaroTheme.spacing.xl2),
         ) {
             state.card?.let { card -> item(key = "card") { CurrentCard(card = card) } }
-            item(key = "header") { HistoryHeader(state = state, onAllPeriod = { onIntent(CardReviewHistoryIntent.ClickAllPeriod) }) }
-            item(key = "reviews") {
-                Column {
-                    state.reviews.forEach { review -> ReviewRow(review = review) }
+            item(key = "header") {
+                Box(modifier = if (state.card != null) itemGap else Modifier) {
+                    HistoryHeader(state = state, onAllPeriod = { onIntent(CardReviewHistoryIntent.ClickAllPeriod) })
                 }
+            }
+            itemsIndexed(items = state.reviews, key = { _, review -> "review-${review.reviewId}" }) { index, review ->
+                ReviewRow(review = review, modifier = if (index == 0) itemGap else Modifier)
             }
             when {
                 state.isLoading && state.reviews.isEmpty() -> {
-                    item(key = "loading") { ReportSkeleton() }
+                    item(key = "loading") { ReportSkeleton(modifier = itemGap) }
                 }
 
                 state.hasError && state.reviews.isEmpty() -> {
                     item(key = "error") {
-                        Column(verticalArrangement = Arrangement.spacedBy(CaroTheme.spacing.l)) {
+                        Column(modifier = itemGap, verticalArrangement = Arrangement.spacedBy(CaroTheme.spacing.l)) {
                             ReportMessage(
                                 title = stringResource(Res.string.report_error_title),
                                 description = stringResource(Res.string.report_error_description),
@@ -116,6 +127,7 @@ internal fun CardReviewHistoryScreen(
                         ReportLoadMoreError(
                             message = stringResource(Res.string.report_load_more_error),
                             onRetry = { onIntent(CardReviewHistoryIntent.Retry) },
+                            modifier = itemGap,
                         )
                     }
                 }
@@ -124,6 +136,7 @@ internal fun CardReviewHistoryScreen(
                 item(key = "caption") {
                     Text(
                         text = stringResource(Res.string.report_card_reviews_caption),
+                        modifier = itemGap,
                         style = CaroTheme.typography.caption1.regular,
                         color = CaroTheme.color.text.tertiary,
                     )
@@ -195,9 +208,12 @@ private fun HistoryHeader(
 }
 
 @Composable
-private fun ReviewRow(review: ReportReview) {
+private fun ReviewRow(
+    review: ReportReview,
+    modifier: Modifier = Modifier,
+) {
     Row(
-        modifier = Modifier.fillMaxWidth().padding(vertical = CaroTheme.spacing.l),
+        modifier = modifier.fillMaxWidth().padding(vertical = CaroTheme.spacing.l),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(CaroTheme.spacing.m),
     ) {

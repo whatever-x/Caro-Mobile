@@ -72,7 +72,13 @@ internal fun LearningHistoryScreen(
             state.hasMore && lastVisible >= listState.layoutInfo.totalItemsCount - LOAD_MORE_THRESHOLD
         }
     }
-    LaunchedEffect(shouldLoadMore) { if (shouldLoadMore) onIntent(LearningHistoryIntent.LoadMore) }
+    LaunchedEffect(shouldLoadMore, state.isLoading) {
+        if (shouldLoadMore &&
+            state.isLoading.not()
+        ) {
+            onIntent(LearningHistoryIntent.LoadMore)
+        }
+    }
     val groups = remember(state.sessions) { state.sessions.groupBy { it.studyDate }.toList() }
 
     Column(modifier = Modifier.fillMaxSize().background(color = CaroTheme.color.background.primary)) {

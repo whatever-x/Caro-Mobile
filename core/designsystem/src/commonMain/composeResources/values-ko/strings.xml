@@ -227,6 +227,8 @@
     <string name="report_scope_all">전체</string>
     <string name="report_scope_deleted_deck">삭제된 덱</string>
     <string name="report_scope_button_description">덱 선택, 현재 %1$s, %2$s</string>
+    <string name="report_scope_expanded">펼쳐짐</string>
+    <string name="report_scope_collapsed">접힘</string>
     <string name="report_date_range">%1$s – %2$s</string>
     <string name="report_all_period_range">전체 기간</string>
     <string name="report_stat_review_label">평가 횟수</string>

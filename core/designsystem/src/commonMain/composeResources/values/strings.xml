@@ -232,6 +232,8 @@
 	<string name="report_scope_all">All</string>
 	<string name="report_scope_deleted_deck">Deleted deck</string>
 	<string name="report_scope_button_description">Select deck, current %1$s, %2$s</string>
+	<string name="report_scope_expanded">Expanded</string>
+	<string name="report_scope_collapsed">Collapsed</string>
 	<string name="report_date_range">%1$s – %2$s</string>
 	<string name="report_all_period_range">All time</string>
 	<string name="report_stat_review_label">Reviews</string>
