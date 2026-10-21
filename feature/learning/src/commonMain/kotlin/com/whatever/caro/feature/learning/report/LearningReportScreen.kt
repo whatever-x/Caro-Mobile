@@ -2,6 +2,7 @@ package com.whatever.caro.feature.learning.report
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
@@ -22,6 +23,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import caromobile.core.designsystem.generated.resources.Res
@@ -105,7 +108,6 @@ internal fun LearningReportScreen(
                     top = CaroTheme.spacing.s,
                     bottom = CaroTheme.spacing.xl4,
                 ),
-            verticalArrangement = Arrangement.spacedBy(SectionSpacing),
         ) {
             item(key = "scope") {
                 val range = state.summary?.range
@@ -128,13 +130,11 @@ internal fun LearningReportScreen(
             val summary = state.summary
             when {
                 state.isSummaryLoading -> {
-                    item(key = "loading") { ReportSkeleton() }
+                    section(key = "loading") { ReportSkeleton() }
                 }
 
                 state.hasSummaryError || summary == null -> {
-                    item(
-                        key = "error",
-                    ) { ReportError(onRetry = { onIntent(LearningReportIntent.ClickRetry) }) }
+                    section(key = "error") { ReportError(onRetry = { onIntent(LearningReportIntent.ClickRetry) }) }
                 }
 
                 else -> {
@@ -166,6 +166,12 @@ internal fun LearningReportScreen(
     }
 }
 
+// 카드 행끼리는 붙이고 나머지 섹션 사이만 띄운다.
+private fun LazyListScope.section(
+    key: String,
+    content: @Composable () -> Unit,
+) = item(key = key) { Box(modifier = Modifier.padding(top = SectionSpacing)) { content() } }
+
 private fun LazyListScope.summaryItems(
     state: LearningReportState,
     summary: StudyReportSummary,
@@ -173,7 +179,7 @@ private fun LazyListScope.summaryItems(
 ) {
     // 전체 덱의 전체 기간에도 기록이 없으면 시작 안내만 보여준다
     if (state.isDeckReport.not() && state.filter.period == null && summary.selected.reviewCount == 0L) {
-        item(key = "empty-all") {
+        section(key = "empty-all") {
             ReportMessage(
                 title = stringResource(Res.string.report_empty_all_title),
                 description = stringResource(Res.string.report_empty_all_description),
@@ -181,9 +187,9 @@ private fun LazyListScope.summaryItems(
         }
         return
     }
-    item(key = "selected") { ReportStats(counts = summary.selected) }
+    section(key = "selected") { ReportStats(counts = summary.selected) }
     if (summary.selected.reviewCount == 0L) {
-        item(key = "empty-period") {
+        section(key = "empty-period") {
             Column(verticalArrangement = Arrangement.spacedBy(CaroTheme.spacing.l)) {
                 ReportMessage(
                     title = stringResource(Res.string.report_empty_period_title),
@@ -201,7 +207,7 @@ private fun LazyListScope.summaryItems(
     }
     // 하루만 골랐거나 학습일이 하루뿐이면 막대 하나라 차트를 숨긴다
     if (summary.range.startDate != summary.range.endDate && summary.selected.studyDayCount > 1) {
-        item(key = "chart") {
+        section(key = "chart") {
             Column(verticalArrangement = Arrangement.spacedBy(CaroTheme.spacing.l)) {
                 ReportChart(
                     buckets = summary.buckets,
@@ -220,8 +226,8 @@ private fun LazyListScope.summaryItems(
             }
         }
     }
-    item(key = "ratings") { ReportRatingDistribution(counts = summary.selected) }
-    item(key = "history") {
+    section(key = "ratings") { ReportRatingDistribution(counts = summary.selected) }
+    section(key = "history") {
         ReportLinkRow(text = stringResource(Res.string.report_history_link), onClick = { onIntent(LearningReportIntent.ClickHistory) })
     }
     if (state.isDeckReport) cardItems(state = state, onIntent = onIntent)
@@ -231,7 +237,7 @@ private fun LazyListScope.cardItems(
     state: LearningReportState,
     onIntent: (LearningReportIntent) -> Unit,
 ) {
-    item(key = "cards-title") {
+    section(key = "cards-title") {
         Column(verticalArrangement = Arrangement.spacedBy(CaroTheme.spacing.m)) {
             ReportSectionTitle(
                 title = stringResource(Res.string.report_cards_title),
@@ -258,11 +264,11 @@ private fun LazyListScope.cardItems(
     }
     when {
         state.hasCardsError && state.cards.isEmpty() -> {
-            item(key = "cards-error") { ReportError(onRetry = { onIntent(LearningReportIntent.RetryCards) }) }
+            section(key = "cards-error") { ReportError(onRetry = { onIntent(LearningReportIntent.RetryCards) }) }
         }
 
         state.hasCardsError -> {
-            item(key = "cards-more-error") {
+            section(key = "cards-more-error") {
                 ReportLoadMoreError(
                     message = stringResource(Res.string.report_load_more_error),
                     onRetry = { onIntent(LearningReportIntent.RetryCards) },
@@ -277,12 +283,20 @@ private fun ReportCardRow(
     record: ReportCardRecord,
     onClick: () -> Unit,
 ) {
+    val dividerColor = CaroTheme.color.border.secondary
     Row(
         modifier =
             Modifier
                 .fillMaxWidth()
                 .noRippleClickable(role = Role.Button, onClick = onClick)
-                .padding(vertical = CaroTheme.spacing.l),
+                .drawBehind {
+                    drawLine(
+                        color = dividerColor,
+                        start = Offset(0f, size.height),
+                        end = Offset(size.width, size.height),
+                        strokeWidth = 1.dp.toPx(),
+                    )
+                }.padding(vertical = CaroTheme.spacing.l),
         horizontalArrangement = Arrangement.spacedBy(CaroTheme.spacing.m),
         verticalAlignment = Alignment.CenterVertically,
     ) {

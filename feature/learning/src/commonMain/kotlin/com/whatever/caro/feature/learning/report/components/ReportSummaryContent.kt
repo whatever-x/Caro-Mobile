@@ -25,6 +25,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
@@ -39,7 +40,6 @@ import androidx.compose.ui.unit.dp
 import caromobile.core.designsystem.generated.resources.Res
 import caromobile.core.designsystem.generated.resources.ic_arrow_down_16
 import caromobile.core.designsystem.generated.resources.ic_arrow_right_16
-import caromobile.core.designsystem.generated.resources.ic_arrow_up_16
 import caromobile.core.designsystem.generated.resources.report_all_period_range
 import caromobile.core.designsystem.generated.resources.report_chart_day_title
 import caromobile.core.designsystem.generated.resources.report_chart_description
@@ -134,8 +134,9 @@ internal fun ReportScopeHeader(
                 color = CaroTheme.color.text.primary,
             )
             Icon(
-                painter = painterResource(if (isSheetOpen) Res.drawable.ic_arrow_up_16 else Res.drawable.ic_arrow_down_16),
+                painter = painterResource(Res.drawable.ic_arrow_down_16),
                 contentDescription = null,
+                modifier = Modifier.rotate(if (isSheetOpen) 180f else 0f),
                 tint = CaroTheme.color.icon.secondary,
             )
         }

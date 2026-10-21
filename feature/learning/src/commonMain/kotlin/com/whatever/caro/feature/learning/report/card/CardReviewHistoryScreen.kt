@@ -93,7 +93,8 @@ internal fun CardReviewHistoryScreen(
                     bottom = CaroTheme.spacing.xl4,
                 ),
         ) {
-            state.card?.let { card -> item(key = "card") { CurrentCard(card = card) } }
+            // 카드 정보가 늦게 와도 첫 항목 키가 바뀌지 않게 항상 둔다. 그렇지 않으면 목록이 헤더 위치를 유지해 카드가 위로 밀린다.
+            item(key = "card") { state.card?.let { card -> CurrentCard(card = card) } }
             item(key = "header") {
                 Box(modifier = if (state.card != null) itemGap else Modifier) {
                     HistoryHeader(state = state, onAllPeriod = { onIntent(CardReviewHistoryIntent.ClickAllPeriod) })
