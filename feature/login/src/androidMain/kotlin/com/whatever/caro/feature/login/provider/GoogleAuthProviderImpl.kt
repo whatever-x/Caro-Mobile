@@ -62,8 +62,6 @@ private class GoogleAuthenticator(
                     ).credential
             val user = getGoogleUserFromCredential(credential) ?: return SocialLoginResult.Failed
             SocialLoginResult.Success(user)
-        } catch (_: GetCredentialCancellationException) {
-            SocialLoginResult.UserCancelled
         } catch (_: NoCredentialException) {
             // 첫 로그인에 대한 fallback
             val fallbackOption =
@@ -90,11 +88,11 @@ private class GoogleAuthenticator(
                 val user =
                     getGoogleUserFromCredential(credential) ?: return SocialLoginResult.Failed
                 SocialLoginResult.Success(user)
-            } catch (_: GetCredentialException) {
-                SocialLoginResult.Failed
+            } catch (error: GetCredentialException) {
+                error.toSocialLoginResult()
             }
-        } catch (_: GetCredentialException) {
-            SocialLoginResult.Failed
+        } catch (error: GetCredentialException) {
+            error.toSocialLoginResult()
         }
     }
 
@@ -125,3 +123,10 @@ private class GoogleAuthenticator(
             .encode(randomBytes)
     }
 }
+
+internal fun GetCredentialException.toSocialLoginResult(): SocialLoginResult<Nothing> =
+    when (this) {
+        is NoCredentialException -> SocialLoginResult.NoCredential
+        is GetCredentialCancellationException -> SocialLoginResult.UserCancelled
+        else -> SocialLoginResult.Failed
+    }
