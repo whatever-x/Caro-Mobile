@@ -15,6 +15,7 @@ import com.whatever.caro.core.navigator.dispatcher.NavigationDispatcher
 import com.whatever.caro.core.navigator.entries.CreateDeckEntry
 import com.whatever.caro.core.navigator.entries.DeckDetailEntry
 import com.whatever.caro.core.navigator.entries.LearningEntry
+import com.whatever.caro.core.navigator.entries.LearningReportEntry
 import com.whatever.caro.core.navigator.entries.SettingEntry
 import com.whatever.caro.core.ui.snackbar.SnackBarMessage
 import com.whatever.caro.core.ui.snackbar.SnackbarController
@@ -67,6 +68,10 @@ fun HomeRoute(
                                     ),
                             ),
                     )
+                }
+
+                HomeSideEffect.NavigateToLearningReport -> {
+                    navDispatcher.emit(command = To(key = LearningReportEntry(deckId = null)))
                 }
 
                 HomeSideEffect.NavigateToSetting -> {

@@ -13,6 +13,7 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             compileOnly(libs.compose.stable.marker)
+            api(libs.kotlinx.date.time)
         }
         nativeMain.dependencies {
             api(libs.compose.stable.marker)

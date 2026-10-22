@@ -13,20 +13,25 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import caromobile.core.designsystem.generated.resources.Res
 import caromobile.core.designsystem.generated.resources.ic_arrow_left_24
+import caromobile.core.designsystem.generated.resources.ic_chart_24
 import caromobile.core.designsystem.generated.resources.ic_more_vertical_24
+import caromobile.core.designsystem.generated.resources.report_entry
 import com.whatever.caro.core.designsystem.modifier.noRippleClickable
 import com.whatever.caro.core.designsystem.themes.CaroTheme
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 internal fun DeckDetailTopBar(
     title: String,
     isLoading: Boolean,
     onBack: () -> Unit,
+    onLearningReport: () -> Unit,
     onEditDeck: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -79,14 +84,29 @@ internal fun DeckDetailTopBar(
             }
         }
 
-        Icon(
-            painter = painterResource(Res.drawable.ic_more_vertical_24),
-            contentDescription = null,
-            modifier =
-                Modifier
-                    .size(24.dp)
-                    .noRippleClickable(onClick = onEditDeck),
-            tint = CaroTheme.color.icon.inverse,
-        )
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(CaroTheme.spacing.l),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            // 홈 상단 바처럼 이 덱의 학습 리포트로 간다
+            Icon(
+                painter = painterResource(Res.drawable.ic_chart_24),
+                contentDescription = stringResource(Res.string.report_entry),
+                modifier =
+                    Modifier
+                        .size(24.dp)
+                        .noRippleClickable(role = Role.Button, onClick = onLearningReport),
+                tint = CaroTheme.color.icon.inverse,
+            )
+            Icon(
+                painter = painterResource(Res.drawable.ic_more_vertical_24),
+                contentDescription = null,
+                modifier =
+                    Modifier
+                        .size(24.dp)
+                        .noRippleClickable(onClick = onEditDeck),
+                tint = CaroTheme.color.icon.inverse,
+            )
+        }
     }
 }

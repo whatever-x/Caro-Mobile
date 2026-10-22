@@ -16,5 +16,7 @@ sealed interface HomeSideEffect : UiSideEffect {
         val deck: Deck,
     ) : HomeSideEffect
 
+    data object NavigateToLearningReport : HomeSideEffect
+
     data object ShowDeckLoadError : HomeSideEffect
 }

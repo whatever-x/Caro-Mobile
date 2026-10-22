@@ -24,6 +24,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -40,6 +41,7 @@ import caromobile.core.designsystem.generated.resources.home_streak_broken_label
 import caromobile.core.designsystem.generated.resources.home_streak_not_started_description
 import caromobile.core.designsystem.generated.resources.home_streak_not_started_label
 import caromobile.core.designsystem.generated.resources.ic_add_24
+import caromobile.core.designsystem.generated.resources.ic_chart_24
 import caromobile.core.designsystem.generated.resources.ic_logo_small
 import caromobile.core.designsystem.generated.resources.ic_setting_24
 import caromobile.core.designsystem.generated.resources.img_fire
@@ -47,6 +49,7 @@ import caromobile.core.designsystem.generated.resources.img_home_streak_active
 import caromobile.core.designsystem.generated.resources.img_home_streak_broken
 import caromobile.core.designsystem.generated.resources.img_home_streak_not_started
 import caromobile.core.designsystem.generated.resources.img_streak_broken
+import caromobile.core.designsystem.generated.resources.report_entry
 import com.whatever.caro.core.designsystem.components.CaroTopBar
 import com.whatever.caro.core.designsystem.modifier.noRippleClickable
 import com.whatever.caro.core.designsystem.themes.CaroTheme
@@ -108,44 +111,30 @@ internal fun HomeScreen(
                     )
                 },
                 trailingContent = {
-                    Image(
-                        modifier = Modifier.noRippleClickable { onIntent(HomeIntent.ClickSettingButton) },
-                        painter = painterResource(resource = Res.drawable.ic_setting_24),
-                        contentDescription = null,
-                    )
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        // 전체 학습 리포트. 설정 위치를 바꾸지 않도록 설정 왼쪽에 두고 덱이 없어도 보여준다
+                        Box(
+                            modifier =
+                                Modifier
+                                    .size(44.dp)
+                                    .noRippleClickable(role = Role.Button) {
+                                        onIntent(HomeIntent.ClickLearningReport)
+                                    },
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            Image(
+                                painter = painterResource(resource = Res.drawable.ic_chart_24),
+                                contentDescription = stringResource(Res.string.report_entry),
+                            )
+                        }
+                        Image(
+                            modifier = Modifier.noRippleClickable { onIntent(HomeIntent.ClickSettingButton) },
+                            painter = painterResource(resource = Res.drawable.ic_setting_24),
+                            contentDescription = null,
+                        )
+                    }
                 },
             )
-
-            if (state.hasLoadError) {
-                Row(
-                    modifier =
-                        Modifier
-                            .fillMaxWidth()
-                            .background(CaroTheme.color.surface.error)
-                            .padding(
-                                horizontal = CaroTheme.spacing.xl2,
-                                vertical = CaroTheme.spacing.m,
-                            ),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Text(
-                        modifier = Modifier.weight(1f),
-                        text = stringResource(Res.string.home_load_error),
-                        style = CaroTheme.typography.label1,
-                        color = CaroTheme.color.text.primary,
-                    )
-                    Text(
-                        modifier =
-                            Modifier
-                                .padding(start = CaroTheme.spacing.m)
-                                .noRippleClickable { onIntent(HomeIntent.ClickRetry) },
-                        text = stringResource(Res.string.home_retry),
-                        style = CaroTheme.typography.label1,
-                        color = CaroTheme.color.text.brand,
-                    )
-                }
-            }
 
             if (state.isLoadedContentVisible) {
                 LazyColumn(
@@ -154,6 +143,44 @@ internal fun HomeScreen(
                 ) {
                     item {
                         HomeStreakBanner(state = state)
+                    }
+
+                    // 상단 영역을 가리지 않도록 인사 영역과 덱 목록 사이에 둔다
+                    if (state.hasLoadError) {
+                        item {
+                            Row(
+                                modifier =
+                                    Modifier
+                                        .fillMaxWidth()
+                                        .padding(
+                                            start = CaroTheme.spacing.xl2,
+                                            end = CaroTheme.spacing.xl2,
+                                            top = CaroTheme.spacing.m,
+                                        ).background(color = CaroTheme.color.surface.error, shape = CaroTheme.shape.m)
+                                        .padding(
+                                            horizontal = CaroTheme.spacing.xl,
+                                            vertical = CaroTheme.spacing.m,
+                                        ),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                Text(
+                                    modifier = Modifier.weight(1f),
+                                    text = stringResource(Res.string.home_load_error),
+                                    style = CaroTheme.typography.label1,
+                                    color = CaroTheme.color.text.primary,
+                                )
+                                Text(
+                                    modifier =
+                                        Modifier
+                                            .padding(start = CaroTheme.spacing.m)
+                                            .noRippleClickable { onIntent(HomeIntent.ClickRetry) },
+                                    text = stringResource(Res.string.home_retry),
+                                    style = CaroTheme.typography.label1,
+                                    color = CaroTheme.color.text.brand,
+                                )
+                            }
+                        }
                     }
 
                     itemsIndexed(
