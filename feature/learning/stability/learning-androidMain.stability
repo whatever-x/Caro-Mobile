@@ -219,7 +219,7 @@ private fun com.whatever.caro.feature.learning.report.components.CalendarDay(dat
     - onClick: STABLE (function type)
 
 @Composable
-private fun com.whatever.caro.feature.learning.report.components.ChartBar(bucket: com.whatever.caro.core.model.report.ReportBucket, label: kotlin.String, fraction: kotlin.Float, isDimmed: kotlin.Boolean, isSelected: kotlin.Boolean, onClick: kotlin.Function0<kotlin.Unit>?, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+private fun com.whatever.caro.feature.learning.report.components.ChartBar(bucket: com.whatever.caro.core.model.report.ReportBucket, label: kotlin.String, fraction: kotlin.Float, isDimmed: kotlin.Boolean, isSelected: kotlin.Boolean, isRest: kotlin.Boolean, onClick: kotlin.Function0<kotlin.Unit>?, modifier: androidx.compose.ui.Modifier): kotlin.Unit
   skippable: false
   restartable: true
   params:
@@ -228,6 +228,7 @@ private fun com.whatever.caro.feature.learning.report.components.ChartBar(bucket
     - fraction: STABLE (primitive type)
     - isDimmed: STABLE (primitive type)
     - isSelected: STABLE (primitive type)
+    - isRest: STABLE (primitive type)
     - onClick: STABLE (function type)
     - modifier: STABLE (marked @Stable or @Immutable)
 
@@ -251,13 +252,14 @@ private fun com.whatever.caro.feature.learning.report.components.DeckOptionRow(n
     - onClick: STABLE (function type)
 
 @Composable
-internal fun com.whatever.caro.feature.learning.report.components.ReportChart(buckets: kotlin.collections.List<com.whatever.caro.core.model.report.ReportBucket>, unit: com.whatever.caro.core.model.report.ReportBucketUnit, selected: com.whatever.caro.core.model.report.ReportBucket?, onClickBar: kotlin.Function1<com.whatever.caro.core.model.report.ReportBucket, kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+internal fun com.whatever.caro.feature.learning.report.components.ReportChart(buckets: kotlin.collections.List<com.whatever.caro.core.model.report.ReportBucket>, unit: com.whatever.caro.core.model.report.ReportBucketUnit, selected: com.whatever.caro.core.model.report.ReportBucket?, restDates: kotlin.collections.List<kotlinx.datetime.LocalDate>, onClickBar: kotlin.Function1<com.whatever.caro.core.model.report.ReportBucket, kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
   skippable: false
   restartable: true
   params:
     - buckets: RUNTIME (requires runtime check)
     - unit: STABLE (class with no mutable properties)
     - selected: UNSTABLE (has mutable properties or unstable members)
+    - restDates: RUNTIME (requires runtime check)
     - onClickBar: STABLE (function type)
     - modifier: STABLE (marked @Stable or @Immutable)
 
