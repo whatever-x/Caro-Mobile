@@ -586,12 +586,13 @@ internal fun ReportRatingDistribution(
                 }
             }
         }
+        // Figma 범례 간격(항목 14, 이름과 값 6)에 맞춰 402pt 폭에서 한 줄에 들어가게 한다
         FlowRow(
-            horizontalArrangement = Arrangement.spacedBy(CaroTheme.spacing.l),
+            horizontalArrangement = Arrangement.spacedBy(14.dp),
             verticalArrangement = Arrangement.spacedBy(CaroTheme.spacing.xs),
         ) {
             ratings.forEach { (rating, count) ->
-                Row(horizontalArrangement = Arrangement.spacedBy(CaroTheme.spacing.s), verticalAlignment = Alignment.CenterVertically) {
+                Row(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalAlignment = Alignment.CenterVertically) {
                     ReportRatingLabel(rating = rating)
                     Text(
                         text = stringResource(Res.string.report_rating_value, count.formatCount()),
