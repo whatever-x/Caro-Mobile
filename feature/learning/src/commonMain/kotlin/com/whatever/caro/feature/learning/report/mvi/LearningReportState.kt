@@ -39,6 +39,7 @@ data class LearningReportState(
     val dateEditor: ReportDateEditorState? = null,
     val monthDetail: ReportMonthDetail? = null,
     val backSteps: ImmutableList<ReportBackStep> = persistentListOf(),
+    val customPeriod: ReportPeriod? = null,
 ) : UiState {
     val isDeckReport: Boolean
         get() = filter.deckId != null

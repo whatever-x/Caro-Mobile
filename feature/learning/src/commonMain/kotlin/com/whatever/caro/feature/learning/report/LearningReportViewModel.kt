@@ -221,7 +221,13 @@ class LearningReportViewModel(
      * 사용자가 고른 조건을 반영한다. 막대로 쌓인 단계는 지운다.
      */
     private fun applyFilter(filter: ReportFilter) {
-        reduce { copy(backSteps = persistentListOf()) }
+        // 직접 설정한 기간은 전체를 고를 때만 잊는다
+        reduce {
+            copy(
+                backSteps = persistentListOf(),
+                customPeriod = customPeriod.takeIf { filter.preset != ReportPeriodPreset.ALL },
+            )
+        }
         showFilter(filter)
     }
 
@@ -243,7 +249,8 @@ class LearningReportViewModel(
     private fun selectPreset(preset: ReportPeriodPreset) {
         val filter = currentState.filter
         if (preset == ReportPeriodPreset.CUSTOM) {
-            val customPeriod = filter.period.takeIf { filter.preset == ReportPeriodPreset.CUSTOM }
+            // 직접 설정한 기간이 없으면 지금 보고 있는 기간으로 채운다
+            val customPeriod = currentState.customPeriod ?: filter.period
             val today = reportToday.today()
             reduce {
                 copy(
@@ -403,8 +410,9 @@ class LearningReportViewModel(
         val start = editor.startDate ?: return
         val end = editor.endDate ?: return
         if (ReportPeriods.isSelectable(start, end, editor.today).not()) return
-        reduce { copy(dateEditor = null) }
-        applyFilter(currentState.filter.copy(preset = ReportPeriodPreset.CUSTOM, period = ReportPeriod(start, end)))
+        val period = ReportPeriod(start, end)
+        reduce { copy(dateEditor = null, customPeriod = period) }
+        applyFilter(currentState.filter.copy(preset = ReportPeriodPreset.CUSTOM, period = period))
     }
 
     private fun loadDecks() {

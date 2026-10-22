@@ -163,6 +163,44 @@ class LearningReportViewModelTest : FunSpec() {
             }
         }
 
+        test("직접 설정을 열면 직접 설정한 기간, 없으면 보고 있는 기간을 채우고 전체를 고르면 잊는다") {
+            runTest {
+                val viewModel = createViewModel(FakeStudyReportRepository())
+                viewModel.intent(LearningReportIntent.Initialize)
+                viewModel.intent(LearningReportIntent.SelectPreset(ReportPeriodPreset.RECENT_7))
+                viewModel.intent(LearningReportIntent.SelectPreset(ReportPeriodPreset.CUSTOM))
+                advanceUntilIdle()
+
+                val recent =
+                    viewModel.state.value.dateEditor
+                        .shouldNotBeNull()
+                recent.startDate shouldBe LocalDate(2026, 10, 15)
+                recent.endDate shouldBe today
+
+                viewModel.intent(LearningReportIntent.ClickDate(LocalDate(2026, 10, 1)))
+                viewModel.intent(LearningReportIntent.ClickDate(LocalDate(2026, 10, 16)))
+                viewModel.intent(LearningReportIntent.ConfirmDateRange)
+                viewModel.intent(LearningReportIntent.SelectPreset(ReportPeriodPreset.RECENT_7))
+                viewModel.intent(LearningReportIntent.SelectPreset(ReportPeriodPreset.CUSTOM))
+                advanceUntilIdle()
+
+                val remembered =
+                    viewModel.state.value.dateEditor
+                        .shouldNotBeNull()
+                remembered.startDate shouldBe LocalDate(2026, 10, 1)
+                remembered.endDate shouldBe LocalDate(2026, 10, 16)
+
+                viewModel.intent(LearningReportIntent.DismissDateEditor)
+                viewModel.intent(LearningReportIntent.SelectPreset(ReportPeriodPreset.ALL))
+                viewModel.intent(LearningReportIntent.SelectPreset(ReportPeriodPreset.CUSTOM))
+                advanceUntilIdle()
+
+                viewModel.state.value.dateEditor
+                    ?.startDate
+                    .shouldBeNull()
+            }
+        }
+
         test("빠른 선택은 날짜를 채우고, 날짜를 직접 바꾸면 빠른 선택이 풀린다") {
             runTest {
                 val repository = FakeStudyReportRepository()
