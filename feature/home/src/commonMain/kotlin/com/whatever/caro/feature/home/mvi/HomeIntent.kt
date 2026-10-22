@@ -18,10 +18,7 @@ sealed interface HomeIntent : UiIntent {
 
     data object ClickCreateDeck : HomeIntent
 
-    /** deckId가 null이면 전체 리포트 */
-    data class ClickLearningReport(
-        val deckId: Long?,
-    ) : HomeIntent
+    data object ClickLearningReport : HomeIntent
 
     data class ClickStartLearning(
         val deckId: Long,

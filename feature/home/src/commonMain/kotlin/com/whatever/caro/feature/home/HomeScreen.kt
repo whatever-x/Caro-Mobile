@@ -118,7 +118,7 @@ internal fun HomeScreen(
                                 Modifier
                                     .size(44.dp)
                                     .noRippleClickable(role = Role.Button) {
-                                        onIntent(HomeIntent.ClickLearningReport(deckId = null))
+                                        onIntent(HomeIntent.ClickLearningReport)
                                     },
                             contentAlignment = Alignment.Center,
                         ) {
@@ -136,37 +136,6 @@ internal fun HomeScreen(
                 },
             )
 
-            if (state.hasLoadError) {
-                Row(
-                    modifier =
-                        Modifier
-                            .fillMaxWidth()
-                            .background(CaroTheme.color.surface.error)
-                            .padding(
-                                horizontal = CaroTheme.spacing.xl2,
-                                vertical = CaroTheme.spacing.m,
-                            ),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Text(
-                        modifier = Modifier.weight(1f),
-                        text = stringResource(Res.string.home_load_error),
-                        style = CaroTheme.typography.label1,
-                        color = CaroTheme.color.text.primary,
-                    )
-                    Text(
-                        modifier =
-                            Modifier
-                                .padding(start = CaroTheme.spacing.m)
-                                .noRippleClickable { onIntent(HomeIntent.ClickRetry) },
-                        text = stringResource(Res.string.home_retry),
-                        style = CaroTheme.typography.label1,
-                        color = CaroTheme.color.text.brand,
-                    )
-                }
-            }
-
             if (state.isLoadedContentVisible) {
                 LazyColumn(
                     modifier = Modifier.fillMaxWidth(),
@@ -174,6 +143,44 @@ internal fun HomeScreen(
                 ) {
                     item {
                         HomeStreakBanner(state = state)
+                    }
+
+                    // 상단 영역을 가리지 않도록 인사 영역과 덱 목록 사이에 둔다
+                    if (state.hasLoadError) {
+                        item {
+                            Row(
+                                modifier =
+                                    Modifier
+                                        .fillMaxWidth()
+                                        .padding(
+                                            start = CaroTheme.spacing.xl2,
+                                            end = CaroTheme.spacing.xl2,
+                                            top = CaroTheme.spacing.m,
+                                        ).background(color = CaroTheme.color.surface.error, shape = CaroTheme.shape.m)
+                                        .padding(
+                                            horizontal = CaroTheme.spacing.xl,
+                                            vertical = CaroTheme.spacing.m,
+                                        ),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                Text(
+                                    modifier = Modifier.weight(1f),
+                                    text = stringResource(Res.string.home_load_error),
+                                    style = CaroTheme.typography.label1,
+                                    color = CaroTheme.color.text.primary,
+                                )
+                                Text(
+                                    modifier =
+                                        Modifier
+                                            .padding(start = CaroTheme.spacing.m)
+                                            .noRippleClickable { onIntent(HomeIntent.ClickRetry) },
+                                    text = stringResource(Res.string.home_retry),
+                                    style = CaroTheme.typography.label1,
+                                    color = CaroTheme.color.text.brand,
+                                )
+                            }
+                        }
                     }
 
                     itemsIndexed(
@@ -201,9 +208,6 @@ internal fun HomeScreen(
                                         deckId = deck.id,
                                     ),
                                 )
-                            },
-                            onLearningReportClick = {
-                                onIntent(HomeIntent.ClickLearningReport(deckId = deck.id))
                             },
                         )
                         if (index == state.decks.lastIndex) {

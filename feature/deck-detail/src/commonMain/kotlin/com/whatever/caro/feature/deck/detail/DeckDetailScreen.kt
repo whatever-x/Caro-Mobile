@@ -10,7 +10,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -27,7 +26,6 @@ import com.whatever.caro.feature.deck.detail.components.SortBottomSheet
 import com.whatever.caro.feature.deck.detail.components.lazycolumn.AddCardButtonItem
 import com.whatever.caro.feature.deck.detail.components.lazycolumn.DeckDescription
 import com.whatever.caro.feature.deck.detail.components.lazycolumn.DeckDetailHeader
-import com.whatever.caro.feature.deck.detail.components.lazycolumn.DeckReportLink
 import com.whatever.caro.feature.deck.detail.components.lazycolumn.FilterAndSortSection
 import com.whatever.caro.feature.deck.detail.components.lazycolumn.SwipeToRevealCardItem
 import com.whatever.caro.feature.deck.detail.mvi.DeckDetailIntent
@@ -53,6 +51,7 @@ internal fun DeckDetailScreen(
                 title = state.deck.title,
                 isLoading = state.isCardListLoading,
                 onBack = { onIntent(DeckDetailIntent.ClickBack) },
+                onLearningReport = { onIntent(DeckDetailIntent.ClickLearningReport) },
                 onEditDeck = { onIntent(DeckDetailIntent.ClickEditDeck) },
             )
 
@@ -70,11 +69,6 @@ internal fun DeckDetailScreen(
                                     horizontal = CaroTheme.spacing.xl,
                                     vertical = CaroTheme.spacing.xl,
                                 ),
-                        )
-                        // 카드를 모두 지운 덱에서도 지난 기록을 볼 수 있게 남긴다
-                        DeckReportLink(
-                            onClick = { onIntent(DeckDetailIntent.ClickLearningReport) },
-                            modifier = Modifier.align(Alignment.End).padding(horizontal = CaroTheme.spacing.xl),
                         )
                         DeckDetailGuid(
                             onAddFirstCard = { onIntent(DeckDetailIntent.ClickAddCard) },
@@ -95,7 +89,6 @@ internal fun DeckDetailScreen(
                                 learningCardTotal = state.deck.todayLearningCount,
                                 learningProgress = state.deck.todayProgress,
                                 currentLearningStatus = state.deck.state,
-                                onLearningReport = { onIntent(DeckDetailIntent.ClickLearningReport) },
                                 onAllStudy = { onIntent(DeckDetailIntent.ClickAllStudy) },
                                 onDailyStudy = { onIntent(DeckDetailIntent.ClickDailyStudy) },
                             )

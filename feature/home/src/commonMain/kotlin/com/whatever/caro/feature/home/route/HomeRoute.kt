@@ -70,8 +70,8 @@ fun HomeRoute(
                     )
                 }
 
-                is HomeSideEffect.NavigateToLearningReport -> {
-                    navDispatcher.emit(command = To(key = LearningReportEntry(deckId = sideEffect.deckId)))
+                HomeSideEffect.NavigateToLearningReport -> {
+                    navDispatcher.emit(command = To(key = LearningReportEntry(deckId = null)))
                 }
 
                 HomeSideEffect.NavigateToSetting -> {
