@@ -239,6 +239,7 @@
     <string name="report_stat_day_value">%1$s일</string>
     <string name="report_chart_month_label">%1$d월</string>
     <string name="report_chart_description">%1$s: %2$s회</string>
+    <string name="report_chart_rest">휴식</string>
     <string name="report_rating_title">평가 분포</string>
     <string name="report_rating_value">%1$s회</string>
     <string name="report_history_link">학습 기록 보기</string>

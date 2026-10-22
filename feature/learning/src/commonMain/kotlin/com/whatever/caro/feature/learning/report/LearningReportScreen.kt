@@ -78,6 +78,7 @@ import org.jetbrains.compose.resources.stringResource
 
 private const val LOAD_MORE_THRESHOLD = 3
 private val SectionSpacing = 28.dp
+private const val MESSAGE_AREA_FRACTION = 0.6f
 
 @Composable
 internal fun LearningReportScreen(
@@ -134,7 +135,7 @@ internal fun LearningReportScreen(
                 }
 
                 state.hasSummaryError || summary == null -> {
-                    section(key = "error") { ReportError(onRetry = { onIntent(LearningReportIntent.ClickRetry) }) }
+                    messageSection(key = "error") { ReportError(onRetry = { onIntent(LearningReportIntent.ClickRetry) }) }
                 }
 
                 else -> {
@@ -172,6 +173,17 @@ private fun LazyListScope.section(
     content: @Composable () -> Unit,
 ) = item(key = key) { Box(modifier = Modifier.padding(top = SectionSpacing)) { content() } }
 
+// 오류와 빈 상태 안내는 남은 화면의 가운데쯤에 둔다.
+private fun LazyListScope.messageSection(
+    key: String,
+    content: @Composable () -> Unit,
+) = item(key = key) {
+    Box(
+        modifier = Modifier.fillParentMaxHeight(MESSAGE_AREA_FRACTION).padding(top = SectionSpacing),
+        contentAlignment = Alignment.Center,
+    ) { content() }
+}
+
 private fun LazyListScope.summaryItems(
     state: LearningReportState,
     summary: StudyReportSummary,
@@ -179,7 +191,7 @@ private fun LazyListScope.summaryItems(
 ) {
     // 전체 덱의 전체 기간에도 기록이 없으면 시작 안내만 보여준다
     if (state.isDeckReport.not() && state.filter.period == null && summary.selected.reviewCount == 0L) {
-        section(key = "empty-all") {
+        messageSection(key = "empty-all") {
             ReportMessage(
                 title = stringResource(Res.string.report_empty_all_title),
                 description = stringResource(Res.string.report_empty_all_description),
@@ -189,7 +201,7 @@ private fun LazyListScope.summaryItems(
     }
     section(key = "selected") { ReportStats(counts = summary.selected) }
     if (summary.selected.reviewCount == 0L) {
-        section(key = "empty-period") {
+        messageSection(key = "empty-period") {
             Column(verticalArrangement = Arrangement.spacedBy(CaroTheme.spacing.l)) {
                 ReportMessage(
                     title = stringResource(Res.string.report_empty_period_title),
@@ -213,6 +225,7 @@ private fun LazyListScope.summaryItems(
                     buckets = summary.buckets,
                     unit = summary.range.bucketUnit,
                     selected = state.monthDetail?.bucket,
+                    restDates = summary.restDates,
                     onClickBar = { onIntent(LearningReportIntent.ClickBar(it)) },
                 )
                 state.monthDetail?.let { detail ->

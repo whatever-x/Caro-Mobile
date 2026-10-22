@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -21,8 +22,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.unit.dp
 import caromobile.core.designsystem.generated.resources.Res
+import caromobile.core.designsystem.generated.resources.ic_arrow_right_16
 import caromobile.core.designsystem.generated.resources.report_all_period_link
 import caromobile.core.designsystem.generated.resources.report_card_deleted
 import caromobile.core.designsystem.generated.resources.report_card_reviews_caption
@@ -34,10 +39,14 @@ import caromobile.core.designsystem.generated.resources.report_error_title
 import caromobile.core.designsystem.generated.resources.report_history_date
 import caromobile.core.designsystem.generated.resources.report_load_more_error
 import caromobile.core.designsystem.generated.resources.report_retry
+import caromobile.core.designsystem.generated.resources.report_sheet_recent7
 import com.whatever.caro.core.designsystem.modifier.noRippleClickable
 import com.whatever.caro.core.designsystem.themes.CaroTheme
 import com.whatever.caro.core.model.report.ReportCardLabel
 import com.whatever.caro.core.model.report.ReportReview
+import com.whatever.caro.feature.learning.report.ReportPeriodPreset
+import com.whatever.caro.feature.learning.report.ReportPeriods
+import com.whatever.caro.feature.learning.report.SystemReportToday
 import com.whatever.caro.feature.learning.report.card.mvi.CardReviewHistoryIntent
 import com.whatever.caro.feature.learning.report.card.mvi.CardReviewHistoryState
 import com.whatever.caro.feature.learning.report.components.ReportLoadMoreError
@@ -50,6 +59,7 @@ import com.whatever.caro.feature.learning.report.components.ReportTopBar
 import com.whatever.caro.feature.learning.report.components.label
 import com.whatever.caro.feature.learning.report.components.toRangeText
 import com.whatever.caro.feature.learning.report.components.toReportTimeText
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
 private const val LOAD_MORE_THRESHOLD = 3
@@ -96,12 +106,13 @@ internal fun CardReviewHistoryScreen(
             // 카드 정보가 늦게 와도 첫 항목 키가 바뀌지 않게 항상 둔다. 그렇지 않으면 목록이 헤더 위치를 유지해 카드가 위로 밀린다.
             item(key = "card") { state.card?.let { card -> CurrentCard(card = card) } }
             item(key = "header") {
-                Box(modifier = if (state.card != null) itemGap else Modifier) {
+                // 헤더는 터치 영역이 48dp라 Figma 간격보다 좁게 띄운다
+                Box(modifier = if (state.card != null) Modifier.padding(top = CaroTheme.spacing.m) else Modifier) {
                     HistoryHeader(state = state, onAllPeriod = { onIntent(CardReviewHistoryIntent.ClickAllPeriod) })
                 }
             }
             itemsIndexed(items = state.reviews, key = { _, review -> "review-${review.reviewId}" }) { index, review ->
-                ReviewRow(review = review, modifier = if (index == 0) itemGap else Modifier)
+                ReviewRow(review = review, modifier = if (index == 0) Modifier.padding(top = CaroTheme.spacing.s) else Modifier)
             }
             when {
                 state.isLoading && state.reviews.isEmpty() -> {
@@ -180,7 +191,14 @@ private fun HistoryHeader(
     state: CardReviewHistoryState,
     onAllPeriod: () -> Unit,
 ) {
-    val range = state.period.toRangeText()
+    // 최근 7일 칩에서 들어온 기간은 칩 이름으로 보여준다
+    val today = remember { SystemReportToday.today() }
+    val range =
+        if (state.period == ReportPeriods.presetPeriod(ReportPeriodPreset.RECENT_7, today)) {
+            stringResource(Res.string.report_sheet_recent7)
+        } else {
+            state.period.toRangeText()
+        }
     Row(verticalAlignment = Alignment.CenterVertically) {
         Text(
             text =
@@ -194,16 +212,25 @@ private fun HistoryHeader(
             color = CaroTheme.color.text.primary,
         )
         if (state.period != null) {
-            Text(
-                text = stringResource(Res.string.report_all_period_link),
+            Row(
                 modifier =
                     Modifier
                         .heightIn(min = ReportMinTouchSize)
                         .noRippleClickable(role = Role.Button, onClick = onAllPeriod)
                         .padding(vertical = CaroTheme.spacing.m),
-                style = CaroTheme.typography.caption1.regular,
-                color = CaroTheme.color.text.secondary,
-            )
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    text = stringResource(Res.string.report_all_period_link),
+                    style = CaroTheme.typography.caption1.regular,
+                    color = CaroTheme.color.text.secondary,
+                )
+                Icon(
+                    painter = painterResource(Res.drawable.ic_arrow_right_16),
+                    contentDescription = null,
+                    tint = CaroTheme.color.icon.secondary,
+                )
+            }
         }
     }
 }
@@ -213,8 +240,19 @@ private fun ReviewRow(
     review: ReportReview,
     modifier: Modifier = Modifier,
 ) {
+    val dividerColor = CaroTheme.color.border.secondary
     Row(
-        modifier = modifier.fillMaxWidth().padding(vertical = CaroTheme.spacing.l),
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .drawBehind {
+                    drawLine(
+                        color = dividerColor,
+                        start = Offset(0f, size.height),
+                        end = Offset(size.width, size.height),
+                        strokeWidth = 1.dp.toPx(),
+                    )
+                }.padding(vertical = CaroTheme.spacing.l),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(CaroTheme.spacing.m),
     ) {

@@ -20,6 +20,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import caromobile.core.designsystem.generated.resources.Res
@@ -137,10 +138,16 @@ internal fun ReportMessage(
 ) {
     Column(
         modifier = modifier.fillMaxWidth().padding(top = CaroTheme.spacing.xl2, bottom = CaroTheme.spacing.s),
+        horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(CaroTheme.spacing.s),
     ) {
-        Text(text = title, style = CaroTheme.typography.heading2, color = CaroTheme.color.text.primary)
-        Text(text = description, style = CaroTheme.typography.body2.medium, color = CaroTheme.color.text.secondary)
+        Text(text = title, style = CaroTheme.typography.heading2, color = CaroTheme.color.text.primary, textAlign = TextAlign.Center)
+        Text(
+            text = description,
+            style = CaroTheme.typography.body2.medium,
+            color = CaroTheme.color.text.secondary,
+            textAlign = TextAlign.Center,
+        )
     }
 }
 
@@ -201,11 +208,18 @@ internal fun ReportLoadMoreError(
                     .padding(horizontal = CaroTheme.spacing.s),
             contentAlignment = Alignment.Center,
         ) {
-            Text(
-                text = stringResource(Res.string.report_retry),
-                style = CaroTheme.typography.body2.semiBold,
-                color = CaroTheme.color.text.secondary,
-            )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    text = stringResource(Res.string.report_retry),
+                    style = CaroTheme.typography.body2.semiBold,
+                    color = CaroTheme.color.text.secondary,
+                )
+                Icon(
+                    painter = painterResource(Res.drawable.ic_arrow_right_16),
+                    contentDescription = null,
+                    tint = CaroTheme.color.icon.secondary,
+                )
+            }
         }
     }
 }

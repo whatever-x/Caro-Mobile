@@ -45,6 +45,7 @@ import caromobile.core.designsystem.generated.resources.report_chart_day_title
 import caromobile.core.designsystem.generated.resources.report_chart_description
 import caromobile.core.designsystem.generated.resources.report_chart_month_label
 import caromobile.core.designsystem.generated.resources.report_chart_month_title
+import caromobile.core.designsystem.generated.resources.report_chart_rest
 import caromobile.core.designsystem.generated.resources.report_chart_week_title
 import caromobile.core.designsystem.generated.resources.report_date_range
 import caromobile.core.designsystem.generated.resources.report_load_more_error
@@ -110,8 +111,9 @@ internal fun ReportScopeHeader(
             deckDeleted || deckName == null -> stringResource(Res.string.report_scope_deleted_deck)
             else -> deckName
         }
-    val rangeText = period.toRangeText()
-    val description = stringResource(Res.string.report_scope_button_description, name, rangeText)
+    // 전체 기간인데 첫 학습일을 아직 모르면 기간 줄을 숨긴다
+    val rangeText = period?.toRangeText()
+    val description = stringResource(Res.string.report_scope_button_description, name, rangeText.orEmpty())
     val sheetState = stringResource(if (isSheetOpen) Res.string.report_scope_expanded else Res.string.report_scope_collapsed)
     Column(modifier = modifier.fillMaxWidth()) {
         Row(
@@ -140,7 +142,7 @@ internal fun ReportScopeHeader(
                 tint = CaroTheme.color.icon.secondary,
             )
         }
-        Text(text = rangeText, style = CaroTheme.typography.body2.medium, color = CaroTheme.color.text.secondary)
+        rangeText?.let { Text(text = it, style = CaroTheme.typography.body2.medium, color = CaroTheme.color.text.secondary) }
     }
 }
 
@@ -246,12 +248,14 @@ internal fun ReportSectionTitle(
  * 평가 횟수 차트. 막대가 [CHART_VISIBLE_BARS]개를 넘으면 차트만 가로로 넘기고,
  * 처음에는 기록이 있는 가장 최근 막대가 오른쪽 끝에 오도록 둔다. 화면 밖에 막대가 더 있는 쪽은 흐리게 덮는다.
  * 월 막대와 주 막대만 누를 수 있다. [selected]가 있으면 그 막대만 진하게 보여준다.
+ * [restDates]는 서버가 전체 리포트의 일 단위일 때만 보내며, 그 날짜 아래에 휴식을 표시한다.
  */
 @Composable
 internal fun ReportChart(
     buckets: List<ReportBucket>,
     unit: ReportBucketUnit,
     selected: ReportBucket?,
+    restDates: List<LocalDate>,
     onClickBar: (ReportBucket) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -265,7 +269,14 @@ internal fun ReportChart(
             val lastActive = buckets.indexOfLast { it.reviewCount > 0 }
             val scrollState =
                 remember(buckets, slotPx) {
-                    ScrollState(initial = ((lastActive + 1) * slotPx - constraints.maxWidth).roundToInt().coerceAtLeast(0))
+                    // 막대 폭을 px로 반올림해 생기는 차이로 끝에서 오른쪽 흐림이 남지 않게, 마지막 막대면 끝까지 넘긴다
+                    val initial =
+                        if (lastActive == buckets.lastIndex) {
+                            Int.MAX_VALUE
+                        } else {
+                            ((lastActive + 1) * slotPx - constraints.maxWidth).roundToInt().coerceAtLeast(0)
+                        }
+                    ScrollState(initial = initial)
                 }
             Row(modifier = Modifier.horizontalScroll(scrollState)) {
                 buckets.forEachIndexed { index, bucket ->
@@ -275,6 +286,7 @@ internal fun ReportChart(
                         fraction = bucket.reviewCount.toFloat() / maxCount,
                         isDimmed = selected != null && bucket != selected,
                         isSelected = bucket == selected,
+                        isRest = bucket.startDate in restDates,
                         onClick = if (unit == ReportBucketUnit.DAY) null else ({ onClickBar(bucket) }),
                         modifier = Modifier.width(slot),
                     )
@@ -313,6 +325,7 @@ private fun ChartBar(
     fraction: Float,
     isDimmed: Boolean,
     isSelected: Boolean,
+    isRest: Boolean,
     onClick: (() -> Unit)?,
     modifier: Modifier = Modifier,
 ) {
@@ -327,16 +340,19 @@ private fun ChartBar(
     ) {
         BoxWithConstraints(modifier = Modifier.fillMaxWidth().height(ChartHeight), contentAlignment = Alignment.BottomCenter) {
             val barColor = CaroTheme.color.surface.brand
-            Box(
-                modifier =
-                    Modifier
-                        .width(minOf(ChartBarMaxWidth, maxWidth * 0.6f))
-                        .height(maxOf(ChartBarMinHeight, ChartHeight * fraction))
-                        .background(
-                            color = if (isDimmed) barColor.copy(alpha = DIMMED_ALPHA) else barColor,
-                            shape = RoundedCornerShape(topStart = 4.dp, topEnd = 4.dp),
-                        ),
-            )
+            // 평가가 없는 날은 막대를 그리지 않는다
+            if (bucket.reviewCount > 0) {
+                Box(
+                    modifier =
+                        Modifier
+                            .width(minOf(ChartBarMaxWidth, maxWidth * 0.6f))
+                            .height(maxOf(ChartBarMinHeight, ChartHeight * fraction))
+                            .background(
+                                color = if (isDimmed) barColor.copy(alpha = DIMMED_ALPHA) else barColor,
+                                shape = RoundedCornerShape(topStart = 4.dp, topEnd = 4.dp),
+                            ),
+                )
+            }
         }
         Text(
             text = label,
@@ -351,6 +367,13 @@ private fun ChartBar(
             maxLines = 1,
             modifier = Modifier.clearAndSetSemantics {},
         )
+        if (isRest) {
+            Text(
+                text = stringResource(Res.string.report_chart_rest),
+                style = CaroTheme.typography.caption2.regular,
+                color = CaroTheme.color.text.tertiary,
+            )
+        }
     }
 }
 
@@ -587,7 +610,7 @@ internal fun ReportRatingDistribution(
 @Composable
 internal fun ReportSkeleton(modifier: Modifier = Modifier) {
     Column(modifier = modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(CaroTheme.spacing.xl3)) {
-        listOf(88.dp, 180.dp, 60.dp).forEach { height ->
+        listOf(88.dp, 180.dp).forEach { height ->
             Spacer(
                 modifier =
                     Modifier
