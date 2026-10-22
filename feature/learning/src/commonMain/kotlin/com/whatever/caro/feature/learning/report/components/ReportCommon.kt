@@ -125,7 +125,7 @@ internal fun ReportLinkRow(
         Icon(
             painter = painterResource(Res.drawable.ic_arrow_right_16),
             contentDescription = null,
-            tint = CaroTheme.color.icon.secondary,
+            tint = CaroTheme.color.icon.primary,
         )
     }
 }
