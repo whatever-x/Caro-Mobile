@@ -1,36 +1,21 @@
-# Screenshot Scenario 목록
+# 스크린샷 시나리오 목록
 
-이 디렉터리의 `scenarios.json`은 Android/iOS 스크린샷 테스트 시나리오의 명시적 목록입니다. 현재 10개 feature 모듈의 29개 시나리오가 등록되어 있습니다. 각 모듈의 테스트가 생성한 PNG 이름과 Roborazzi 비교 결과를 이 목록으로 검증합니다.
+[scenarios.json](scenarios.json)은 Android/iOS 스크린샷 테스트의 시나리오 ID를 feature 모듈별로 관리합니다. CI는 이 목록으로 생성된 PNG 이름과 비교 결과를 검증합니다.
 
-수집·비교·게시 로직은 별도 Python 스크립트 없이 GitHub Actions 워크플로에 있습니다.
+## 등록 형식
 
-| 워크플로 | 역할 |
-| --- | --- |
-| [screenshot-golden.yml](../../.github/workflows/screenshot-golden.yml) | develop의 전체 이미지를 기록·검증하고 90일 Golden Artifact로 보관 |
-| [screenshot-pr.yml](../../.github/workflows/screenshot-pr.yml) | 정확한 PR base SHA의 Golden을 복원하고 Roborazzi compare task로 변경·신규 이미지를 생성 |
-| [screenshot-comment.yml](../../.github/workflows/screenshot-comment.yml) | 변경 이미지만 전용 브랜치에 게시하고 기존 액션으로 PR 고정 댓글 생성·갱신 |
-
-로컬 실행 방법, 결과 경로, 신규·삭제·무변경 처리와 워크플로 활성화 조건은 [Screenshot Test 가이드](../../.github/screenshot-test.md)를 참고하세요.
-
-화면·상태를 추가할 때는 해당 feature의 결정적인 `commonTest` 시나리오와 Android/iOS 캡처 테스트를 작성한 뒤 이 목록에 ID를 등록합니다. ID는 영문·숫자로 시작하고 영문·숫자·점·밑줄·하이픈만 사용합니다. `_actual` 및 `_compare` 접미사는 Roborazzi가 사용하므로 시나리오 ID에 사용하지 않습니다.
-
-이미지 원본과 보고서는 `build/` 아래 재생성 가능한 산출물입니다. feature 브랜치에 PNG를 커밋하지 않습니다.
-
-## CI 실행 시간
-
-- Golden/PR 모두 `scenarios.json`의 실제 렌더링 테스트에만 Gradle `--rerun`을 적용합니다. 전체 `--rerun-tasks`는 사용하지 않으므로 컴파일·링크 task의 재사용 판단은 Gradle에 맡깁니다.
-- `setup-gradle`은 Gradle User Home 캐시를 읽고 씁니다. iOS의 `~/.konan`은 별도 캐시이며 OS·CPU 아키텍처·Xcode 버전/빌드·앱 버전 두 항목(`version-code`, `version-name`)을 제외한 버전 카탈로그 해시로 구분합니다. 서로 다른 툴체인의 캐시로 fallback하지 않습니다.
-- 실행별 `screenshot-profile-android/ios` Artifact(14일)에서 Gradle 단계별 시간을 확인합니다. 캐시 적중 여부는 `Cache Kotlin/Native`와 `setup-gradle` 로그에 기록됩니다.
-- 성능 비교는 같은 앱 코드·러너·Xcode 조건에서 최초 실행과 캐시 적중 실행을 구분합니다. worker 수는 iOS에서만 비교하고 측정 근거 없이 제한하지 않습니다.
-
-## Golden 대기 및 워크플로 회귀 검사
-
-PR은 checkout 직후 정확한 base SHA의 Golden 실행을 조회합니다. 생성 중이면 30초 간격으로 최대 10분 기다립니다. 성공한 실행의 이미지를 확보한 뒤 환경과 캐시를 준비합니다. 실행 없음, 실패·취소, 시간 초과, 이미지 다운로드 실패는 원인을 명시하고 종료합니다. 비교 작업 전체 제한은 45분이며 대기 시간도 포함합니다.
-
-다음 명령은 실제 워크플로의 Bash를 실행해 대기·종료·다운로드와 캐시 해시를 검사합니다. 외부 GitHub 응답과 대기 시간만 대체하므로 Python 3, Bash, jq가 필요합니다. 이 검사는 실제 Android/iOS 렌더링과 별개입니다.
-
-```bash
-python3 scripts/screenshot/test_workflows.py
+```json
+{
+  "home": ["home.home.with_deck"],
+  "login": ["login.login.initial"]
+}
 ```
 
-`konan-v2` 키로 처음 실행할 때는 캐시를 새로 생성합니다. 앱 버전만 바꾸면 같은 키를 재사용하며, 의존성이나 툴체인이 바뀌면 새 키를 사용합니다. 이미 저장된 작은 PR Gradle 캐시는 같은 키로 덮어쓸 수 없으므로 해당 항목만 삭제한 뒤 정상 실행으로 복구합니다.
+키는 feature 모듈명이고, 배열에는 해당 모듈의 캡처 테스트가 사용하는 시나리오 ID를 작성합니다.
+
+## 수정 규칙
+
+- 캡처 테스트를 추가·삭제하면 목록도 함께 수정합니다.
+- ID는 영문·숫자로 시작하고, 영문·숫자·점·밑줄·하이픈만 사용합니다.
+- `_actual`·`_compare` 접미사는 Roborazzi가 사용하므로 ID에 넣지 않습니다.
+- 생성된 이미지와 보고서는 빌드 산출물이며 Git에 커밋하지 않습니다.
