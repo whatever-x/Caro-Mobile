@@ -1,0 +1,23 @@
+{
+  "fixture": "text/invalid_utf8_and_cp949.csv",
+  "purpose": "Bytes invalid in both UTF-8 and CP949 (0xFF lead byte, 0x81 followed by space). Must stop with the 'save as UTF-8' dialog; no EUC-KR fallback and no U+FFFD insertion.",
+  "acceptanceCriteria": [
+    "AC-03"
+  ],
+  "designRefs": [
+    "Mobile 5 인코딩 판별 불가",
+    "Mobile 7.2 인코딩 5"
+  ],
+  "generatedByDefault": true,
+  "expectedOutcome": "error",
+  "error": {
+    "kind": "ENCODING_UNDETERMINED",
+    "userMessageKo": "파일을 UTF-8로 저장해 다시 시도해 주세요",
+    "designRef": "Mobile 5"
+  },
+  "format": "TEXT",
+  "warnings": [],
+  "uncoveredByCanonicalCodes": [],
+  "ambiguities": [],
+  "fileBytes": 21
+}

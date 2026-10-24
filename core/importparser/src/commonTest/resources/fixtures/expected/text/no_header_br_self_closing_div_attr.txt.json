@@ -1,0 +1,351 @@
+{
+  "fixture": "text/no_header_br_self_closing_div_attr.txt",
+  "purpose": "No headers; self-closing <br />, <BR/>, <hr/> and <div class=\"x\"> are tags for detection and for line breaks (PO P9). Line-break details of D-27: raw newline -> space, adjacent block tags -> one newline, each <br> -> one newline. Only known tags and comments are stripped (PO P13): 'x<y and y>z' and <foo> stay as text; <style>/<script> blocks go with their content (D-28). Media tags are removed and counted per element (PO P14, D-29). Ruby becomes base(reading) (PO P15, D-30).",
+  "acceptanceCriteria": [
+    "AC-03",
+    "AC-08",
+    "AC-12",
+    "AC-18"
+  ],
+  "designRefs": [
+    "Mobile 7.5 HTML 신호 (PO P9, P14, P15)",
+    "Mobile 7.5 지우는 태그의 범위 (PO P13)",
+    "Mobile 7.5 미디어 (PO P14, D-29)",
+    "Mobile 7.5 후리가나 (PO P15, D-30)",
+    "Mobile 7.5 정리 순서 1-7 (D-27, D-28)",
+    "Mobile 7.2 구문 RFC 4180"
+  ],
+  "generatedByDefault": true,
+  "expectedOutcome": "parsed",
+  "format": "TEXT",
+  "sourceName": "no_header_br_self_closing_div_attr.txt",
+  "encoding": "UTF-8",
+  "utf8Bom": false,
+  "htmlMode": "HTML",
+  "htmlModeReason": "known tags <br />, <div class=\"x\"> found (PO P9, self-closing and attributes allowed)",
+  "separator": "\t",
+  "separatorSource": "detected",
+  "hasHeaderRow": false,
+  "subdecks": [],
+  "sheets": [],
+  "noteTypes": [
+    {
+      "id": "text",
+      "name": "no_header_br_self_closing_div_attr.txt",
+      "fieldNames": [
+        "열 1",
+        "열 2"
+      ],
+      "isCloze": false,
+      "noteCount": 13
+    }
+  ],
+  "rowCount": 13,
+  "warnings": [],
+  "uncoveredByCanonicalCodes": [],
+  "rows": [
+    {
+      "index": 0,
+      "fieldValues": [
+        "line1<br />line2",
+        "줄1<BR/>줄2"
+      ]
+    },
+    {
+      "index": 1,
+      "fieldValues": [
+        "stack",
+        "<div class=\"x\">위</div>\n<div class=\"x\">아래</div>"
+      ]
+    },
+    {
+      "index": 2,
+      "fieldValues": [
+        "blank line",
+        "a<div><br></div><div>b</div>"
+      ]
+    },
+    {
+      "index": 3,
+      "fieldValues": [
+        "list",
+        "<ul><li>하나</li><li>둘</li></ul>"
+      ]
+    },
+    {
+      "index": 4,
+      "fieldValues": [
+        "두 줄\n원문",
+        "위<br><br>아래"
+      ]
+    },
+    {
+      "index": 5,
+      "fieldValues": [
+        "a < b",
+        "<hr/>구분선 뒤"
+      ]
+    },
+    {
+      "index": 6,
+      "fieldValues": [
+        "x<y and y>z",
+        "HTML 파일에서도 그대로"
+      ]
+    },
+    {
+      "index": 7,
+      "fieldValues": [
+        "<style>.x{color:red}</style>스타일 뒤",
+        "<script>var a = 1 < 2;</script>스크립트 뒤<!-- 주석 -->"
+      ]
+    },
+    {
+      "index": 8,
+      "fieldValues": [
+        "<ruby>漢字<rt>かんじ</rt></ruby>",
+        "<foo>모르는 태그</foo> <b>굵게</b>"
+      ]
+    },
+    {
+      "index": 9,
+      "fieldValues": [
+        "<ruby>漢字<rp>(</rp><rt>かんじ</rt><rp>)</rp></ruby>",
+        "<ruby><rb>漢</rb><rt>かん</rt><rb>字</rb><rt>じ</rt></ruby>"
+      ]
+    },
+    {
+      "index": 10,
+      "fieldValues": [
+        "<ruby>漢字</ruby>",
+        "<ruby>漢字<rt></rt></ruby> 漢字[かんじ]"
+      ]
+    },
+    {
+      "index": 11,
+      "fieldValues": [
+        "<ruby>漢<rt>かん</ruby>字 <ruby>日<rt> </rt></ruby>",
+        "<video controls><source src=\"a.mp4\"><source src=\"a.webm\"></video>동영상 뒤"
+      ]
+    },
+    {
+      "index": 12,
+      "fieldValues": [
+        "<audio src=\"a.mp3\"></audio>소리 뒤",
+        "<img src=\"b.png\"><embed src=\"c.swf\"><iframe src=\"d.html\">대체 글</iframe><source src=\"e.mp3\">"
+      ]
+    }
+  ],
+  "cards": {
+    "appLanguage": "ko",
+    "emptySideText": "빈 항목입니다",
+    "mapping": "default: first field -> front, remaining fields in order -> back, joined by \\n, blank fields skipped (AC-06, Mobile 7.7). TEXT rows whose front value has {{c<n>:: markup use the cloze transform (PO P10, Mobile 7.6)",
+    "coverage": "all rows",
+    "items": [
+      {
+        "rowIndex": 0,
+        "front": "line1\nline2",
+        "back": "줄1\n줄2",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "frontUtf16Length": 11,
+        "backUtf16Length": 5,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 1,
+        "front": "stack",
+        "back": "위\n아래",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "frontUtf16Length": 5,
+        "backUtf16Length": 4,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 2,
+        "front": "blank line",
+        "back": "a\n\nb",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "frontUtf16Length": 10,
+        "backUtf16Length": 4,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 3,
+        "front": "list",
+        "back": "하나\n둘",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "frontUtf16Length": 4,
+        "backUtf16Length": 4,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 4,
+        "front": "두 줄 원문",
+        "back": "위\n\n아래",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "frontUtf16Length": 6,
+        "backUtf16Length": 5,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 5,
+        "front": "a < b",
+        "back": "구분선 뒤",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "frontUtf16Length": 5,
+        "backUtf16Length": 5,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 6,
+        "front": "x<y and y>z",
+        "back": "HTML 파일에서도 그대로",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "frontUtf16Length": 11,
+        "backUtf16Length": 14,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 7,
+        "front": "스타일 뒤",
+        "back": "스크립트 뒤",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "frontUtf16Length": 5,
+        "backUtf16Length": 6,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 8,
+        "front": "漢字(かんじ)",
+        "back": "<foo>모르는 태그</foo> 굵게",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "frontUtf16Length": 7,
+        "backUtf16Length": 20,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 9,
+        "front": "漢字(かんじ)",
+        "back": "漢(かん)字(じ)",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "frontUtf16Length": 7,
+        "backUtf16Length": 9,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 10,
+        "front": "漢字",
+        "back": "漢字 漢字[かんじ]",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "frontUtf16Length": 2,
+        "backUtf16Length": 10,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 11,
+        "front": "漢(かん)字 日",
+        "back": "동영상 뒤",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "frontUtf16Length": 8,
+        "backUtf16Length": 5,
+        "mediaRemoved": 1,
+        "excluded": false
+      },
+      {
+        "rowIndex": 12,
+        "front": "소리 뒤",
+        "back": "대체 글",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "frontUtf16Length": 4,
+        "backUtf16Length": 4,
+        "mediaRemoved": 5,
+        "excluded": false
+      }
+    ]
+  },
+  "previewStats": {
+    "cardCount": 13,
+    "excludedCount": 0,
+    "emptyReplacedCount": 0,
+    "truncatedCount": 0,
+    "mediaRemovedCount": 6
+  },
+  "limit": {
+    "maxCards": 10000,
+    "exceeded": false
+  },
+  "ambiguities": [],
+  "quotedFields": "row 1 column 2 (inner quotes doubled, LF inside), row 4 column 1 (LF inside), rows 11-12 media fields (inner quotes doubled)",
+  "mediaRule": "rowIndex 11: <video> with two <source> children = 1 (D-29). rowIndex 12: <audio> 1 + <img> 1 + <embed> 1 + <iframe> 1 + <source> outside any media element 1 = 5; iframe fallback text stays",
+  "rubyRule": "rowIndex 8-11: <rt> -> (reading), <rb> kept as base text, <rp> removed with content, several pairs per ruby, ruby without rt -> base only, empty or blank rt -> no parentheses, omitted </rt> ends before </ruby> (D-30), plain 漢字[かんじ] unchanged",
+  "resolvedObservations": [
+    {
+      "rowIndex": 6,
+      "section": "Mobile 7.5 지우는 태그의 범위 (PO P13)",
+      "note": "'<y and y>' is not a known tag, so 'x<y and y>z' stays intact even in an HTML file (the earlier build removed it like Anki and showed 'xz')."
+    },
+    {
+      "rowIndex": 8,
+      "section": "Mobile 7.5 후리가나 (PO P15)",
+      "note": "<ruby>漢字<rt>かんじ</rt></ruby> becomes 漢字(かんじ); an earlier build kept the tags as text."
+    }
+  ],
+  "observations": [
+    {
+      "rowIndex": 8,
+      "section": "Mobile 7.5 지우는 태그의 범위 (PO P13)",
+      "note": "Unknown tags such as <foo> stay as literal text."
+    }
+  ],
+  "fileBytes": 947
+}

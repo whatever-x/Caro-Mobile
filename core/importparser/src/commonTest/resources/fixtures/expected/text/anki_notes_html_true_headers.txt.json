@@ -1,0 +1,250 @@
+{
+  "fixture": "text/anki_notes_html_true_headers.txt",
+  "purpose": "Anki 'Notes in Plain Text' export with #separator/#html:true/#guid/#notetype/#deck/#tags headers; Basic, 4-field Vocab and Cloze rows; HTML tags, entities, [sound:], <img>, quoted multi-line field. Cloze rows are transformed (PO P10); meta columns are not counted in '열 N' (D-20).",
+  "acceptanceCriteria": [
+    "AC-03",
+    "AC-06",
+    "AC-07",
+    "AC-08",
+    "AC-09",
+    "AC-18"
+  ],
+  "designRefs": [
+    "Mobile 7.2 Anki 헤더",
+    "Mobile 7.5 (D-27)",
+    "Mobile 7.6 (PO P10)",
+    "Mobile 7.7",
+    "Mobile 13.2 D-13, D-20, D-27"
+  ],
+  "generatedByDefault": true,
+  "expectedOutcome": "parsed",
+  "format": "TEXT",
+  "sourceName": "anki_notes_html_true_headers.txt",
+  "encoding": "UTF-8",
+  "utf8Bom": false,
+  "htmlMode": "HTML",
+  "htmlModeReason": "#html:true header",
+  "separator": "\t",
+  "separatorSource": "header (#separator:tab)",
+  "hasHeaderRow": false,
+  "subdecks": [],
+  "sheets": [],
+  "noteTypes": [
+    {
+      "id": "text",
+      "name": "anki_notes_html_true_headers.txt",
+      "fieldNames": [
+        "열 1",
+        "열 2",
+        "열 3",
+        "열 4"
+      ],
+      "isCloze": false,
+      "noteCount": 6
+    }
+  ],
+  "rowCount": 6,
+  "warnings": [],
+  "uncoveredByCanonicalCodes": [
+    "No warning when a TEXT file mixes several Anki note types (#notetype column) and they are merged into one note type (D-13)."
+  ],
+  "rows": [
+    {
+      "index": 0,
+      "fieldValues": [
+        "<b>apple</b>",
+        "사과<br>an edible fruit",
+        "",
+        ""
+      ]
+    },
+    {
+      "index": 1,
+      "fieldValues": [
+        "食べる",
+        "먹다&nbsp;(to eat)",
+        "<div>毎朝パンを食べる。</div><div>매일 아침 빵을 먹는다.</div>",
+        "たべる [sound:taberu.mp3]"
+      ]
+    },
+    {
+      "index": 2,
+      "fieldValues": [
+        "{{c1::Seoul}} is the capital of {{c2::Korea::country}}.",
+        "Tom &amp; Jerry <img src=\"a.png\">",
+        "",
+        ""
+      ]
+    },
+    {
+      "index": 3,
+      "fieldValues": [
+        "{{c1,2::서울}}은 한국의 수도이다.",
+        "",
+        "",
+        ""
+      ]
+    },
+    {
+      "index": 4,
+      "fieldValues": [
+        "여러 줄\n두 번째 줄",
+        "<p>단락</p>&lt;b&gt;는 글자",
+        "",
+        ""
+      ]
+    },
+    {
+      "index": 5,
+      "fieldValues": [
+        "<!-- 주석 -->보이는 글<style>.x{color:red}</style>",
+        "<span style=\"color:red\">&#54620;&#xAE00;</span><script>var a=1;</script>",
+        "",
+        ""
+      ]
+    }
+  ],
+  "cards": {
+    "appLanguage": "ko",
+    "emptySideText": "빈 항목입니다",
+    "mapping": "default: first field -> front, remaining fields in order -> back, joined by \\n, blank fields skipped (AC-06, Mobile 7.7). TEXT rows whose front value has {{c<n>:: markup use the cloze transform (PO P10, Mobile 7.6)",
+    "coverage": "all rows",
+    "items": [
+      {
+        "rowIndex": 0,
+        "front": "apple",
+        "back": "사과\nan edible fruit",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "frontUtf16Length": 5,
+        "backUtf16Length": 18,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 1,
+        "front": "食べる",
+        "back": "먹다 (to eat)\n毎朝パンを食べる。\n매일 아침 빵을 먹는다.\nたべる",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "frontUtf16Length": 3,
+        "backUtf16Length": 39,
+        "mediaRemoved": 1,
+        "excluded": false
+      },
+      {
+        "rowIndex": 2,
+        "front": "[...] is the capital of [country].",
+        "back": "Seoul is the capital of Korea.\nTom & Jerry",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "frontUtf16Length": 34,
+        "backUtf16Length": 42,
+        "mediaRemoved": 1,
+        "excluded": false
+      },
+      {
+        "rowIndex": 3,
+        "front": "[...]은 한국의 수도이다.",
+        "back": "서울은 한국의 수도이다.",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "frontUtf16Length": 16,
+        "backUtf16Length": 13,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 4,
+        "front": "여러 줄 두 번째 줄",
+        "back": "단락\n<b>는 글자",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "frontUtf16Length": 11,
+        "backUtf16Length": 10,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 5,
+        "front": "보이는 글",
+        "back": "한글",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "frontUtf16Length": 5,
+        "backUtf16Length": 2,
+        "mediaRemoved": 0,
+        "excluded": false
+      }
+    ]
+  },
+  "previewStats": {
+    "cardCount": 6,
+    "excludedCount": 0,
+    "emptyReplacedCount": 0,
+    "truncatedCount": 0,
+    "mediaRemovedCount": 2
+  },
+  "limit": {
+    "maxCards": 10000,
+    "exceeded": false
+  },
+  "ambiguities": [],
+  "metaColumns": {
+    "guid": 1,
+    "notetype": 2,
+    "deck": 3,
+    "tags": 8,
+    "base": "1-based file column"
+  },
+  "metaColumnValues": {
+    "notetype": [
+      "Basic",
+      "Vocab",
+      "Cloze",
+      "Cloze",
+      "Basic",
+      "Basic"
+    ],
+    "deck": [
+      "Lang::Vocab::N5",
+      "Lang::Vocab::N5",
+      "Lang::Grammar",
+      "Lang::Grammar",
+      "Lang::Vocab::N4",
+      "Lang::Vocab::N4"
+    ]
+  },
+  "fieldNameRule": "file columns 4-7 -> 열 1-열 4: position among field columns after removing meta columns (Mobile 13.2 D-20)",
+  "headerLines": 6,
+  "resolvedObservations": [
+    {
+      "rowIndex": 4,
+      "section": "Mobile 7.5 정리 순서 4 (D-27)",
+      "note": "Raw newline inside an HTML field becomes one space, as Anki renders it."
+    },
+    {
+      "rowIndex": 1,
+      "section": "Mobile 7.5 정리 순서 5 (D-27)",
+      "note": "Adjacent block tags </div><div> give one newline (no blank line)."
+    },
+    {
+      "rowIndex": 2,
+      "section": "Mobile 7.6 (PO P10)",
+      "note": "TEXT values with {{c<n>:: in the front field use the cloze transform; back = filled sentence + remaining fields."
+    }
+  ],
+  "fileBytes": 811
+}

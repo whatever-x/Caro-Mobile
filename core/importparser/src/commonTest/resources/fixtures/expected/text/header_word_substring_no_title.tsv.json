@@ -1,0 +1,122 @@
+{
+  "fixture": "text/header_word_substring_no_title.tsv",
+  "purpose": "First row values contain known title words only as substrings ('word0001', '뜻0001'). Title words match the whole trimmed, case-folded cell (D-21), so there is no title row.",
+  "acceptanceCriteria": [
+    "AC-03"
+  ],
+  "designRefs": [
+    "Mobile 7.2 제목 행 추정",
+    "Mobile 13.2 D-21"
+  ],
+  "generatedByDefault": true,
+  "expectedOutcome": "parsed",
+  "format": "TEXT",
+  "sourceName": "header_word_substring_no_title.tsv",
+  "encoding": "UTF-8",
+  "utf8Bom": false,
+  "htmlMode": "PLAIN",
+  "htmlModeReason": "",
+  "separator": "\t",
+  "separatorSource": "detected",
+  "hasHeaderRow": false,
+  "subdecks": [],
+  "sheets": [],
+  "noteTypes": [
+    {
+      "id": "text",
+      "name": "header_word_substring_no_title.tsv",
+      "fieldNames": [
+        "열 1",
+        "열 2"
+      ],
+      "isCloze": false,
+      "noteCount": 3
+    }
+  ],
+  "rowCount": 3,
+  "warnings": [],
+  "uncoveredByCanonicalCodes": [],
+  "rows": [
+    {
+      "index": 0,
+      "fieldValues": [
+        "word0001",
+        "뜻0001"
+      ]
+    },
+    {
+      "index": 1,
+      "fieldValues": [
+        "word0002",
+        "뜻0002"
+      ]
+    },
+    {
+      "index": 2,
+      "fieldValues": [
+        "word0003",
+        "뜻0003"
+      ]
+    }
+  ],
+  "cards": {
+    "appLanguage": "ko",
+    "emptySideText": "빈 항목입니다",
+    "mapping": "default: first field -> front, remaining fields in order -> back, joined by \\n, blank fields skipped (AC-06, Mobile 7.7). TEXT rows whose front value has {{c<n>:: markup use the cloze transform (PO P10, Mobile 7.6)",
+    "coverage": "all rows",
+    "items": [
+      {
+        "rowIndex": 0,
+        "front": "word0001",
+        "back": "뜻0001",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "frontUtf16Length": 8,
+        "backUtf16Length": 5,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 1,
+        "front": "word0002",
+        "back": "뜻0002",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "frontUtf16Length": 8,
+        "backUtf16Length": 5,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 2,
+        "front": "word0003",
+        "back": "뜻0003",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "frontUtf16Length": 8,
+        "backUtf16Length": 5,
+        "mediaRemoved": 0,
+        "excluded": false
+      }
+    ]
+  },
+  "previewStats": {
+    "cardCount": 3,
+    "excludedCount": 0,
+    "emptyReplacedCount": 0,
+    "truncatedCount": 0,
+    "mediaRemovedCount": 0
+  },
+  "limit": {
+    "maxCards": 10000,
+    "exceeded": false
+  },
+  "ambiguities": [],
+  "fileBytes": 51
+}

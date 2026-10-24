@@ -8,6 +8,8 @@ sealed interface HomeSideEffect : UiSideEffect {
 
     data object NavigateToCreateDeck : HomeSideEffect
 
+    data object NavigateToImportDeck : HomeSideEffect
+
     data class NavigateToDailyLearning(
         val deckId: Long,
     ) : HomeSideEffect

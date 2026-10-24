@@ -1,0 +1,956 @@
+{
+  "fixture": "xlsx/wordlist_multi_sheet.xlsx",
+  "purpose": "Word list workbook: sheets Day1 (title row, blank cells, styled empty row, vertical and horizontal merged cells), Day2 (number formats, booleans, formulas with/without cached values, error, inline and phonetic shared strings), Notes (empty sheet).",
+  "acceptanceCriteria": [
+    "AC-04",
+    "AC-06",
+    "AC-09",
+    "AC-12",
+    "AC-18"
+  ],
+  "designRefs": [
+    "Mobile 7.4 읽기 규칙",
+    "Mobile 7.4 숫자 서식 (PO P3)",
+    "Mobile 7.2 제목 행 추정",
+    "Backend 7.2 sheets[].rowCount"
+  ],
+  "generatedByDefault": true,
+  "expectedOutcome": "parsed",
+  "format": "XLSX",
+  "sourceName": "wordlist_multi_sheet.xlsx",
+  "htmlMode": "PLAIN",
+  "htmlModeReason": "XLSX is always PLAIN",
+  "date1904": false,
+  "sheets": [
+    {
+      "index": 0,
+      "name": "Day1",
+      "rowCount": 8
+    },
+    {
+      "index": 1,
+      "name": "Day2",
+      "rowCount": 26
+    },
+    {
+      "index": 2,
+      "name": "Notes",
+      "rowCount": 0
+    }
+  ],
+  "defaultSheetIndex": 0,
+  "warnings": [],
+  "warningsNote": "top-level warnings are for the default sheet (Day1); see perSheet for others",
+  "perSheet": [
+    {
+      "sheetIndex": 0,
+      "sheetName": "Day1",
+      "hasHeaderRow": true,
+      "noteTypes": [
+        {
+          "id": "xlsx",
+          "name": "Day1",
+          "fieldNames": [
+            "word",
+            "meaning",
+            "example",
+            "level"
+          ],
+          "isCloze": false,
+          "noteCount": 6
+        }
+      ],
+      "rowCount": 6,
+      "warnings": [],
+      "rows": [
+        {
+          "index": 0,
+          "fieldValues": [
+            "apple",
+            "사과",
+            "I eat an apple.",
+            "1"
+          ]
+        },
+        {
+          "index": 1,
+          "fieldValues": [
+            "食べる",
+            "먹다",
+            "",
+            "2"
+          ]
+        },
+        {
+          "index": 2,
+          "fieldValues": [
+            "run",
+            "달리다",
+            "He runs every day.",
+            "1"
+          ]
+        },
+        {
+          "index": 3,
+          "fieldValues": [
+            "",
+            "운영하다",
+            "She runs a shop.",
+            "2"
+          ]
+        },
+        {
+          "index": 4,
+          "fieldValues": [
+            "",
+            "뜻만 있는 행",
+            "",
+            ""
+          ]
+        },
+        {
+          "index": 5,
+          "fieldValues": [
+            "bank",
+            "은행",
+            "",
+            "3"
+          ]
+        }
+      ],
+      "cards": {
+        "appLanguage": "ko",
+        "mapping": "default: first field -> front, remaining fields in order -> back, joined by \\n, blank fields skipped (AC-06, Mobile 7.7)",
+        "coverage": "all rows",
+        "items": [
+          {
+            "rowIndex": 0,
+            "front": "apple",
+            "back": "사과\nI eat an apple.\n1",
+            "frontReplaced": false,
+            "backReplaced": false,
+            "frontTruncated": false,
+            "backTruncated": false,
+            "frontUtf16Length": 5,
+            "backUtf16Length": 20,
+            "mediaRemoved": 0,
+            "excluded": false
+          },
+          {
+            "rowIndex": 1,
+            "front": "食べる",
+            "back": "먹다\n2",
+            "frontReplaced": false,
+            "backReplaced": false,
+            "frontTruncated": false,
+            "backTruncated": false,
+            "frontUtf16Length": 3,
+            "backUtf16Length": 4,
+            "mediaRemoved": 0,
+            "excluded": false
+          },
+          {
+            "rowIndex": 2,
+            "front": "run",
+            "back": "달리다\nHe runs every day.\n1",
+            "frontReplaced": false,
+            "backReplaced": false,
+            "frontTruncated": false,
+            "backTruncated": false,
+            "frontUtf16Length": 3,
+            "backUtf16Length": 24,
+            "mediaRemoved": 0,
+            "excluded": false
+          },
+          {
+            "rowIndex": 3,
+            "front": "빈 항목입니다",
+            "back": "운영하다\nShe runs a shop.\n2",
+            "frontReplaced": true,
+            "backReplaced": false,
+            "frontTruncated": false,
+            "backTruncated": false,
+            "frontUtf16Length": 7,
+            "backUtf16Length": 23,
+            "mediaRemoved": 0,
+            "excluded": false
+          },
+          {
+            "rowIndex": 4,
+            "front": "빈 항목입니다",
+            "back": "뜻만 있는 행",
+            "frontReplaced": true,
+            "backReplaced": false,
+            "frontTruncated": false,
+            "backTruncated": false,
+            "frontUtf16Length": 7,
+            "backUtf16Length": 7,
+            "mediaRemoved": 0,
+            "excluded": false
+          },
+          {
+            "rowIndex": 5,
+            "front": "bank",
+            "back": "은행\n3",
+            "frontReplaced": false,
+            "backReplaced": false,
+            "frontTruncated": false,
+            "backTruncated": false,
+            "frontUtf16Length": 4,
+            "backUtf16Length": 4,
+            "mediaRemoved": 0,
+            "excluded": false
+          }
+        ]
+      },
+      "previewStats": {
+        "cardCount": 6,
+        "excludedCount": 0,
+        "emptyReplacedCount": 2,
+        "truncatedCount": 0,
+        "mediaRemovedCount": 0
+      },
+      "cellChecks": [
+        {
+          "cell": "A4",
+          "note": "styled cell without value -> row element exists, row skipped"
+        },
+        {
+          "cell": "A6",
+          "note": "inside merge A5:A6 -> empty"
+        },
+        {
+          "cell": "C8",
+          "note": "inside merge B8:C8 -> empty"
+        }
+      ]
+    },
+    {
+      "sheetIndex": 1,
+      "sheetName": "Day2",
+      "hasHeaderRow": true,
+      "noteTypes": [
+        {
+          "id": "xlsx",
+          "name": "Day2",
+          "fieldNames": [
+            "front",
+            "back"
+          ],
+          "isCloze": false,
+          "noteCount": 25
+        }
+      ],
+      "rowCount": 25,
+      "warnings": [
+        {
+          "code": "XLSX_NUMBER_FORMAT_RAW",
+          "count": 3
+        },
+        {
+          "code": "XLSX_FORMULA_WITHOUT_VALUE",
+          "count": 1
+        }
+      ],
+      "rows": [
+        {
+          "index": 0,
+          "fieldValues": [
+            "general 0.1+0.2",
+            "0.3"
+          ]
+        },
+        {
+          "index": 1,
+          "fieldValues": [
+            "general integer",
+            "1234567"
+          ]
+        },
+        {
+          "index": 2,
+          "fieldValues": [
+            "general negative",
+            "-0.5"
+          ]
+        },
+        {
+          "index": 3,
+          "fieldValues": [
+            "general 15 digits",
+            "123456789.123457"
+          ]
+        },
+        {
+          "index": 4,
+          "fieldValues": [
+            "general small",
+            "0.000123"
+          ]
+        },
+        {
+          "index": 5,
+          "fieldValues": [
+            "percent 9",
+            "13%"
+          ]
+        },
+        {
+          "index": 6,
+          "fieldValues": [
+            "percent 10",
+            "12.50%"
+          ]
+        },
+        {
+          "index": 7,
+          "fieldValues": [
+            "thousands 3",
+            "1,235"
+          ]
+        },
+        {
+          "index": 8,
+          "fieldValues": [
+            "thousands 4",
+            "1,234.50"
+          ]
+        },
+        {
+          "index": 9,
+          "fieldValues": [
+            "date 14",
+            "2023-03-15"
+          ]
+        },
+        {
+          "index": 10,
+          "fieldValues": [
+            "datetime 22",
+            "2023-03-15 18:00"
+          ]
+        },
+        {
+          "index": 11,
+          "fieldValues": [
+            "time 21",
+            "16:30:00"
+          ]
+        },
+        {
+          "index": 12,
+          "fieldValues": [
+            "date 14 serial 60",
+            "1900-02-29"
+          ]
+        },
+        {
+          "index": 13,
+          "fieldValues": [
+            "date 14 serial 61",
+            "1900-03-01"
+          ]
+        },
+        {
+          "index": 14,
+          "fieldValues": [
+            "currency custom",
+            "1234.5"
+          ]
+        },
+        {
+          "index": 15,
+          "fieldValues": [
+            "custom 0.000",
+            "3.14159"
+          ]
+        },
+        {
+          "index": 16,
+          "fieldValues": [
+            "custom date",
+            "45000"
+          ]
+        },
+        {
+          "index": 17,
+          "fieldValues": [
+            "boolean true",
+            "TRUE"
+          ]
+        },
+        {
+          "index": 18,
+          "fieldValues": [
+            "boolean false",
+            "FALSE"
+          ]
+        },
+        {
+          "index": 19,
+          "fieldValues": [
+            "formula cached number",
+            "0.3"
+          ]
+        },
+        {
+          "index": 20,
+          "fieldValues": [
+            "formula cached string",
+            "abcd"
+          ]
+        },
+        {
+          "index": 21,
+          "fieldValues": [
+            "formula without cache",
+            ""
+          ]
+        },
+        {
+          "index": 22,
+          "fieldValues": [
+            "error value",
+            "#DIV/0!"
+          ]
+        },
+        {
+          "index": 23,
+          "fieldValues": [
+            "inline string",
+            "인라인 문자열"
+          ]
+        },
+        {
+          "index": 24,
+          "fieldValues": [
+            "phonetic",
+            "漢字"
+          ]
+        }
+      ],
+      "cards": {
+        "appLanguage": "ko",
+        "mapping": "default: first field -> front, remaining fields in order -> back, joined by \\n, blank fields skipped (AC-06, Mobile 7.7)",
+        "coverage": "all rows",
+        "items": [
+          {
+            "rowIndex": 0,
+            "front": "general 0.1+0.2",
+            "back": "0.3",
+            "frontReplaced": false,
+            "backReplaced": false,
+            "frontTruncated": false,
+            "backTruncated": false,
+            "frontUtf16Length": 15,
+            "backUtf16Length": 3,
+            "mediaRemoved": 0,
+            "excluded": false
+          },
+          {
+            "rowIndex": 1,
+            "front": "general integer",
+            "back": "1234567",
+            "frontReplaced": false,
+            "backReplaced": false,
+            "frontTruncated": false,
+            "backTruncated": false,
+            "frontUtf16Length": 15,
+            "backUtf16Length": 7,
+            "mediaRemoved": 0,
+            "excluded": false
+          },
+          {
+            "rowIndex": 2,
+            "front": "general negative",
+            "back": "-0.5",
+            "frontReplaced": false,
+            "backReplaced": false,
+            "frontTruncated": false,
+            "backTruncated": false,
+            "frontUtf16Length": 16,
+            "backUtf16Length": 4,
+            "mediaRemoved": 0,
+            "excluded": false
+          },
+          {
+            "rowIndex": 3,
+            "front": "general 15 digits",
+            "back": "123456789.123457",
+            "frontReplaced": false,
+            "backReplaced": false,
+            "frontTruncated": false,
+            "backTruncated": false,
+            "frontUtf16Length": 17,
+            "backUtf16Length": 16,
+            "mediaRemoved": 0,
+            "excluded": false
+          },
+          {
+            "rowIndex": 4,
+            "front": "general small",
+            "back": "0.000123",
+            "frontReplaced": false,
+            "backReplaced": false,
+            "frontTruncated": false,
+            "backTruncated": false,
+            "frontUtf16Length": 13,
+            "backUtf16Length": 8,
+            "mediaRemoved": 0,
+            "excluded": false
+          },
+          {
+            "rowIndex": 5,
+            "front": "percent 9",
+            "back": "13%",
+            "frontReplaced": false,
+            "backReplaced": false,
+            "frontTruncated": false,
+            "backTruncated": false,
+            "frontUtf16Length": 9,
+            "backUtf16Length": 3,
+            "mediaRemoved": 0,
+            "excluded": false
+          },
+          {
+            "rowIndex": 6,
+            "front": "percent 10",
+            "back": "12.50%",
+            "frontReplaced": false,
+            "backReplaced": false,
+            "frontTruncated": false,
+            "backTruncated": false,
+            "frontUtf16Length": 10,
+            "backUtf16Length": 6,
+            "mediaRemoved": 0,
+            "excluded": false
+          },
+          {
+            "rowIndex": 7,
+            "front": "thousands 3",
+            "back": "1,235",
+            "frontReplaced": false,
+            "backReplaced": false,
+            "frontTruncated": false,
+            "backTruncated": false,
+            "frontUtf16Length": 11,
+            "backUtf16Length": 5,
+            "mediaRemoved": 0,
+            "excluded": false
+          },
+          {
+            "rowIndex": 8,
+            "front": "thousands 4",
+            "back": "1,234.50",
+            "frontReplaced": false,
+            "backReplaced": false,
+            "frontTruncated": false,
+            "backTruncated": false,
+            "frontUtf16Length": 11,
+            "backUtf16Length": 8,
+            "mediaRemoved": 0,
+            "excluded": false
+          },
+          {
+            "rowIndex": 9,
+            "backEn": "3/15/2023",
+            "front": "date 14",
+            "back": "2023-03-15",
+            "frontReplaced": false,
+            "backReplaced": false,
+            "frontTruncated": false,
+            "backTruncated": false,
+            "frontUtf16Length": 7,
+            "backUtf16Length": 10,
+            "mediaRemoved": 0,
+            "excluded": false
+          },
+          {
+            "rowIndex": 10,
+            "backEn": "3/15/2023 18:00",
+            "front": "datetime 22",
+            "back": "2023-03-15 18:00",
+            "frontReplaced": false,
+            "backReplaced": false,
+            "frontTruncated": false,
+            "backTruncated": false,
+            "frontUtf16Length": 11,
+            "backUtf16Length": 16,
+            "mediaRemoved": 0,
+            "excluded": false
+          },
+          {
+            "rowIndex": 11,
+            "front": "time 21",
+            "back": "16:30:00",
+            "frontReplaced": false,
+            "backReplaced": false,
+            "frontTruncated": false,
+            "backTruncated": false,
+            "frontUtf16Length": 7,
+            "backUtf16Length": 8,
+            "mediaRemoved": 0,
+            "excluded": false
+          },
+          {
+            "rowIndex": 12,
+            "backEn": "2/29/1900",
+            "front": "date 14 serial 60",
+            "back": "1900-02-29",
+            "frontReplaced": false,
+            "backReplaced": false,
+            "frontTruncated": false,
+            "backTruncated": false,
+            "frontUtf16Length": 17,
+            "backUtf16Length": 10,
+            "mediaRemoved": 0,
+            "excluded": false
+          },
+          {
+            "rowIndex": 13,
+            "backEn": "3/1/1900",
+            "front": "date 14 serial 61",
+            "back": "1900-03-01",
+            "frontReplaced": false,
+            "backReplaced": false,
+            "frontTruncated": false,
+            "backTruncated": false,
+            "frontUtf16Length": 17,
+            "backUtf16Length": 10,
+            "mediaRemoved": 0,
+            "excluded": false
+          },
+          {
+            "rowIndex": 14,
+            "front": "currency custom",
+            "back": "1234.5",
+            "frontReplaced": false,
+            "backReplaced": false,
+            "frontTruncated": false,
+            "backTruncated": false,
+            "frontUtf16Length": 15,
+            "backUtf16Length": 6,
+            "mediaRemoved": 0,
+            "excluded": false
+          },
+          {
+            "rowIndex": 15,
+            "front": "custom 0.000",
+            "back": "3.14159",
+            "frontReplaced": false,
+            "backReplaced": false,
+            "frontTruncated": false,
+            "backTruncated": false,
+            "frontUtf16Length": 12,
+            "backUtf16Length": 7,
+            "mediaRemoved": 0,
+            "excluded": false
+          },
+          {
+            "rowIndex": 16,
+            "front": "custom date",
+            "back": "45000",
+            "frontReplaced": false,
+            "backReplaced": false,
+            "frontTruncated": false,
+            "backTruncated": false,
+            "frontUtf16Length": 11,
+            "backUtf16Length": 5,
+            "mediaRemoved": 0,
+            "excluded": false
+          },
+          {
+            "rowIndex": 17,
+            "front": "boolean true",
+            "back": "TRUE",
+            "frontReplaced": false,
+            "backReplaced": false,
+            "frontTruncated": false,
+            "backTruncated": false,
+            "frontUtf16Length": 12,
+            "backUtf16Length": 4,
+            "mediaRemoved": 0,
+            "excluded": false
+          },
+          {
+            "rowIndex": 18,
+            "front": "boolean false",
+            "back": "FALSE",
+            "frontReplaced": false,
+            "backReplaced": false,
+            "frontTruncated": false,
+            "backTruncated": false,
+            "frontUtf16Length": 13,
+            "backUtf16Length": 5,
+            "mediaRemoved": 0,
+            "excluded": false
+          },
+          {
+            "rowIndex": 19,
+            "front": "formula cached number",
+            "back": "0.3",
+            "frontReplaced": false,
+            "backReplaced": false,
+            "frontTruncated": false,
+            "backTruncated": false,
+            "frontUtf16Length": 21,
+            "backUtf16Length": 3,
+            "mediaRemoved": 0,
+            "excluded": false
+          },
+          {
+            "rowIndex": 20,
+            "front": "formula cached string",
+            "back": "abcd",
+            "frontReplaced": false,
+            "backReplaced": false,
+            "frontTruncated": false,
+            "backTruncated": false,
+            "frontUtf16Length": 21,
+            "backUtf16Length": 4,
+            "mediaRemoved": 0,
+            "excluded": false
+          },
+          {
+            "rowIndex": 21,
+            "front": "formula without cache",
+            "back": "빈 항목입니다",
+            "frontReplaced": false,
+            "backReplaced": true,
+            "frontTruncated": false,
+            "backTruncated": false,
+            "frontUtf16Length": 21,
+            "backUtf16Length": 7,
+            "mediaRemoved": 0,
+            "excluded": false
+          },
+          {
+            "rowIndex": 22,
+            "front": "error value",
+            "back": "#DIV/0!",
+            "frontReplaced": false,
+            "backReplaced": false,
+            "frontTruncated": false,
+            "backTruncated": false,
+            "frontUtf16Length": 11,
+            "backUtf16Length": 7,
+            "mediaRemoved": 0,
+            "excluded": false
+          },
+          {
+            "rowIndex": 23,
+            "front": "inline string",
+            "back": "인라인 문자열",
+            "frontReplaced": false,
+            "backReplaced": false,
+            "frontTruncated": false,
+            "backTruncated": false,
+            "frontUtf16Length": 13,
+            "backUtf16Length": 7,
+            "mediaRemoved": 0,
+            "excluded": false
+          },
+          {
+            "rowIndex": 24,
+            "front": "phonetic",
+            "back": "漢字",
+            "frontReplaced": false,
+            "backReplaced": false,
+            "frontTruncated": false,
+            "backTruncated": false,
+            "frontUtf16Length": 8,
+            "backUtf16Length": 2,
+            "mediaRemoved": 0,
+            "excluded": false
+          }
+        ]
+      },
+      "previewStats": {
+        "cardCount": 25,
+        "excludedCount": 0,
+        "emptyReplacedCount": 1,
+        "truncatedCount": 0,
+        "mediaRemovedCount": 0
+      },
+      "cellChecks": [
+        {
+          "cell": "B2",
+          "label": "general 0.1+0.2",
+          "numFmtId": 0,
+          "storedV": "0.30000000000000004"
+        },
+        {
+          "cell": "B3",
+          "label": "general integer",
+          "numFmtId": 0,
+          "storedV": "1234567"
+        },
+        {
+          "cell": "B4",
+          "label": "general negative",
+          "numFmtId": 0,
+          "storedV": "-0.5"
+        },
+        {
+          "cell": "B5",
+          "label": "general 15 digits",
+          "numFmtId": 0,
+          "storedV": "123456789.12345679"
+        },
+        {
+          "cell": "B6",
+          "label": "general small",
+          "numFmtId": 0,
+          "storedV": "0.000123"
+        },
+        {
+          "cell": "B7",
+          "label": "percent 9",
+          "numFmtId": 9,
+          "storedV": "0.125"
+        },
+        {
+          "cell": "B8",
+          "label": "percent 10",
+          "numFmtId": 10,
+          "storedV": "0.125"
+        },
+        {
+          "cell": "B9",
+          "label": "thousands 3",
+          "numFmtId": 3,
+          "storedV": "1234.5"
+        },
+        {
+          "cell": "B10",
+          "label": "thousands 4",
+          "numFmtId": 4,
+          "storedV": "1234.5"
+        },
+        {
+          "cell": "B11",
+          "label": "date 14",
+          "numFmtId": 14,
+          "storedV": "45000"
+        },
+        {
+          "cell": "B12",
+          "label": "datetime 22",
+          "numFmtId": 22,
+          "storedV": "45000.75"
+        },
+        {
+          "cell": "B13",
+          "label": "time 21",
+          "numFmtId": 21,
+          "storedV": "0.6875"
+        },
+        {
+          "cell": "B14",
+          "label": "date 14 serial 60",
+          "numFmtId": 14,
+          "storedV": "60"
+        },
+        {
+          "cell": "B15",
+          "label": "date 14 serial 61",
+          "numFmtId": 14,
+          "storedV": "61"
+        },
+        {
+          "cell": "B16",
+          "label": "currency custom",
+          "numFmtId": "custom",
+          "storedV": "1234.5"
+        },
+        {
+          "cell": "B17",
+          "label": "custom 0.000",
+          "numFmtId": "custom",
+          "storedV": "3.14159"
+        },
+        {
+          "cell": "B18",
+          "label": "custom date",
+          "numFmtId": "custom",
+          "storedV": "45000"
+        },
+        {
+          "cell": "B19",
+          "label": "boolean true",
+          "numFmtId": 0,
+          "storedV": "1"
+        },
+        {
+          "cell": "B20",
+          "label": "boolean false",
+          "numFmtId": 0,
+          "storedV": "0"
+        },
+        {
+          "cell": "B21",
+          "label": "formula cached number",
+          "numFmtId": 0,
+          "storedV": "0.30000000000000004"
+        },
+        {
+          "cell": "B22",
+          "label": "formula cached string",
+          "numFmtId": 0,
+          "storedV": "abcd"
+        },
+        {
+          "cell": "B23",
+          "label": "formula without cache",
+          "numFmtId": 0,
+          "storedV": null
+        },
+        {
+          "cell": "B24",
+          "label": "error value",
+          "numFmtId": 0,
+          "storedV": "#DIV/0!"
+        },
+        {
+          "cell": "B25",
+          "label": "inline string",
+          "numFmtId": 0,
+          "storedV": null
+        },
+        {
+          "cell": "B26",
+          "label": "phonetic",
+          "numFmtId": 0,
+          "storedV": null
+        }
+      ]
+    },
+    {
+      "sheetIndex": 2,
+      "sheetName": "Notes",
+      "rowCount": 0,
+      "emptyResult": true,
+      "warnings": [],
+      "designRef": "Mobile 5 빈 결과 (빈 시트)"
+    }
+  ],
+  "uncoveredByCanonicalCodes": [
+    "Error cells (t=\"e\", e.g. #DIV/0!) are imported as their text with no warning code.",
+    "Custom date formats fall back to the serial number (45000) under XLSX_NUMBER_FORMAT_RAW; the code does not distinguish 'date shown as number' from other raw values."
+  ],
+  "noteTypeRule": "id 'xlsx', name = selected sheet name (Mobile 13.2 D-24)",
+  "ambiguities": [
+    {
+      "path": "Day2 'date 14 serial 60'",
+      "value": "1900-02-29",
+      "section": "Mobile 7.4 숫자 서식",
+      "note": "Value follows Excel display (fictional 1900-02-29). '1900-02-29 일련번호 처리 포함' is read as 'show what Excel shows'; a date library cannot represent this day."
+    },
+    {
+      "path": "Day2 dates",
+      "value": "ko yyyy-MM-dd / en M/d/yyyy",
+      "section": "Mobile 7.4",
+      "note": "Fixed by the design as an implementation interpretation; time part of 22 uses H:mm (24h)."
+    }
+  ]
+}

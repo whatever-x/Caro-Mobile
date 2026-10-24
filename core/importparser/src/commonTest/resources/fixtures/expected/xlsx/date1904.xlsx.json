@@ -1,0 +1,171 @@
+{
+  "fixture": "xlsx/date1904.xlsx",
+  "purpose": "Workbook with <workbookPr date1904=\"1\">: the same serial 45000 shows 2027-03-16 (not 2023-03-15).",
+  "acceptanceCriteria": [
+    "AC-18"
+  ],
+  "designRefs": [
+    "Mobile 7.4 숫자 서식 기본 날짜 14~22 (date1904)",
+    "PO P3"
+  ],
+  "generatedByDefault": true,
+  "expectedOutcome": "parsed",
+  "format": "XLSX",
+  "sourceName": "date1904.xlsx",
+  "htmlMode": "PLAIN",
+  "date1904": true,
+  "sheets": [
+    {
+      "index": 0,
+      "name": "Sheet1",
+      "rowCount": 5
+    }
+  ],
+  "defaultSheetIndex": 0,
+  "warnings": [],
+  "perSheet": [
+    {
+      "sheetIndex": 0,
+      "sheetName": "Sheet1",
+      "hasHeaderRow": true,
+      "noteTypes": [
+        {
+          "id": "xlsx",
+          "name": "Sheet1",
+          "fieldNames": [
+            "front",
+            "back"
+          ],
+          "isCloze": false,
+          "noteCount": 4
+        }
+      ],
+      "rowCount": 4,
+      "warnings": [],
+      "rows": [
+        {
+          "index": 0,
+          "fieldValues": [
+            "date 14",
+            "2027-03-16"
+          ]
+        },
+        {
+          "index": 1,
+          "fieldValues": [
+            "date 14 zero",
+            "1904-01-01"
+          ]
+        },
+        {
+          "index": 2,
+          "fieldValues": [
+            "datetime 22",
+            "2027-03-16 12:00"
+          ]
+        },
+        {
+          "index": 3,
+          "fieldValues": [
+            "general",
+            "45000"
+          ]
+        }
+      ],
+      "cards": {
+        "appLanguage": "ko",
+        "mapping": "default: first field -> front, remaining fields in order -> back, joined by \\n, blank fields skipped (AC-06, Mobile 7.7)",
+        "coverage": "all rows",
+        "items": [
+          {
+            "rowIndex": 0,
+            "backEn": "3/16/2027",
+            "front": "date 14",
+            "back": "2027-03-16",
+            "frontReplaced": false,
+            "backReplaced": false,
+            "frontTruncated": false,
+            "backTruncated": false,
+            "frontUtf16Length": 7,
+            "backUtf16Length": 10,
+            "mediaRemoved": 0,
+            "excluded": false
+          },
+          {
+            "rowIndex": 1,
+            "backEn": "1/1/1904",
+            "front": "date 14 zero",
+            "back": "1904-01-01",
+            "frontReplaced": false,
+            "backReplaced": false,
+            "frontTruncated": false,
+            "backTruncated": false,
+            "frontUtf16Length": 12,
+            "backUtf16Length": 10,
+            "mediaRemoved": 0,
+            "excluded": false
+          },
+          {
+            "rowIndex": 2,
+            "backEn": "3/16/2027 12:00",
+            "front": "datetime 22",
+            "back": "2027-03-16 12:00",
+            "frontReplaced": false,
+            "backReplaced": false,
+            "frontTruncated": false,
+            "backTruncated": false,
+            "frontUtf16Length": 11,
+            "backUtf16Length": 16,
+            "mediaRemoved": 0,
+            "excluded": false
+          },
+          {
+            "rowIndex": 3,
+            "front": "general",
+            "back": "45000",
+            "frontReplaced": false,
+            "backReplaced": false,
+            "frontTruncated": false,
+            "backTruncated": false,
+            "frontUtf16Length": 7,
+            "backUtf16Length": 5,
+            "mediaRemoved": 0,
+            "excluded": false
+          }
+        ]
+      },
+      "previewStats": {
+        "cardCount": 4,
+        "excludedCount": 0,
+        "emptyReplacedCount": 0,
+        "truncatedCount": 0,
+        "mediaRemovedCount": 0
+      },
+      "cellChecks": [
+        {
+          "cell": "B2",
+          "numFmtId": 14,
+          "storedV": "45000"
+        },
+        {
+          "cell": "B3",
+          "numFmtId": 14,
+          "storedV": "0"
+        },
+        {
+          "cell": "B4",
+          "numFmtId": 22,
+          "storedV": "45000.5"
+        },
+        {
+          "cell": "B5",
+          "numFmtId": 0,
+          "storedV": "45000"
+        }
+      ]
+    }
+  ],
+  "uncoveredByCanonicalCodes": [],
+  "noteTypeRule": "id 'xlsx', name = selected sheet name (Mobile 13.2 D-24)",
+  "ambiguities": []
+}

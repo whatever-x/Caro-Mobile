@@ -1,0 +1,129 @@
+{
+  "fixture": "text/csv_header_bom_quoted.csv",
+  "purpose": "Comma CSV with UTF-8 BOM, CRLF records, title row, quoted comma, quoted LF newline, doubled quote, quoted semicolon (must not count for separator detection), one blank line (skipped).",
+  "acceptanceCriteria": [
+    "AC-03",
+    "AC-06"
+  ],
+  "designRefs": [
+    "Mobile 7.2 인코딩 1 (BOM 제거)",
+    "Mobile 7.2 구문 RFC 4180",
+    "Mobile 7.2 구분자/제목 행 추정"
+  ],
+  "generatedByDefault": true,
+  "expectedOutcome": "parsed",
+  "format": "TEXT",
+  "sourceName": "csv_header_bom_quoted.csv",
+  "encoding": "UTF-8",
+  "utf8Bom": true,
+  "htmlMode": "PLAIN",
+  "htmlModeReason": "",
+  "separator": ",",
+  "separatorSource": "detected",
+  "hasHeaderRow": true,
+  "subdecks": [],
+  "sheets": [],
+  "noteTypes": [
+    {
+      "id": "text",
+      "name": "csv_header_bom_quoted.csv",
+      "fieldNames": [
+        "term",
+        "definition",
+        "example"
+      ],
+      "isCloze": false,
+      "noteCount": 3
+    }
+  ],
+  "rowCount": 3,
+  "warnings": [],
+  "uncoveredByCanonicalCodes": [],
+  "rows": [
+    {
+      "index": 0,
+      "fieldValues": [
+        "apple",
+        "사과, 능금",
+        "I eat an apple.\nShe eats apples."
+      ]
+    },
+    {
+      "index": 1,
+      "fieldValues": [
+        "say \"hi\"",
+        "인사하다",
+        ""
+      ]
+    },
+    {
+      "index": 2,
+      "fieldValues": [
+        "ringo",
+        "뜻; 의미",
+        "りんご"
+      ]
+    }
+  ],
+  "cards": {
+    "appLanguage": "ko",
+    "emptySideText": "빈 항목입니다",
+    "mapping": "default: first field -> front, remaining fields in order -> back, joined by \\n, blank fields skipped (AC-06, Mobile 7.7). TEXT rows whose front value has {{c<n>:: markup use the cloze transform (PO P10, Mobile 7.6)",
+    "coverage": "all rows",
+    "items": [
+      {
+        "rowIndex": 0,
+        "front": "apple",
+        "back": "사과, 능금\nI eat an apple.\nShe eats apples.",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "frontUtf16Length": 5,
+        "backUtf16Length": 39,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 1,
+        "front": "say \"hi\"",
+        "back": "인사하다",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "frontUtf16Length": 8,
+        "backUtf16Length": 4,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 2,
+        "front": "ringo",
+        "back": "뜻; 의미\nりんご",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "frontUtf16Length": 5,
+        "backUtf16Length": 9,
+        "mediaRemoved": 0,
+        "excluded": false
+      }
+    ]
+  },
+  "previewStats": {
+    "cardCount": 3,
+    "excludedCount": 0,
+    "emptyReplacedCount": 0,
+    "truncatedCount": 0,
+    "mediaRemovedCount": 0
+  },
+  "limit": {
+    "maxCards": 10000,
+    "exceeded": false
+  },
+  "ambiguities": [],
+  "lineEndings": "CRLF between records, LF inside quoted field",
+  "fileBytes": 148
+}

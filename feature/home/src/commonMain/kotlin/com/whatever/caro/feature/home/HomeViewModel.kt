@@ -46,9 +46,11 @@ class HomeViewModel(
             }
 
             HomeIntent.ClickCreateDeckButton -> {
-                postSideEffect(
-                    HomeSideEffect.NavigateToCreateDeck,
-                )
+                reduce { copy(isCreateDeckBottomSheetVisible = true) }
+            }
+
+            HomeIntent.DismissCreateDeckBottomSheet -> {
+                reduce { copy(isCreateDeckBottomSheetVisible = false) }
             }
 
             is HomeIntent.ClickDeckButton -> {
@@ -64,7 +66,13 @@ class HomeViewModel(
             }
 
             HomeIntent.ClickCreateDeck -> {
+                reduce { copy(isCreateDeckBottomSheetVisible = false) }
                 postSideEffect(HomeSideEffect.NavigateToCreateDeck)
+            }
+
+            HomeIntent.ClickImportDeck -> {
+                reduce { copy(isCreateDeckBottomSheetVisible = false) }
+                postSideEffect(HomeSideEffect.NavigateToImportDeck)
             }
         }
     }

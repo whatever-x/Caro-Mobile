@@ -76,6 +76,10 @@ play-review = "2.0.2"
 compose-stable-marker = "1.0.7"
 build-konfig = "0.17.1"
 
+# Import parser
+okio = "3.16.4"
+zstd-kmp = "0.4.0"
+
 # Test
 turbine = "1.2.1"
 mokkery = "3.3.0"
@@ -102,6 +106,7 @@ androidx-datastore = { group = "androidx.datastore", name = "datastore", version
 androidx-datastore-preferences = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "androidx-datastore" }
 androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "androidx-room" }
 androidx-room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "androidx-room" }
+androidx-sqlite = { group = "androidx.sqlite", name = "sqlite", version.ref = "androidx-sqlite" }
 androidx-sqlite-bundled = { group = "androidx.sqlite", name = "sqlite-bundled", version.ref = "androidx-sqlite" }
 androidx-credentials-credentials = { group = "androidx.credentials", name = "credentials", version.ref = "androidx-credentials" }
 androidx-credentials-auth = { group = "androidx.credentials", name = "credentials-play-services-auth", version.ref = "androidx-credentials" }
@@ -189,6 +194,10 @@ firebase-auth = { group = "com.google.firebase", name = "firebase-auth" }
 # Utility
 play-review = { group = "com.google.android.play", name = "review-ktx", version.ref = "play-review" }
 compose-stable-marker = { group = "com.github.skydoves", name = "compose-stable-marker", version.ref = "compose-stable-marker" }
+
+# Import parser
+okio = { group = "com.squareup.okio", name = "okio", version.ref = "okio" }
+zstd-kmp-okio = { group = "com.squareup.zstd", name = "zstd-kmp-okio", version.ref = "zstd-kmp" }
 
 # Test
 turbine = { group = "app.cash.turbine", name = "turbine", version.ref = "turbine" }

@@ -52,6 +52,7 @@ include(":core:analytics")
 include(":core:crashlytics")
 include(":core:messaging")
 include(":core:util")
+include(":core:importparser")
 
 // :Feature
 include(":feature:home")
@@ -63,3 +64,4 @@ include(":feature:setting")
 include(":feature:profile")
 include(":feature:card")
 include(":feature:learning")
+include(":feature:importer")

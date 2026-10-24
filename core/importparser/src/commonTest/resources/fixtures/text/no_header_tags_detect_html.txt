@@ -1,0 +1,4 @@
+dog	개<br>(동물)
+cat	<span>고양이</span>
+bird	새 &amp; 날개
+fish	<DIV>물고기</DIV>

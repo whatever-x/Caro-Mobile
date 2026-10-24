@@ -33,6 +33,28 @@ private fun com.whatever.caro.core.designsystem.animation.animatedSlideOffsetY(a
     - onAnimationFinish: STABLE (function type)
 
 @Composable
+public fun com.whatever.caro.core.designsystem.components.CaroCheckbox(state: androidx.compose.ui.state.ToggleableState, modifier: androidx.compose.ui.Modifier, onClick: kotlin.Function0<kotlin.Unit>?, enabled: kotlin.Boolean): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - state: STABLE (class with no mutable properties)
+    - modifier: STABLE (marked @Stable or @Immutable)
+    - onClick: STABLE (function type)
+    - enabled: STABLE (primitive type)
+
+@Composable
+public fun com.whatever.caro.core.designsystem.components.CaroCtaButton(text: kotlin.String, onClick: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier, enabled: kotlin.Boolean, style: com.whatever.caro.core.designsystem.components.CaroCtaButtonStyle, disabledReason: kotlin.String?): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - text: STABLE (String is immutable)
+    - onClick: STABLE (function type)
+    - modifier: STABLE (marked @Stable or @Immutable)
+    - enabled: STABLE (primitive type)
+    - style: STABLE (class with no mutable properties)
+    - disabledReason: STABLE (class with no mutable properties)
+
+@Composable
 public fun com.whatever.caro.core.designsystem.components.CaroDialog(onDismissRequest: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier, properties: androidx.compose.ui.window.DialogProperties, title: @[Composable] androidx.compose.runtime.internal.ComposableFunction0<kotlin.Unit>?, buttons: @[Composable] androidx.compose.runtime.internal.ComposableFunction0<kotlin.Unit>?, content: @[Composable] androidx.compose.runtime.internal.ComposableFunction0<kotlin.Unit>): kotlin.Unit
   skippable: true
   restartable: true
@@ -67,6 +89,22 @@ private fun com.whatever.caro.core.designsystem.components.CaroDialogContent(mod
     - content: STABLE (composable function type)
 
 @Composable
+public fun com.whatever.caro.core.designsystem.components.CaroFieldCounter(count: kotlin.String, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - count: STABLE (String is immutable)
+    - modifier: STABLE (marked @Stable or @Immutable)
+
+@Composable
+public fun com.whatever.caro.core.designsystem.components.CaroRequiredFieldHeader(label: kotlin.String, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - label: STABLE (String is immutable)
+    - modifier: STABLE (marked @Stable or @Immutable)
+
+@Composable
 public fun com.whatever.caro.core.designsystem.components.CaroSnackBarHost(modifier: androidx.compose.ui.Modifier, hostState: androidx.compose.material3.SnackbarHostState, snackbar: @[Composable] androidx.compose.runtime.internal.ComposableFunction1<androidx.compose.material3.SnackbarData, kotlin.Unit>): kotlin.Unit
   skippable: true
   restartable: true
@@ -84,7 +122,7 @@ public fun com.whatever.caro.core.designsystem.components.CaroSnackbar(modifier:
     - snackbarData: STABLE (marked @Stable or @Immutable)
 
 @Composable
-public fun com.whatever.caro.core.designsystem.components.CaroTextArea(value: kotlin.String, onValueChange: kotlin.Function1<kotlin.String, kotlin.Unit>, modifier: androidx.compose.ui.Modifier, header: @[Composable] androidx.compose.runtime.internal.ComposableFunction0<kotlin.Unit>?, footer: @[Composable] androidx.compose.runtime.internal.ComposableFunction0<kotlin.Unit>?, placeholder: kotlin.String?, enabled: kotlin.Boolean, readOnly: kotlin.Boolean, keyboardOptions: androidx.compose.foundation.text.KeyboardOptions, keyboardActions: androidx.compose.foundation.text.KeyboardActions, interactionSource: androidx.compose.foundation.interaction.MutableInteractionSource, focusRequester: androidx.compose.ui.focus.FocusRequester?): kotlin.Unit
+public fun com.whatever.caro.core.designsystem.components.CaroTextArea(value: kotlin.String, onValueChange: kotlin.Function1<kotlin.String, kotlin.Unit>, modifier: androidx.compose.ui.Modifier, header: @[Composable] androidx.compose.runtime.internal.ComposableFunction0<kotlin.Unit>?, footer: @[Composable] androidx.compose.runtime.internal.ComposableFunction0<kotlin.Unit>?, placeholder: kotlin.String?, enabled: kotlin.Boolean, readOnly: kotlin.Boolean, keyboardOptions: androidx.compose.foundation.text.KeyboardOptions, keyboardActions: androidx.compose.foundation.text.KeyboardActions, interactionSource: androidx.compose.foundation.interaction.MutableInteractionSource, focusRequester: androidx.compose.ui.focus.FocusRequester?, minHeight: androidx.compose.ui.unit.Dp, maxHeight: androidx.compose.ui.unit.Dp, fillHeight: kotlin.Boolean, semanticsLabel: kotlin.String?): kotlin.Unit
   skippable: true
   restartable: true
   params:
@@ -100,6 +138,10 @@ public fun com.whatever.caro.core.designsystem.components.CaroTextArea(value: ko
     - keyboardActions: STABLE (marked @Stable or @Immutable)
     - interactionSource: STABLE (marked @Stable or @Immutable)
     - focusRequester: STABLE (marked @Stable or @Immutable)
+    - minHeight: STABLE (marked @Stable or @Immutable)
+    - maxHeight: STABLE (marked @Stable or @Immutable)
+    - fillHeight: STABLE (primitive type)
+    - semanticsLabel: STABLE (class with no mutable properties)
 
 @Composable
 public fun com.whatever.caro.core.designsystem.components.CaroTextField(value: kotlin.String, onValueChange: kotlin.Function1<kotlin.String, kotlin.Unit>, modifier: androidx.compose.ui.Modifier, header: @[Composable] androidx.compose.runtime.internal.ComposableFunction0<kotlin.Unit>?, footer: @[Composable] androidx.compose.runtime.internal.ComposableFunction0<kotlin.Unit>?, placeholder: kotlin.String?, enabled: kotlin.Boolean, readOnly: kotlin.Boolean, singleLine: kotlin.Boolean, keyboardOptions: androidx.compose.foundation.text.KeyboardOptions, keyboardActions: androidx.compose.foundation.text.KeyboardActions, trailingIcon: @[Composable] androidx.compose.runtime.internal.ComposableFunction0<kotlin.Unit>?, interactionSource: androidx.compose.foundation.interaction.MutableInteractionSource, focusRequester: androidx.compose.ui.focus.FocusRequester?): kotlin.Unit
@@ -120,6 +162,14 @@ public fun com.whatever.caro.core.designsystem.components.CaroTextField(value: k
     - trailingIcon: STABLE (composable function type)
     - interactionSource: STABLE (marked @Stable or @Immutable)
     - focusRequester: STABLE (marked @Stable or @Immutable)
+
+@Composable
+public fun com.whatever.caro.core.designsystem.components.CaroTipSection(lines: kotlin.collections.List<kotlin.String>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+  skippable: false
+  restartable: true
+  params:
+    - lines: RUNTIME (requires runtime check)
+    - modifier: STABLE (marked @Stable or @Immutable)
 
 @Composable
 public fun com.whatever.caro.core.designsystem.components.CaroTopBar(modifier: androidx.compose.ui.Modifier, leadingContent: @[Composable] @[ExtensionFunctionType] androidx.compose.runtime.internal.ComposableFunction1<androidx.compose.foundation.layout.BoxScope, kotlin.Unit>?, centerContent: @[Composable] @[ExtensionFunctionType] androidx.compose.runtime.internal.ComposableFunction1<androidx.compose.foundation.layout.BoxScope, kotlin.Unit>?, trailingContent: @[Composable] @[ExtensionFunctionType] androidx.compose.runtime.internal.ComposableFunction1<androidx.compose.foundation.layout.BoxScope, kotlin.Unit>?): kotlin.Unit
@@ -210,10 +260,11 @@ private fun com.whatever.caro.core.designsystem.components.PreviewTrailing2Icon(
   params:
 
 @Composable
-private fun com.whatever.caro.core.designsystem.components.TextAreaBox(value: kotlin.String, onValueChange: kotlin.Function1<kotlin.String, kotlin.Unit>, placeholder: kotlin.String?, enabled: kotlin.Boolean, readOnly: kotlin.Boolean, keyboardOptions: androidx.compose.foundation.text.KeyboardOptions, keyboardActions: androidx.compose.foundation.text.KeyboardActions, interactionSource: androidx.compose.foundation.interaction.MutableInteractionSource, focusRequester: androidx.compose.ui.focus.FocusRequester?): kotlin.Unit
+private fun com.whatever.caro.core.designsystem.components.TextAreaBox(modifier: androidx.compose.ui.Modifier, value: kotlin.String, onValueChange: kotlin.Function1<kotlin.String, kotlin.Unit>, placeholder: kotlin.String?, enabled: kotlin.Boolean, readOnly: kotlin.Boolean, keyboardOptions: androidx.compose.foundation.text.KeyboardOptions, keyboardActions: androidx.compose.foundation.text.KeyboardActions, interactionSource: androidx.compose.foundation.interaction.MutableInteractionSource, focusRequester: androidx.compose.ui.focus.FocusRequester?, minHeight: androidx.compose.ui.unit.Dp, maxHeight: androidx.compose.ui.unit.Dp, fillHeight: kotlin.Boolean, semanticsLabel: kotlin.String?): kotlin.Unit
   skippable: true
   restartable: true
   params:
+    - modifier: STABLE (marked @Stable or @Immutable)
     - value: STABLE (String is immutable)
     - onValueChange: STABLE (function type)
     - placeholder: STABLE (class with no mutable properties)
@@ -223,6 +274,10 @@ private fun com.whatever.caro.core.designsystem.components.TextAreaBox(value: ko
     - keyboardActions: STABLE (marked @Stable or @Immutable)
     - interactionSource: STABLE (marked @Stable or @Immutable)
     - focusRequester: STABLE (marked @Stable or @Immutable)
+    - minHeight: STABLE (marked @Stable or @Immutable)
+    - maxHeight: STABLE (marked @Stable or @Immutable)
+    - fillHeight: STABLE (primitive type)
+    - semanticsLabel: STABLE (class with no mutable properties)
 
 @Composable
 private fun com.whatever.caro.core.designsystem.components.TextFieldBox(value: kotlin.String, onValueChange: kotlin.Function1<kotlin.String, kotlin.Unit>, placeholder: kotlin.String?, enabled: kotlin.Boolean, readOnly: kotlin.Boolean, singleLine: kotlin.Boolean, keyboardOptions: androidx.compose.foundation.text.KeyboardOptions, keyboardActions: androidx.compose.foundation.text.KeyboardActions, trailingIcon: @[Composable] androidx.compose.runtime.internal.ComposableFunction0<kotlin.Unit>?, interactionSource: androidx.compose.foundation.interaction.MutableInteractionSource, focusRequester: androidx.compose.ui.focus.FocusRequester?): kotlin.Unit

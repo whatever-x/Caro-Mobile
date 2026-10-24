@@ -90,6 +90,20 @@ fun CaroLoadingOverlayBox(
 }
 
 @Composable
+fun rememberDelayedVisible(active: Boolean): Boolean {
+    var isVisible by remember(active) { mutableStateOf(false) }
+
+    LaunchedEffect(active) {
+        if (active) {
+            delay(SCREEN_LOADING_VISUAL_DELAY_MILLIS)
+            isVisible = true
+        }
+    }
+
+    return isVisible
+}
+
+@Composable
 private fun LoadingInteractionBlocker() {
     Box(
         modifier =
@@ -107,12 +121,6 @@ private fun LoadingInteractionBlocker() {
 
 @Composable
 fun CaroLoadingOverlay(modifier: Modifier = Modifier) {
-    val composition by rememberLottieComposition {
-        LottieCompositionSpec.JsonString(
-            Res.readBytes(path = LOTTIE_SCREEN_LOADING_PATH).decodeToString(),
-        )
-    }
-
     Box(
         modifier =
             modifier
@@ -127,14 +135,25 @@ fun CaroLoadingOverlay(modifier: Modifier = Modifier) {
                 },
         contentAlignment = Alignment.Center,
     ) {
-        Image(
-            modifier = Modifier.size(ScreenLoadingSize),
-            painter =
-                rememberLottiePainter(
-                    composition = composition,
-                    iterations = Compottie.IterateForever,
-                ),
-            contentDescription = null,
+        ScreenLoadingLottie()
+    }
+}
+
+@Composable
+internal fun ScreenLoadingLottie(modifier: Modifier = Modifier) {
+    val composition by rememberLottieComposition {
+        LottieCompositionSpec.JsonString(
+            Res.readBytes(path = LOTTIE_SCREEN_LOADING_PATH).decodeToString(),
         )
     }
+
+    Image(
+        modifier = modifier.size(ScreenLoadingSize),
+        painter =
+            rememberLottiePainter(
+                composition = composition,
+                iterations = Compottie.IterateForever,
+            ),
+        contentDescription = null,
+    )
 }

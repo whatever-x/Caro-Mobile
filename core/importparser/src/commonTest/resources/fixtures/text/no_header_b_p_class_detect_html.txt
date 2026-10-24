@@ -1,0 +1,3 @@
+<b>run</b>	달리다
+walk	<p class=ex>걷다</p>
+Tom &amp; Jerry	<b>톰</b>과 제리

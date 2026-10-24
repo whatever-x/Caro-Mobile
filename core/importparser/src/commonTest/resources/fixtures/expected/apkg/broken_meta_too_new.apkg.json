@@ -1,0 +1,23 @@
+{
+  "fixture": "apkg/broken_meta_too_new.apkg",
+  "purpose": "modern_anki21b_main.apkg with meta replaced by PackageMetadata.version = 99.",
+  "acceptanceCriteria": [
+    "AC-02"
+  ],
+  "designRefs": [
+    "Mobile 5 meta 버전 Unknown(TooNew)",
+    "Mobile 7.3 순서 2",
+    "Backend 7.6 IM005"
+  ],
+  "generatedByDefault": true,
+  "expectedOutcome": "error",
+  "error": {
+    "kind": "UNSUPPORTED_FILE",
+    "reason": "meta version unknown (TooNew)",
+    "userMessageKoExample": "Anki에서 다시 내보내 주세요"
+  },
+  "format": "APKG",
+  "warnings": [],
+  "uncoveredByCanonicalCodes": [],
+  "ambiguities": []
+}

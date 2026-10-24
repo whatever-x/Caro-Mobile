@@ -1,0 +1,13 @@
+#separator:tab
+#html:true
+#guid column:1
+#notetype column:2
+#deck column:3
+#tags column:8
+t1-g01	Basic	Lang::Vocab::N5	<b>apple</b>	사과<br>an edible fruit			fruit n5
+t1-g02	Vocab	Lang::Vocab::N5	食べる	먹다&nbsp;(to eat)	<div>毎朝パンを食べる。</div><div>매일 아침 빵을 먹는다.</div>	たべる [sound:taberu.mp3]	verb
+t1-g03	Cloze	Lang::Grammar	{{c1::Seoul}} is the capital of {{c2::Korea::country}}.	"Tom &amp; Jerry <img src=""a.png"">"			cloze
+t1-g04	Cloze	Lang::Grammar	{{c1,2::서울}}은 한국의 수도이다.				
+t1-g05	Basic	Lang::Vocab::N4	"여러 줄
+두 번째 줄"	<p>단락</p>&lt;b&gt;는 글자			
+t1-g06	Basic	Lang::Vocab::N4	<!-- 주석 -->보이는 글<style>.x{color:red}</style>	"<span style=""color:red"">&#54620;&#xAE00;</span><script>var a=1;</script>"			html

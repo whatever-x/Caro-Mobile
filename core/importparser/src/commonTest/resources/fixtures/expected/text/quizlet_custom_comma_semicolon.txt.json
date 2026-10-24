@@ -1,0 +1,97 @@
+{
+  "fixture": "text/quizlet_custom_comma_semicolon.txt",
+  "purpose": "Quizlet custom export (term ',' definition, records ';') on one line. Row separator other than newline is a documented limitation: the result is one wrong row.",
+  "acceptanceCriteria": [
+    "AC-03",
+    "AC-18"
+  ],
+  "designRefs": [
+    "Mobile 7.2 Quizlet (행 구분자는 줄바꿈만 지원)",
+    "Mobile 7.2 구분자 추정 (동률이면 탭 > 세미콜론 > 쉼표)"
+  ],
+  "generatedByDefault": true,
+  "expectedOutcome": "parsed",
+  "format": "TEXT",
+  "sourceName": "quizlet_custom_comma_semicolon.txt",
+  "encoding": "UTF-8",
+  "utf8Bom": false,
+  "htmlMode": "PLAIN",
+  "htmlModeReason": "",
+  "separator": ";",
+  "separatorSource": "detected",
+  "hasHeaderRow": false,
+  "subdecks": [],
+  "sheets": [],
+  "noteTypes": [
+    {
+      "id": "text",
+      "name": "quizlet_custom_comma_semicolon.txt",
+      "fieldNames": [
+        "열 1",
+        "열 2",
+        "열 3"
+      ],
+      "isCloze": false,
+      "noteCount": 1
+    }
+  ],
+  "rowCount": 1,
+  "warnings": [],
+  "uncoveredByCanonicalCodes": [
+    "No warning when a single physical line looks like several records (custom Quizlet row separator); the design relies on paste-screen help text only."
+  ],
+  "rows": [
+    {
+      "index": 0,
+      "fieldValues": [
+        "abandon,버리다",
+        "benevolent,자비로운",
+        "candid,솔직한"
+      ]
+    }
+  ],
+  "cards": {
+    "appLanguage": "ko",
+    "emptySideText": "빈 항목입니다",
+    "mapping": "default: first field -> front, remaining fields in order -> back, joined by \\n, blank fields skipped (AC-06, Mobile 7.7). TEXT rows whose front value has {{c<n>:: markup use the cloze transform (PO P10, Mobile 7.6)",
+    "coverage": "all rows",
+    "items": [
+      {
+        "rowIndex": 0,
+        "front": "abandon,버리다",
+        "back": "benevolent,자비로운\ncandid,솔직한",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "frontUtf16Length": 11,
+        "backUtf16Length": 26,
+        "mediaRemoved": 0,
+        "excluded": false
+      }
+    ]
+  },
+  "previewStats": {
+    "cardCount": 1,
+    "excludedCount": 0,
+    "emptyReplacedCount": 0,
+    "truncatedCount": 0,
+    "mediaRemovedCount": 0
+  },
+  "limit": {
+    "maxCards": 10000,
+    "exceeded": false
+  },
+  "ambiguities": [],
+  "documentedLimitation": true,
+  "separatorDetectionDetail": "1 non-empty row: semicolon count 2, comma count 3, each in 1 row -> tie on row count -> priority tab > semicolon > comma -> semicolon",
+  "afterUserSwitchesSeparatorToComma": {
+    "fieldValues": [
+      "abandon",
+      "버리다;benevolent",
+      "자비로운;candid",
+      "솔직한"
+    ]
+  },
+  "fileBytes": 58
+}

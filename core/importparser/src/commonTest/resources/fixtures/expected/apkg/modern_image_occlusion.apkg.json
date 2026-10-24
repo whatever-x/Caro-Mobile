@@ -1,0 +1,112 @@
+{
+  "fixture": "apkg/modern_image_occlusion.apkg",
+  "purpose": "Modern package with 2 Basic notes and 2 stock Image Occlusion notes (notetype kind = cloze, original_stock_kind = image occlusion).",
+  "acceptanceCriteria": [
+    "AC-02",
+    "AC-07"
+  ],
+  "designRefs": [
+    "Mobile 7.3 Image Occlusion (선택 제안)",
+    "Mobile 6.6 APKG_IMAGE_OCCLUSION_EXCLUDED"
+  ],
+  "generatedByDefault": true,
+  "expectedOutcome": "parsed",
+  "format": "APKG",
+  "htmlMode": "HTML",
+  "packageVersion": "Latest",
+  "metaVersion": 3,
+  "collectionEntry": "collection.anki21b",
+  "subdecks": [
+    {
+      "id": null,
+      "path": "Diagrams",
+      "noteCount": 4
+    }
+  ],
+  "notesWithoutDeck": 0,
+  "noteTypes": [
+    {
+      "id": null,
+      "name": "Basic",
+      "fieldNames": [
+        "Front",
+        "Back"
+      ],
+      "isCloze": false,
+      "isImageOcclusion": false,
+      "noteCount": 2
+    },
+    {
+      "id": null,
+      "name": "Image Occlusion",
+      "fieldNames": [
+        "Occlusion",
+        "Image",
+        "Header",
+        "Back Extra",
+        "Comments"
+      ],
+      "isCloze": true,
+      "isImageOcclusion": true,
+      "noteCount": 2,
+      "configKind": 1,
+      "originalStockKind": 6,
+      "excludedByDefault": true
+    }
+  ],
+  "totalNotes": 4,
+  "warnings": [
+    {
+      "code": "APKG_IMAGE_OCCLUSION_EXCLUDED",
+      "count": 2
+    }
+  ],
+  "warningsNote": "Optional proposal in the design; if not implemented, IO notes appear as a cloze type and the warning is absent.",
+  "uncoveredByCanonicalCodes": [],
+  "cards": {
+    "appLanguage": "ko",
+    "mapping": "default: first field -> front, remaining fields -> back (cloze: Text -> cloze sentence, Back Extra -> extra), joined by \\n, blank fields skipped (AC-06, AC-07, Mobile 4.6, 7.7)",
+    "coverage": "Basic notes (IO excluded)",
+    "items": [
+      {
+        "rowIndex": 0,
+        "front": "label-1",
+        "back": "라벨 1",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "frontUtf16Length": 7,
+        "backUtf16Length": 4,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 1,
+        "front": "label-2",
+        "back": "라벨 2",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "frontUtf16Length": 7,
+        "backUtf16Length": 4,
+        "mediaRemoved": 0,
+        "excluded": false
+      }
+    ]
+  },
+  "previewStats": {
+    "selection": "all subdecks (default), IO type excluded",
+    "cardCount": 2,
+    "excludedCount": 0,
+    "emptyReplacedCount": 0,
+    "truncatedCount": 0,
+    "mediaRemovedCount": 0
+  },
+  "limit": {
+    "maxCards": 10000,
+    "exceeded": false
+  },
+  "ambiguities": []
+}

@@ -18,6 +18,15 @@ public fun com.whatever.caro.core.ui.card.CaroFlashCard(frontText: kotlin.String
     - modifier: STABLE (marked @Stable or @Immutable)
 
 @Composable
+public fun com.whatever.caro.core.ui.card.CaroFullTextDialog(sections: kotlin.collections.List<com.whatever.caro.core.ui.card.CaroFullTextSection>, onDismiss: kotlin.Function0<kotlin.Unit>, closeLabel: kotlin.String?): kotlin.Unit
+  skippable: false
+  restartable: true
+  params:
+    - sections: RUNTIME (requires runtime check)
+    - onDismiss: STABLE (function type)
+    - closeLabel: STABLE (class with no mutable properties)
+
+@Composable
 private fun com.whatever.caro.core.ui.card.FlashCardFace(frontText: kotlin.String, backText: kotlin.String, isFlipped: kotlin.Boolean, flipHint: kotlin.String, moreLabel: kotlin.String, onShowMore: kotlin.Function1<kotlin.String, kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
   skippable: true
   restartable: true
@@ -29,14 +38,6 @@ private fun com.whatever.caro.core.ui.card.FlashCardFace(frontText: kotlin.Strin
     - moreLabel: STABLE (String is immutable)
     - onShowMore: STABLE (function type)
     - modifier: STABLE (marked @Stable or @Immutable)
-
-@Composable
-private fun com.whatever.caro.core.ui.card.FlashCardFullTextDialog(text: kotlin.String, onDismissRequest: kotlin.Function0<kotlin.Unit>): kotlin.Unit
-  skippable: true
-  restartable: true
-  params:
-    - text: STABLE (String is immutable)
-    - onDismissRequest: STABLE (function type)
 
 @Composable
 private fun com.whatever.caro.core.ui.card.FlashCardPrimaryText(text: kotlin.String, moreLabel: kotlin.String, onShowMore: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
@@ -54,6 +55,15 @@ private fun com.whatever.caro.core.ui.card.FlipHint(text: kotlin.String, modifie
   restartable: true
   params:
     - text: STABLE (String is immutable)
+    - modifier: STABLE (marked @Stable or @Immutable)
+
+@Composable
+private fun com.whatever.caro.core.ui.card.FullTextSections(sections: kotlin.collections.List<com.whatever.caro.core.ui.card.CaroFullTextSection>, contentPadding: androidx.compose.foundation.layout.PaddingValues, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+  skippable: false
+  restartable: true
+  params:
+    - sections: RUNTIME (requires runtime check)
+    - contentPadding: STABLE (marked @Stable or @Immutable)
     - modifier: STABLE (marked @Stable or @Immutable)
 
 @Composable
@@ -80,6 +90,15 @@ public fun com.whatever.caro.core.ui.image.ConfigureCaroImageLoader(config: com.
     - config: STABLE (marked @Stable or @Immutable)
 
 @Composable
+public fun com.whatever.caro.core.ui.loading.CaroLoadingCard(message: kotlin.String, modifier: androidx.compose.ui.Modifier, detail: kotlin.String?): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - message: STABLE (String is immutable)
+    - modifier: STABLE (marked @Stable or @Immutable)
+    - detail: STABLE (class with no mutable properties)
+
+@Composable
 public fun com.whatever.caro.core.ui.loading.CaroLoadingOverlay(modifier: androidx.compose.ui.Modifier): kotlin.Unit
   skippable: true
   restartable: true
@@ -94,6 +113,26 @@ public fun com.whatever.caro.core.ui.loading.CaroLoadingOverlayBox(isLoading: ko
     - isLoading: STABLE (primitive type)
     - modifier: STABLE (marked @Stable or @Immutable)
     - content: STABLE (composable function type)
+
+@Composable
+private fun com.whatever.caro.core.ui.loading.LoadingInteractionBlocker(): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+
+@Composable
+internal fun com.whatever.caro.core.ui.loading.ScreenLoadingLottie(modifier: androidx.compose.ui.Modifier): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - modifier: STABLE (marked @Stable or @Immutable)
+
+@Composable
+public fun com.whatever.caro.core.ui.loading.rememberDelayedVisible(active: kotlin.Boolean): kotlin.Boolean
+  skippable: true
+  restartable: true
+  params:
+    - active: STABLE (primitive type)
 
 @Composable
 public fun com.whatever.caro.core.ui.swipe.rememberSwipeGestureState(): com.whatever.caro.core.ui.swipe.SwipeGestureState

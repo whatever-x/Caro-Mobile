@@ -1,0 +1,127 @@
+{
+  "fixture": "text/tsv_no_header.tsv",
+  "purpose": "Tab-separated, no Anki headers, no title row, 3 columns (back joins columns 2 and 3).",
+  "acceptanceCriteria": [
+    "AC-03",
+    "AC-06"
+  ],
+  "designRefs": [
+    "Mobile 7.2 구분자 추정, 제목 행 추정",
+    "Mobile 6.6 열 N"
+  ],
+  "generatedByDefault": true,
+  "expectedOutcome": "parsed",
+  "format": "TEXT",
+  "sourceName": "tsv_no_header.tsv",
+  "encoding": "UTF-8",
+  "utf8Bom": false,
+  "htmlMode": "PLAIN",
+  "htmlModeReason": "",
+  "separator": "\t",
+  "separatorSource": "detected",
+  "hasHeaderRow": false,
+  "subdecks": [],
+  "sheets": [],
+  "noteTypes": [
+    {
+      "id": "text",
+      "name": "tsv_no_header.tsv",
+      "fieldNames": [
+        "열 1",
+        "열 2",
+        "열 3"
+      ],
+      "isCloze": false,
+      "noteCount": 3
+    }
+  ],
+  "rowCount": 3,
+  "warnings": [],
+  "uncoveredByCanonicalCodes": [],
+  "rows": [
+    {
+      "index": 0,
+      "fieldValues": [
+        "one",
+        "하나",
+        "いち"
+      ]
+    },
+    {
+      "index": 1,
+      "fieldValues": [
+        "two",
+        "둘",
+        "に"
+      ]
+    },
+    {
+      "index": 2,
+      "fieldValues": [
+        "three",
+        "셋",
+        "さん"
+      ]
+    }
+  ],
+  "cards": {
+    "appLanguage": "ko",
+    "emptySideText": "빈 항목입니다",
+    "mapping": "default: first field -> front, remaining fields in order -> back, joined by \\n, blank fields skipped (AC-06, Mobile 7.7). TEXT rows whose front value has {{c<n>:: markup use the cloze transform (PO P10, Mobile 7.6)",
+    "coverage": "all rows",
+    "items": [
+      {
+        "rowIndex": 0,
+        "front": "one",
+        "back": "하나\nいち",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "frontUtf16Length": 3,
+        "backUtf16Length": 5,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 1,
+        "front": "two",
+        "back": "둘\nに",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "frontUtf16Length": 3,
+        "backUtf16Length": 3,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 2,
+        "front": "three",
+        "back": "셋\nさん",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "frontUtf16Length": 5,
+        "backUtf16Length": 4,
+        "mediaRemoved": 0,
+        "excluded": false
+      }
+    ]
+  },
+  "previewStats": {
+    "cardCount": 3,
+    "excludedCount": 0,
+    "emptyReplacedCount": 0,
+    "truncatedCount": 0,
+    "mediaRemovedCount": 0
+  },
+  "limit": {
+    "maxCards": 10000,
+    "exceeded": false
+  },
+  "ambiguities": [],
+  "fileBytes": 47
+}

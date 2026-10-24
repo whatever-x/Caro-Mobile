@@ -39,6 +39,7 @@ kotlin {
             implementation(projects.feature.setting)
             implementation(projects.feature.deckDetail)
             implementation(projects.feature.learning)
+            implementation(projects.feature.importer)
 
             implementation(libs.koin.compose.viewmodel)
             implementation(libs.koin.compose.navigation3)

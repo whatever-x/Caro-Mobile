@@ -1,0 +1,175 @@
+{
+  "fixture": "text/quizlet_default_tab_newline.txt",
+  "purpose": "Quizlet default export: term TAB definition, records separated by newline, no trailing newline. Same content is the paste fixture.",
+  "acceptanceCriteria": [
+    "AC-01",
+    "AC-03",
+    "AC-18"
+  ],
+  "designRefs": [
+    "Mobile 7.2 Quizlet",
+    "Mobile 6.5 붙여넣기"
+  ],
+  "generatedByDefault": true,
+  "expectedOutcome": "parsed",
+  "format": "TEXT",
+  "sourceName": "quizlet_default_tab_newline.txt",
+  "encoding": "UTF-8",
+  "utf8Bom": false,
+  "htmlMode": "PLAIN",
+  "htmlModeReason": "",
+  "separator": "\t",
+  "separatorSource": "detected",
+  "hasHeaderRow": false,
+  "subdecks": [],
+  "sheets": [],
+  "noteTypes": [
+    {
+      "id": "text",
+      "name": "quizlet_default_tab_newline.txt",
+      "fieldNames": [
+        "열 1",
+        "열 2"
+      ],
+      "isCloze": false,
+      "noteCount": 5
+    }
+  ],
+  "rowCount": 5,
+  "warnings": [],
+  "uncoveredByCanonicalCodes": [],
+  "rows": [
+    {
+      "index": 0,
+      "fieldValues": [
+        "abandon",
+        "버리다"
+      ]
+    },
+    {
+      "index": 1,
+      "fieldValues": [
+        "benevolent",
+        "자비로운"
+      ]
+    },
+    {
+      "index": 2,
+      "fieldValues": [
+        "candid",
+        "솔직한"
+      ]
+    },
+    {
+      "index": 3,
+      "fieldValues": [
+        "diligent",
+        "부지런한"
+      ]
+    },
+    {
+      "index": 4,
+      "fieldValues": [
+        "eager",
+        "열망하는"
+      ]
+    }
+  ],
+  "cards": {
+    "appLanguage": "ko",
+    "emptySideText": "빈 항목입니다",
+    "mapping": "default: first field -> front, remaining fields in order -> back, joined by \\n, blank fields skipped (AC-06, Mobile 7.7). TEXT rows whose front value has {{c<n>:: markup use the cloze transform (PO P10, Mobile 7.6)",
+    "coverage": "all rows",
+    "items": [
+      {
+        "rowIndex": 0,
+        "front": "abandon",
+        "back": "버리다",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "frontUtf16Length": 7,
+        "backUtf16Length": 3,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 1,
+        "front": "benevolent",
+        "back": "자비로운",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "frontUtf16Length": 10,
+        "backUtf16Length": 4,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 2,
+        "front": "candid",
+        "back": "솔직한",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "frontUtf16Length": 6,
+        "backUtf16Length": 3,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 3,
+        "front": "diligent",
+        "back": "부지런한",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "frontUtf16Length": 8,
+        "backUtf16Length": 4,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 4,
+        "front": "eager",
+        "back": "열망하는",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "frontUtf16Length": 5,
+        "backUtf16Length": 4,
+        "mediaRemoved": 0,
+        "excluded": false
+      }
+    ]
+  },
+  "previewStats": {
+    "cardCount": 5,
+    "excludedCount": 0,
+    "emptyReplacedCount": 0,
+    "truncatedCount": 0,
+    "mediaRemovedCount": 0
+  },
+  "limit": {
+    "maxCards": 10000,
+    "exceeded": false
+  },
+  "ambiguities": [],
+  "pasteVariant": {
+    "sourceName": {
+      "ko": "붙여넣기",
+      "en": "Pasted text"
+    },
+    "noteTypeName": {
+      "ko": "붙여넣기",
+      "en": "Pasted text"
+    },
+    "rowsAndCards": "same as file"
+  },
+  "fileBytes": 99
+}

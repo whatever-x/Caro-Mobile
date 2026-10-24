@@ -1,0 +1,106 @@
+{
+  "fixture": "apkg/large_10001_notes_modern.apkg",
+  "purpose": "10,001 Basic notes in Big::Part1 (5,000), Big::Part2 (5,000), Big::Part3 (1). Default all-selection exceeds the cap; Part1+Part2 is exactly 10,000.",
+  "acceptanceCriteria": [
+    "AC-05",
+    "AC-13",
+    "AC-19"
+  ],
+  "designRefs": [
+    "Mobile 4.5 하위 덱 선택",
+    "Mobile 5 상한 초과",
+    "Mobile 7.7 상한 판정 (가져올 카드 수)"
+  ],
+  "generatedByDefault": true,
+  "expectedOutcome": "parsed",
+  "format": "APKG",
+  "htmlMode": "HTML",
+  "packageVersion": "Latest",
+  "collectionEntry": "collection.anki21b",
+  "subdecks": [
+    {
+      "id": null,
+      "path": "Big::Part1",
+      "noteCount": 5000
+    },
+    {
+      "id": null,
+      "path": "Big::Part2",
+      "noteCount": 5000
+    },
+    {
+      "id": null,
+      "path": "Big::Part3",
+      "noteCount": 1
+    }
+  ],
+  "notesWithoutDeck": 0,
+  "noteTypes": [
+    {
+      "id": "1700000001",
+      "name": "Basic",
+      "fieldNames": [
+        "Front",
+        "Back"
+      ],
+      "isCloze": false,
+      "noteCount": 10001
+    }
+  ],
+  "totalNotes": 10001,
+  "warnings": [],
+  "uncoveredByCanonicalCodes": [],
+  "rows": [
+    {
+      "rowIndex": 0,
+      "guid": "caro-big-00001",
+      "fieldValues": [
+        "filler00001",
+        "채움00001"
+      ]
+    },
+    {
+      "rowIndex": 10000,
+      "guid": "caro-big-10001",
+      "fieldValues": [
+        "filler10001",
+        "채움10001"
+      ]
+    }
+  ],
+  "selectionExamples": [
+    {
+      "selectedPaths": [
+        "Big::Part1",
+        "Big::Part2",
+        "Big::Part3"
+      ],
+      "cardCount": 10001,
+      "exceeded": true,
+      "nextButtonEnabled": false,
+      "guidance": "Anki: 하위 덱 선택을 해제하거나 Anki에서 하위 덱별로 내보내기 (Mobile 5)"
+    },
+    {
+      "selectedPaths": [
+        "Big::Part1",
+        "Big::Part2"
+      ],
+      "cardCount": 10000,
+      "exceeded": false,
+      "nextButtonEnabled": true
+    },
+    {
+      "selectedPaths": [
+        "Big::Part3"
+      ],
+      "cardCount": 1,
+      "exceeded": false,
+      "nextButtonEnabled": true
+    }
+  ],
+  "limit": {
+    "maxCards": 10000,
+    "exceededWithDefaultSelection": true
+  },
+  "ambiguities": []
+}

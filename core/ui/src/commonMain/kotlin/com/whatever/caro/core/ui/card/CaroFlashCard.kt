@@ -3,12 +3,9 @@ package com.whatever.caro.core.ui.card
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -18,8 +15,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -31,14 +26,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.DialogProperties
 import com.whatever.caro.core.designsystem.modifier.noRippleClickable
 import com.whatever.caro.core.designsystem.themes.CaroTheme
 
@@ -110,9 +102,10 @@ fun CaroFlashCard(
     }
 
     expandedText?.let { text ->
-        FlashCardFullTextDialog(
-            text = text,
-            onDismissRequest = { expandedText = null },
+        val sections = remember(text) { listOf(CaroFullTextSection(title = null, body = text)) }
+        CaroFullTextDialog(
+            sections = sections,
+            onDismiss = { expandedText = null },
         )
     }
 }
@@ -261,55 +254,6 @@ private fun FlipHint(
     }
 }
 
-@Composable
-private fun FlashCardFullTextDialog(
-    text: String,
-    onDismissRequest: () -> Unit,
-) {
-    Dialog(
-        onDismissRequest = onDismissRequest,
-        properties = DialogProperties(usePlatformDefaultWidth = false),
-    ) {
-        BoxWithConstraints(
-            modifier =
-                Modifier
-                    .fillMaxSize()
-                    .pointerInput(onDismissRequest) {
-                        detectTapGestures { onDismissRequest() }
-                    }.padding(CaroTheme.spacing.l),
-            contentAlignment = Alignment.Center,
-        ) {
-            val dialogWidth = minOf(maxWidth, FlashCardDialogWidth)
-            val dialogHeight = minOf(maxHeight, FlashCardDialogHeight)
-
-            Surface(
-                modifier =
-                    Modifier
-                        .width(dialogWidth)
-                        .height(dialogHeight)
-                        .pointerInput(Unit) { detectTapGestures {} },
-                shape = CaroTheme.shape.l,
-                color = CaroTheme.color.surface.primary,
-                border = BorderStroke(FlashCardBorderWidth, CaroTheme.color.border.secondary),
-                shadowElevation = FlashCardDialogElevation,
-            ) {
-                Text(
-                    text = text,
-                    modifier =
-                        Modifier
-                            .fillMaxSize()
-                            .padding(
-                                horizontal = CaroTheme.spacing.s,
-                                vertical = CaroTheme.spacing.xl4,
-                            ).verticalScroll(rememberScrollState()),
-                    style = CaroTheme.typography.body1,
-                    color = CaroTheme.color.text.primary,
-                )
-            }
-        }
-    }
-}
-
 private const val FLASH_CARD_COLLAPSED_MAX_LINES = 10
 private const val FLASH_CARD_FLIP_DURATION_MILLIS = 280
 private const val FLASH_CARD_HALF_ROTATION_DEGREES = 180f
@@ -322,7 +266,4 @@ private val FlashCardFlipLineWidth = 12.dp
 private val FlashCardFlipLineHeight = 1.5.dp
 private val FlashCardFlipLineSpacing = 3.dp
 private val FlashCardFlipHintBottomPadding = 7.dp
-private val FlashCardDialogWidth = 362.dp
-private val FlashCardDialogHeight = 642.dp
-private val FlashCardDialogElevation = 16.dp
 private val FlashCardCameraDistance = 12.dp

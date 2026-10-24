@@ -1,0 +1,29 @@
+{
+  "fixture": "apkg/empty_zero_notes.apkg",
+  "purpose": "Valid legacy package with one empty deck and no notes or note types.",
+  "acceptanceCriteria": [
+    "AC-02",
+    "AC-05"
+  ],
+  "designRefs": [
+    "Mobile 5 빈 결과 (행 0개)",
+    "Mobile 7.3 하위 덱 목록 (노트 1개 이상인 덱만)"
+  ],
+  "generatedByDefault": true,
+  "expectedOutcome": "parsed",
+  "emptyResult": true,
+  "format": "APKG",
+  "htmlMode": "HTML",
+  "packageVersion": "Legacy1",
+  "collectionEntry": "collection.anki2",
+  "subdecks": [],
+  "notesWithoutDeck": 0,
+  "noteTypes": [],
+  "totalNotes": 0,
+  "warnings": [],
+  "uncoveredByCanonicalCodes": [],
+  "previewStats": {
+    "cardCount": 0
+  },
+  "ambiguities": []
+}

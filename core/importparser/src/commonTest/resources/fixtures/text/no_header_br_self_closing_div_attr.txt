@@ -1,0 +1,15 @@
+line1<br />line2	줄1<BR/>줄2
+stack	"<div class=""x"">위</div>
+<div class=""x"">아래</div>"
+blank line	a<div><br></div><div>b</div>
+list	<ul><li>하나</li><li>둘</li></ul>
+"두 줄
+원문"	위<br><br>아래
+a < b	<hr/>구분선 뒤
+x<y and y>z	HTML 파일에서도 그대로
+<style>.x{color:red}</style>스타일 뒤	<script>var a = 1 < 2;</script>스크립트 뒤<!-- 주석 -->
+<ruby>漢字<rt>かんじ</rt></ruby>	<foo>모르는 태그</foo> <b>굵게</b>
+<ruby>漢字<rp>(</rp><rt>かんじ</rt><rp>)</rp></ruby>	<ruby><rb>漢</rb><rt>かん</rt><rb>字</rb><rt>じ</rt></ruby>
+<ruby>漢字</ruby>	<ruby>漢字<rt></rt></ruby> 漢字[かんじ]
+<ruby>漢<rt>かん</ruby>字 <ruby>日<rt> </rt></ruby>	"<video controls><source src=""a.mp4""><source src=""a.webm""></video>동영상 뒤"
+"<audio src=""a.mp3""></audio>소리 뒤"	"<img src=""b.png""><embed src=""c.swf""><iframe src=""d.html"">대체 글</iframe><source src=""e.mp3"">"
