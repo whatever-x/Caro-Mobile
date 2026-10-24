@@ -48,6 +48,7 @@ flowchart TB
         monitoring["분석·오류 수집<br/>:core:analytics<br/>:core:crashlytics"]
         messaging[":core:messaging"]
         util[":core:util"]
+        importparser[":core:importparser"]
     end
 
     subgraph buildPlugins["빌드 플러그인"]
@@ -66,10 +67,11 @@ flowchart TB
     feature --> commonCore
     feature -.->|기능별 추가| model
     feature -.->|기능별 추가| util
+    feature -.->|기능별 추가| importparser
 ```
 
 모든 feature는 공통 기반에 의존합니다.
-`:core:model`·`:core:util`로 향하는 점선은 일부 feature가 직접 선언한 의존성입니다.
+`:core:model`·`:core:util`·`:core:importparser`로 향하는 점선은 일부 feature가 직접 선언한 의존성입니다.
 빌드 플러그인은 별도 영역으로 표시하며, 적용 대상은 [빌드 로직 구성](#7-빌드-로직-구성)에서 확인합니다.
 
 | 구성 | 책임 |
@@ -90,6 +92,7 @@ flowchart TB
 | `:core:crashlytics` | 오류·크래시 수집 |
 | `:core:messaging` | 푸시 알림 |
 | `:core:util` | 숫자 포맷 등의 공통 유틸리티 |
+| `:core:importparser` | 외부 학습 데이터 파일(Anki 패키지·텍스트·엑셀) 파싱 |
 | `:build-logic` | 공유 Gradle 플러그인과 빌드 설정 제공 |
 
 `:composeApp`은 feature와 앱 구성에 필요한 core 모듈을 조립합니다.
@@ -117,7 +120,7 @@ flowchart LR
 `:core:ui`는 디자인시스템을 사용하는 공유 UI 기능을 제공합니다.
 `:core:navigator`는 화면 이동에 필요한 모델을 사용합니다. 이 모델은 `api` 의존성으로 호출 모듈에도 노출합니다.
 
-`:core:viewmodel`·`:core:util`과 분석·오류 수집·푸시 모듈은 현재 다른 프로젝트 모듈에 직접 의존하지 않습니다.
+`:core:viewmodel`·`:core:util`·`:core:importparser`와 분석·오류 수집·푸시 모듈은 현재 다른 프로젝트 모듈에 직접 의존하지 않습니다.
 전체 목록과 선언 방식은 [core 내부 의존 관계](docs/architecture/modules-platform.md#core-내부-의존-관계)를 확인합니다.
 
 ### 2.2 feature와 core 관계
@@ -131,6 +134,7 @@ flowchart LR
     feature[":feature:*"] --> common["공통 core 모듈"]
     feature -.->|일부 feature만 직접 의존| model[":core:model"]
     feature -.->|일부 feature만 직접 의존| util[":core:util"]
+    feature -.->|일부 feature만 직접 의존| importparser[":core:importparser"]
 ```
 
 | 공통 의존 모듈 | feature에서 사용하는 책임 |

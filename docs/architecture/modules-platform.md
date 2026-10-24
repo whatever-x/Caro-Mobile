@@ -27,6 +27,7 @@
 | `:core:crashlytics` | 오류·크래시 수집의 공통 계약과 플랫폼별 Firebase 연동 |
 | `:core:messaging` | 푸시 토큰·메시지 수신·알림 표시와 플랫폼별 Firebase 연동 |
 | `:core:util` | 숫자 포맷 등의 공통 유틸리티와 플랫폼별 구현 |
+| `:core:importparser` | Anki 패키지·텍스트·엑셀 파일을 공통 표 형식으로 읽는 파서. 앱 모델에 의존하지 않고, 서버 파싱에서 재사용할 수 있도록 jvm 타깃도 제공 |
 | `:feature:*` | home·login 등의 기능별 화면·상태·ViewModel. `caro.feature` 플러그인으로 core 의존성을 자동 주입 |
 | `build-logic/convention/` | 모듈 설정을 표준화하는 Gradle 컨벤션 플러그인 |
 
@@ -42,7 +43,7 @@
 :composeApp → 앱 구성에 필요한 core 모듈 + 모든 feature 모듈
 ```
 
-`:composeApp`은 `:core:util`을 제외한 core 모듈에 직접 의존합니다. `:core:util`은 `:feature:home`의 의존성으로 연결됩니다.
+`:composeApp`은 `:core:util`·`:core:importparser`를 제외한 core 모듈에 직접 의존합니다. `:core:util`은 `:feature:home`·`:feature:importer`, `:core:importparser`는 `:feature:importer`의 의존성으로 연결됩니다.
 `:core:analytics`·`:core:crashlytics`·`:core:messaging`과 `:feature:login`은 `api`, 나머지 프로젝트 모듈은 `implementation`으로 선언합니다.
 등록 원본은 [composeApp의 빌드 설정](../../composeApp/build.gradle.kts)과 [Android 앱의 빌드 설정](../../androidApp/build.gradle.kts)입니다.
 iOS는 Gradle 앱 모듈 대신 Xcode 프로젝트에서 공유 KMP 프레임워크를 연동합니다.
@@ -65,6 +66,7 @@ iOS는 Gradle 앱 모듈 대신 Xcode 프로젝트에서 공유 KMP 프레임워
 | `:core:crashlytics` | 없음 | — |
 | `:core:messaging` | 없음 | — |
 | `:core:util` | 없음 | — |
+| `:core:importparser` | 없음 | — |
 
 `api` 의존성은 호출 모듈에도 노출됩니다. `implementation` 의존성은 호출 모듈의 컴파일 의존성으로 자동 노출되지 않습니다.
 예를 들어 `:core:navigator`를 사용하는 feature에서는 `:core:model` 타입을 사용할 수 있지만, `:core:data`를 사용한다는 이유로 `:core:remote`를 직접 사용할 수 있다고 가정하지 않습니다.
@@ -88,6 +90,7 @@ iOS는 Gradle 앱 모듈 대신 Xcode 프로젝트에서 공유 KMP 프레임워
 | `:feature:deck` | 없음 |
 | `:feature:deck-detail` | `:core:model` |
 | `:feature:home` | `:core:model`, `:core:util` |
+| `:feature:importer` | `:core:model`, `:core:importparser`, `:core:util` |
 | `:feature:learning` | `:core:model` |
 | `:feature:login` | `:core:model` |
 | `:feature:profile` | `:core:model` |
