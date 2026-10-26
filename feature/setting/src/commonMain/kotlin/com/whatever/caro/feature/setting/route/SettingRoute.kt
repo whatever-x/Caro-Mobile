@@ -3,6 +3,7 @@ package com.whatever.caro.feature.setting.route
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -11,6 +12,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalUriHandler
@@ -26,6 +28,10 @@ import caromobile.core.designsystem.generated.resources.setting_dialog_button_ca
 import caromobile.core.designsystem.generated.resources.setting_dialog_button_delete_account
 import caromobile.core.designsystem.generated.resources.setting_dialog_content
 import caromobile.core.designsystem.generated.resources.setting_dialog_title
+import caromobile.core.designsystem.generated.resources.setting_notification_error
+import caromobile.core.designsystem.generated.resources.setting_notification_open_settings
+import caromobile.core.designsystem.generated.resources.setting_notification_permission_content
+import caromobile.core.designsystem.generated.resources.setting_notification_permission_title
 import caromobile.core.designsystem.generated.resources.setting_privcay_policy_url
 import caromobile.core.designsystem.generated.resources.setting_report_bug_url
 import caromobile.core.designsystem.generated.resources.setting_snackbar_delete_account
@@ -34,6 +40,7 @@ import caromobile.core.designsystem.generated.resources.setting_snackbar_logout
 import caromobile.core.designsystem.generated.resources.setting_snackbar_user_info_load_error
 import caromobile.core.designsystem.generated.resources.setting_terms_of_service_url
 import com.whatever.caro.core.designsystem.components.CaroDialog
+import com.whatever.caro.core.designsystem.components.CaroDialogButton
 import com.whatever.caro.core.designsystem.components.CaroSnackbarStyle
 import com.whatever.caro.core.designsystem.modifier.noRippleClickable
 import com.whatever.caro.core.designsystem.themes.CaroTheme
@@ -41,6 +48,7 @@ import com.whatever.caro.core.navigator.contract.NavCommand
 import com.whatever.caro.core.navigator.dispatcher.NavigationDispatcher
 import com.whatever.caro.core.navigator.entries.EditProfileEntry
 import com.whatever.caro.core.navigator.entries.LoginEntry
+import com.whatever.caro.core.ui.notification.rememberNotificationPermissionController
 import com.whatever.caro.core.ui.snackbar.SnackBarMessage
 import com.whatever.caro.core.ui.snackbar.SnackbarController
 import com.whatever.caro.feature.setting.SettingScreen
@@ -50,6 +58,8 @@ import com.whatever.caro.feature.setting.model.SnackbarType
 import com.whatever.caro.feature.setting.model.WebViewType
 import com.whatever.caro.feature.setting.mvi.SettingIntent
 import com.whatever.caro.feature.setting.mvi.SettingSideEffect
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -61,6 +71,9 @@ fun SettingRoute(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val backState = rememberNavigationEventState(currentInfo = NavigationEventInfo.None)
     val uriHandler = LocalUriHandler.current
+    val permissionController = rememberNotificationPermissionController()
+    val scope = rememberCoroutineScope()
+    val notificationErrorMessage = stringResource(Res.string.setting_notification_error)
     val privacyPolicyUrl = stringResource(resource = Res.string.setting_privcay_policy_url)
     val termsOfServiceUrl = stringResource(resource = Res.string.setting_terms_of_service_url)
     val reportBugUrl = stringResource(resource = Res.string.setting_report_bug_url)
@@ -75,7 +88,7 @@ fun SettingRoute(
     NavigationBackHandler(
         state = backState,
         onBackCompleted = {
-            if (!state.isLoading) {
+            if (!state.isLoading && !state.isNotificationLoading) {
                 viewModel.intent(SettingIntent.ClickBack)
             }
         },
@@ -83,11 +96,40 @@ fun SettingRoute(
 
     LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
         viewModel.intent(SettingIntent.Initialize)
+        scope.launch {
+            try {
+                viewModel.intent(SettingIntent.NotificationPermissionRefreshed(permissionController.isGranted()))
+            } catch (exception: Exception) {
+                if (exception is CancellationException) throw exception
+                viewModel.intent(SettingIntent.NotificationPermissionFailed)
+            }
+        }
     }
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(viewModel, permissionController) {
         viewModel.sideEffect.collect { sideEffect ->
             when (sideEffect) {
+                SettingSideEffect.RequestNotificationPermission -> {
+                    scope.launch {
+                        try {
+                            viewModel.intent(SettingIntent.NotificationPermissionResult(permissionController.request()))
+                        } catch (exception: CancellationException) {
+                            viewModel.intent(SettingIntent.DismissNotificationPermissionDialog)
+                            throw exception
+                        } catch (exception: Exception) {
+                            viewModel.intent(SettingIntent.NotificationPermissionFailed)
+                        }
+                    }
+                }
+
+                SettingSideEffect.OpenNotificationSettings -> {
+                    try {
+                        permissionController.openSettings()
+                    } catch (_: Exception) {
+                        viewModel.intent(SettingIntent.NotificationPermissionFailed)
+                    }
+                }
+
                 is SettingSideEffect.NavigateToEditNickName -> {
                     navDispatcher.emit(
                         NavCommand.To(
@@ -127,9 +169,11 @@ fun SettingRoute(
                             SnackbarType.DELETE_ACCOUNT -> deleteAccountSnackbarMessage
                             SnackbarType.DELETE_ACCOUNT_ERROR -> deleteAccountErrorSnackbarMessage
                             SnackbarType.USER_INFO_LOAD_ERROR -> userInfoLoadErrorSnackbarMessage
+                            SnackbarType.NOTIFICATION_CHANGE_ERROR -> notificationErrorMessage
                         }
                     val style =
                         when (sideEffect.type) {
+                            SnackbarType.NOTIFICATION_CHANGE_ERROR,
                             SnackbarType.DELETE_ACCOUNT_ERROR,
                             SnackbarType.USER_INFO_LOAD_ERROR,
                             -> CaroSnackbarStyle.Error
@@ -149,6 +193,12 @@ fun SettingRoute(
         appVersion = AppConfig.appVersion,
         onIntent = viewModel::intent,
     )
+    if (state.notificationPermissionDialogVisible) {
+        NotificationPermissionDialog(
+            onDismiss = { viewModel.intent(SettingIntent.DismissNotificationPermissionDialog) },
+            onOpenSettings = { viewModel.intent(SettingIntent.OpenNotificationSettings) },
+        )
+    }
     if (state.accountDeleteDialogVisible) {
         DeleteAccountDialog(
             enabled = !state.isDeletingAccount,
@@ -231,5 +281,50 @@ private fun DialogButton(
         color = if (enabled) contentColor else CaroTheme.color.text.disabled,
         style = CaroTheme.typography.caption1.regular,
         textAlign = TextAlign.Center,
+    )
+}
+
+@Composable
+internal fun NotificationPermissionDialog(
+    onDismiss: () -> Unit,
+    onOpenSettings: () -> Unit,
+) {
+    CaroDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Text(
+                text = stringResource(Res.string.setting_notification_permission_title),
+                style = CaroTheme.typography.heading2,
+                color = CaroTheme.color.text.primary,
+            )
+        },
+        content = {
+            Spacer(Modifier.size(CaroTheme.spacing.s))
+            Text(
+                text = stringResource(Res.string.setting_notification_permission_content),
+                textAlign = TextAlign.Center,
+                style = CaroTheme.typography.body2.medium,
+                color = CaroTheme.color.text.secondary,
+            )
+            Spacer(Modifier.size(CaroTheme.spacing.m))
+        },
+        buttons = {
+            Row(horizontalArrangement = Arrangement.spacedBy(CaroTheme.spacing.s)) {
+                CaroDialogButton(
+                    text = stringResource(Res.string.setting_dialog_button_cancel),
+                    backgroundColor = CaroTheme.color.surface.tertiary,
+                    textColor = CaroTheme.color.text.brand,
+                    modifier = Modifier.weight(1f),
+                    onClick = onDismiss,
+                )
+                CaroDialogButton(
+                    text = stringResource(Res.string.setting_notification_open_settings),
+                    backgroundColor = CaroTheme.color.surface.brand,
+                    textColor = CaroTheme.color.text.inverse,
+                    modifier = Modifier.weight(1f),
+                    onClick = onOpenSettings,
+                )
+            }
+        },
     )
 }

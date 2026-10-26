@@ -10,6 +10,9 @@ data class SettingState(
     val socialLoginType: SocialLoginType = SocialLoginType.NONE,
     val accountDeleteDialogVisible: Boolean = false,
     val isDeletingAccount: Boolean = false,
+    val notificationEnabled: Boolean = false,
+    val isNotificationLoading: Boolean = false,
+    val notificationPermissionDialogVisible: Boolean = false,
 ) : UiState {
     val isUserInfoVisible: Boolean
         get() = isLoading || nickname.isNotBlank()

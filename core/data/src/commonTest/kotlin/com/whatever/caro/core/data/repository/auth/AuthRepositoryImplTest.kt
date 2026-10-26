@@ -1,5 +1,6 @@
 package com.whatever.caro.core.data.repository.auth
 
+import com.whatever.caro.core.data.repository.fcm.FcmTokenRepository
 import com.whatever.caro.core.datastore.datasource.LocalAuthDataSource
 import com.whatever.caro.core.model.auth.AuthSession
 import com.whatever.caro.core.model.auth.SocialLoginType
@@ -30,11 +31,69 @@ class AuthRepositoryImplTest : FunSpec() {
             remoteAuthDataSource: AuthDataSource = mock(),
             remoteNonAuthDataSource: NonAuthDataSource = mock(),
             localAuthDataSource: LocalAuthDataSource = mock(),
+            fcmTokenRepository: FcmTokenRepository =
+                mock {
+                    everySuspend { unregisterToken() } returns Unit
+                    everySuspend { resumeRegistration() } returns Unit
+                },
         ) = AuthRepositoryImpl(
             remoteAuthDataSource = remoteAuthDataSource,
             remoteNonAuthDataSource = remoteNonAuthDataSource,
             localAuthDataSource = localAuthDataSource,
+            fcmTokenRepository = fcmTokenRepository,
         )
+
+        test("로그아웃은 FCM 삭제를 인증 로그아웃과 로컬 세션 삭제보다 먼저 수행한다") {
+            runTest {
+                val operations = mutableListOf<String>()
+                val fcm =
+                    object : FcmTokenRepository {
+                        override suspend fun syncTokens(tokens: kotlinx.coroutines.flow.Flow<String>) = Unit
+
+                        override fun observeNotificationEnabled(): kotlinx.coroutines.flow.Flow<Boolean> = error("unused")
+
+                        override fun updateNotificationPermission(granted: Boolean) = Unit
+
+                        override suspend fun setNotificationEnabled(enabled: Boolean) = error("unused")
+
+                        override suspend fun resumeRegistration() = Unit
+
+                        override suspend fun unregisterToken() {
+                            operations.add("fcm")
+                        }
+                    }
+                val remote =
+                    object : AuthDataSource {
+                        override suspend fun logout() {
+                            operations.add("logout")
+                        }
+
+                        override suspend fun withdraw() = error("unused")
+
+                        override suspend fun completeRegistration(request: CompleteRegistrationRequest): TokenResponse = error("unused")
+                    }
+                val local = mock<LocalAuthDataSource> { everySuspend { clear() } returns Unit }
+                repositoryWith(remoteAuthDataSource = remote, localAuthDataSource = local, fcmTokenRepository = fcm).logout()
+                operations shouldBe listOf("fcm", "logout")
+                verifySuspend { local.clear() }
+            }
+        }
+
+        test("FCM 삭제 실패로 로그아웃이나 로컬 세션 삭제를 막지 않는다") {
+            runTest {
+                val fcm = mock<FcmTokenRepository> { everySuspend { unregisterToken() } throws IllegalStateException("delete failed") }
+                val remote = mock<AuthDataSource> { everySuspend { logout() } returns Unit }
+                val local = mock<LocalAuthDataSource> { everySuspend { clear() } returns Unit }
+                shouldNotThrowAny {
+                    repositoryWith(remoteAuthDataSource = remote, localAuthDataSource = local, fcmTokenRepository = fcm).logout()
+                }
+                verifySuspend {
+                    fcm.unregisterToken()
+                    remote.logout()
+                    local.clear()
+                }
+            }
+        }
 
         test("loginWithSocial은 발급된 토큰을 저장하고 가입 완료 여부를 반환한다") {
             runTest {

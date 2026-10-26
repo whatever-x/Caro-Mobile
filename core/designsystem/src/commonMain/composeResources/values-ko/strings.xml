@@ -221,4 +221,10 @@
     <string name="card_detail_delete_cancel">취소</string>
     <string name="card_detail_load_error">카드를 불러오지 못했어요. 잠시 후 다시 시도해주세요.</string>
     <string name="card_detail_delete_error">카드를 삭제하지 못했어요. 잠시 후 다시 시도해주세요.</string>
+    <string name="setting_notification_label">알림 수신</string>
+    <string name="setting_notification_error">알림 설정을 변경하지 못했어요. 다시 시도해 주세요.</string>
+    <string name="setting_notification_permission_title">알림 권한이 필요해요</string>
+    <string name="setting_notification_permission_content">알림을 받으려면 권한을 허용해야 해요. 기기 설정에서 Caro의 알림을 허용해 주세요.</string>
+    <string name="setting_notification_open_settings">앱 설정으로</string>
+    <string name="setting_notification_changing">알림 설정 변경 중</string>
 </resources>
