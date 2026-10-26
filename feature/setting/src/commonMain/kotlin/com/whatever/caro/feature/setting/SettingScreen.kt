@@ -2,26 +2,38 @@ package com.whatever.caro.feature.setting
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.toggleable
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import caromobile.core.designsystem.generated.resources.Res
 import caromobile.core.designsystem.generated.resources.ic_arrow_left_24
+import caromobile.core.designsystem.generated.resources.ic_bell_24
 import caromobile.core.designsystem.generated.resources.ic_file_text_24
 import caromobile.core.designsystem.generated.resources.ic_lock_24
 import caromobile.core.designsystem.generated.resources.ic_log_out_24
@@ -35,14 +47,16 @@ import caromobile.core.designsystem.generated.resources.setting_menu_logout
 import caromobile.core.designsystem.generated.resources.setting_menu_privacy_policy
 import caromobile.core.designsystem.generated.resources.setting_menu_report_bug
 import caromobile.core.designsystem.generated.resources.setting_menu_terms_of_service
+import caromobile.core.designsystem.generated.resources.setting_notification_changing
+import caromobile.core.designsystem.generated.resources.setting_notification_label
 import caromobile.core.designsystem.generated.resources.setting_title
 import caromobile.core.designsystem.generated.resources.setting_userinfo_nickname_change
+import com.whatever.caro.core.designsystem.components.CaroSwitch
 import com.whatever.caro.core.designsystem.components.CaroTopBar
 import com.whatever.caro.core.designsystem.modifier.noRippleClickable
 import com.whatever.caro.core.designsystem.themes.CaroTheme
 import com.whatever.caro.core.model.auth.SocialLoginType
 import com.whatever.caro.feature.setting.component.MenuSection
-import com.whatever.caro.feature.setting.model.AppConfig
 import com.whatever.caro.feature.setting.model.SettingMenu
 import com.whatever.caro.feature.setting.mvi.SettingIntent
 import com.whatever.caro.feature.setting.mvi.SettingState
@@ -91,10 +105,11 @@ private val secondMenu =
 @Composable
 internal fun SettingScreen(
     state: SettingState,
+    appVersion: String,
     onIntent: (SettingIntent) -> Unit,
 ) {
     val onEnabledIntent: (SettingIntent) -> Unit = { intent ->
-        if (!state.isLoading) onIntent(intent)
+        if (!state.isLoading && !state.isNotificationLoading) onIntent(intent)
     }
 
     Column(
@@ -125,44 +140,90 @@ internal fun SettingScreen(
                 }
             },
         )
-        if (state.isUserInfoVisible) {
-            UserInfo(
-                modifier = Modifier.background(CaroTheme.color.surface.primary),
-                nickname = state.nickname,
-                emailAddress = state.emailAddress,
-                socialLoginType = state.socialLoginType,
-                isLoading = state.isLoading,
-                onNicknameChangeClick = {
-                    onEnabledIntent(SettingIntent.ClickNicknameChange)
-                },
-            )
+        BoxWithConstraints(modifier = Modifier.weight(1f)) {
+            Column(Modifier.verticalScroll(rememberScrollState()).heightIn(min = maxHeight)) {
+                if (state.isUserInfoVisible) {
+                    UserInfo(
+                        modifier = Modifier.background(CaroTheme.color.surface.primary),
+                        nickname = state.nickname,
+                        emailAddress = state.emailAddress,
+                        socialLoginType = state.socialLoginType,
+                        isLoading = state.isLoading,
+                        onNicknameChangeClick = {
+                            onEnabledIntent(SettingIntent.ClickNicknameChange)
+                        },
+                    )
+                }
+                Spacer(modifier = Modifier.size(size = CaroTheme.spacing.s))
+                NotificationRow(
+                    enabled = state.notificationEnabled,
+                    busy = state.isNotificationLoading,
+                    available = !state.isLoading && !state.isNotificationLoading,
+                    onClick = { onEnabledIntent(SettingIntent.ClickNotificationToggle) },
+                )
+                Spacer(modifier = Modifier.size(size = CaroTheme.spacing.s))
+                MenuSection(
+                    modifier = Modifier.fillMaxWidth(),
+                    items = firstMenu,
+                    onClickMenu = onEnabledIntent,
+                )
+                Spacer(modifier = Modifier.size(size = CaroTheme.spacing.s))
+                MenuSection(
+                    modifier = Modifier.fillMaxWidth(),
+                    items = secondMenu,
+                    onClickMenu = onEnabledIntent,
+                )
+                Spacer(modifier = Modifier.weight(1f))
+                // FIXME: 임시 디자인 적용
+                Box(modifier = Modifier.fillMaxWidth()) {
+                    Text(
+                        modifier = Modifier.align(Alignment.Center),
+                        text =
+                            stringResource(
+                                Res.string.setting_description_app_version,
+                                appVersion,
+                            ),
+                        style = CaroTheme.typography.caption1.medium,
+                        color = CaroTheme.color.text.tertiary,
+                    )
+                }
+            }
         }
-        Spacer(modifier = Modifier.size(size = CaroTheme.spacing.s))
-        MenuSection(
-            modifier = Modifier.fillMaxWidth(),
-            items = firstMenu,
-            onClickMenu = onEnabledIntent,
+    }
+}
+
+@Composable
+private fun NotificationRow(
+    enabled: Boolean,
+    busy: Boolean,
+    available: Boolean,
+    onClick: () -> Unit,
+) {
+    val changing = stringResource(Res.string.setting_notification_changing)
+    Row(
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .background(CaroTheme.color.surface.primary)
+                .toggleable(value = enabled, enabled = available, role = Role.Switch, onValueChange = { onClick() })
+                .semantics { if (busy) stateDescription = changing }
+                .padding(horizontal = CaroTheme.spacing.xl2, vertical = CaroTheme.spacing.l),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(CaroTheme.spacing.s),
+    ) {
+        Icon(
+            imageVector = vectorResource(Res.drawable.ic_bell_24),
+            tint = CaroTheme.color.icon.secondary,
+            contentDescription = null,
         )
-        Spacer(modifier = Modifier.size(size = CaroTheme.spacing.s))
-        MenuSection(
-            modifier = Modifier.fillMaxWidth(),
-            items = secondMenu,
-            onClickMenu = onEnabledIntent,
+        Text(
+            text = stringResource(Res.string.setting_notification_label),
+            modifier = Modifier.weight(1f),
+            style = CaroTheme.typography.heading3,
+            color = CaroTheme.color.text.primary,
         )
-        Spacer(modifier = Modifier.weight(1f))
-        // FIXME: 임시 디자인 적용
-        Box(modifier = Modifier.fillMaxWidth()) {
-            Text(
-                modifier = Modifier.align(Alignment.Center),
-                text =
-                    stringResource(
-                        Res.string.setting_description_app_version,
-                        AppConfig.appVersion,
-                    ),
-                style = CaroTheme.typography.caption1.medium,
-                color = CaroTheme.color.text.tertiary,
-            )
-        }
+        if (busy) CircularProgressIndicator(modifier = Modifier.size(16.dp), strokeWidth = 2.dp, color = CaroTheme.color.surface.brand)
+        CaroSwitch(checked = enabled, modifier = Modifier.alpha(if (busy) 0.5f else 1f))
     }
 }
 
@@ -282,6 +343,7 @@ private fun SettingScreenPreview() {
                     emailAddress = "rsw1452@gmail.com",
                     socialLoginType = SocialLoginType.GOOGLE,
                 ),
+            appVersion = "1.0.0",
             onIntent = {},
         )
     }

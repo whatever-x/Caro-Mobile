@@ -21,6 +21,7 @@ repositories {
 dependencies {
     compileOnly(libs.bundles.build.logic.plugins)
     compileOnly(libs.kmp.spm.gradleplugin)
+    compileOnly(libs.roborazzi.gradleplugin)
 }
 
 java {
@@ -67,6 +68,10 @@ gradlePlugin {
         register("kmpTest") {
             id = "caro.kmp.test"
             implementationClass = "KmpTestPlugin"
+        }
+        register("screenshot") {
+            id = "caro.screenshot"
+            implementationClass = "ScreenshotPlugin"
         }
         register("feature") {
             id = "caro.feature"

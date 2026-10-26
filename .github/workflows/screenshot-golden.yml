@@ -1,0 +1,107 @@
+name: Screenshot Golden
+
+on:
+  push:
+    branches: [develop]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: screenshot-golden-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  capture:
+    name: Golden / ${{ matrix.platform }}
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: android
+            target: androidHostTest
+            test-task: testAndroidHostTest
+            task: recordRoborazziAndroidHostTest
+            runner: ubuntu-24.04
+          - platform: ios
+            target: iosSimulatorArm64
+            test-task: iosSimulatorArm64Test
+            task: recordRoborazziIosSimulatorArm64
+            runner: macos-26
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v4
+      - uses: gradle/actions/setup-gradle@v5
+        with:
+          cache-read-only: false
+      - name: Select Xcode 26.6
+        if: matrix.platform == 'ios'
+        id: xcode
+        run: |
+          sudo xcode-select --switch /Applications/Xcode_26.6.app
+          echo "version=$(xcodebuild -version | shasum -a 256 | cut -d ' ' -f 1)" >> "$GITHUB_OUTPUT"
+      - name: Cache Kotlin/Native
+        if: matrix.platform == 'ios'
+        id: konan
+        uses: actions/cache@v4
+        with:
+          path: ~/.konan
+          key: konan-v1-${{ matrix.runner }}-${{ runner.os }}-${{ runner.arch }}-${{ steps.xcode.outputs.version }}-${{ hashFiles('gradle/libs.versions.toml') }}
+      - name: Configure offline screenshot fixtures
+        run: |
+          cat > local.properties <<'EOF'
+          CARO_DEV_SERVER=https://example.invalid/
+          CARO_QA_SERVER=https://example.invalid/
+          CARO_PROD_SERVER=https://example.invalid/
+          GOOGLE_WEB_CLIENT_ID=screenshot-test
+          EOF
+      - name: Record all scenarios
+        shell: bash
+        run: |
+          test_tasks=()
+          while IFS= read -r module; do
+            test_tasks+=(":feature:$module:${{ matrix.test-task }}" --rerun)
+          done < <(jq -r 'keys[]' scripts/screenshot/scenarios.json)
+          ./gradlew '${{ matrix.task }}' "${test_tasks[@]}" --stacktrace --profile --console=plain
+      - name: 등록된 스크린샷 검증 및 수집
+        shell: bash
+        env:
+          TARGET: ${{ matrix.target }}
+        run: |
+          jq -e 'type == "object" and length > 0 and all(to_entries[];
+            (.key | test("^[A-Za-z0-9][A-Za-z0-9._-]*$")) and
+            (.value | type == "array" and length > 0 and length == (unique | length) and
+              all(.[]; type == "string" and test("^[A-Za-z0-9][A-Za-z0-9._-]*$") and
+                (test("_(actual|compare)$") | not))))' scripts/screenshot/scenarios.json > /dev/null
+          mkdir -p build/screenshot-golden
+          while IFS= read -r module; do
+            source="feature/$module/build/outputs/roborazzi/$TARGET"
+            test -d "$source"
+            diff -u <(jq -r --arg module "$module" '.[$module][] + ".png"' scripts/screenshot/scenarios.json | sort) \
+              <(find "$source" -type f -name '*.png' -exec basename {} \; | sort)
+            mkdir -p "build/screenshot-golden/$module"
+            while IFS= read -r scenario; do
+              test -f "$source/$scenario.png" && test ! -L "$source/$scenario.png"
+              cp "$source/$scenario.png" "build/screenshot-golden/$module/"
+            done < <(jq -r --arg module "$module" '.[$module][]' scripts/screenshot/scenarios.json)
+          done < <(jq -r 'keys[]' scripts/screenshot/scenarios.json)
+          cp scripts/screenshot/scenarios.json build/screenshot-golden/
+      - uses: actions/upload-artifact@v6
+        with:
+          name: screenshot-golden-${{ matrix.platform }}
+          path: build/screenshot-golden/
+          if-no-files-found: error
+          retention-days: 90
+      - name: Upload Gradle profile
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: screenshot-profile-${{ matrix.platform }}
+          path: build/reports/profile/
+          if-no-files-found: warn
+          retention-days: 14

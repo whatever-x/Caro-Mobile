@@ -52,7 +52,7 @@ runs:
         distribution: temurin
 
     - name: Setup Android SDK
-      uses: android-actions/setup-android@v3.2.2
+      uses: android-actions/setup-android@v4
 
     - name: Append sdk.dir to local.properties
       shell: bash

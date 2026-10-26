@@ -7,6 +7,7 @@ plugins {
     id("caro.koin")
     id("caro.kmp.test")
     id("caro.kover")
+    id("caro.screenshot")
 }
 
 kotlin {

@@ -4,6 +4,7 @@ import com.whatever.caro.core.remote.api.AuthApi
 import com.whatever.caro.core.remote.api.CardApi
 import com.whatever.caro.core.remote.api.DeckApi
 import com.whatever.caro.core.remote.api.NicknameApi
+import com.whatever.caro.core.remote.api.NotificationApi
 import com.whatever.caro.core.remote.api.StreakApi
 import com.whatever.caro.core.remote.api.StudySessionApi
 import com.whatever.caro.core.remote.api.UserApi
@@ -11,6 +12,7 @@ import com.whatever.caro.core.remote.api.createAuthApi
 import com.whatever.caro.core.remote.api.createCardApi
 import com.whatever.caro.core.remote.api.createDeckApi
 import com.whatever.caro.core.remote.api.createNicknameApi
+import com.whatever.caro.core.remote.api.createNotificationApi
 import com.whatever.caro.core.remote.api.createStreakApi
 import com.whatever.caro.core.remote.api.createStudySessionApi
 import com.whatever.caro.core.remote.api.createUserApi
@@ -51,5 +53,9 @@ val apiModule =
 
         single<UserApi> {
             get<Ktorfit>(named(NetworkClient.Caro.AUTH)).createUserApi()
+        }
+
+        single<NotificationApi> {
+            get<Ktorfit>(named(NetworkClient.Caro.AUTH)).createNotificationApi()
         }
     }

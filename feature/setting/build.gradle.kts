@@ -9,6 +9,7 @@ plugins {
     id("caro.koin")
     id("caro.kmp.test")
     id("caro.kover")
+    id("caro.screenshot")
     alias(libs.plugins.build.konfig)
 }
 
