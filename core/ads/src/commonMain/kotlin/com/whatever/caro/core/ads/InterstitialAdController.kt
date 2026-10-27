@@ -2,10 +2,17 @@ package com.whatever.caro.core.ads
 
 import kotlinx.coroutines.flow.StateFlow
 
+enum class AdInitializationResult {
+    INITIALIZED,
+    DEFERRED,
+    DISABLED,
+    RETRYABLE_FAILURE,
+}
+
 interface InterstitialAdController {
     val privacyOptionsRequired: StateFlow<Boolean>
 
-    suspend fun initialize()
+    suspend fun initialize(): AdInitializationResult
 
     fun preload()
 

@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.StateFlow
 internal interface NativeInterstitialProvider {
     val privacyOptionsRequired: StateFlow<Boolean>
 
-    suspend fun initialize()
+    suspend fun initialize(): AdInitializationResult
 
     fun preload()
 

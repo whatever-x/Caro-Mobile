@@ -4,6 +4,7 @@ import com.whatever.caro.core.data.repository.ads.InterstitialFrequencyRepositor
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -21,9 +22,10 @@ internal class DefaultInterstitialAdController(
     },
 ) : InterstitialAdController {
     private val presentation = Mutex()
+    private val privacyRequest = Mutex()
     override val privacyOptionsRequired = provider.privacyOptionsRequired
 
-    override suspend fun initialize() = provider.initialize()
+    override suspend fun initialize(): AdInitializationResult = presentation.withLock { provider.initialize() }
 
     override fun preload() = provider.preload()
 
@@ -50,7 +52,7 @@ internal class DefaultInterstitialAdController(
                 throw cancelled
             } catch (_: Exception) {
                 // Retain an uncertain reservation to preserve the daily upper bound.
-                if (shownOn != null) withContext(NonCancellable) { frequency.confirmShown(reservation, shownOn ?: today()) }
+                shownOn?.let { shownAt -> withContext(NonCancellable) { frequency.confirmShown(reservation, shownAt) } }
             }
         } catch (cancelled: CancellationException) {
             throw cancelled
@@ -62,11 +64,11 @@ internal class DefaultInterstitialAdController(
     }
 
     override suspend fun showPrivacyOptions() {
-        if (!presentation.tryLock()) return
+        if (!privacyRequest.tryLock()) return
         try {
-            provider.showPrivacyOptions()
+            presentation.withLock { provider.showPrivacyOptions() }
         } finally {
-            presentation.unlock()
+            privacyRequest.unlock()
         }
     }
 }

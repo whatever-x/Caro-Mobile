@@ -23,6 +23,7 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import java.lang.ref.WeakReference
 import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 import kotlin.time.TimeMark
 import kotlin.time.TimeSource
 
@@ -41,6 +42,7 @@ internal class AndroidInterstitialProvider(
     private var initialized = false
     private var consentUpdated = false
     private var consentUpdating = false
+    val consentFormShowing = MutableStateFlow(false)
     private var loading = false
     private var generation = 0
     private var loadedAt: TimeMark? = null
@@ -51,16 +53,19 @@ internal class AndroidInterstitialProvider(
         host: Activity?,
         active: Boolean,
         allowConsent: Boolean,
-    ) {
+    ): Boolean {
         activity = WeakReference(host)
         this.active = active
         this.allowConsent = allowConsent
+        return allowConsent && host() != null
     }
 
     override suspend fun initialize() =
         withContext(Dispatchers.Main.immediate) {
-            val host = host() ?: return@withContext
-            if (!configured() || !allowConsent || consentUpdating || initialized) return@withContext
+            if (!configured()) return@withContext AdInitializationResult.DISABLED
+            if (initialized) return@withContext AdInitializationResult.INITIALIZED
+            if (!allowConsent || consentUpdating || consentFormShowing.value) return@withContext AdInitializationResult.DEFERRED
+            val host = host() ?: return@withContext AdInitializationResult.DEFERRED
             consentUpdating = true
             try {
                 if (!consentUpdated) {
@@ -74,7 +79,7 @@ internal class AndroidInterstitialProvider(
                     }
                 }
                 updatePrivacyOptions()
-                if (!allowConsent || host() == null) return@withContext
+                if (!allowConsent || host() == null) return@withContext AdInitializationResult.DEFERRED
                 if (consent.consentStatus == ConsentInformation.ConsentStatus.REQUIRED) {
                     suspendCancellableCoroutine { continuation ->
                         UserMessagingPlatform.loadConsentForm(context, { form ->
@@ -84,12 +89,22 @@ internal class AndroidInterstitialProvider(
                                 if (!allowConsent || currentHost == null) {
                                     continuation.resume(Unit)
                                 } else {
-                                    form.show(currentHost) { if (continuation.isActive) continuation.resume(Unit) }
+                                    consentFormShowing.value = true
+                                    try {
+                                        form.show(currentHost) {
+                                            consentFormShowing.value = false
+                                            if (continuation.isActive) continuation.resume(Unit)
+                                        }
+                                    } catch (exception: Exception) {
+                                        consentFormShowing.value = false
+                                        if (continuation.isActive) continuation.resumeWithException(exception)
+                                    }
                                 }
                             }
                         }, { if (continuation.isActive) continuation.resume(Unit) })
                     }
                 }
+                if (!allowConsent || host() == null) return@withContext AdInitializationResult.DEFERRED
                 updatePrivacyOptions()
                 if (consent.canRequestAds()) {
                     withContext(Dispatchers.IO) {
@@ -97,6 +112,9 @@ internal class AndroidInterstitialProvider(
                     }
                     initialized = true
                     preload()
+                    AdInitializationResult.INITIALIZED
+                } else {
+                    AdInitializationResult.RETRYABLE_FAILURE
                 }
             } finally {
                 consentUpdating = false
@@ -173,14 +191,21 @@ internal class AndroidInterstitialProvider(
     override suspend fun showPrivacyOptions() =
         withContext(Dispatchers.Main.immediate) {
             val host = host() ?: return@withContext
-            if (!allowConsent || !privacyOptionsRequired.value) return@withContext
+            if (!allowConsent || !privacyOptionsRequired.value || consentFormShowing.value) return@withContext
             generation++
             ad = null
             loading = false
             suspendCancellableCoroutine { continuation ->
-                UserMessagingPlatform.showPrivacyOptionsForm(host) {
-                    updatePrivacyOptions()
-                    if (continuation.isActive) continuation.resume(Unit)
+                consentFormShowing.value = true
+                try {
+                    UserMessagingPlatform.showPrivacyOptionsForm(host) {
+                        consentFormShowing.value = false
+                        updatePrivacyOptions()
+                        if (continuation.isActive) continuation.resume(Unit)
+                    }
+                } catch (exception: Exception) {
+                    consentFormShowing.value = false
+                    if (continuation.isActive) continuation.resumeWithException(exception)
                 }
             }
             if (consent.canRequestAds()) preload()

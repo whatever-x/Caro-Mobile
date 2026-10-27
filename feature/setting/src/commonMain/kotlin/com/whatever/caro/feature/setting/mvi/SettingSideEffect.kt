@@ -9,8 +9,6 @@ sealed interface SettingSideEffect : UiSideEffect {
 
     data object OpenNotificationSettings : SettingSideEffect
 
-    data object OpenAdPrivacyOptions : SettingSideEffect
-
     data class NavigateToEditNickName(
         val currentNickname: String,
     ) : SettingSideEffect

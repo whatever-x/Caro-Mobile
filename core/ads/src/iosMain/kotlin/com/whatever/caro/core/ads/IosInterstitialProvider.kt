@@ -26,6 +26,7 @@ import platform.UIKit.UIWindow
 import platform.UIKit.UIWindowScene
 import platform.darwin.NSObject
 import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 import kotlin.time.TimeMark
 import kotlin.time.TimeSource
 
@@ -38,6 +39,7 @@ internal class IosInterstitialProvider : NativeInterstitialProvider {
     private var initialized = false
     private var consentUpdated = false
     private var consentUpdating = false
+    val consentFormShowing = MutableStateFlow(false)
     private var loading = false
     private var generation = 0
     private var loadedAt: TimeMark? = null
@@ -47,15 +49,18 @@ internal class IosInterstitialProvider : NativeInterstitialProvider {
     fun bindHost(
         active: Boolean,
         allowConsent: Boolean,
-    ) {
+    ): Boolean {
         this.active = active
         this.allowConsent = allowConsent
+        return allowConsent && active && (host() != null || consentFormShowing.value)
     }
 
     override suspend fun initialize() =
         withContext(Dispatchers.Main.immediate) {
-            if (!configured() || !allowConsent || consentUpdating || initialized) return@withContext
-            val host = host() ?: return@withContext
+            if (!configured()) return@withContext AdInitializationResult.DISABLED
+            if (initialized) return@withContext AdInitializationResult.INITIALIZED
+            if (!allowConsent || consentUpdating || consentFormShowing.value) return@withContext AdInitializationResult.DEFERRED
+            val host = host() ?: return@withContext AdInitializationResult.DEFERRED
             consentUpdating = true
             try {
                 if (!consentUpdated) {
@@ -67,7 +72,7 @@ internal class IosInterstitialProvider : NativeInterstitialProvider {
                     }
                 }
                 updatePrivacyOptions()
-                if (!allowConsent || host() == null) return@withContext
+                if (!allowConsent || host() == null) return@withContext AdInitializationResult.DEFERRED
                 if (consent.consentStatus == UMPConsentStatusRequired) {
                     suspendCancellableCoroutine { continuation ->
                         UMPConsentForm.loadWithCompletionHandler { form, _ ->
@@ -76,13 +81,21 @@ internal class IosInterstitialProvider : NativeInterstitialProvider {
                             if (!allowConsent || currentHost == null || form == null) {
                                 continuation.resume(Unit)
                             } else {
-                                form.presentFromViewController(currentHost) {
-                                    if (continuation.isActive) continuation.resume(Unit)
+                                consentFormShowing.value = true
+                                try {
+                                    form.presentFromViewController(currentHost) {
+                                        consentFormShowing.value = false
+                                        if (continuation.isActive) continuation.resume(Unit)
+                                    }
+                                } catch (exception: Exception) {
+                                    consentFormShowing.value = false
+                                    if (continuation.isActive) continuation.resumeWithException(exception)
                                 }
                             }
                         }
                     }
                 }
+                if (!allowConsent || host() == null) return@withContext AdInitializationResult.DEFERRED
                 updatePrivacyOptions()
                 if (consent.canRequestAds) {
                     suspendCancellableCoroutine { continuation ->
@@ -92,6 +105,9 @@ internal class IosInterstitialProvider : NativeInterstitialProvider {
                     }
                     initialized = true
                     preload()
+                    AdInitializationResult.INITIALIZED
+                } else {
+                    AdInitializationResult.RETRYABLE_FAILURE
                 }
             } finally {
                 consentUpdating = false
@@ -166,14 +182,21 @@ internal class IosInterstitialProvider : NativeInterstitialProvider {
     override suspend fun showPrivacyOptions() =
         withContext(Dispatchers.Main.immediate) {
             val host = host() ?: return@withContext
-            if (!allowConsent || !privacyOptionsRequired.value) return@withContext
+            if (!allowConsent || !privacyOptionsRequired.value || consentFormShowing.value) return@withContext
             generation++
             ad = null
             loading = false
             suspendCancellableCoroutine { continuation ->
-                UMPConsentForm.presentPrivacyOptionsFormFromViewController(host) {
-                    updatePrivacyOptions()
-                    if (continuation.isActive) continuation.resume(Unit)
+                consentFormShowing.value = true
+                try {
+                    UMPConsentForm.presentPrivacyOptionsFormFromViewController(host) {
+                        consentFormShowing.value = false
+                        updatePrivacyOptions()
+                        if (continuation.isActive) continuation.resume(Unit)
+                    }
+                } catch (exception: Exception) {
+                    consentFormShowing.value = false
+                    if (continuation.isActive) continuation.resumeWithException(exception)
                 }
             }
             if (consent.canRequestAds) preload()

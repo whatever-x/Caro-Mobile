@@ -1,4 +1,5 @@
 import app.cash.turbine.test
+import com.whatever.caro.core.ads.InterstitialAdController
 import com.whatever.caro.core.data.repository.auth.AuthRepository
 import com.whatever.caro.core.data.repository.fcm.FcmTokenRepository
 import com.whatever.caro.core.data.repository.profile.ProfileRepository
@@ -39,6 +40,12 @@ private data class SettingFixture(
     val profileRepository: ProfileRepository,
 )
 
+private fun fakeAdsController(required: MutableStateFlow<Boolean> = MutableStateFlow(false)) =
+    mock<InterstitialAdController> {
+        every { privacyOptionsRequired } returns required
+        everySuspend { showPrivacyOptions() } returns Unit
+    }
+
 @OptIn(ExperimentalCoroutinesApi::class)
 class SettingViewModelTest : FunSpec() {
     init {
@@ -74,6 +81,7 @@ class SettingViewModelTest : FunSpec() {
                     authRepository = authRepository,
                     profileRepository = profileRepository,
                     exceptionFilter = exceptionFilter,
+                    adsController = fakeAdsController(),
                     fcmTokenRepository =
                         mock<FcmTokenRepository> {
                             every { observeNotificationEnabled() } returns MutableStateFlow(false)
@@ -87,6 +95,27 @@ class SettingViewModelTest : FunSpec() {
             )
         }
 
+        test("광고 개인정보 설정 표시 상태와 클릭을 ViewModel에서 처리한다") {
+            runTest {
+                val required = MutableStateFlow(false)
+                val ads = fakeAdsController(required)
+                val repository =
+                    mock<FcmTokenRepository> {
+                        every { observeNotificationEnabled() } returns MutableStateFlow(false)
+                    }
+                val viewModel = SettingViewModel(mock(), mock(), ExceptionFilter.None, repository, ads)
+                runCurrent()
+                viewModel.state.value.adPrivacyOptionsRequired shouldBe false
+                required.value = true
+                runCurrent()
+                viewModel.state.value.adPrivacyOptionsRequired shouldBe true
+
+                viewModel.intent(SettingIntent.ClickAdPrivacyOptions)
+                runCurrent()
+                verifySuspend(exactly(1)) { ads.showPrivacyOptions() }
+            }
+        }
+
         test("알림 ON 중복 입력은 권한 요청 하나만 발생시키고 거절 시 OFF 안내를 표시한다") {
             runTest {
                 val confirmed = MutableStateFlow(false)
@@ -95,7 +124,7 @@ class SettingViewModelTest : FunSpec() {
                         every { observeNotificationEnabled() } returns confirmed
                         every { updateNotificationPermission(any()) } returns Unit
                     }
-                val viewModel = SettingViewModel(mock(), mock(), ExceptionFilter.None, repository)
+                val viewModel = SettingViewModel(mock(), mock(), ExceptionFilter.None, repository, fakeAdsController())
                 viewModel.sideEffect.test {
                     viewModel.intent(SettingIntent.ClickNotificationToggle)
                     viewModel.intent(SettingIntent.ClickNotificationToggle)
@@ -119,7 +148,7 @@ class SettingViewModelTest : FunSpec() {
                         every { observeNotificationEnabled() } returns MutableStateFlow(true)
                         everySuspend { setNotificationEnabled(false) } throws IllegalStateException("offline")
                     }
-                val viewModel = SettingViewModel(mock(), mock(), ExceptionFilter.None, repository)
+                val viewModel = SettingViewModel(mock(), mock(), ExceptionFilter.None, repository, fakeAdsController())
                 runCurrent()
                 viewModel.sideEffect.test {
                     viewModel.intent(SettingIntent.ClickNotificationToggle)
@@ -138,7 +167,7 @@ class SettingViewModelTest : FunSpec() {
                         every { observeNotificationEnabled() } returns MutableStateFlow(false)
                         every { updateNotificationPermission(any()) } returns Unit
                     }
-                val viewModel = SettingViewModel(mock(), mock(), ExceptionFilter.None, repository)
+                val viewModel = SettingViewModel(mock(), mock(), ExceptionFilter.None, repository, fakeAdsController())
                 viewModel.intent(SettingIntent.ClickNotificationToggle)
                 runCurrent()
                 viewModel.intent(SettingIntent.NotificationPermissionResult(false))
@@ -159,7 +188,7 @@ class SettingViewModelTest : FunSpec() {
                         every { observeNotificationEnabled() } returns MutableStateFlow(false)
                         every { updateNotificationPermission(any()) } returns Unit
                     }
-                val viewModel = SettingViewModel(mock(), mock(), ExceptionFilter.None, repository)
+                val viewModel = SettingViewModel(mock(), mock(), ExceptionFilter.None, repository, fakeAdsController())
                 viewModel.sideEffect.test {
                     viewModel.intent(SettingIntent.ClickNotificationToggle)
                     runCurrent()
@@ -183,7 +212,7 @@ class SettingViewModelTest : FunSpec() {
                         every { updateNotificationPermission(any()) } returns Unit
                         everySuspend { setNotificationEnabled(true) } calls { confirmed.value = true }
                     }
-                val viewModel = SettingViewModel(mock(), mock(), ExceptionFilter.None, repository)
+                val viewModel = SettingViewModel(mock(), mock(), ExceptionFilter.None, repository, fakeAdsController())
                 viewModel.intent(SettingIntent.ClickNotificationToggle)
                 runCurrent()
                 viewModel.intent(SettingIntent.NotificationPermissionResult(false))

@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigationevent.NavigationEventInfo
@@ -37,7 +38,6 @@ import caromobile.core.designsystem.generated.resources.app_exit_dialog_button_c
 import caromobile.core.designsystem.generated.resources.app_exit_dialog_button_exit
 import caromobile.core.designsystem.generated.resources.app_exit_dialog_title
 import com.whatever.caro.core.ads.ConfigureAdHost
-import com.whatever.caro.core.ads.InterstitialAdController
 import com.whatever.caro.core.data.repository.fcm.FcmTokenRepository
 import com.whatever.caro.core.datastore.datasource.LocalNotificationDataSource
 import com.whatever.caro.core.designsystem.components.CaroDialog
@@ -75,6 +75,7 @@ import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
+import org.koin.compose.viewmodel.koinViewModel
 
 private val HomeSnackbarBottomPadding = 88.dp
 
@@ -93,10 +94,11 @@ fun CaroApp(
 
     val localNotificationDataSource = koinInject<LocalNotificationDataSource>()
     val notificationPermissionController = rememberNotificationPermissionController()
-    var notificationStartupComplete by remember { mutableStateOf(false) }
+    val startupViewModel = koinViewModel<AppStartupViewModel>()
+    val startupState by startupViewModel.state.collectAsStateWithLifecycle()
     val notificationScope = rememberCoroutineScope()
     LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
-        if (notificationStartupComplete) {
+        if (startupState.notificationFinished) {
             notificationScope.launch {
                 try {
                     fcmTokenRepository.updateNotificationPermission(notificationPermissionController.isGranted())
@@ -108,15 +110,15 @@ fun CaroApp(
         }
     }
     LaunchedEffect(localNotificationDataSource, notificationPermissionController) {
+        if (startupState.notificationFinished) return@LaunchedEffect
         try {
             requestInitialNotificationPermission(localNotificationDataSource, notificationPermissionController)
             fcmTokenRepository.updateNotificationPermission(notificationPermissionController.isGranted())
         } catch (exception: Exception) {
             if (exception is CancellationException) throw exception
             Napier.w { "Initial notification permission request failed" }
-        } finally {
-            notificationStartupComplete = true
         }
+        startupViewModel.intent(AppStartupIntent.NotificationFinished)
     }
 
     val savedStateConfiguration =
@@ -145,18 +147,9 @@ fun CaroApp(
         }
 
     val backStack = rememberNavBackStack(savedStateConfiguration, SplashEntry)
-    val adsController = koinInject<InterstitialAdController>()
     val allowConsent = backStack.lastOrNull() is HomeEntry || backStack.lastOrNull() is SettingEntry
-    ConfigureAdHost(allowConsent)
-    LaunchedEffect(allowConsent, notificationStartupComplete) {
-        if (allowConsent && notificationStartupComplete) {
-            try {
-                adsController.initialize()
-            } catch (exception: Exception) {
-                if (exception is CancellationException) throw exception
-                Napier.w { "Ad consent initialization failed" }
-            }
-        }
+    ConfigureAdHost(allowConsent) { available, formShowing ->
+        startupViewModel.intent(AppStartupIntent.AdHostChanged(available, formShowing))
     }
 
     LaunchedEffect(messagingClient, fcmTokenRepository) {

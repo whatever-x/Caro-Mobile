@@ -1,5 +1,6 @@
 package com.whatever.caro.feature.setting
 
+import com.whatever.caro.core.ads.InterstitialAdController
 import com.whatever.caro.core.data.repository.auth.AuthRepository
 import com.whatever.caro.core.data.repository.fcm.FcmTokenRepository
 import com.whatever.caro.core.data.repository.profile.ProfileRepository
@@ -18,6 +19,7 @@ class SettingViewModel(
     private val profileRepository: ProfileRepository,
     exceptionFilter: ExceptionFilter,
     private val fcmTokenRepository: FcmTokenRepository,
+    private val adsController: InterstitialAdController,
 ) : BaseViewModel<SettingState, SettingIntent, SettingSideEffect>(
         initialState = SettingState(),
         exceptionFilter = exceptionFilter,
@@ -27,6 +29,11 @@ class SettingViewModel(
     private var waitingForNotificationSettings = false
 
     init {
+        launch {
+            adsController.privacyOptionsRequired.collect { required ->
+                reduce { copy(adPrivacyOptionsRequired = required) }
+            }
+        }
         launch {
             suspendRunCatching {
                 fcmTokenRepository.observeNotificationEnabled().collect { enabled ->
@@ -102,7 +109,7 @@ class SettingViewModel(
             }
 
             SettingIntent.ClickAdPrivacyOptions -> {
-                postSideEffect(SettingSideEffect.OpenAdPrivacyOptions)
+                adsController.showPrivacyOptions()
             }
 
             SettingIntent.ClickPrivacyPolicy -> {

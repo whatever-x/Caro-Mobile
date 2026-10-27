@@ -4,15 +4,18 @@ import com.whatever.caro.core.data.repository.ads.InterstitialFrequencyRepositor
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.DatePeriod
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.plus
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class DefaultInterstitialAdControllerTest : FunSpec() {
     init {
         test("19장 완료는 준비된 광고와 당일 빈도를 소비하지 않는다") {
@@ -309,6 +312,33 @@ class DefaultInterstitialAdControllerTest : FunSpec() {
             }
         }
 
+        test("초기화 중 개인정보 설정 요청은 초기화가 끝난 뒤 처리한다") {
+            runTest {
+                val started = CompletableDeferred<Unit>()
+                val finish = CompletableDeferred<Unit>()
+                val provider =
+                    TestInterstitialProvider().apply {
+                        initializeAction = {
+                            started.complete(Unit)
+                            finish.await()
+                            AdInitializationResult.INITIALIZED
+                        }
+                    }
+                val controller = DefaultInterstitialAdController(provider, TestInterstitialFrequency()) { TODAY }
+                val initializing = launch { controller.initialize() }
+                started.await()
+                val privacy = launch { controller.showPrivacyOptions() }
+                runCurrent()
+                controller.showPrivacyOptions()
+                provider.privacyCalls shouldBe 0
+
+                finish.complete(Unit)
+                initializing.join()
+                privacy.join()
+                provider.privacyCalls shouldBe 1
+            }
+        }
+
         test("전면광고 표시 중에는 privacy 창을 겹쳐 띄우지 않는다") {
             runTest {
                 val started = CompletableDeferred<Unit>()
@@ -326,12 +356,13 @@ class DefaultInterstitialAdControllerTest : FunSpec() {
                 val showing = launch { controller.showIfEligible(20) }
                 started.await()
 
-                controller.showPrivacyOptions()
+                val privacy = launch { controller.showPrivacyOptions() }
+                runCurrent()
                 provider.privacyCalls shouldBe 0
 
                 dismiss.complete(Unit)
                 showing.join()
-                controller.showPrivacyOptions()
+                privacy.join()
                 provider.privacyCalls shouldBe 1
             }
         }
@@ -368,8 +399,9 @@ private class TestInterstitialProvider : NativeInterstitialProvider {
         true
     }
     var privacyAction: suspend () -> Unit = {}
+    var initializeAction: suspend () -> AdInitializationResult = { AdInitializationResult.INITIALIZED }
 
-    override suspend fun initialize() = Unit
+    override suspend fun initialize() = initializeAction()
 
     override fun preload() = Unit
 
