@@ -54,6 +54,13 @@ jobs:
         with:
           path: ~/.konan
           key: konan-v2-${{ matrix.runner }}-${{ runner.os }}-${{ runner.arch }}-${{ steps.xcode.outputs.version }}-${{ steps.xcode.outputs.dependency_hash }}
+      - name: Resolve platform scenarios
+        shell: bash
+        env:
+          PLATFORM: ${{ matrix.platform }}
+        run: |
+          mkdir -p build
+          scripts/screenshot/resolve-scenarios.sh "$PLATFORM" > build/screenshot-scenarios.json
       - name: Configure offline screenshot fixtures
         run: |
           cat > local.properties <<'EOF'
@@ -68,7 +75,7 @@ jobs:
           test_tasks=()
           while IFS= read -r module; do
             test_tasks+=(":feature:$module:${{ matrix.test-task }}" --rerun)
-          done < <(jq -r 'keys[]' scripts/screenshot/scenarios.json)
+          done < <(jq -r 'keys[]' build/screenshot-scenarios.json)
           ./gradlew '${{ matrix.task }}' "${test_tasks[@]}" --stacktrace --profile --console=plain
       - name: 등록된 스크린샷 검증 및 수집
         shell: bash
@@ -79,20 +86,20 @@ jobs:
             (.key | test("^[A-Za-z0-9][A-Za-z0-9._-]*$")) and
             (.value | type == "array" and length > 0 and length == (unique | length) and
               all(.[]; type == "string" and test("^[A-Za-z0-9][A-Za-z0-9._-]*$") and
-                (test("_(actual|compare)$") | not))))' scripts/screenshot/scenarios.json > /dev/null
+                (test("_(actual|compare)$") | not))))' build/screenshot-scenarios.json > /dev/null
           mkdir -p build/screenshot-golden
           while IFS= read -r module; do
             source="feature/$module/build/outputs/roborazzi/$TARGET"
             test -d "$source"
-            diff -u <(jq -r --arg module "$module" '.[$module][] + ".png"' scripts/screenshot/scenarios.json | sort) \
+            diff -u <(jq -r --arg module "$module" '.[$module][] + ".png"' build/screenshot-scenarios.json | sort) \
               <(find "$source" -type f -name '*.png' -exec basename {} \; | sort)
             mkdir -p "build/screenshot-golden/$module"
             while IFS= read -r scenario; do
               test -f "$source/$scenario.png" && test ! -L "$source/$scenario.png"
               cp "$source/$scenario.png" "build/screenshot-golden/$module/"
-            done < <(jq -r --arg module "$module" '.[$module][]' scripts/screenshot/scenarios.json)
-          done < <(jq -r 'keys[]' scripts/screenshot/scenarios.json)
-          cp scripts/screenshot/scenarios.json build/screenshot-golden/
+            done < <(jq -r --arg module "$module" '.[$module][]' build/screenshot-scenarios.json)
+          done < <(jq -r 'keys[]' build/screenshot-scenarios.json)
+          cp build/screenshot-scenarios.json build/screenshot-golden/scenarios.json
       - uses: actions/upload-artifact@v6
         with:
           name: screenshot-golden-${{ matrix.platform }}
