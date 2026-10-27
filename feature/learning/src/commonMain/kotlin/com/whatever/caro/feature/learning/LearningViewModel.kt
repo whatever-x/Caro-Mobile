@@ -33,6 +33,7 @@ class LearningViewModel(
     ) {
     private var cardStartedAt: TimeMark? = null
     private var isStopConfirmed = false
+    private var hasRequestedLoad = false
 
     /** 실패한 서버 호출을 그대로 다시 실행하기 위한 진입점. 오류 다이얼로그의 재시도가 이 값을 호출한다. */
     private var retryAction: (suspend () -> Unit)? = null
@@ -53,15 +54,48 @@ class LearningViewModel(
 
     override suspend fun handleIntent(intent: LearningIntent) {
         when (intent) {
-            LearningIntent.Load -> load()
-            LearningIntent.FlipCard -> reduce { copy(isFlipped = !isFlipped) }
-            is LearningIntent.Evaluate -> evaluate(intent)
-            LearningIntent.RequestStop -> requestStop()
-            LearningIntent.DismissStop -> reduce { copy(showStopDialog = false) }
-            LearningIntent.ConfirmStop -> confirmStop()
-            LearningIntent.ConfirmError -> confirmError()
-            LearningIntent.RetryError -> retryError()
-            LearningIntent.ClickNavigateToHome -> postSideEffect(LearningSideEffect.NavigateToHome)
+            LearningIntent.Load -> {
+                if (!hasRequestedLoad) {
+                    hasRequestedLoad = true
+                    load()
+                }
+            }
+
+            LearningIntent.FlipCard -> {
+                if (!currentState.isCompleted) reduce { copy(isFlipped = !isFlipped) }
+            }
+
+            is LearningIntent.Evaluate -> {
+                evaluate(intent)
+            }
+
+            LearningIntent.RequestStop -> {
+                requestStop()
+            }
+
+            LearningIntent.DismissStop -> {
+                reduce { copy(showStopDialog = false) }
+            }
+
+            LearningIntent.ConfirmStop -> {
+                confirmStop()
+            }
+
+            LearningIntent.ConfirmError -> {
+                confirmError()
+            }
+
+            LearningIntent.RetryError -> {
+                retryError()
+            }
+
+            LearningIntent.CompletionAdFinished -> {
+                reduce { copy(isAwaitingCompletionAd = false) }
+            }
+
+            LearningIntent.ClickNavigateToHome -> {
+                if (!currentState.isAwaitingCompletionAd) postSideEffect(LearningSideEffect.NavigateToHome)
+            }
         }
     }
 
@@ -79,7 +113,7 @@ class LearningViewModel(
     }
 
     private suspend fun confirmStop() {
-        if (isStopConfirmed) return
+        if (isStopConfirmed || currentState.isSubmitting || currentState.isCompleted) return
         isStopConfirmed = true
         if (mode != LearningMode.DAILY || currentState.evaluations.isEmpty()) {
             postSideEffect(LearningSideEffect.PopBackStack)
@@ -97,7 +131,7 @@ class LearningViewModel(
     }
 
     private fun requestStop() {
-        if (currentState.error != null) return
+        if (currentState.error != null || currentState.isSubmitting || currentState.isAwaitingCompletionAd) return
         if (currentState.currentCard != null && !currentState.isCompleted) {
             reduce { copy(showStopDialog = true) }
         } else {
@@ -163,7 +197,7 @@ class LearningViewModel(
     }
 
     private suspend fun evaluate(intent: LearningIntent.Evaluate) {
-        if (currentState.isSubmitting || currentState.error != null) return
+        if (currentState.isSubmitting || currentState.isCompleted || isStopConfirmed || currentState.error != null) return
         val card = currentState.currentCard ?: return
         val all =
             currentState.evaluations + StudyEvaluation(card.id, intent.rating, elapsedCardTimeMs())
@@ -173,7 +207,8 @@ class LearningViewModel(
             return
         }
         if (mode == LearningMode.ALL) {
-            reduce { copy(evaluations = all, isCompleted = true) }
+            reduce { copy(evaluations = all, isCompleted = true, isAwaitingCompletionAd = true, showStopDialog = false) }
+            postSideEffect(LearningSideEffect.ShowCompletionAd(all.size))
             return
         }
         reduce { copy(evaluations = all) }
@@ -189,8 +224,11 @@ class LearningViewModel(
                 isSubmitting = false,
                 isCompleted = true,
                 ratingCounts = ratingCounts,
+                isAwaitingCompletionAd = true,
+                showStopDialog = false,
             )
         }
+        postSideEffect(LearningSideEffect.ShowCompletionAd(ratingCounts.again + ratingCounts.fair + ratingCounts.easy))
     }
 
     private suspend fun submitEvaluations(): StudyRatingCounts {

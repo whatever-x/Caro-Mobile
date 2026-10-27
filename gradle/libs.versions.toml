@@ -1,4 +1,6 @@
 [versions]
+google-mobile-ads = "1.6.0"
+google-ump = "4.0.0"
 agp = "9.0.0"
 android-compileSdk = "36"
 android-minSdk = "28"
@@ -94,6 +96,8 @@ stability-analyzer = "0.7.2"
 google-id = "1.2.0"
 
 [libraries]
+google-mobile-ads = { module = "com.google.android.libraries.ads.mobile.sdk:ads-mobile-sdk", version.ref = "google-mobile-ads" }
+google-ump = { module = "com.google.android.ump:user-messaging-platform", version.ref = "google-ump" }
 # androidX
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "androidx-core-ktx" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "androidx-appcompat" }

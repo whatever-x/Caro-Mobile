@@ -101,6 +101,10 @@ class SettingViewModel(
                 )
             }
 
+            SettingIntent.ClickAdPrivacyOptions -> {
+                postSideEffect(SettingSideEffect.OpenAdPrivacyOptions)
+            }
+
             SettingIntent.ClickPrivacyPolicy -> {
                 postSideEffect(
                     SettingSideEffect.NavigateWebView(

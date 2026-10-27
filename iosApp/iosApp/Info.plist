@@ -2,6 +2,12 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>SKAdNetworkItems</key>
+	<array><dict><key>SKAdNetworkIdentifier</key><string>cstr6suwn9.skadnetwork</string></dict></array>
+	<key>GADApplicationIdentifier</key>
+	<string>$(CARO_ADMOB_APP_ID)</string>
+	<key>CaroInterstitialAdUnitID</key>
+	<string>$(CARO_ADMOB_INTERSTITIAL_ID)</string>
 	<key>CFBundleShortVersionString</key>
 	<string>1.0.2</string>
 	<key>CFBundleVersion</key>

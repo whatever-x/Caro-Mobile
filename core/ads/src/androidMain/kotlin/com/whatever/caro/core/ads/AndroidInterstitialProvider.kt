@@ -1,0 +1,197 @@
+package com.whatever.caro.core.ads
+
+import android.app.Activity
+import android.content.Context
+import android.content.pm.PackageManager
+import com.google.android.libraries.ads.mobile.sdk.MobileAds
+import com.google.android.libraries.ads.mobile.sdk.common.AdLoadCallback
+import com.google.android.libraries.ads.mobile.sdk.common.AdRequest
+import com.google.android.libraries.ads.mobile.sdk.common.FullScreenContentError
+import com.google.android.libraries.ads.mobile.sdk.common.LoadAdError
+import com.google.android.libraries.ads.mobile.sdk.initialization.InitializationConfig
+import com.google.android.libraries.ads.mobile.sdk.interstitial.InterstitialAd
+import com.google.android.libraries.ads.mobile.sdk.interstitial.InterstitialAdEventCallback
+import com.google.android.ump.ConsentInformation
+import com.google.android.ump.ConsentRequestParameters
+import com.google.android.ump.UserMessagingPlatform
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withContext
+import java.lang.ref.WeakReference
+import kotlin.coroutines.resume
+import kotlin.time.TimeMark
+import kotlin.time.TimeSource
+
+internal class AndroidInterstitialProvider(
+    context: Context,
+) : NativeInterstitialProvider {
+    private val callbacks = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
+    private val context = context.applicationContext
+    private val metadata = context.packageManager.getApplicationInfo(context.packageName, PackageManager.GET_META_DATA).metaData
+    private val appId = metadata?.getString("com.google.android.gms.ads.APPLICATION_ID").orEmpty()
+    private val unitId = metadata?.getString("com.whatever.caro.ads.INTERSTITIAL_ID").orEmpty()
+    private val consent = UserMessagingPlatform.getConsentInformation(context)
+    private var activity = WeakReference<Activity>(null)
+    private var active = false
+    private var allowConsent = false
+    private var initialized = false
+    private var consentUpdated = false
+    private var consentUpdating = false
+    private var loading = false
+    private var generation = 0
+    private var loadedAt: TimeMark? = null
+    private var ad: InterstitialAd? = null
+    override val privacyOptionsRequired = MutableStateFlow(false)
+
+    fun bindHost(
+        host: Activity?,
+        active: Boolean,
+        allowConsent: Boolean,
+    ) {
+        activity = WeakReference(host)
+        this.active = active
+        this.allowConsent = allowConsent
+    }
+
+    override suspend fun initialize() =
+        withContext(Dispatchers.Main.immediate) {
+            val host = host() ?: return@withContext
+            if (!configured() || !allowConsent || consentUpdating || initialized) return@withContext
+            consentUpdating = true
+            try {
+                if (!consentUpdated) {
+                    suspendCancellableCoroutine { continuation ->
+                        consent.requestConsentInfoUpdate(host, ConsentRequestParameters.Builder().build(), {
+                            consentUpdated = true
+                            if (continuation.isActive) continuation.resume(Unit)
+                        }, {
+                            if (continuation.isActive) continuation.resume(Unit)
+                        })
+                    }
+                }
+                updatePrivacyOptions()
+                if (!allowConsent || host() == null) return@withContext
+                if (consent.consentStatus == ConsentInformation.ConsentStatus.REQUIRED) {
+                    suspendCancellableCoroutine { continuation ->
+                        UserMessagingPlatform.loadConsentForm(context, { form ->
+                            callbacks.launch {
+                                val currentHost = host()
+                                if (!continuation.isActive) return@launch
+                                if (!allowConsent || currentHost == null) {
+                                    continuation.resume(Unit)
+                                } else {
+                                    form.show(currentHost) { if (continuation.isActive) continuation.resume(Unit) }
+                                }
+                            }
+                        }, { if (continuation.isActive) continuation.resume(Unit) })
+                    }
+                }
+                updatePrivacyOptions()
+                if (consent.canRequestAds()) {
+                    withContext(Dispatchers.IO) {
+                        MobileAds.initialize(context, InitializationConfig.Builder(appId).build()) {}
+                    }
+                    initialized = true
+                    preload()
+                }
+            } finally {
+                consentUpdating = false
+            }
+        }
+
+    override fun preload() {
+        if (!initialized || !consent.canRequestAds() || loading || ad != null) return
+        loading = true
+        val requestGeneration = generation
+        InterstitialAd.load(
+            AdRequest.Builder(unitId).build(),
+            object : AdLoadCallback<InterstitialAd> {
+                override fun onAdLoaded(ad: InterstitialAd) {
+                    callbacks.launch {
+                        if (requestGeneration == generation) {
+                            loading = false
+                            if (consent.canRequestAds()) {
+                                this@AndroidInterstitialProvider.ad = ad
+                                loadedAt = TimeSource.Monotonic.markNow()
+                            }
+                        }
+                    }
+                }
+
+                override fun onAdFailedToLoad(adError: LoadAdError) {
+                    callbacks.launch { if (requestGeneration == generation) loading = false }
+                }
+            },
+        )
+    }
+
+    override fun takeReadyAd(): ReadyInterstitial? {
+        if (!consent.canRequestAds() || host() == null) return null
+        val ready = ad ?: return null
+        ad = null
+        if ((loadedAt?.elapsedNow()?.inWholeMinutes ?: 60) >= 60) return null
+        return ReadyInterstitial { onShown ->
+            withContext(Dispatchers.Main.immediate) {
+                val host = host()
+                if (host == null || !consent.canRequestAds()) return@withContext false
+                suspendCancellableCoroutine { continuation ->
+                    var shown = false
+                    ready.adEventCallback =
+                        object : InterstitialAdEventCallback {
+                            override fun onAdShowedFullScreenContent() {
+                                callbacks.launch {
+                                    shown = true
+                                    onShown()
+                                }
+                            }
+
+                            override fun onAdImpression() {
+                                callbacks.launch {
+                                    shown = true
+                                    onShown()
+                                }
+                            }
+
+                            override fun onAdDismissedFullScreenContent() {
+                                callbacks.launch { if (continuation.isActive) continuation.resume(shown) }
+                            }
+
+                            override fun onAdFailedToShowFullScreenContent(fullScreenContentError: FullScreenContentError) {
+                                callbacks.launch { if (continuation.isActive) continuation.resume(shown) }
+                            }
+                        }
+                    ready.show(host)
+                }
+            }
+        }
+    }
+
+    override suspend fun showPrivacyOptions() =
+        withContext(Dispatchers.Main.immediate) {
+            val host = host() ?: return@withContext
+            if (!allowConsent || !privacyOptionsRequired.value) return@withContext
+            generation++
+            ad = null
+            loading = false
+            suspendCancellableCoroutine { continuation ->
+                UserMessagingPlatform.showPrivacyOptionsForm(host) {
+                    updatePrivacyOptions()
+                    if (continuation.isActive) continuation.resume(Unit)
+                }
+            }
+            if (consent.canRequestAds()) preload()
+        }
+
+    private fun host() = activity.get()?.takeIf { active && !it.isFinishing && !it.isDestroyed }
+
+    private fun configured() = appId.startsWith("ca-app-pub-") && unitId.startsWith("ca-app-pub-")
+
+    private fun updatePrivacyOptions() {
+        privacyOptionsRequired.value =
+            consent.privacyOptionsRequirementStatus == ConsentInformation.PrivacyOptionsRequirementStatus.REQUIRED
+    }
+}

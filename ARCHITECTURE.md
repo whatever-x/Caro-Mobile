@@ -86,6 +86,7 @@ flowchart TB
 | `:core:ui` | 공유 UI 유틸리티 |
 | `:core:viewmodel` | MVI 기반 클래스 |
 | `:core:navigator` | 화면 이동 계약·명령 |
+| `:core:ads` | 전면광고, UMP 동의와 플랫폼별 표시 제어 |
 | `:core:analytics` | 분석 이벤트 수집 |
 | `:core:crashlytics` | 오류·크래시 수집 |
 | `:core:messaging` | 푸시 알림 |

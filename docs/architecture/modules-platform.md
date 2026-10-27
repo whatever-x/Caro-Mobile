@@ -23,6 +23,7 @@
 | `:core:viewmodel` | MVI 패턴의 BaseViewModel 추상화 |
 | `:core:navigator` | 내비게이션 키·명령·디스패처 |
 | `:core:remote` | Ktor HTTP 클라이언트(Android의 OkHttp, iOS의 Darwin)와 DataSource |
+| `:core:ads` | 전면광고와 UMP 동의의 플랫폼별 연결 및 표시 제어 |
 | `:core:analytics` | 분석 이벤트 수집의 공통 계약과 플랫폼별 Firebase 연동 |
 | `:core:crashlytics` | 오류·크래시 수집의 공통 계약과 플랫폼별 Firebase 연동 |
 | `:core:messaging` | 푸시 토큰·메시지 수신·알림 표시와 플랫폼별 Firebase 연동 |
@@ -53,6 +54,7 @@ iOS는 Gradle 앱 모듈 대신 Xcode 프로젝트에서 공유 KMP 프레임워
 
 | 모듈 | 직접 의존하는 프로젝트 모듈 | 선언 방식 |
 | --- | --- | --- |
+| `:core:ads` | `:core:data` | `implementation` |
 | `:core:data` | `:core:remote`, `:core:datastore`, `:core:model` | `implementation` |
 | `:core:remote` | `:core:model` | `implementation` |
 | `:core:ui` | `:core:designsystem` | `implementation` |
@@ -88,10 +90,10 @@ iOS는 Gradle 앱 모듈 대신 Xcode 프로젝트에서 공유 KMP 프레임워
 | `:feature:deck` | 없음 |
 | `:feature:deck-detail` | `:core:model` |
 | `:feature:home` | `:core:model`, `:core:util` |
-| `:feature:learning` | `:core:model` |
+| `:feature:learning` | `:core:model`, `:core:ads` |
 | `:feature:login` | `:core:model` |
 | `:feature:profile` | `:core:model` |
-| `:feature:setting` | `:core:model` |
+| `:feature:setting` | `:core:model`, `:core:ads` |
 | `:feature:splash` | 없음 |
 
 추가 의존성은 모두 `implementation`으로 선언합니다.

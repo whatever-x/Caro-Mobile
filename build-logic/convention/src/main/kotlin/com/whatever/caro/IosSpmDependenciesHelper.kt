@@ -1,6 +1,7 @@
 package com.whatever.caro
 
 import io.github.frankois944.spmForKmp.swiftPackageConfig
+import io.github.frankois944.spmForKmp.definition.product.ProductName
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import java.net.URI
 
@@ -75,6 +76,24 @@ fun KotlinNativeTarget.configureFirebaseMessaging() {
                 products = {
                     add("FirebaseMessaging", exportToKotlin = true)
                 },
+            )
+        }
+    }
+}
+
+fun KotlinNativeTarget.configureGoogleMobileAds() {
+    swiftPackageConfig {
+        minIos = IOS_MIN_VERSION
+        dependency {
+            remotePackageVersion(
+                url = URI("https://github.com/googleads/swift-package-manager-google-mobile-ads.git"),
+                version = "13.11.0",
+                products = { add("GoogleMobileAds", exportToKotlin = true) },
+            )
+            remotePackageVersion(
+                url = URI("https://github.com/googleads/swift-package-manager-google-user-messaging-platform.git"),
+                version = "3.1.0",
+                products = { add(ProductName("UserMessagingPlatform", alias = "GoogleUserMessagingPlatform"), exportToKotlin = true) },
             )
         }
     }

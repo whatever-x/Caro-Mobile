@@ -39,6 +39,7 @@ import caromobile.core.designsystem.generated.resources.setting_snackbar_delete_
 import caromobile.core.designsystem.generated.resources.setting_snackbar_logout
 import caromobile.core.designsystem.generated.resources.setting_snackbar_user_info_load_error
 import caromobile.core.designsystem.generated.resources.setting_terms_of_service_url
+import com.whatever.caro.core.ads.InterstitialAdController
 import com.whatever.caro.core.designsystem.components.CaroDialog
 import com.whatever.caro.core.designsystem.components.CaroDialogButton
 import com.whatever.caro.core.designsystem.components.CaroSnackbarStyle
@@ -74,6 +75,8 @@ fun SettingRoute(
     val permissionController = rememberNotificationPermissionController()
     val scope = rememberCoroutineScope()
     val notificationErrorMessage = stringResource(Res.string.setting_notification_error)
+    val adsController = org.koin.compose.koinInject<InterstitialAdController>()
+    val adPrivacyOptionsRequired by adsController.privacyOptionsRequired.collectAsStateWithLifecycle()
     val privacyPolicyUrl = stringResource(resource = Res.string.setting_privcay_policy_url)
     val termsOfServiceUrl = stringResource(resource = Res.string.setting_terms_of_service_url)
     val reportBugUrl = stringResource(resource = Res.string.setting_report_bug_url)
@@ -109,6 +112,16 @@ fun SettingRoute(
     LaunchedEffect(viewModel, permissionController) {
         viewModel.sideEffect.collect { sideEffect ->
             when (sideEffect) {
+                SettingSideEffect.OpenAdPrivacyOptions -> {
+                    try {
+                        adsController.showPrivacyOptions()
+                    } catch (exception: Exception) {
+                        if (exception is kotlinx.coroutines.CancellationException) throw exception
+                        io.github.aakira.napier.Napier
+                            .w { "Ad privacy options failed" }
+                    }
+                }
+
                 SettingSideEffect.RequestNotificationPermission -> {
                     scope.launch {
                         try {
@@ -191,6 +204,7 @@ fun SettingRoute(
     SettingScreen(
         state = state,
         appVersion = AppConfig.appVersion,
+        showAdPrivacyOptions = adPrivacyOptionsRequired,
         onIntent = viewModel::intent,
     )
     if (state.notificationPermissionDialogVisible) {

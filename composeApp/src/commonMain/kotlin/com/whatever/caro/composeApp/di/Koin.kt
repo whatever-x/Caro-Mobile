@@ -1,5 +1,6 @@
 package com.whatever.caro.composeApp.di
 
+import com.whatever.caro.core.ads.di.adsModule
 import com.whatever.caro.core.analytics.di.analyticsModule
 import com.whatever.caro.core.crashlytics.di.crashlyticsModule
 import com.whatever.caro.core.data.di.dataModule
@@ -44,6 +45,7 @@ fun initKoin(configuration: KoinAppDeclaration? = null) {
             remoteModule,
             deviceModule,
             analyticsModule,
+            adsModule,
             crashlyticsModule,
             messagingModule,
             // feature

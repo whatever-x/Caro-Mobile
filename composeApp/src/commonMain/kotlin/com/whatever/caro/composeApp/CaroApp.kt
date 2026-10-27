@@ -36,6 +36,8 @@ import caromobile.core.designsystem.generated.resources.Res
 import caromobile.core.designsystem.generated.resources.app_exit_dialog_button_cancel
 import caromobile.core.designsystem.generated.resources.app_exit_dialog_button_exit
 import caromobile.core.designsystem.generated.resources.app_exit_dialog_title
+import com.whatever.caro.core.ads.ConfigureAdHost
+import com.whatever.caro.core.ads.InterstitialAdController
 import com.whatever.caro.core.data.repository.fcm.FcmTokenRepository
 import com.whatever.caro.core.datastore.datasource.LocalNotificationDataSource
 import com.whatever.caro.core.designsystem.components.CaroDialog
@@ -143,6 +145,19 @@ fun CaroApp(
         }
 
     val backStack = rememberNavBackStack(savedStateConfiguration, SplashEntry)
+    val adsController = koinInject<InterstitialAdController>()
+    val allowConsent = backStack.lastOrNull() is HomeEntry || backStack.lastOrNull() is SettingEntry
+    ConfigureAdHost(allowConsent)
+    LaunchedEffect(allowConsent, notificationStartupComplete) {
+        if (allowConsent && notificationStartupComplete) {
+            try {
+                adsController.initialize()
+            } catch (exception: Exception) {
+                if (exception is CancellationException) throw exception
+                Napier.w { "Ad consent initialization failed" }
+            }
+        }
+    }
 
     LaunchedEffect(messagingClient, fcmTokenRepository) {
         fcmTokenRepository.syncTokens(messagingClient.tokenFlow)

@@ -273,6 +273,8 @@
 					"-ObjC",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.whatever.caro.dev;
+				CARO_ADMOB_APP_ID = "ca-app-pub-3940256099942544~1458002511";
+				CARO_ADMOB_INTERSTITIAL_ID = "ca-app-pub-3940256099942544/4411468910";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "match Development com.whatever.caro.dev";
@@ -386,6 +388,8 @@
 					"-ObjC",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.whatever.caro;
+				CARO_ADMOB_APP_ID = "";
+				CARO_ADMOB_INTERSTITIAL_ID = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "match AppStore com.whatever.caro";
@@ -499,6 +503,8 @@
 					"-ObjC",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.whatever.caro.qa;
+				CARO_ADMOB_APP_ID = "ca-app-pub-3940256099942544~1458002511";
+				CARO_ADMOB_INTERSTITIAL_ID = "ca-app-pub-3940256099942544/4411468910";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "match Development com.whatever.caro.qa";
@@ -612,6 +618,8 @@
 					"-ObjC",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.whatever.caro;
+				CARO_ADMOB_APP_ID = "";
+				CARO_ADMOB_INTERSTITIAL_ID = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "match Development com.whatever.caro";
@@ -777,6 +785,8 @@
 					"-ObjC",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.whatever.caro.dev;
+				CARO_ADMOB_APP_ID = "ca-app-pub-3940256099942544~1458002511";
+				CARO_ADMOB_INTERSTITIAL_ID = "ca-app-pub-3940256099942544/4411468910";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "match Development com.whatever.caro.dev";
@@ -883,6 +893,8 @@
 					"-ObjC",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.whatever.caro.qa;
+				CARO_ADMOB_APP_ID = "ca-app-pub-3940256099942544~1458002511";
+				CARO_ADMOB_INTERSTITIAL_ID = "ca-app-pub-3940256099942544/4411468910";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "match AppStore com.whatever.caro.qa";

@@ -6,4 +6,8 @@ sealed interface LearningSideEffect : UiSideEffect {
     data object PopBackStack : LearningSideEffect
 
     data object NavigateToHome : LearningSideEffect
+
+    data class ShowCompletionAd(
+        val evaluatedCardCount: Int,
+    ) : LearningSideEffect
 }

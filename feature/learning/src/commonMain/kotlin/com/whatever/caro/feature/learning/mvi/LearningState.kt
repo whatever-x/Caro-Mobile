@@ -20,6 +20,7 @@ data class LearningState(
     val ratingCounts: StudyRatingCounts? = null,
     val showStopDialog: Boolean = false,
     val isCompleted: Boolean = false,
+    val isAwaitingCompletionAd: Boolean = false,
     val error: LearningError? = null,
 ) : UiState {
     val currentCard: StudyCard? get() = cards.getOrNull(index)

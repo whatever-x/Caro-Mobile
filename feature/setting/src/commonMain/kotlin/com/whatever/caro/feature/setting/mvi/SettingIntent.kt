@@ -29,6 +29,8 @@ sealed interface SettingIntent : UiIntent {
 
     data object ClickPrivacyPolicy : SettingIntent
 
+    data object ClickAdPrivacyOptions : SettingIntent
+
     data object ClickReportBug : SettingIntent
 
     data object ClickLogOut : SettingIntent
