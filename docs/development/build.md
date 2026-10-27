@@ -66,7 +66,7 @@ Spotless는 Kotlin·Gradle Kotlin DSL에 ktlint 1.8.0을 적용합니다. Compos
 
 ## AdMob 개발 설정
 
-Android와 iOS의 dev 및 QA 설정에는 Google 공식 테스트 광고 App ID와 전면광고 단위를 사용합니다. Android 운영 설정에서 App ID 또는 광고 단위가 없으면 SDK 초기화와 광고 요청을 생략합니다. iOS는 SDK가 시작 시 App ID를 검사하므로 운영 빌드에 유효한 App ID가 없거나 Google 테스트 App ID를 사용하면 빌드를 중단합니다. iOS에서 유효한 App ID가 있고 광고 단위가 없으면 앱의 광고 초기화와 요청을 생략합니다.
+Android와 iOS의 dev 및 QA 설정에는 Google 공식 테스트 광고 App ID와 전면광고 단위를 사용합니다. Android 운영 설정에서 App ID 또는 광고 단위가 없으면 SDK 초기화와 광고 요청을 생략합니다. iOS는 SDK가 시작 시 App ID를 검사하므로 운영 빌드에 형식에 맞는 App ID가 없거나 Google 테스트 App ID를 사용하면 빌드를 중단합니다. 이 검사는 ID가 실제 운영 계정에 속하는지 확인하지 않습니다. iOS에서 App ID가 있고 광고 단위가 없으면 앱의 광고 초기화와 요청을 생략합니다.
 
 Android 운영 빌드는 Gradle property `caro.admob.android.appId`와 `caro.admob.android.interstitialId`를 사용합니다. iOS는 Xcode build setting `CARO_ADMOB_APP_ID`와 `CARO_ADMOB_INTERSTITIAL_ID`를 사용합니다. 실제 운영 값과 AdMob 개인정보 메시지는 배포 전에 계정에서 확인합니다.
 
