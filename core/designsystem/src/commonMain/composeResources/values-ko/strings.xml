@@ -166,7 +166,8 @@
     <string name="setting_userinfo_nickname_change">닉네임 변경</string>
     <string name="setting_menu_terms_of_service">이용약관</string>
     <string name="setting_menu_privacy_policy">개인정보 처리방침</string>
-    <string name="setting_menu_report_bug">버그신고</string>
+    <string name="setting_menu_report_bug">문의 및 버그 제보</string>
+    <string name="setting_report_bug_url">https://docs.google.com/forms/d/e/1FAIpQLSesAOudCkfFsblSs_74H9mRBBLzfFKnAIhm42TTWujUK2BnPg/viewform</string>
     <string name="setting_menu_logout">로그아웃</string>
     <string name="setting_menu_delete_account">계정탈퇴</string>
     <string name="setting_description_app_version">현재 앱 버전 : %1$s</string>

@@ -1,3 +1,4 @@
+import app.cash.turbine.ReceiveTurbine
 import app.cash.turbine.test
 import com.whatever.caro.core.data.repository.auth.AuthRepository
 import com.whatever.caro.core.data.repository.fcm.FcmTokenRepository
@@ -27,6 +28,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runCurrent
@@ -196,6 +198,223 @@ class SettingViewModelTest : FunSpec() {
                 viewModel.state.value.notificationEnabled shouldBe true
                 viewModel.state.value.isNotificationLoading shouldBe false
                 verifySuspend(exactly(1)) { repository.setNotificationEnabled(true) }
+            }
+        }
+
+        suspend fun ReceiveTurbine<SettingSideEffect>.startInquiry(
+            viewModel: SettingViewModel,
+            scope: TestScope,
+        ): Long {
+            viewModel.intent(SettingIntent.ClickReportBug)
+            scope.runCurrent()
+            return (awaitItem() as SettingSideEffect.OpenInquiry).requestId
+        }
+
+        test("URL 열기 완료보다 백그라운드와 복귀가 빠르면 완료 후 평가를 요청한다") {
+            runTest {
+                val (viewModel) = createViewModel()
+                viewModel.sideEffect.test {
+                    val requestId = startInquiry(viewModel, this@runTest)
+                    viewModel.intent(SettingIntent.AppBackgrounded)
+                    viewModel.intent(SettingIntent.AppResumed)
+                    viewModel.intent(SettingIntent.InquiryOpenResult(requestId, true))
+                    advanceUntilIdle()
+                    awaitItem() shouldBe SettingSideEffect.RequestStoreReview(requestId)
+                    expectNoEvents()
+                }
+            }
+        }
+
+        test("백그라운드 중 열기 성공은 복귀까지 평가를 기다린다") {
+            runTest {
+                val (viewModel) = createViewModel()
+                viewModel.sideEffect.test {
+                    val requestId = startInquiry(viewModel, this@runTest)
+                    viewModel.intent(SettingIntent.AppBackgrounded)
+                    viewModel.intent(SettingIntent.InquiryOpenResult(requestId, true))
+                    advanceUntilIdle()
+                    expectNoEvents()
+                    viewModel.intent(SettingIntent.AppResumed)
+                    advanceUntilIdle()
+                    awaitItem() shouldBe SettingSideEffect.RequestStoreReview(requestId)
+                }
+            }
+        }
+
+        test("열기 성공 뒤 첫 실제 복귀만 평가를 요청하고 중복 결과는 무시한다") {
+            runTest {
+                val (viewModel) = createViewModel()
+                viewModel.sideEffect.test {
+                    val requestId = startInquiry(viewModel, this@runTest)
+                    viewModel.intent(SettingIntent.InquiryOpenResult(requestId, true))
+                    viewModel.intent(SettingIntent.AppResumed)
+                    advanceUntilIdle()
+                    expectNoEvents()
+                    viewModel.intent(SettingIntent.AppBackgrounded)
+                    viewModel.intent(SettingIntent.AppResumed)
+                    advanceUntilIdle()
+                    awaitItem() shouldBe SettingSideEffect.RequestStoreReview(requestId)
+                    viewModel.intent(SettingIntent.InquiryOpenResult(requestId, true))
+                    viewModel.intent(SettingIntent.AppBackgrounded)
+                    viewModel.intent(SettingIntent.AppResumed)
+                    advanceUntilIdle()
+                    expectNoEvents()
+                }
+            }
+        }
+
+        test("성공 이후 중복 실패와 취소 결과는 확정된 열기를 되돌리지 않는다") {
+            runTest {
+                val (viewModel) = createViewModel()
+                viewModel.sideEffect.test {
+                    val requestId = startInquiry(viewModel, this@runTest)
+                    viewModel.intent(SettingIntent.InquiryOpenResult(requestId, true))
+                    viewModel.intent(SettingIntent.InquiryOpenResult(requestId, false))
+                    viewModel.intent(SettingIntent.InquiryOpenCancelled(requestId))
+                    viewModel.intent(SettingIntent.AppBackgrounded)
+                    viewModel.intent(SettingIntent.AppResumed)
+                    advanceUntilIdle()
+                    awaitItem() shouldBe SettingSideEffect.RequestStoreReview(requestId)
+                }
+            }
+        }
+
+        test("열기 성공 없이 복귀해도 평가를 요청하지 않는다") {
+            runTest {
+                val (viewModel) = createViewModel()
+                viewModel.sideEffect.test {
+                    startInquiry(viewModel, this@runTest)
+                    viewModel.intent(SettingIntent.AppBackgrounded)
+                    viewModel.intent(SettingIntent.AppResumed)
+                    advanceUntilIdle()
+                    expectNoEvents()
+                }
+            }
+        }
+
+        test("복귀 이후 실패한 URL 열기는 이후 복귀에도 평가를 요청하지 않는다") {
+            runTest {
+                val (viewModel) = createViewModel()
+                viewModel.sideEffect.test {
+                    val requestId = startInquiry(viewModel, this@runTest)
+                    viewModel.intent(SettingIntent.AppBackgrounded)
+                    viewModel.intent(SettingIntent.AppResumed)
+                    viewModel.intent(SettingIntent.InquiryOpenResult(requestId, false))
+                    viewModel.intent(SettingIntent.InquiryOpenResult(requestId, true))
+                    viewModel.intent(SettingIntent.AppBackgrounded)
+                    viewModel.intent(SettingIntent.AppResumed)
+                    advanceUntilIdle()
+                    expectNoEvents()
+                }
+            }
+        }
+
+        test("취소된 열기의 늦은 성공 결과는 평가를 만들지 않는다") {
+            runTest {
+                val (viewModel) = createViewModel()
+                viewModel.sideEffect.test {
+                    val requestId = startInquiry(viewModel, this@runTest)
+                    viewModel.intent(SettingIntent.InquiryOpenCancelled(requestId))
+                    viewModel.intent(SettingIntent.InquiryOpenResult(requestId, true))
+                    viewModel.intent(SettingIntent.AppBackgrounded)
+                    viewModel.intent(SettingIntent.AppResumed)
+                    advanceUntilIdle()
+                    expectNoEvents()
+                }
+            }
+        }
+
+        test("새 문의 이후 이전 요청의 성공 실패 취소는 새 문의를 바꾸지 않는다") {
+            runTest {
+                val (viewModel) = createViewModel()
+                viewModel.sideEffect.test {
+                    val previousId = startInquiry(viewModel, this@runTest)
+                    val requestId = startInquiry(viewModel, this@runTest)
+                    viewModel.intent(SettingIntent.InquiryOpenResult(previousId, true))
+                    viewModel.intent(SettingIntent.InquiryOpenResult(previousId, false))
+                    viewModel.intent(SettingIntent.InquiryOpenCancelled(previousId))
+                    viewModel.intent(SettingIntent.AppBackgrounded)
+                    viewModel.intent(SettingIntent.AppResumed)
+                    advanceUntilIdle()
+                    expectNoEvents()
+                    viewModel.intent(SettingIntent.InquiryOpenResult(requestId, true))
+                    advanceUntilIdle()
+                    awaitItem() shouldBe SettingSideEffect.RequestStoreReview(requestId)
+                }
+            }
+        }
+
+        test("설정 이탈은 열기 결과와 이미 발행된 평가 요청의 소유권을 무효화한다") {
+            runTest {
+                val (viewModel) = createViewModel()
+                viewModel.sideEffect.test {
+                    val requestId = startInquiry(viewModel, this@runTest)
+                    viewModel.intent(SettingIntent.InquiryOpenResult(requestId, true))
+                    viewModel.intent(SettingIntent.AppBackgrounded)
+                    viewModel.intent(SettingIntent.AppResumed)
+                    advanceUntilIdle()
+                    awaitItem() shouldBe SettingSideEffect.RequestStoreReview(requestId)
+                    viewModel.isCurrentInquiryRequest(requestId) shouldBe true
+                    viewModel.intent(SettingIntent.CancelPendingInquiry)
+                    viewModel.intent(SettingIntent.InquiryOpenResult(requestId, true))
+                    viewModel.intent(SettingIntent.AppBackgrounded)
+                    viewModel.intent(SettingIntent.AppResumed)
+                    advanceUntilIdle()
+                    viewModel.isCurrentInquiryRequest(requestId) shouldBe false
+                    expectNoEvents()
+                }
+            }
+        }
+
+        test("일반 복귀와 약관 복귀에는 평가를 요청하지 않는다") {
+            runTest {
+                val (viewModel) = createViewModel()
+                viewModel.sideEffect.test {
+                    viewModel.intent(SettingIntent.AppBackgrounded)
+                    viewModel.intent(SettingIntent.AppResumed)
+                    viewModel.intent(SettingIntent.ClickTermsOfService)
+                    advanceUntilIdle()
+                    awaitItem() shouldBe SettingSideEffect.NavigateWebView(WebViewType.TERMS_OF_SERVICE)
+                    viewModel.intent(SettingIntent.AppBackgrounded)
+                    viewModel.intent(SettingIntent.AppResumed)
+                    advanceUntilIdle()
+                    expectNoEvents()
+                }
+            }
+        }
+
+        test("새 문의 복귀는 공용 평가 요청기에 다시 위임할 수 있다") {
+            runTest {
+                val (viewModel) = createViewModel()
+                viewModel.sideEffect.test {
+                    repeat(2) {
+                        val requestId = startInquiry(viewModel, this@runTest)
+                        viewModel.intent(SettingIntent.InquiryOpenResult(requestId, true))
+                        viewModel.intent(SettingIntent.AppBackgrounded)
+                        viewModel.intent(SettingIntent.AppResumed)
+                        advanceUntilIdle()
+                        awaitItem() shouldBe SettingSideEffect.RequestStoreReview(requestId)
+                        expectNoEvents()
+                    }
+                }
+            }
+        }
+
+        test("새 ViewModel은 이전 문의의 대기를 복원하지 않는다") {
+            runTest {
+                val (previous) = createViewModel()
+                previous.sideEffect.test {
+                    val requestId = startInquiry(previous, this@runTest)
+                    previous.intent(SettingIntent.InquiryOpenResult(requestId, true))
+                    previous.intent(SettingIntent.AppBackgrounded)
+                    advanceUntilIdle()
+                }
+                val (recreated) = createViewModel()
+                recreated.sideEffect.test {
+                    recreated.intent(SettingIntent.AppResumed)
+                    advanceUntilIdle()
+                    expectNoEvents()
+                }
             }
         }
 
@@ -440,7 +659,7 @@ class SettingViewModelTest : FunSpec() {
             }
         }
 
-        test("ClickReportBug 은 REPORT_BUG 웹뷰로 이동한다") {
+        test("ClickReportBug 은 식별자가 있는 URL 열기를 요청한다") {
             runTest {
                 val (viewModel, _) = createViewModel()
 
@@ -449,7 +668,7 @@ class SettingViewModelTest : FunSpec() {
                     advanceUntilIdle()
 
                     awaitItem() shouldBe
-                        SettingSideEffect.NavigateWebView(type = WebViewType.REPORT_BUG)
+                        SettingSideEffect.OpenInquiry(requestId = 1L)
                 }
             }
         }
