@@ -2,6 +2,7 @@ import app.cash.turbine.test
 import com.whatever.caro.core.data.repository.auth.AuthRepository
 import com.whatever.caro.core.data.repository.profile.ProfileRepository
 import com.whatever.caro.core.model.auth.AuthSession
+import com.whatever.caro.core.model.exception.CaroServerException
 import com.whatever.caro.core.viewmodel.ExceptionFilter
 import com.whatever.caro.feature.profile.NicknameValidationResult
 import com.whatever.caro.feature.profile.NicknameValidator
@@ -310,6 +311,40 @@ class CreateProfileViewModelTest : FunSpec() {
             state.birthDateOn(LocalDate(2026, 10, 28)) shouldBe "2026-10-28"
         }
 
+        test("가입 중 닉네임 중복이면 닉네임 단계로 돌아가고 생년월일을 유지한다") {
+            runTest {
+                val (viewModel, authRepository, _) = createViewModel(randomNickname = "기존닉네임")
+                everySuspend { authRepository.completeRegistration(any(), any(), any()) } calls {
+                    throw CaroServerException(code = "U003", message = "duplicate", debugMessage = "duplicate")
+                }
+                advanceUntilIdle()
+                viewModel.intent(CreateProfileIntent.ClickConfirm)
+                viewModel.intent(CreateProfileIntent.UpdateYear("1994"))
+                viewModel.intent(CreateProfileIntent.UpdateMonth("02"))
+                viewModel.intent(CreateProfileIntent.UpdateDay("15"))
+                viewModel.intent(CreateProfileIntent.ClickConfirm)
+                advanceUntilIdle()
+
+                viewModel.state.value.step shouldBe CreateProfileStep.Nickname
+                viewModel.state.value.nickname shouldBe "기존닉네임"
+                viewModel.state.value.validationResult shouldBe NicknameValidationResult.Duplicate
+                viewModel.state.value.isLoading shouldBe false
+                viewModel.state.value.registrationFailed shouldBe false
+                viewModel.state.value.isConfirmEnabled shouldBe false
+                viewModel.state.value.year shouldBe "1994"
+                viewModel.state.value.month shouldBe "02"
+                viewModel.state.value.day shouldBe "15"
+
+                viewModel.intent(CreateProfileIntent.UpdateNickname("새닉네임"))
+                advanceUntilIdle()
+                viewModel.state.value.validationResult shouldBe NicknameValidationResult.Valid
+                viewModel.intent(CreateProfileIntent.ClickConfirm)
+                advanceUntilIdle()
+                viewModel.state.value.step shouldBe CreateProfileStep.BirthDate
+                viewModel.state.value.birthDate shouldBe "1994-02-15"
+            }
+        }
+
         test("가입 실패 후 입력을 유지하고 다시 시도한다") {
             runTest {
                 val (viewModel, authRepository, _) = createViewModel()
@@ -326,7 +361,9 @@ class CreateProfileViewModelTest : FunSpec() {
                 viewModel.intent(CreateProfileIntent.UpdateDay("15"))
                 viewModel.intent(CreateProfileIntent.ClickConfirm)
                 advanceUntilIdle()
+                viewModel.state.value.step shouldBe CreateProfileStep.BirthDate
                 viewModel.state.value.registrationFailed shouldBe true
+                viewModel.state.value.isLoading shouldBe false
                 viewModel.state.value.birthDate shouldBe "1994-02-15"
                 viewModel.sideEffect.test {
                     viewModel.intent(CreateProfileIntent.ClickConfirm)

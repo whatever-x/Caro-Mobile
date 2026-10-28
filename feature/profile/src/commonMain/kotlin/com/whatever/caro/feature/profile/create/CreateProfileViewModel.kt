@@ -3,6 +3,7 @@ package com.whatever.caro.feature.profile.create
 import com.whatever.caro.core.data.repository.auth.AuthRepository
 import com.whatever.caro.core.data.repository.profile.ProfileRepository
 import com.whatever.caro.core.data.util.suspendRunCatching
+import com.whatever.caro.core.model.exception.CaroServerException
 import com.whatever.caro.core.viewmodel.BaseViewModel
 import com.whatever.caro.core.viewmodel.ExceptionFilter
 import com.whatever.caro.feature.profile.NicknameValidationResult
@@ -232,8 +233,19 @@ class CreateProfileViewModel(
             }.onSuccess {
                 postSideEffect(CreateProfileSideEffect.NavigateHome)
             }.onFailure { throwable ->
-                Napier.e(throwable = throwable) { "completeRegistration failed" }
-                reduce { copy(isLoading = false, registrationFailed = true) }
+                if (throwable is CaroServerException && throwable.code == "U003") {
+                    reduce {
+                        copy(
+                            step = CreateProfileStep.Nickname,
+                            validationResult = NicknameValidationResult.Duplicate,
+                            isLoading = false,
+                            registrationFailed = false,
+                        )
+                    }
+                } else {
+                    Napier.e(throwable = throwable) { "completeRegistration failed" }
+                    reduce { copy(isLoading = false, registrationFailed = true) }
+                }
             }
         }
     }
