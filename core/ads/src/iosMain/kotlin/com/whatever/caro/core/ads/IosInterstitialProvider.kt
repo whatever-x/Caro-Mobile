@@ -12,8 +12,12 @@ import GoogleUserMessagingPlatform.UMPConsentInformation
 import GoogleUserMessagingPlatform.UMPConsentStatusRequired
 import GoogleUserMessagingPlatform.UMPPrivacyOptionsRequirementStatusRequired
 import GoogleUserMessagingPlatform.UMPRequestParameters
+import com.whatever.caro.core.data.repository.ads.AdEligibilityMonitor
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import platform.Foundation.NSBundle
@@ -30,7 +34,10 @@ import kotlin.coroutines.resumeWithException
 import kotlin.time.TimeMark
 import kotlin.time.TimeSource
 
-internal class IosInterstitialProvider : NativeInterstitialProvider {
+internal class IosInterstitialProvider(
+    private val eligibility: AdEligibilityMonitor,
+) : NativeInterstitialProvider {
+    private val callbacks = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
     private val appId = NSBundle.mainBundle.objectForInfoDictionaryKey("GADApplicationIdentifier") as? String ?: ""
     private val unitId = NSBundle.mainBundle.objectForInfoDictionaryKey("CaroInterstitialAdUnitID") as? String ?: ""
     private val consent = UMPConsentInformation.sharedInstance
@@ -42,9 +49,16 @@ internal class IosInterstitialProvider : NativeInterstitialProvider {
     val consentFormShowing = MutableStateFlow(false)
     private var loading = false
     private var generation = 0
+    private var accountGeneration: Long? = null
     private var loadedAt: TimeMark? = null
     private var ad: GADInterstitialAd? = null
     override val privacyOptionsRequired = MutableStateFlow(false)
+
+    init {
+        callbacks.launch {
+            eligibility.state.collect { currentAccount() }
+        }
+    }
 
     fun bindHost(
         active: Boolean,
@@ -57,6 +71,7 @@ internal class IosInterstitialProvider : NativeInterstitialProvider {
 
     override suspend fun initialize() =
         withContext(Dispatchers.Main.immediate) {
+            val account = currentAccount() ?: return@withContext AdInitializationResult.DEFERRED
             if (!configured()) return@withContext AdInitializationResult.DISABLED
             if (initialized) return@withContext AdInitializationResult.INITIALIZED
             if (!allowConsent || consentUpdating || consentFormShowing.value) return@withContext AdInitializationResult.DEFERRED
@@ -66,11 +81,12 @@ internal class IosInterstitialProvider : NativeInterstitialProvider {
                 if (!consentUpdated) {
                     suspendCancellableCoroutine { continuation ->
                         consent.requestConsentInfoUpdateWithParameters(UMPRequestParameters()) { error ->
-                            consentUpdated = error == null
+                            if (isEligible(account)) consentUpdated = error == null
                             if (continuation.isActive) continuation.resume(Unit)
                         }
                     }
                 }
+                if (!isEligible(account)) return@withContext AdInitializationResult.DEFERRED
                 updatePrivacyOptions()
                 if (!allowConsent || host() == null) return@withContext AdInitializationResult.DEFERRED
                 if (consent.consentStatus == UMPConsentStatusRequired) {
@@ -78,7 +94,7 @@ internal class IosInterstitialProvider : NativeInterstitialProvider {
                         UMPConsentForm.loadWithCompletionHandler { form, _ ->
                             val currentHost = host()
                             if (!continuation.isActive) return@loadWithCompletionHandler
-                            if (!allowConsent || currentHost == null || form == null) {
+                            if (!isEligible(account) || !allowConsent || currentHost == null || form == null) {
                                 continuation.resume(Unit)
                             } else {
                                 consentFormShowing.value = true
@@ -95,7 +111,7 @@ internal class IosInterstitialProvider : NativeInterstitialProvider {
                         }
                     }
                 }
-                if (!allowConsent || host() == null) return@withContext AdInitializationResult.DEFERRED
+                if (!isEligible(account) || !allowConsent || host() == null) return@withContext AdInitializationResult.DEFERRED
                 updatePrivacyOptions()
                 if (consent.canRequestAds) {
                     suspendCancellableCoroutine { continuation ->
@@ -103,6 +119,7 @@ internal class IosInterstitialProvider : NativeInterstitialProvider {
                             if (continuation.isActive) continuation.resume(Unit)
                         }
                     }
+                    if (!isEligible(account)) return@withContext AdInitializationResult.DEFERRED
                     initialized = true
                     preload()
                     AdInitializationResult.INITIALIZED
@@ -115,11 +132,12 @@ internal class IosInterstitialProvider : NativeInterstitialProvider {
         }
 
     override fun preload() {
+        val account = currentAccount() ?: return
         if (!initialized || !consent.canRequestAds || loading || ad != null) return
         loading = true
         val requestGeneration = generation
         GADInterstitialAd.loadWithAdUnitID(unitId, GADRequest.request()) { loaded, _ ->
-            if (requestGeneration == generation) {
+            if (requestGeneration == generation && isEligible(account)) {
                 loading = false
                 if (consent.canRequestAds) {
                     ad = loaded
@@ -130,6 +148,7 @@ internal class IosInterstitialProvider : NativeInterstitialProvider {
     }
 
     override fun takeReadyAd(): ReadyInterstitial? {
+        val account = currentAccount() ?: return null
         if (!consent.canRequestAds || host() == null) return null
         val ready = ad ?: return null
         ad = null
@@ -137,7 +156,7 @@ internal class IosInterstitialProvider : NativeInterstitialProvider {
         return ReadyInterstitial { onShown ->
             withContext(Dispatchers.Main.immediate) {
                 val host = host()
-                if (host == null || !consent.canRequestAds) return@withContext false
+                if (!isEligible(account) || host == null || !consent.canRequestAds) return@withContext false
                 suspendCancellableCoroutine { continuation ->
                     val delegate =
                         object : NSObject(), GADFullScreenContentDelegateProtocol {
@@ -145,12 +164,12 @@ internal class IosInterstitialProvider : NativeInterstitialProvider {
 
                             override fun adWillPresentFullScreenContent(ad: GADFullScreenPresentingAdProtocol) {
                                 shown = true
-                                onShown()
+                                if (isEligible(account)) onShown()
                             }
 
                             override fun adDidRecordImpression(ad: GADFullScreenPresentingAdProtocol) {
                                 shown = true
-                                onShown()
+                                if (isEligible(account)) onShown()
                             }
 
                             override fun adDidDismissFullScreenContent(ad: GADFullScreenPresentingAdProtocol) {
@@ -181,6 +200,7 @@ internal class IosInterstitialProvider : NativeInterstitialProvider {
 
     override suspend fun showPrivacyOptions() =
         withContext(Dispatchers.Main.immediate) {
+            val account = currentAccount() ?: return@withContext
             val host = host() ?: return@withContext
             if (!allowConsent || !privacyOptionsRequired.value || consentFormShowing.value) return@withContext
             generation++
@@ -191,7 +211,7 @@ internal class IosInterstitialProvider : NativeInterstitialProvider {
                 try {
                     UMPConsentForm.presentPrivacyOptionsFormFromViewController(host) {
                         consentFormShowing.value = false
-                        updatePrivacyOptions()
+                        if (isEligible(account)) updatePrivacyOptions()
                         if (continuation.isActive) continuation.resume(Unit)
                     }
                 } catch (exception: Exception) {
@@ -199,7 +219,7 @@ internal class IosInterstitialProvider : NativeInterstitialProvider {
                     if (continuation.isActive) continuation.resumeWithException(exception)
                 }
             }
-            if (consent.canRequestAds) preload()
+            if (isEligible(account) && consent.canRequestAds) preload()
         }
 
     private fun host(): UIViewController? {
@@ -212,6 +232,22 @@ internal class IosInterstitialProvider : NativeInterstitialProvider {
             ?.firstOrNull { it.isKeyWindow() }
             ?.rootViewController
             ?.takeIf { it.presentedViewController == null }
+    }
+
+    private fun isEligible(account: Long): Boolean = eligibility.state.value.let { it.allowed && it.generation == account }
+
+    private fun currentAccount(): Long? {
+        val state = eligibility.state.value
+        if (accountGeneration != state.generation) {
+            accountGeneration = state.generation
+            generation++
+            ad = null
+            loading = false
+            initialized = false
+            consentUpdated = false
+            privacyOptionsRequired.value = false
+        }
+        return state.generation.takeIf { state.allowed }
     }
 
     private fun configured() = appId.startsWith("ca-app-pub-") && unitId.startsWith("ca-app-pub-")

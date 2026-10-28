@@ -8,5 +8,5 @@ import org.koin.dsl.module
 
 actual val nativeAdsModule =
     module {
-        single { AndroidInterstitialProvider(androidContext()) } bind NativeInterstitialProvider::class
+        single { AndroidInterstitialProvider(androidContext(), get()) } bind NativeInterstitialProvider::class
     }

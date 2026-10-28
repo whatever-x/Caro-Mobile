@@ -14,6 +14,7 @@ import com.google.android.libraries.ads.mobile.sdk.interstitial.InterstitialAdEv
 import com.google.android.ump.ConsentInformation
 import com.google.android.ump.ConsentRequestParameters
 import com.google.android.ump.UserMessagingPlatform
+import com.whatever.caro.core.data.repository.ads.AdEligibilityMonitor
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -29,6 +30,7 @@ import kotlin.time.TimeSource
 
 internal class AndroidInterstitialProvider(
     context: Context,
+    private val eligibility: AdEligibilityMonitor,
 ) : NativeInterstitialProvider {
     private val callbacks = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
     private val context = context.applicationContext
@@ -45,9 +47,16 @@ internal class AndroidInterstitialProvider(
     val consentFormShowing = MutableStateFlow(false)
     private var loading = false
     private var generation = 0
+    private var accountGeneration: Long? = null
     private var loadedAt: TimeMark? = null
     private var ad: InterstitialAd? = null
     override val privacyOptionsRequired = MutableStateFlow(false)
+
+    init {
+        callbacks.launch {
+            eligibility.state.collect { currentAccount() }
+        }
+    }
 
     fun bindHost(
         host: Activity?,
@@ -62,6 +71,7 @@ internal class AndroidInterstitialProvider(
 
     override suspend fun initialize() =
         withContext(Dispatchers.Main.immediate) {
+            val account = currentAccount() ?: return@withContext AdInitializationResult.DEFERRED
             if (!configured()) return@withContext AdInitializationResult.DISABLED
             if (initialized) return@withContext AdInitializationResult.INITIALIZED
             if (!allowConsent || consentUpdating || consentFormShowing.value) return@withContext AdInitializationResult.DEFERRED
@@ -71,13 +81,14 @@ internal class AndroidInterstitialProvider(
                 if (!consentUpdated) {
                     suspendCancellableCoroutine { continuation ->
                         consent.requestConsentInfoUpdate(host, ConsentRequestParameters.Builder().build(), {
-                            consentUpdated = true
+                            if (isEligible(account)) consentUpdated = true
                             if (continuation.isActive) continuation.resume(Unit)
                         }, {
                             if (continuation.isActive) continuation.resume(Unit)
                         })
                     }
                 }
+                if (!isEligible(account)) return@withContext AdInitializationResult.DEFERRED
                 updatePrivacyOptions()
                 if (!allowConsent || host() == null) return@withContext AdInitializationResult.DEFERRED
                 if (consent.consentStatus == ConsentInformation.ConsentStatus.REQUIRED) {
@@ -86,7 +97,7 @@ internal class AndroidInterstitialProvider(
                             callbacks.launch {
                                 val currentHost = host()
                                 if (!continuation.isActive) return@launch
-                                if (!allowConsent || currentHost == null) {
+                                if (!isEligible(account) || !allowConsent || currentHost == null) {
                                     continuation.resume(Unit)
                                 } else {
                                     consentFormShowing.value = true
@@ -104,12 +115,13 @@ internal class AndroidInterstitialProvider(
                         }, { if (continuation.isActive) continuation.resume(Unit) })
                     }
                 }
-                if (!allowConsent || host() == null) return@withContext AdInitializationResult.DEFERRED
+                if (!isEligible(account) || !allowConsent || host() == null) return@withContext AdInitializationResult.DEFERRED
                 updatePrivacyOptions()
                 if (consent.canRequestAds()) {
                     withContext(Dispatchers.IO) {
-                        MobileAds.initialize(context, InitializationConfig.Builder(appId).build()) {}
+                        if (isEligible(account)) MobileAds.initialize(context, InitializationConfig.Builder(appId).build()) {}
                     }
+                    if (!isEligible(account)) return@withContext AdInitializationResult.DEFERRED
                     initialized = true
                     preload()
                     AdInitializationResult.INITIALIZED
@@ -122,6 +134,7 @@ internal class AndroidInterstitialProvider(
         }
 
     override fun preload() {
+        val account = currentAccount() ?: return
         if (!initialized || !consent.canRequestAds() || loading || ad != null) return
         loading = true
         val requestGeneration = generation
@@ -130,7 +143,7 @@ internal class AndroidInterstitialProvider(
             object : AdLoadCallback<InterstitialAd> {
                 override fun onAdLoaded(ad: InterstitialAd) {
                     callbacks.launch {
-                        if (requestGeneration == generation) {
+                        if (requestGeneration == generation && isEligible(account)) {
                             loading = false
                             if (consent.canRequestAds()) {
                                 this@AndroidInterstitialProvider.ad = ad
@@ -141,13 +154,14 @@ internal class AndroidInterstitialProvider(
                 }
 
                 override fun onAdFailedToLoad(adError: LoadAdError) {
-                    callbacks.launch { if (requestGeneration == generation) loading = false }
+                    callbacks.launch { if (requestGeneration == generation && isEligible(account)) loading = false }
                 }
             },
         )
     }
 
     override fun takeReadyAd(): ReadyInterstitial? {
+        val account = currentAccount() ?: return null
         if (!consent.canRequestAds() || host() == null) return null
         val ready = ad ?: return null
         ad = null
@@ -155,7 +169,7 @@ internal class AndroidInterstitialProvider(
         return ReadyInterstitial { onShown ->
             withContext(Dispatchers.Main.immediate) {
                 val host = host()
-                if (host == null || !consent.canRequestAds()) return@withContext false
+                if (!isEligible(account) || host == null || !consent.canRequestAds()) return@withContext false
                 suspendCancellableCoroutine { continuation ->
                     var shown = false
                     ready.adEventCallback =
@@ -163,14 +177,14 @@ internal class AndroidInterstitialProvider(
                             override fun onAdShowedFullScreenContent() {
                                 callbacks.launch {
                                     shown = true
-                                    onShown()
+                                    if (isEligible(account)) onShown()
                                 }
                             }
 
                             override fun onAdImpression() {
                                 callbacks.launch {
                                     shown = true
-                                    onShown()
+                                    if (isEligible(account)) onShown()
                                 }
                             }
 
@@ -190,6 +204,7 @@ internal class AndroidInterstitialProvider(
 
     override suspend fun showPrivacyOptions() =
         withContext(Dispatchers.Main.immediate) {
+            val account = currentAccount() ?: return@withContext
             val host = host() ?: return@withContext
             if (!allowConsent || !privacyOptionsRequired.value || consentFormShowing.value) return@withContext
             generation++
@@ -200,7 +215,7 @@ internal class AndroidInterstitialProvider(
                 try {
                     UserMessagingPlatform.showPrivacyOptionsForm(host) {
                         consentFormShowing.value = false
-                        updatePrivacyOptions()
+                        if (isEligible(account)) updatePrivacyOptions()
                         if (continuation.isActive) continuation.resume(Unit)
                     }
                 } catch (exception: Exception) {
@@ -208,10 +223,26 @@ internal class AndroidInterstitialProvider(
                     if (continuation.isActive) continuation.resumeWithException(exception)
                 }
             }
-            if (consent.canRequestAds()) preload()
+            if (isEligible(account) && consent.canRequestAds()) preload()
         }
 
     private fun host() = activity.get()?.takeIf { active && !it.isFinishing && !it.isDestroyed }
+
+    private fun isEligible(account: Long): Boolean = eligibility.state.value.let { it.allowed && it.generation == account }
+
+    private fun currentAccount(): Long? {
+        val state = eligibility.state.value
+        if (accountGeneration != state.generation) {
+            accountGeneration = state.generation
+            generation++
+            ad = null
+            loading = false
+            initialized = false
+            consentUpdated = false
+            privacyOptionsRequired.value = false
+        }
+        return state.generation.takeIf { state.allowed }
+    }
 
     private fun configured() = appId.startsWith("ca-app-pub-") && unitId.startsWith("ca-app-pub-")
 

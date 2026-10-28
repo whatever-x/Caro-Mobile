@@ -2,6 +2,7 @@ package com.whatever.caro.composeApp
 
 import com.whatever.caro.core.ads.AdInitializationResult
 import com.whatever.caro.core.ads.InterstitialAdController
+import com.whatever.caro.core.data.repository.ads.AdEligibilityState
 import com.whatever.caro.core.viewmodel.ExceptionFilter
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
@@ -24,10 +25,28 @@ class AppStartupViewModelTest : FunSpec() {
         beforeTest { Dispatchers.setMain(dispatcher) }
         afterTest { Dispatchers.resetMain() }
 
+        test("성인 확인 전에는 초기화하지 않고 확인 후 초기화한다") {
+            runTest(dispatcher) {
+                val eligibility = MutableStateFlow(AdEligibilityState())
+                val ads = FakeAdsController()
+                val viewModel = AppStartupViewModel(ads, ExceptionFilter.None, eligibility)
+                viewModel.intent(AppStartupIntent.NotificationFinished)
+                viewModel.intent(AppStartupIntent.AdHostChanged(true))
+                advanceUntilIdle()
+                ads.calls shouldBe 0
+                eligibility.value = AdEligibilityState(generation = 1, allowed = true)
+                advanceUntilIdle()
+                ads.calls shouldBe 1
+                eligibility.value = AdEligibilityState(generation = 2, allowed = false)
+                advanceUntilIdle()
+                viewModel.state.value.adEligible shouldBe false
+            }
+        }
+
         test("백그라운드에서 알림 처리가 끝나면 홈 복귀 후 초기화한다") {
             runTest(dispatcher) {
                 val ads = FakeAdsController()
-                val viewModel = AppStartupViewModel(ads, ExceptionFilter.None)
+                val viewModel = AppStartupViewModel(ads, ExceptionFilter.None, MutableStateFlow(AdEligibilityState(allowed = true)))
                 viewModel.intent(AppStartupIntent.NotificationFinished)
                 advanceUntilIdle()
                 ads.calls shouldBe 0
@@ -43,7 +62,7 @@ class AppStartupViewModelTest : FunSpec() {
             runTest(dispatcher) {
                 val completion = CompletableDeferred<AdInitializationResult>()
                 val ads = FakeAdsController { completion.await() }
-                val viewModel = AppStartupViewModel(ads, ExceptionFilter.None)
+                val viewModel = AppStartupViewModel(ads, ExceptionFilter.None, MutableStateFlow(AdEligibilityState(allowed = true)))
                 viewModel.intent(AppStartupIntent.AdHostChanged(true))
                 runCurrent()
                 ads.calls shouldBe 0
@@ -64,7 +83,7 @@ class AppStartupViewModelTest : FunSpec() {
             runTest(dispatcher) {
                 val completion = CompletableDeferred<AdInitializationResult>()
                 val ads = FakeAdsController { if (calls == 1) completion.await() else AdInitializationResult.INITIALIZED }
-                val viewModel = AppStartupViewModel(ads, ExceptionFilter.None)
+                val viewModel = AppStartupViewModel(ads, ExceptionFilter.None, MutableStateFlow(AdEligibilityState(allowed = true)))
                 viewModel.intent(AppStartupIntent.NotificationFinished)
                 viewModel.intent(AppStartupIntent.AdHostChanged(true))
                 runCurrent()
@@ -90,7 +109,7 @@ class AppStartupViewModelTest : FunSpec() {
                             AdInitializationResult.INITIALIZED
                         }
                     }
-                val viewModel = AppStartupViewModel(ads, ExceptionFilter.None)
+                val viewModel = AppStartupViewModel(ads, ExceptionFilter.None, MutableStateFlow(AdEligibilityState(allowed = true)))
                 viewModel.intent(AppStartupIntent.NotificationFinished)
                 viewModel.intent(AppStartupIntent.AdHostChanged(true))
                 advanceUntilIdle()
@@ -110,7 +129,7 @@ class AppStartupViewModelTest : FunSpec() {
             runTest(dispatcher) {
                 val completion = CompletableDeferred<AdInitializationResult>()
                 val ads = FakeAdsController { if (calls == 1) completion.await() else AdInitializationResult.INITIALIZED }
-                val viewModel = AppStartupViewModel(ads, ExceptionFilter.None)
+                val viewModel = AppStartupViewModel(ads, ExceptionFilter.None, MutableStateFlow(AdEligibilityState(allowed = true)))
                 viewModel.intent(AppStartupIntent.NotificationFinished)
                 viewModel.intent(AppStartupIntent.AdHostChanged(true))
                 runCurrent()
@@ -132,7 +151,7 @@ class AppStartupViewModelTest : FunSpec() {
         test("동의 창이 열려 있으면 닫힌 뒤 초기화를 시작한다") {
             runTest(dispatcher) {
                 val ads = FakeAdsController()
-                val viewModel = AppStartupViewModel(ads, ExceptionFilter.None)
+                val viewModel = AppStartupViewModel(ads, ExceptionFilter.None, MutableStateFlow(AdEligibilityState(allowed = true)))
                 viewModel.intent(AppStartupIntent.NotificationFinished)
                 viewModel.intent(AppStartupIntent.AdHostChanged(available = true, formShowing = true))
                 advanceUntilIdle()
@@ -147,7 +166,7 @@ class AppStartupViewModelTest : FunSpec() {
             runTest(dispatcher) {
                 val completion = CompletableDeferred<AdInitializationResult>()
                 val ads = FakeAdsController { completion.await() }
-                val viewModel = AppStartupViewModel(ads, ExceptionFilter.None)
+                val viewModel = AppStartupViewModel(ads, ExceptionFilter.None, MutableStateFlow(AdEligibilityState(allowed = true)))
                 viewModel.intent(AppStartupIntent.NotificationFinished)
                 viewModel.intent(AppStartupIntent.AdHostChanged(available = true))
                 runCurrent()
@@ -165,7 +184,7 @@ class AppStartupViewModelTest : FunSpec() {
         test("초기화 취소 뒤에는 다음 호스트 연결을 기다린다") {
             runTest(dispatcher) {
                 val ads = FakeAdsController { if (calls == 1) throw CancellationException() else AdInitializationResult.INITIALIZED }
-                val viewModel = AppStartupViewModel(ads, ExceptionFilter.None)
+                val viewModel = AppStartupViewModel(ads, ExceptionFilter.None, MutableStateFlow(AdEligibilityState(allowed = true)))
                 viewModel.intent(AppStartupIntent.NotificationFinished)
                 viewModel.intent(AppStartupIntent.AdHostChanged(true))
                 advanceUntilIdle()
@@ -181,7 +200,7 @@ class AppStartupViewModelTest : FunSpec() {
         test("초기화 예외는 실패 상태로 남고 다음 호스트 연결에서 재시도한다") {
             runTest(dispatcher) {
                 val ads = FakeAdsController { if (calls == 1) error("SDK error") else AdInitializationResult.INITIALIZED }
-                val viewModel = AppStartupViewModel(ads, ExceptionFilter.None)
+                val viewModel = AppStartupViewModel(ads, ExceptionFilter.None, MutableStateFlow(AdEligibilityState(allowed = true)))
                 viewModel.intent(AppStartupIntent.NotificationFinished)
                 viewModel.intent(AppStartupIntent.AdHostChanged(true))
                 advanceUntilIdle()
@@ -197,7 +216,7 @@ class AppStartupViewModelTest : FunSpec() {
         test("설정이 없는 광고는 복귀할 때 다시 초기화하지 않는다") {
             runTest(dispatcher) {
                 val ads = FakeAdsController { AdInitializationResult.DISABLED }
-                val viewModel = AppStartupViewModel(ads, ExceptionFilter.None)
+                val viewModel = AppStartupViewModel(ads, ExceptionFilter.None, MutableStateFlow(AdEligibilityState(allowed = true)))
                 viewModel.intent(AppStartupIntent.NotificationFinished)
                 viewModel.intent(AppStartupIntent.AdHostChanged(true))
                 advanceUntilIdle()

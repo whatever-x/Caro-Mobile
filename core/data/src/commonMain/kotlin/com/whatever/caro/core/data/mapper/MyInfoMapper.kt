@@ -9,6 +9,7 @@ internal fun MyInfoResponse.toMyInfo(): MyInfo =
         nickname = nickname.orEmpty(),
         email = email.orEmpty(),
         socialLoginType = loginPlatform ?: SocialLoginType.NONE,
+        isAdult = isAdult,
     )
 
 internal fun MyInfoResponse.toMyNickname(): String = nickname.orEmpty()

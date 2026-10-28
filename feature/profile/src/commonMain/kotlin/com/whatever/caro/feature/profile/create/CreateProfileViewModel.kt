@@ -10,9 +10,12 @@ import com.whatever.caro.feature.profile.NicknameValidator
 import com.whatever.caro.feature.profile.create.mvi.CreateProfileIntent
 import com.whatever.caro.feature.profile.create.mvi.CreateProfileSideEffect
 import com.whatever.caro.feature.profile.create.mvi.CreateProfileState
+import com.whatever.caro.feature.profile.create.mvi.CreateProfileStep
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.ensureActive
+import kotlin.coroutines.coroutineContext
 
 class CreateProfileViewModel(
     private val authRepository: AuthRepository,
@@ -32,14 +35,74 @@ class CreateProfileViewModel(
 
     override suspend fun handleIntent(intent: CreateProfileIntent) {
         if (currentState.isLoading) return
+        if (currentState.isReloginDialogVisible &&
+            intent != CreateProfileIntent.ConfirmRelogin && intent != CreateProfileIntent.DismissRelogin
+        ) {
+            return
+        }
 
         when (intent) {
-            is CreateProfileIntent.UpdateNickname -> handleUpdateNickname(intent.nickname)
-            is CreateProfileIntent.ClickRefresh -> fetchRandomNickname()
-            is CreateProfileIntent.ClickConfirm -> handleConfirm()
-            is CreateProfileIntent.ClickBack -> reduce { copy(isCancelDialogVisible = true) }
-            is CreateProfileIntent.ConfirmCancel -> handleConfirmCancel()
-            is CreateProfileIntent.DismissCancelDialog -> reduce { copy(isCancelDialogVisible = false) }
+            is CreateProfileIntent.UpdateNickname -> {
+                handleUpdateNickname(intent.nickname)
+            }
+
+            is CreateProfileIntent.UpdateYear -> {
+                reduce { copy(year = intent.value.filter { it in '0'..'9' }.take(4), registrationFailed = false) }
+            }
+
+            is CreateProfileIntent.UpdateMonth -> {
+                reduce { copy(month = intent.value.filter { it in '0'..'9' }.take(2), registrationFailed = false) }
+            }
+
+            is CreateProfileIntent.UpdateDay -> {
+                reduce { copy(day = intent.value.filter { it in '0'..'9' }.take(2), registrationFailed = false) }
+            }
+
+            is CreateProfileIntent.RetryNicknameCheck -> {
+                if (currentState.validationResult == NicknameValidationResult.CheckFailed) {
+                    handleUpdateNickname(currentState.nickname)
+                }
+            }
+
+            is CreateProfileIntent.ClickRefresh -> {
+                fetchRandomNickname()
+            }
+
+            is CreateProfileIntent.ClickConfirm -> {
+                handleConfirm()
+            }
+
+            is CreateProfileIntent.ClickRelogin -> {
+                if (currentState.registrationFailed && currentState.step == CreateProfileStep.BirthDate) {
+                    reduce { copy(isReloginDialogVisible = true) }
+                }
+            }
+
+            is CreateProfileIntent.DismissRelogin -> {
+                reduce { copy(isReloginDialogVisible = false) }
+            }
+
+            is CreateProfileIntent.ConfirmRelogin -> {
+                handleRelogin()
+            }
+
+            is CreateProfileIntent.ClickBack -> {
+                reduce {
+                    if (step == CreateProfileStep.BirthDate) {
+                        copy(step = CreateProfileStep.Nickname, registrationFailed = false)
+                    } else {
+                        copy(isCancelDialogVisible = true)
+                    }
+                }
+            }
+
+            is CreateProfileIntent.ConfirmCancel -> {
+                handleConfirmCancel()
+            }
+
+            is CreateProfileIntent.DismissCancelDialog -> {
+                reduce { copy(isCancelDialogVisible = false) }
+            }
         }
     }
 
@@ -68,6 +131,10 @@ class CreateProfileViewModel(
             )
         }
 
+        checkNickname(filtered)
+    }
+
+    private fun checkNickname(filtered: String) {
         nicknameValidationJob?.cancel()
         nicknameValidationJob =
             launch {
@@ -81,9 +148,9 @@ class CreateProfileViewModel(
                         }
                     }.getOrElse { throwable ->
                         Napier.e(throwable = throwable) { "checkNicknameAvailability failed" }
-                        // TODO: 서버 에러 처리 UI 확정 시 폴백 제거
-                        NicknameValidationResult.Valid
+                        NicknameValidationResult.CheckFailed
                     }
+                coroutineContext.ensureActive()
                 reduce { copy(validationResult = result) }
             }
     }
@@ -96,6 +163,7 @@ class CreateProfileViewModel(
             launch {
                 suspendRunCatching { profileRepository.getRandomNickname() }
                     .onSuccess { nickname ->
+                        coroutineContext.ensureActive()
                         reduce {
                             copy(
                                 nickname = nickname,
@@ -103,8 +171,13 @@ class CreateProfileViewModel(
                             )
                         }
                     }.onFailure { throwable ->
+                        coroutineContext.ensureActive()
                         Napier.e(throwable = throwable) { "getRandomNickname failed" }
+                        if (currentState.validationResult == NicknameValidationResult.Checking) {
+                            checkNickname(currentState.nickname)
+                        }
                     }
+                coroutineContext.ensureActive()
                 reduce { copy(isRandomNicknameLoading = false) }
             }
     }
@@ -122,24 +195,45 @@ class CreateProfileViewModel(
         postSideEffect(CreateProfileSideEffect.NavigateLogin)
     }
 
+    private fun handleRelogin() {
+        if (!currentState.isReloginDialogVisible || !currentState.registrationFailed) return
+        reduce { copy(isReloginDialogVisible = false, isLoading = true, reloginFailed = false) }
+        launch {
+            suspendRunCatching { authRepository.logout() }
+                .onSuccess { postSideEffect(CreateProfileSideEffect.NavigateLogin) }
+                .onFailure { throwable ->
+                    Napier.e(throwable = throwable) { "logout for relogin failed" }
+                    reduce { copy(isLoading = false, reloginFailed = true) }
+                }
+        }
+    }
+
     private fun handleConfirm() {
         if (currentState.isConfirmEnabled.not()) return
+        if (currentState.step == CreateProfileStep.Nickname) {
+            nicknameValidationJob?.cancel()
+            randomNicknameJob?.cancel()
+            reduce { copy(step = CreateProfileStep.BirthDate, isRandomNicknameLoading = false) }
+            return
+        }
         val nickname = currentState.nickname
+        val birthDate = currentState.birthDate ?: return
         nicknameValidationJob?.cancel()
         randomNicknameJob?.cancel()
-        reduce { copy(isLoading = true, isRandomNicknameLoading = false) }
+        reduce { copy(isLoading = true, isRandomNicknameLoading = false, registrationFailed = false, reloginFailed = false) }
         launch {
             suspendRunCatching {
                 // TODO: 약관 동의 화면 추가 시 termsAgreed 전달 값 변경
                 authRepository.completeRegistration(
                     nickname = nickname,
                     termsAgreed = true,
+                    birthDate = birthDate,
                 )
             }.onSuccess {
                 postSideEffect(CreateProfileSideEffect.NavigateHome)
             }.onFailure { throwable ->
                 Napier.e(throwable = throwable) { "completeRegistration failed" }
-                reduce { copy(isLoading = false) }
+                reduce { copy(isLoading = false, registrationFailed = true) }
             }
         }
     }

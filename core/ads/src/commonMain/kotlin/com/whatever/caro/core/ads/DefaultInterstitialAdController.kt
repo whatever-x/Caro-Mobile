@@ -1,8 +1,10 @@
 package com.whatever.caro.core.ads
 
+import com.whatever.caro.core.data.repository.ads.AdEligibilityState
 import com.whatever.caro.core.data.repository.ads.InterstitialFrequencyRepository
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
@@ -13,6 +15,7 @@ import kotlin.time.Clock
 internal class DefaultInterstitialAdController(
     private val provider: NativeInterstitialProvider,
     private val frequency: InterstitialFrequencyRepository,
+    private val eligibility: StateFlow<AdEligibilityState>,
     private val today: () -> String = {
         Clock.System
             .now()
@@ -25,17 +28,24 @@ internal class DefaultInterstitialAdController(
     private val privacyRequest = Mutex()
     override val privacyOptionsRequired = provider.privacyOptionsRequired
 
-    override suspend fun initialize(): AdInitializationResult = presentation.withLock { provider.initialize() }
+    override suspend fun initialize(): AdInitializationResult =
+        presentation.withLock {
+            if (eligibility.value.allowed) provider.initialize() else AdInitializationResult.DEFERRED
+        }
 
-    override fun preload() = provider.preload()
+    override fun preload() {
+        if (eligibility.value.allowed) provider.preload()
+    }
 
     override suspend fun showIfEligible(evaluatedCardCount: Int) {
-        if (evaluatedCardCount < 20 || !presentation.tryLock()) return
+        val access = eligibility.value
+        if (!access.allowed || evaluatedCardCount < 20 || !presentation.tryLock()) return
         try {
+            if (eligibility.value != access) return
             val ad = provider.takeReadyAd() ?: return
             val reservedDate = today()
             val reservation = frequency.reserve(reservedDate) ?: return
-            if (today() != reservedDate) {
+            if (eligibility.value != access || today() != reservedDate) {
                 frequency.release(reservation)
                 return
             }
@@ -66,7 +76,9 @@ internal class DefaultInterstitialAdController(
     override suspend fun showPrivacyOptions() {
         if (!privacyRequest.tryLock()) return
         try {
-            presentation.withLock { provider.showPrivacyOptions() }
+            presentation.withLock {
+                if (eligibility.value.allowed) provider.showPrivacyOptions()
+            }
         } finally {
             privacyRequest.unlock()
         }

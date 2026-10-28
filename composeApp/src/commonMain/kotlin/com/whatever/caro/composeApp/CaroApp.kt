@@ -39,6 +39,8 @@ import caromobile.core.designsystem.generated.resources.app_exit_dialog_button_e
 import caromobile.core.designsystem.generated.resources.app_exit_dialog_title
 import com.whatever.caro.core.ads.ConfigureAdHost
 import com.whatever.caro.core.data.repository.fcm.FcmTokenRepository
+import com.whatever.caro.core.datastore.datasource.AuthTokens
+import com.whatever.caro.core.datastore.datasource.LocalAuthDataSource
 import com.whatever.caro.core.datastore.datasource.LocalNotificationDataSource
 import com.whatever.caro.core.designsystem.components.CaroDialog
 import com.whatever.caro.core.designsystem.components.CaroDialogButton
@@ -93,11 +95,13 @@ fun CaroApp(
     ConfigureCaroImageLoader()
 
     val localNotificationDataSource = koinInject<LocalNotificationDataSource>()
+    val localAuthDataSource = koinInject<LocalAuthDataSource>()
     val notificationPermissionController = rememberNotificationPermissionController()
     val startupViewModel = koinViewModel<AppStartupViewModel>()
     val startupState by startupViewModel.state.collectAsStateWithLifecycle()
     val notificationScope = rememberCoroutineScope()
     LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
+        startupViewModel.intent(AppStartupIntent.RefreshEligibility)
         if (startupState.notificationFinished) {
             notificationScope.launch {
                 try {
@@ -174,8 +178,13 @@ fun CaroApp(
                 }
 
                 is NavCommand.ResetTo -> {
-                    backStack.clear()
-                    backStack.add(command.key)
+                    val generation = command.expiredSessionGeneration
+                    if (generation == null ||
+                        isCurrentExpiredSession(AuthSessionEvent.Expired(generation), localAuthDataSource.fetchTokens())
+                    ) {
+                        backStack.clear()
+                        backStack.add(command.key)
+                    }
                 }
             }
         }
@@ -184,9 +193,9 @@ fun CaroApp(
     LaunchedEffect(authSessionEventBus, navDispatcher) {
         authSessionEventBus.events.collect { event ->
             when (event) {
-                AuthSessionEvent.Expired -> {
+                is AuthSessionEvent.Expired -> {
                     Napier.w { "Auth session expired → navigate to LoginEntry" }
-                    navDispatcher.emit(NavCommand.ResetTo(LoginEntry))
+                    navDispatcher.emit(NavCommand.ResetTo(LoginEntry, expiredSessionGeneration = event.generation))
                 }
             }
         }
@@ -314,3 +323,8 @@ private fun AppExitDialog(
         },
     )
 }
+
+internal fun isCurrentExpiredSession(
+    event: AuthSessionEvent.Expired,
+    current: AuthTokens,
+): Boolean = current.generation == event.generation && current.accessToken == null

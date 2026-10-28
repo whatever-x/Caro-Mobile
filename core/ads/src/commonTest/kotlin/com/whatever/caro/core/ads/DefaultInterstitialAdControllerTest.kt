@@ -1,5 +1,6 @@
 package com.whatever.caro.core.ads
 
+import com.whatever.caro.core.data.repository.ads.AdEligibilityState
 import com.whatever.caro.core.data.repository.ads.InterstitialFrequencyRepository
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
@@ -18,11 +19,41 @@ import kotlinx.datetime.plus
 @OptIn(ExperimentalCoroutinesApi::class)
 class DefaultInterstitialAdControllerTest : FunSpec() {
     init {
+        test("연령 미확인 상태에서는 광고 SDK와 개인정보 설정을 호출하지 않는다") {
+            runTest {
+                val provider = TestInterstitialProvider()
+                val controller =
+                    DefaultInterstitialAdController(provider, TestInterstitialFrequency(), MutableStateFlow(AdEligibilityState())) { TODAY }
+                controller.initialize() shouldBe AdInitializationResult.DEFERRED
+                controller.preload()
+                controller.showIfEligible(20)
+                controller.showPrivacyOptions()
+                provider.initializeCalls shouldBe 0
+                provider.preloadCalls shouldBe 0
+                provider.takeReadyCalls shouldBe 0
+                provider.privacyCalls shouldBe 0
+            }
+        }
+
+        test("광고 예약 중 계정이 바뀌면 예약을 취소하고 표시하지 않는다") {
+            runTest {
+                val provider = TestInterstitialProvider()
+                val access = allowed()
+                val frequency =
+                    TestInterstitialFrequency().apply {
+                        afterReserve = { access.value = AdEligibilityState(generation = 1) }
+                    }
+                DefaultInterstitialAdController(provider, frequency, access) { TODAY }.showIfEligible(20)
+                provider.showCalls shouldBe 0
+                frequency.released.size shouldBe 1
+            }
+        }
+
         test("19장 완료는 준비된 광고와 당일 빈도를 소비하지 않는다") {
             runTest {
                 val provider = TestInterstitialProvider()
                 val frequency = TestInterstitialFrequency()
-                val controller = DefaultInterstitialAdController(provider, frequency) { TODAY }
+                val controller = DefaultInterstitialAdController(provider, frequency, allowed()) { TODAY }
 
                 controller.showIfEligible(19)
 
@@ -36,7 +67,7 @@ class DefaultInterstitialAdControllerTest : FunSpec() {
             runTest {
                 val provider = TestInterstitialProvider()
                 val frequency = TestInterstitialFrequency()
-                val controller = DefaultInterstitialAdController(provider, frequency) { TODAY }
+                val controller = DefaultInterstitialAdController(provider, frequency, allowed()) { TODAY }
 
                 controller.showIfEligible(20)
                 provider.ready = true
@@ -53,7 +84,7 @@ class DefaultInterstitialAdControllerTest : FunSpec() {
             runTest {
                 val provider = TestInterstitialProvider().apply { ready = false }
                 val frequency = TestInterstitialFrequency()
-                val controller = DefaultInterstitialAdController(provider, frequency) { TODAY }
+                val controller = DefaultInterstitialAdController(provider, frequency, allowed()) { TODAY }
 
                 controller.showIfEligible(20)
 
@@ -66,11 +97,11 @@ class DefaultInterstitialAdControllerTest : FunSpec() {
         test("같은 기기에서 이미 소비한 날짜는 새 controller에서도 표시하지 않는다") {
             runTest {
                 val frequency = TestInterstitialFrequency()
-                val first = DefaultInterstitialAdController(TestInterstitialProvider(), frequency) { TODAY }
+                val first = DefaultInterstitialAdController(TestInterstitialProvider(), frequency, allowed()) { TODAY }
                 first.showIfEligible(20)
                 val provider = TestInterstitialProvider()
 
-                DefaultInterstitialAdController(provider, frequency) { TODAY }.showIfEligible(20)
+                DefaultInterstitialAdController(provider, frequency, allowed()) { TODAY }.showIfEligible(20)
 
                 provider.showCalls shouldBe 0
                 frequency.confirmed shouldBe listOf("reservation-1")
@@ -92,7 +123,7 @@ class DefaultInterstitialAdControllerTest : FunSpec() {
                         }
                     }
                 val frequency = TestInterstitialFrequency()
-                val controller = DefaultInterstitialAdController(provider, frequency) { TODAY }
+                val controller = DefaultInterstitialAdController(provider, frequency, allowed()) { TODAY }
                 val first = launch { controller.showIfEligible(20) }
                 started.await()
 
@@ -111,7 +142,7 @@ class DefaultInterstitialAdControllerTest : FunSpec() {
             runTest {
                 val provider = TestInterstitialProvider().apply { showAction = { false } }
                 val frequency = TestInterstitialFrequency()
-                val controller = DefaultInterstitialAdController(provider, frequency) { TODAY }
+                val controller = DefaultInterstitialAdController(provider, frequency, allowed()) { TODAY }
 
                 controller.showIfEligible(20)
 
@@ -134,7 +165,7 @@ class DefaultInterstitialAdControllerTest : FunSpec() {
             runTest {
                 val provider = TestInterstitialProvider().apply { showAction = { true } }
                 val frequency = TestInterstitialFrequency()
-                val controller = DefaultInterstitialAdController(provider, frequency) { TODAY }
+                val controller = DefaultInterstitialAdController(provider, frequency, allowed()) { TODAY }
 
                 controller.showIfEligible(20)
                 frequency.confirmed shouldBe listOf("reservation-1")
@@ -148,7 +179,7 @@ class DefaultInterstitialAdControllerTest : FunSpec() {
                         }
                     }
                 val callbackFrequency = TestInterstitialFrequency()
-                DefaultInterstitialAdController(callbackProvider, callbackFrequency) { TODAY }.showIfEligible(20)
+                DefaultInterstitialAdController(callbackProvider, callbackFrequency, allowed()) { TODAY }.showIfEligible(20)
 
                 callbackFrequency.confirmed shouldBe listOf("reservation-1")
                 callbackFrequency.released shouldBe emptyList()
@@ -162,7 +193,7 @@ class DefaultInterstitialAdControllerTest : FunSpec() {
                         showAction = { error("presentation result lost") }
                     }
                 val frequency = TestInterstitialFrequency()
-                val controller = DefaultInterstitialAdController(provider, frequency) { TODAY }
+                val controller = DefaultInterstitialAdController(provider, frequency, allowed()) { TODAY }
 
                 controller.showIfEligible(20)
                 provider.ready = true
@@ -185,7 +216,7 @@ class DefaultInterstitialAdControllerTest : FunSpec() {
                         }
                     }
                 val frequency = TestInterstitialFrequency()
-                val controller = DefaultInterstitialAdController(provider, frequency) { TODAY }
+                val controller = DefaultInterstitialAdController(provider, frequency, allowed()) { TODAY }
 
                 controller.showIfEligible(20)
 
@@ -207,7 +238,7 @@ class DefaultInterstitialAdControllerTest : FunSpec() {
                     }
                 val frequency = TestInterstitialFrequency()
                 var date = TODAY
-                val controller = DefaultInterstitialAdController(provider, frequency) { date }
+                val controller = DefaultInterstitialAdController(provider, frequency, allowed()) { date }
                 var returnedNormally = false
                 val showing =
                     launch {
@@ -248,7 +279,7 @@ class DefaultInterstitialAdControllerTest : FunSpec() {
                     TestInterstitialFrequency().apply {
                         afterReserve = { date = "2026-10-28" }
                     }
-                val controller = DefaultInterstitialAdController(provider, frequency) { date }
+                val controller = DefaultInterstitialAdController(provider, frequency, allowed()) { date }
 
                 controller.showIfEligible(20)
 
@@ -274,7 +305,7 @@ class DefaultInterstitialAdControllerTest : FunSpec() {
                         }
                     }
                 val frequency = TestInterstitialFrequency()
-                val controller = DefaultInterstitialAdController(provider, frequency) { date }
+                val controller = DefaultInterstitialAdController(provider, frequency, allowed()) { date }
 
                 controller.showIfEligible(20)
 
@@ -296,7 +327,7 @@ class DefaultInterstitialAdControllerTest : FunSpec() {
                         }
                     }
                 val frequency = TestInterstitialFrequency()
-                val controller = DefaultInterstitialAdController(provider, frequency) { TODAY }
+                val controller = DefaultInterstitialAdController(provider, frequency, allowed()) { TODAY }
                 val privacy = launch { controller.showPrivacyOptions() }
                 started.await()
 
@@ -324,7 +355,7 @@ class DefaultInterstitialAdControllerTest : FunSpec() {
                             AdInitializationResult.INITIALIZED
                         }
                     }
-                val controller = DefaultInterstitialAdController(provider, TestInterstitialFrequency()) { TODAY }
+                val controller = DefaultInterstitialAdController(provider, TestInterstitialFrequency(), allowed()) { TODAY }
                 val initializing = launch { controller.initialize() }
                 started.await()
                 val privacy = launch { controller.showPrivacyOptions() }
@@ -352,7 +383,7 @@ class DefaultInterstitialAdControllerTest : FunSpec() {
                             true
                         }
                     }
-                val controller = DefaultInterstitialAdController(provider, TestInterstitialFrequency()) { TODAY }
+                val controller = DefaultInterstitialAdController(provider, TestInterstitialFrequency(), allowed()) { TODAY }
                 val showing = launch { controller.showIfEligible(20) }
                 started.await()
 
@@ -371,7 +402,7 @@ class DefaultInterstitialAdControllerTest : FunSpec() {
             runTest {
                 val provider = TestInterstitialProvider()
                 val frequency = TestInterstitialFrequency().apply { reserveFailure = IllegalStateException("disk full") }
-                val controller = DefaultInterstitialAdController(provider, frequency) { TODAY }
+                val controller = DefaultInterstitialAdController(provider, frequency, allowed()) { TODAY }
 
                 controller.showIfEligible(20)
                 provider.showCalls shouldBe 0
@@ -391,6 +422,8 @@ private const val TODAY = "2026-10-27"
 private class TestInterstitialProvider : NativeInterstitialProvider {
     override val privacyOptionsRequired = MutableStateFlow(false)
     var ready = true
+    var initializeCalls = 0
+    var preloadCalls = 0
     var takeReadyCalls = 0
     var showCalls = 0
     var privacyCalls = 0
@@ -401,9 +434,14 @@ private class TestInterstitialProvider : NativeInterstitialProvider {
     var privacyAction: suspend () -> Unit = {}
     var initializeAction: suspend () -> AdInitializationResult = { AdInitializationResult.INITIALIZED }
 
-    override suspend fun initialize() = initializeAction()
+    override suspend fun initialize(): AdInitializationResult {
+        initializeCalls++
+        return initializeAction()
+    }
 
-    override fun preload() = Unit
+    override fun preload() {
+        preloadCalls++
+    }
 
     override fun takeReadyAd(): ReadyInterstitial? {
         takeReadyCalls++
@@ -466,3 +504,5 @@ private class TestInterstitialFrequency : InterstitialFrequencyRepository {
         }
     }
 }
+
+private fun allowed() = MutableStateFlow(AdEligibilityState(allowed = true))
