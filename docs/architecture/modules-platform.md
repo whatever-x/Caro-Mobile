@@ -27,6 +27,7 @@
 | `:core:crashlytics` | 오류·크래시 수집의 공통 계약과 플랫폼별 Firebase 연동 |
 | `:core:messaging` | 푸시 토큰·메시지 수신·알림 표시와 플랫폼별 Firebase 연동 |
 | `:core:util` | 숫자 포맷 등의 공통 유틸리티와 플랫폼별 구현 |
+| `:core:inapp-review` | 재사용 가능한 플랫폼 평가 요청과 앱 전체의 재요청 간격 관리 |
 | `:feature:*` | home·login 등의 기능별 화면·상태·ViewModel. `caro.feature` 플러그인으로 core 의존성을 자동 주입 |
 | `build-logic/convention/` | 모듈 설정을 표준화하는 Gradle 컨벤션 플러그인 |
 
@@ -65,6 +66,7 @@ iOS는 Gradle 앱 모듈 대신 Xcode 프로젝트에서 공유 KMP 프레임워
 | `:core:crashlytics` | 없음 | — |
 | `:core:messaging` | 없음 | — |
 | `:core:util` | 없음 | — |
+| `:core:inapp-review` | `:core:data` | `implementation` |
 
 `api` 의존성은 호출 모듈에도 노출됩니다. `implementation` 의존성은 호출 모듈의 컴파일 의존성으로 자동 노출되지 않습니다.
 예를 들어 `:core:navigator`를 사용하는 feature에서는 `:core:model` 타입을 사용할 수 있지만, `:core:data`를 사용한다는 이유로 `:core:remote`를 직접 사용할 수 있다고 가정하지 않습니다.
@@ -91,7 +93,7 @@ iOS는 Gradle 앱 모듈 대신 Xcode 프로젝트에서 공유 KMP 프레임워
 | `:feature:learning` | `:core:model` |
 | `:feature:login` | `:core:model` |
 | `:feature:profile` | `:core:model` |
-| `:feature:setting` | `:core:model` |
+| `:feature:setting` | `:core:model`, `:core:inapp-review` |
 | `:feature:splash` | 없음 |
 
 추가 의존성은 모두 `implementation`으로 선언합니다.
@@ -115,3 +117,23 @@ iOS 프레임워크 연동과 서명 준비는 [개발 환경과 빌드](../deve
 예를 들어 `HttpClientEngineProvider`는 공통 인터페이스와 플랫폼별 구현을 갖습니다.
 Android 구현은 OkHttp를 사용합니다.
 iOS 구현은 Darwin을 사용합니다.
+
+## 인앱 리뷰 요청
+
+인앱 리뷰가 필요한 feature는 `:core:inapp-review`에 직접 의존하고,
+Route에서 `rememberInAppReviewRequester()`로 `InAppReviewRequester`를 얻습니다.
+ViewModel은 요청할 시점을 일회성 SideEffect로 전달하고, Route는 화면 수명에 묶인 코루틴에서
+`requester.requestReview()`를 호출합니다. 호출자는 취소를 전파하고, 화면이 사라진 뒤 요청을 계속하지 않습니다.
+
+공용 모듈은 Google Play·StoreKit 호출과 앱 전체의 최소 30일 재요청 간격을 관리합니다.
+`:core:data`의 Repository와 `:core:datastore`의 단일 저장 트랜잭션으로 요청 시각을 예약합니다.
+서로 다른 feature나 requester 인스턴스가 동시에 호출해도 같은 기록을 사용합니다.
+기록은 인증 정보와 별개이므로 로그아웃 후에도 유지합니다.
+이는 앱의 요청 시도를 제한하는 정책이며, 평가창 표시나 평가 완료를 저장한 값이 아닙니다.
+
+iOS는 `:composeApp`의 진입점에서 Swift 콜백을 받아 공용 모듈의 provider에 전달합니다.
+Swift는 요청 시점의 활성 `windowScene`에서 `AppStore.requestReview(in:)`를 호출합니다.
+플랫폼 타입은 `iosMain` 안에만 두고 feature를 Swift framework의 공개 의존성으로 추가하지 않습니다.
+
+스토어 쿼터와 사용자 설정 때문에 호출 후 평가창이 나타나지 않을 수 있습니다.
+새 기능에서 재사용할 때에도 충분한 사용 경험과 자연스러운 요청 시점은 해당 feature에서 판단합니다.

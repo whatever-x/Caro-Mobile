@@ -48,6 +48,7 @@ flowchart TB
         monitoring["분석·오류 수집<br/>:core:analytics<br/>:core:crashlytics"]
         messaging[":core:messaging"]
         util[":core:util"]
+        inappReview["앱 내 평가 요청<br/>:core:inapp-review"]
     end
 
     subgraph buildPlugins["빌드 플러그인"]
@@ -63,9 +64,11 @@ flowchart TB
     app --> model
     app --> monitoring
     app --> messaging
+    app --> inappReview
     feature --> commonCore
     feature -.->|기능별 추가| model
     feature -.->|기능별 추가| util
+    feature -.->|기능별 추가| inappReview
 ```
 
 모든 feature는 공통 기반에 의존합니다.
@@ -90,6 +93,7 @@ flowchart TB
 | `:core:crashlytics` | 오류·크래시 수집 |
 | `:core:messaging` | 푸시 알림 |
 | `:core:util` | 숫자 포맷 등의 공통 유틸리티 |
+| `:core:inapp-review` | 플랫폼 평가 요청과 앱 전체의 재요청 간격 관리 |
 | `:build-logic` | 공유 Gradle 플러그인과 빌드 설정 제공 |
 
 `:composeApp`은 feature와 앱 구성에 필요한 core 모듈을 조립합니다.
@@ -109,12 +113,14 @@ flowchart LR
     remote --> model
     navigator[":core:navigator"] -->|api| model
     ui[":core:ui"] --> designsystem[":core:designsystem"]
+    inappReview[":core:inapp-review"] --> data
 ```
 
 데이터 계층은 `:core:model`의 타입을 공유합니다.
 `:core:data`는 원격·로컬 데이터 접근과 변환을 조율합니다.
 
 `:core:ui`는 디자인시스템을 사용하는 공유 UI 기능을 제공합니다.
+`:core:inapp-review`는 평가 요청 예약을 `:core:data`의 Repository에 위임하고 플랫폼 평가 API를 호출합니다.
 `:core:navigator`는 화면 이동에 필요한 모델을 사용합니다. 이 모델은 `api` 의존성으로 호출 모듈에도 노출합니다.
 
 `:core:viewmodel`·`:core:util`과 분석·오류 수집·푸시 모듈은 현재 다른 프로젝트 모듈에 직접 의존하지 않습니다.
@@ -131,6 +137,7 @@ flowchart LR
     feature[":feature:*"] --> common["공통 core 모듈"]
     feature -.->|일부 feature만 직접 의존| model[":core:model"]
     feature -.->|일부 feature만 직접 의존| util[":core:util"]
+    feature -.->|일부 feature만 직접 의존| inappReview[":core:inapp-review"]
 ```
 
 | 공통 의존 모듈 | feature에서 사용하는 책임 |
@@ -141,7 +148,7 @@ flowchart LR
 | `:core:designsystem` | Screen·컴포넌트의 테마·리소스·공통 UI |
 | `:core:ui` | Route·Screen에서 사용하는 스낵바·이미지 등의 공유 UI 기능 |
 
-기능에 따라 `:core:model`·`:core:util` 같은 모듈을 추가로 선언합니다.
+기능에 따라 `:core:model`·`:core:util`·`:core:inapp-review` 같은 모듈을 추가로 선언합니다.
 feature의 데이터 요청은 `:core:data`의 Repository를 통해 원격·로컬 구현으로 이어집니다.
 feature 간 화면 연결은 `:core:navigator`의 계약을 사용합니다.
 core는 feature 구현에 의존하지 않습니다.
