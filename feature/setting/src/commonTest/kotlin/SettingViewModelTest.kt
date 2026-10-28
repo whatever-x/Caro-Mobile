@@ -1,5 +1,6 @@
 import app.cash.turbine.test
 import com.whatever.caro.core.data.repository.auth.AuthRepository
+import com.whatever.caro.core.data.repository.fcm.FcmTokenRepository
 import com.whatever.caro.core.data.repository.profile.ProfileRepository
 import com.whatever.caro.core.model.auth.SocialLoginType
 import com.whatever.caro.core.model.profile.MyInfo
@@ -13,7 +14,9 @@ import com.whatever.caro.feature.setting.mvi.SettingState
 import dev.mokkery.answering.calls
 import dev.mokkery.answering.returns
 import dev.mokkery.answering.throws
+import dev.mokkery.every
 import dev.mokkery.everySuspend
+import dev.mokkery.matcher.any
 import dev.mokkery.mock
 import dev.mokkery.verify.VerifyMode.Companion.exactly
 import dev.mokkery.verifySuspend
@@ -22,6 +25,7 @@ import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
@@ -70,12 +74,129 @@ class SettingViewModelTest : FunSpec() {
                     authRepository = authRepository,
                     profileRepository = profileRepository,
                     exceptionFilter = exceptionFilter,
+                    fcmTokenRepository =
+                        mock<FcmTokenRepository> {
+                            every { observeNotificationEnabled() } returns MutableStateFlow(false)
+                            every { updateNotificationPermission(any()) } returns Unit
+                        },
                 )
             return SettingFixture(
                 viewModel = viewModel,
                 authRepository = authRepository,
                 profileRepository = profileRepository,
             )
+        }
+
+        test("알림 ON 중복 입력은 권한 요청 하나만 발생시키고 거절 시 OFF 안내를 표시한다") {
+            runTest {
+                val confirmed = MutableStateFlow(false)
+                val repository =
+                    mock<FcmTokenRepository> {
+                        every { observeNotificationEnabled() } returns confirmed
+                        every { updateNotificationPermission(any()) } returns Unit
+                    }
+                val viewModel = SettingViewModel(mock(), mock(), ExceptionFilter.None, repository)
+                viewModel.sideEffect.test {
+                    viewModel.intent(SettingIntent.ClickNotificationToggle)
+                    viewModel.intent(SettingIntent.ClickNotificationToggle)
+                    runCurrent()
+                    awaitItem() shouldBe SettingSideEffect.RequestNotificationPermission
+                    expectNoEvents()
+                    viewModel.state.value.isNotificationLoading shouldBe true
+                    viewModel.intent(SettingIntent.NotificationPermissionResult(false))
+                    runCurrent()
+                    viewModel.state.value.notificationEnabled shouldBe false
+                    viewModel.state.value.notificationPermissionDialogVisible shouldBe true
+                    viewModel.state.value.isNotificationLoading shouldBe false
+                }
+            }
+        }
+
+        test("알림 API 실패는 직전 상태와 재조작 가능 상태를 유지한다") {
+            runTest {
+                val repository =
+                    mock<FcmTokenRepository> {
+                        every { observeNotificationEnabled() } returns MutableStateFlow(true)
+                        everySuspend { setNotificationEnabled(false) } throws IllegalStateException("offline")
+                    }
+                val viewModel = SettingViewModel(mock(), mock(), ExceptionFilter.None, repository)
+                runCurrent()
+                viewModel.sideEffect.test {
+                    viewModel.intent(SettingIntent.ClickNotificationToggle)
+                    runCurrent()
+                    awaitItem() shouldBe SettingSideEffect.ShowSnackbar(SnackbarType.NOTIFICATION_CHANGE_ERROR)
+                    viewModel.state.value.notificationEnabled shouldBe true
+                    viewModel.state.value.isNotificationLoading shouldBe false
+                }
+            }
+        }
+
+        test("안내 취소 후 OS 권한 복귀만으로 알림을 켜지 않는다") {
+            runTest {
+                val repository =
+                    mock<FcmTokenRepository> {
+                        every { observeNotificationEnabled() } returns MutableStateFlow(false)
+                        every { updateNotificationPermission(any()) } returns Unit
+                    }
+                val viewModel = SettingViewModel(mock(), mock(), ExceptionFilter.None, repository)
+                viewModel.intent(SettingIntent.ClickNotificationToggle)
+                runCurrent()
+                viewModel.intent(SettingIntent.NotificationPermissionResult(false))
+                runCurrent()
+                viewModel.intent(SettingIntent.DismissNotificationPermissionDialog)
+                viewModel.intent(SettingIntent.NotificationPermissionRefreshed(true))
+                runCurrent()
+                viewModel.state.value.notificationPermissionDialogVisible shouldBe false
+                viewModel.state.value.notificationEnabled shouldBe false
+                verifySuspend(exactly(0)) { repository.setNotificationEnabled(any()) }
+            }
+        }
+
+        test("권한 요청이 취소되면 알림 로딩을 해제하고 다시 조작할 수 있다") {
+            runTest {
+                val repository =
+                    mock<FcmTokenRepository> {
+                        every { observeNotificationEnabled() } returns MutableStateFlow(false)
+                        every { updateNotificationPermission(any()) } returns Unit
+                    }
+                val viewModel = SettingViewModel(mock(), mock(), ExceptionFilter.None, repository)
+                viewModel.sideEffect.test {
+                    viewModel.intent(SettingIntent.ClickNotificationToggle)
+                    runCurrent()
+                    awaitItem() shouldBe SettingSideEffect.RequestNotificationPermission
+                    viewModel.intent(SettingIntent.DismissNotificationPermissionDialog)
+                    runCurrent()
+                    viewModel.state.value.isNotificationLoading shouldBe false
+                    viewModel.intent(SettingIntent.ClickNotificationToggle)
+                    runCurrent()
+                    awaitItem() shouldBe SettingSideEffect.RequestNotificationPermission
+                }
+            }
+        }
+
+        test("앱 설정에서 허용하고 복귀하면 대기한 ON을 한번만 처리한다") {
+            runTest {
+                val confirmed = MutableStateFlow(false)
+                val repository =
+                    mock<FcmTokenRepository> {
+                        every { observeNotificationEnabled() } returns confirmed
+                        every { updateNotificationPermission(any()) } returns Unit
+                        everySuspend { setNotificationEnabled(true) } calls { confirmed.value = true }
+                    }
+                val viewModel = SettingViewModel(mock(), mock(), ExceptionFilter.None, repository)
+                viewModel.intent(SettingIntent.ClickNotificationToggle)
+                runCurrent()
+                viewModel.intent(SettingIntent.NotificationPermissionResult(false))
+                runCurrent()
+                viewModel.intent(SettingIntent.OpenNotificationSettings)
+                runCurrent()
+                viewModel.intent(SettingIntent.NotificationPermissionRefreshed(true))
+                viewModel.intent(SettingIntent.NotificationPermissionRefreshed(true))
+                runCurrent()
+                viewModel.state.value.notificationEnabled shouldBe true
+                viewModel.state.value.isNotificationLoading shouldBe false
+                verifySuspend(exactly(1)) { repository.setNotificationEnabled(true) }
+            }
         }
 
         test("Initialize는 현재 사용자 정보를 상태에 반영한다") {

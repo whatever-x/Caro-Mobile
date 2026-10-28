@@ -8,6 +8,7 @@ import caromobile.core.designsystem.generated.resources.Res
 import caromobile.core.designsystem.generated.resources.login_snackbar_cancel
 import caromobile.core.designsystem.generated.resources.login_snackbar_error
 import caromobile.core.designsystem.generated.resources.login_snackbar_network_error
+import caromobile.core.designsystem.generated.resources.login_snackbar_no_credential
 import caromobile.core.designsystem.generated.resources.login_snackbar_server_error
 import com.whatever.caro.core.designsystem.components.CaroSnackbarStyle
 import com.whatever.caro.core.model.auth.SocialLoginType
@@ -39,6 +40,7 @@ fun LoginRoute(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val loginErrorMessage = stringResource(Res.string.login_snackbar_error)
     val loginCancelledMessage = stringResource(Res.string.login_snackbar_cancel)
+    val loginNoCredentialMessage = stringResource(Res.string.login_snackbar_no_credential)
     val loginNetworkErrorMessage = stringResource(Res.string.login_snackbar_network_error)
     val loginServerErrorMessage = stringResource(Res.string.login_snackbar_server_error)
 
@@ -75,6 +77,7 @@ fun LoginRoute(
                         when (sideEffect.error) {
                             LoginError.UNKNOWN -> loginErrorMessage
                             LoginError.USER_CANCELLED -> loginCancelledMessage
+                            LoginError.NO_CREDENTIAL -> loginNoCredentialMessage
                             LoginError.NETWORK -> loginNetworkErrorMessage
                             LoginError.SERVER -> loginServerErrorMessage
                         }

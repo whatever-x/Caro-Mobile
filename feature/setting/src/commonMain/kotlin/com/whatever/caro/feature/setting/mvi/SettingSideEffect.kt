@@ -5,6 +5,10 @@ import com.whatever.caro.feature.setting.model.SnackbarType
 import com.whatever.caro.feature.setting.model.WebViewType
 
 sealed interface SettingSideEffect : UiSideEffect {
+    data object RequestNotificationPermission : SettingSideEffect
+
+    data object OpenNotificationSettings : SettingSideEffect
+
     data class NavigateToEditNickName(
         val currentNickname: String,
     ) : SettingSideEffect

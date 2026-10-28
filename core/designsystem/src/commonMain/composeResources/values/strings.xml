@@ -9,6 +9,7 @@
 	<!-- login -->
 	<string name="login_snackbar_cancel">Cancelled.</string>
 	<string name="login_snackbar_error">An error occurred.</string>
+	<string name="login_snackbar_no_credential">No Google sign-in information found. Check your device’s account settings.</string>
 	<string name="login_snackbar_network_error">Please check your network connection.</string>
 	<string name="login_snackbar_server_error">A server error occurred.</string>
 	<string name="login_text_logo_description">Build your daily study habit\nwith just one card</string>
@@ -256,4 +257,10 @@
 	<string name="library_forbidden_body">This deck isn't available to your account.</string>
 	<string name="library_home">Home</string>
 	<string name="library_back">Back</string>
+	<string name="setting_notification_label">Notifications</string>
+	<string name="setting_notification_error">Could not change notification settings. Please try again.</string>
+	<string name="setting_notification_permission_title">Notification permission required</string>
+	<string name="setting_notification_permission_content">To receive notifications, allow notifications for Caro in your device settings.</string>
+	<string name="setting_notification_open_settings">App settings</string>
+	<string name="setting_notification_changing">Updating notification settings</string>
 </resources>

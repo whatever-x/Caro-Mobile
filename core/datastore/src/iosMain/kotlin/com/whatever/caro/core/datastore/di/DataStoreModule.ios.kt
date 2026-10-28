@@ -6,6 +6,8 @@ import com.whatever.caro.core.datastore.DataStoreFactory
 import com.whatever.caro.core.datastore.PreferencesPathProvider
 import com.whatever.caro.core.datastore.datasource.LocalAuthDataSource
 import com.whatever.caro.core.datastore.datasource.LocalAuthDataSourceImpl
+import com.whatever.caro.core.datastore.datasource.LocalNotificationDataSource
+import com.whatever.caro.core.datastore.datasource.LocalNotificationDataSourceImpl
 import org.koin.core.module.Module
 import org.koin.dsl.bind
 import org.koin.dsl.module
@@ -25,4 +27,5 @@ actual val dataStoreModule: Module =
         }
 
         single<LocalAuthDataSourceImpl>() bind LocalAuthDataSource::class
+        single<LocalNotificationDataSourceImpl>() bind LocalNotificationDataSource::class
     }

@@ -8,6 +8,7 @@ import androidx.credentials.Credential
 import androidx.credentials.CredentialManager
 import androidx.credentials.CustomCredential
 import androidx.credentials.GetCredentialRequest
+import androidx.credentials.GetCredentialResponse
 import androidx.credentials.exceptions.GetCredentialCancellationException
 import androidx.credentials.exceptions.GetCredentialException
 import androidx.credentials.exceptions.NoCredentialException
@@ -28,22 +29,23 @@ class GoogleAuthProviderImpl : GoogleAuthProvider {
         return remember(context) {
             GoogleAuthenticator(
                 context = context,
-                credentialManager = CredentialManager.create(context),
+                getCredential = CredentialManager.create(context)::getCredential,
             )
         }
     }
 }
 
-private class GoogleAuthenticator(
+internal class GoogleAuthenticator(
     private val context: Context,
-    private val credentialManager: CredentialManager,
+    private val serverClientId: String = BuildKonfig.GOOGLE_WEB_CLIENT_ID,
+    private val getCredential: suspend (Context, GetCredentialRequest) -> GetCredentialResponse,
 ) : SocialAuthenticator<GoogleUser> {
     override suspend fun authenticate(): SocialLoginResult<GoogleUser> {
         val option =
             GetGoogleIdOption
                 .Builder()
                 .setFilterByAuthorizedAccounts(true)
-                .setServerClientId(BuildKonfig.GOOGLE_WEB_CLIENT_ID)
+                .setServerClientId(serverClientId)
                 .setAutoSelectEnabled(true)
                 .setNonce(generateNonce())
                 .build()
@@ -55,21 +57,15 @@ private class GoogleAuthenticator(
                 .build()
         return try {
             val credential =
-                credentialManager
-                    .getCredential(
-                        context = context,
-                        request = request,
-                    ).credential
+                getCredential(context, request).credential
             val user = getGoogleUserFromCredential(credential) ?: return SocialLoginResult.Failed
             SocialLoginResult.Success(user)
-        } catch (_: GetCredentialCancellationException) {
-            SocialLoginResult.UserCancelled
         } catch (_: NoCredentialException) {
             // 첫 로그인에 대한 fallback
             val fallbackOption =
                 GetGoogleIdOption
                     .Builder()
-                    .setServerClientId(BuildKonfig.GOOGLE_WEB_CLIENT_ID)
+                    .setServerClientId(serverClientId)
                     .setFilterByAuthorizedAccounts(false)
                     .setAutoSelectEnabled(false)
                     .build()
@@ -82,19 +78,15 @@ private class GoogleAuthenticator(
 
             try {
                 val credential =
-                    credentialManager
-                        .getCredential(
-                            request = fallbackRequest,
-                            context = context,
-                        ).credential
+                    getCredential(context, fallbackRequest).credential
                 val user =
                     getGoogleUserFromCredential(credential) ?: return SocialLoginResult.Failed
                 SocialLoginResult.Success(user)
-            } catch (_: GetCredentialException) {
-                SocialLoginResult.Failed
+            } catch (error: GetCredentialException) {
+                error.toSocialLoginResult()
             }
-        } catch (_: GetCredentialException) {
-            SocialLoginResult.Failed
+        } catch (error: GetCredentialException) {
+            error.toSocialLoginResult()
         }
     }
 
@@ -125,3 +117,10 @@ private class GoogleAuthenticator(
             .encode(randomBytes)
     }
 }
+
+internal fun GetCredentialException.toSocialLoginResult(): SocialLoginResult<Nothing> =
+    when (this) {
+        is NoCredentialException -> SocialLoginResult.NoCredential
+        is GetCredentialCancellationException -> SocialLoginResult.UserCancelled
+        else -> SocialLoginResult.Failed
+    }
