@@ -1,8 +1,7 @@
-# 스크린샷 시나리오 목록
+# 스크린샷 캡처 계약
 
-[scenarios.json](scenarios.json)은 Android/iOS 스크린샷 테스트의 시나리오 ID를 feature 모듈별로 관리합니다. CI는 이 목록으로 생성된 PNG 이름과 비교 결과를 검증합니다.
-
-## 등록 형식
+[scenarios.json](scenarios.json)은 feature 모듈별 기대 논리 ID 목록입니다. 실행 코드는 각 feature의 `commonTest` 시나리오와
+Android/iOS 래퍼에 있습니다. 목록을 고쳐도 테스트가 생성되거나 실행되지는 않습니다.
 
 ```json
 {
@@ -11,11 +10,20 @@
 }
 ```
 
-키는 feature 모듈명이고, 배열에는 해당 모듈의 캡처 테스트가 사용하는 시나리오 ID를 작성합니다.
+[capture-config.json](capture-config.json)은 ko/en과 플랫폼 프로필·variant·캡처 bounds의 단일 원본입니다.
+기대 파일명은 `<scenario-id>__<language>__<profile-id>.png`로 확장합니다. ID는 영문·숫자로 시작하며 영문·숫자·점·밑줄·하이픈을
+사용합니다. `__`와 `_actual`·`_compare`·`_before` 접미사는 출력 identity/Roborazzi용으로 예약합니다. ID는 모듈 전체에서 고유해야 합니다.
 
-## 수정 규칙
+[pipeline.py](pipeline.py)는 확장·PNG·Golden·결과 수집·게시 검증과 플랫폼 댓글 생성을 담당합니다.
+의존성은 Python 3 표준 라이브러리이며, 실제 동작 fixture는 [test_pipeline.py](test_pipeline.py)입니다.
 
-- 캡처 테스트를 추가·삭제하면 목록도 함께 수정합니다.
-- ID는 영문·숫자로 시작하고, 영문·숫자·점·밑줄·하이픈만 사용합니다.
-- `_actual`·`_compare` 접미사는 Roborazzi가 사용하므로 ID에 넣지 않습니다.
-- 생성된 이미지와 보고서는 빌드 산출물이며 Git에 커밋하지 않습니다.
+```bash
+# 저장소 루트에서 실행
+python3 scripts/screenshot/pipeline.py expand --platform android
+python3 scripts/screenshot/pipeline.py expand --platform ios
+python3 scripts/screenshot/test_pipeline.py
+```
+
+개발과 캡처 API는 [스크린샷 테스트 개발](../../docs/development/screenshot-testing.md),
+CI·exact-base Golden·v2 마이그레이션·게시 승인과 결과 확인은 [스크린샷 CI](../../docs/ci/screenshot-test.md)를 따릅니다.
+PNG·보고서는 빌드 산출물이며 커밋하지 않습니다.

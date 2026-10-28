@@ -3,13 +3,12 @@ package com.whatever.caro.feature.login
 import androidx.compose.runtime.Composable
 import com.whatever.caro.core.designsystem.themes.CaroTheme
 import com.whatever.caro.feature.login.mvi.LoginState
+import com.whatever.caro.screenshot.ScreenshotScenario
 
 internal object LoginScreenshotScenario {
     const val ID = "login.login.initial"
-    const val FILE_NAME = "$ID.png"
-    const val WIDTH_DP = 393
-    const val HEIGHT_DP = 852
-    const val LOCALE = "ko"
+
+    fun scenarios() = listOf(ScreenshotScenario(ID, render = { Render() }))
 
     @Composable
     fun Render() {

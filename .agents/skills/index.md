@@ -20,3 +20,4 @@
 | 리컴포지션·안정성·Compose 성능을 점검할 때 | [compose-recomposition-performance/SKILL.md](compose-recomposition-performance/SKILL.md) |
 | 슬롯 API를 활용한 재사용 UI·디자인 시스템 컴포넌트를 설계하거나 리뷰할 때 | [compose-slot-api-pattern/SKILL.md](compose-slot-api-pattern/SKILL.md) |
 | Compose UI·상태홀더의 상태 분기·콜백·이벤트·부수효과 테스트를 작성하거나 리뷰할 때 | [compose-ui-testing-patterns/SKILL.md](compose-ui-testing-patterns/SKILL.md) |
+| 스크린샷 시나리오·캡처 추가/수정/삭제 또는 Android/iOS·ko/en 캡처 범위를 점검할 때 | [caro-screenshot-testing/SKILL.md](caro-screenshot-testing/SKILL.md) |

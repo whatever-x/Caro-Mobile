@@ -4,13 +4,12 @@ import androidx.compose.runtime.Composable
 import com.whatever.caro.core.designsystem.themes.CaroTheme
 import com.whatever.caro.core.model.learning.StudyCard
 import com.whatever.caro.feature.learning.mvi.LearningState
+import com.whatever.caro.screenshot.ScreenshotScenario
 
 internal object LearningScreenshotScenario {
     const val ID = "learning.learning.front"
-    const val FILE_NAME = "$ID.png"
-    const val WIDTH_DP = 393
-    const val HEIGHT_DP = 852
-    const val LOCALE = "ko"
+
+    fun scenarios() = listOf(ScreenshotScenario(ID, render = { Render() }))
 
     @Composable
     fun Render() {

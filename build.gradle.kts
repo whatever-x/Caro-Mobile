@@ -16,7 +16,7 @@ plugins {
     alias(libs.plugins.google.services) apply false
     alias(libs.plugins.firebase.crashlytics) apply false
     alias(libs.plugins.mokkery) apply false
-    alias(libs.plugins.spotless) apply false
+    alias(libs.plugins.spotless)
     alias(libs.plugins.kotest) apply false
     alias(libs.plugins.build.konfig) apply false
     alias(libs.plugins.kover) apply false
@@ -25,6 +25,13 @@ plugins {
 }
 
 val ktlintCliVersion = libs.versions.ktlint.cli.get()
+
+configure<SpotlessExtension> {
+    kotlin {
+        target("test-support/screenshot/**/kotlin/**/*.kt")
+        ktlint(ktlintCliVersion)
+    }
+}
 
 subprojects {
     if (!buildFile.isFile) return@subprojects

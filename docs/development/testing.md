@@ -67,4 +67,5 @@
 
 [커버리지 컨벤션](../../build-logic/convention/src/main/kotlin/KoverPlugin.kt)은 `:core:data`의 RepositoryImpl과 `:feature:*`의 ViewModel을 대상으로 합니다. 현재 Gradle 검증 하한은 라인 커버리지 50%입니다. PR 댓글의 80% 표시 기준과 구분합니다. 대상 집계는 [루트 빌드 설정](../../build.gradle.kts)을 확인합니다.
 
+스크린샷 시나리오 작성·로컬 캡처는 [스크린샷 테스트 개발](screenshot-testing.md)을 따릅니다.
 스크린샷 비교·Golden·댓글 게시 확인은 [스크린샷 CI](../ci/screenshot-test.md), 일반 PR 검사 구성은 [CI 검사 안내](../ci/checks.md)를 따릅니다.

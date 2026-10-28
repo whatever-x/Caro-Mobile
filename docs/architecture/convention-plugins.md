@@ -50,7 +50,8 @@ KMP 타깃·Compose·DI·테스트 등의 공통 설정을 통일합니다.
 | `caro.cmp` | Compose Multiplatform 의존성(material3, resources, foundation)과 컴파일러 설정 |
 | `caro.feature` | feature 모듈에 core 의존성(designsystem, data, ui, viewmodel, navigator)을 자동 추가. koin-compose-viewmodel도 추가 |
 | `caro.koin` | Koin Kotlin 컴파일러 플러그인(`io.insert-koin.compiler.plugin`) 적용. commonMain에 `koin-core` 추가. 단축 DSL(`single<X>()`, `viewModel<X>()`) 사용 지원 |
-| `caro.kmp.test` | 테스트 의존성 추가(Kotest, Mokkery, Turbine, coroutines-test, koin-test) |
+| `caro.kmp.test` | 테스트 의존성 추가(Kotest, Mokkery, Turbine, coroutines-test, koin-test). Android `withHostTest` 설정의 원본 |
+| `caro.screenshot` | 테스트 소스셋에만 공통 캡처 지원·생성 설정·플랫폼별 Roborazzi 의존성 연결. [스크린샷 개발](../development/screenshot-testing.md) 참고 |
 | `caro.kover` | `:core:data`와 `:feature:*`에 Kover 적용. 라인 커버리지 최소 50% 검사 |
 | `caro.kotlin.serialization` | kotlinx.serialization 플러그인과 JSON 의존성 추가 |
 | `caro.android.application` | Android 애플리케이션 설정 |
