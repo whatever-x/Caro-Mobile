@@ -177,12 +177,19 @@ jobs:
         with:
           path: ~/.konan
           key: konan-v2-${{ matrix.runner }}-${{ runner.os }}-${{ runner.arch }}-${{ steps.xcode.outputs.version }}-${{ steps.xcode.outputs.dependency_hash }}
+      - name: Resolve platform scenarios
+        shell: bash
+        env:
+          PLATFORM: ${{ matrix.platform }}
+        run: |
+          mkdir -p build
+          scripts/screenshot/resolve-scenarios.sh "$PLATFORM" > build/screenshot-scenarios.json
       - name: Validate scenarios and restore Golden images
         shell: bash
         env:
           TARGET: ${{ matrix.target }}
         run: |
-          for manifest in build/screenshot-baseline/scenarios.json scripts/screenshot/scenarios.json; do
+          for manifest in build/screenshot-baseline/scenarios.json build/screenshot-scenarios.json; do
             jq -e 'type == "object" and length > 0 and all(to_entries[];
               (.key | test("^[A-Za-z0-9][A-Za-z0-9._-]*$")) and
               (.value | type == "array" and length > 0 and length == (unique | length) and
@@ -211,7 +218,7 @@ jobs:
           test_tasks=()
           while IFS= read -r module; do
             test_tasks+=(":feature:$module:${{ matrix.test-task }}" --rerun)
-          done < <(jq -r 'keys[]' scripts/screenshot/scenarios.json)
+          done < <(jq -r 'keys[]' build/screenshot-scenarios.json)
           ./gradlew '${{ matrix.task }}' "${test_tasks[@]}" --stacktrace --profile --console=plain
       - name: Validate Roborazzi results and collect changed images
         shell: bash
@@ -228,7 +235,7 @@ jobs:
           while IFS= read -r module; do
             source="feature/$module/build/outputs/roborazzi/$TARGET"
             results="feature/$module/build/test-results/roborazzi/$TARGET/results-summary.json"
-            ids=$(jq -c --arg module "$module" '.[$module]' scripts/screenshot/scenarios.json)
+            ids=$(jq -c --arg module "$module" '.[$module]' build/screenshot-scenarios.json)
             jq -e --argjson ids "$ids" '
               (.results | type == "array") and
               ([.results[].golden_file_path | split("/")[-1]] | sort) == ($ids | map(. + ".png") | sort) and
@@ -260,8 +267,8 @@ jobs:
             done < <(jq -r '.results[] | [(.golden_file_path | split("/")[-1] | rtrimstr(".png")), .type] | @tsv' "$results")
             jq -c --arg module "$module" '.results[] | {scenario: ($module + "/" + (.golden_file_path | split("/")[-1] | rtrimstr(".png"))), type}' \
               "$results" >> build/screenshot-results.jsonl
-          done < <(jq -r 'keys[]' scripts/screenshot/scenarios.json)
-          removed=$(jq -n --slurpfile golden build/screenshot-baseline/scenarios.json --slurpfile current scripts/screenshot/scenarios.json '
+          done < <(jq -r 'keys[]' build/screenshot-scenarios.json)
+          removed=$(jq -n --slurpfile golden build/screenshot-baseline/scenarios.json --slurpfile current build/screenshot-scenarios.json '
             def scenarios: to_entries[] | .key as $module | .value[] | $module + "/" + .;
             [$golden[0] | scenarios] - [$current[0] | scenarios]')
           jq -s --arg platform "$PLATFORM" --argjson pr_number "$PR_NUMBER" --arg base_sha "$BASE_SHA" --arg head_sha "$HEAD_SHA" --argjson removed "$removed" '

@@ -1,0 +1,8 @@
+{
+  "setting": [
+    "setting.notification.on",
+    "setting.notification.busy",
+    "setting.notification.small.large-font",
+    "setting.notification.permission"
+  ]
+}

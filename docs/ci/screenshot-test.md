@@ -1,6 +1,6 @@
 # 스크린샷 테스트
 
-`scripts/screenshot/scenarios.json`은 피처 모듈의 스크린샷 시나리오를 등록합니다(현재 14개). 고정된 `commonTest` 시나리오를 Android의 `androidHostTest`와 iOS의 `iosSimulatorArm64Test`에서 렌더링하며, ViewModel이나 API를 사용하지 않습니다.
+`scripts/screenshot/scenarios.json`은 공통 스크린샷 시나리오를, `scripts/screenshot/scenarios.android.json`은 Android 전용 시나리오를 등록합니다. 공통 시나리오는 `commonTest`에서 정의해 Android의 `androidHostTest`와 iOS의 `iosSimulatorArm64Test`에서 렌더링합니다. Android 전용 시나리오는 `androidHostTest`에서 렌더링합니다. CI는 플랫폼별 목록을 합쳐 검증합니다.
 
 ## 로컬 실행
 
@@ -19,7 +19,7 @@
 
 ## GitHub Actions 실행 흐름
 
-워크플로는 Roborazzi Gradle 태스크, Bash/`jq`, 아티팩트 액션과 [공식 PR 댓글 예제](https://github.com/takahirom/roborazzi-compare-on-github-comment-sample)의 댓글 액션을 사용합니다. PR 검증·렌더링·게시 로직은 워크플로 안에서 실행하며, 별도 Python이나 셸 스크립트는 필요하지 않습니다.
+워크플로는 Roborazzi Gradle 태스크, Bash, `jq`, Python 3, 아티팩트 액션과 [공식 PR 댓글 예제](https://github.com/takahirom/roborazzi-compare-on-github-comment-sample)의 댓글 액션을 사용합니다. 플랫폼별 시나리오 목록은 `scripts/screenshot/resolve-scenarios.sh`가 만들고, PR 검증·렌더링·게시 로직은 워크플로 안에서 실행합니다.
 
 1. **Screenshot Golden** (`screenshot-golden.yml`): `develop`에 push할 때 Android/iOS 스크린샷을 기록합니다. PNG 이름을 `scenarios.json`과 대조하고, 전체 기준 이미지(Golden)를 아티팩트로 업로드해 90일간 보관합니다. 각 아티팩트에는 시나리오 목록도 포함됩니다.
 2. **Screenshot PR** (`screenshot-pr.yml`): `develop` 대상의 열린 PR을 `workflow_dispatch`로 수동 검사합니다. PR의 head/base SHA와 병합 커밋을 고정하고 병합 커밋의 두 부모를 검증한 뒤 요청 메타데이터를 보관합니다. PR의 base SHA와 실행의 head SHA가 정확히 일치하는 성공한 Golden 실행을 찾아 다운로드합니다. 기준 이미지를 각 모듈의 Roborazzi 출력 디렉토리에 복원하고 `compareRoborazziAndroidHostTest` / `compareRoborazziIosSimulatorArm64`를 실행합니다. 등록된 모든 시나리오의 JSON 결과를 검증하고 변경·추가된 이미지만 수집합니다. Roborazzi HTML/JSON 진단 자료는 별도로 업로드하며, 실패 시에도 생성된 자료가 있으면 보관합니다.
