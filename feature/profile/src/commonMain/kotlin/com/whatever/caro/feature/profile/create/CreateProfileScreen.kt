@@ -13,7 +13,9 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -36,12 +38,15 @@ import caromobile.core.designsystem.generated.resources.profile_cancel_dialog_ti
 import caromobile.core.designsystem.generated.resources.profile_content_description_back
 import caromobile.core.designsystem.generated.resources.profile_title_create
 import caromobile.feature.profile.generated.resources.create_profile_birth_day
+import caromobile.feature.profile.generated.resources.create_profile_birth_day_placeholder
 import caromobile.feature.profile.generated.resources.create_profile_birth_description
 import caromobile.feature.profile.generated.resources.create_profile_birth_heading
 import caromobile.feature.profile.generated.resources.create_profile_birth_invalid
 import caromobile.feature.profile.generated.resources.create_profile_birth_label
 import caromobile.feature.profile.generated.resources.create_profile_birth_month
+import caromobile.feature.profile.generated.resources.create_profile_birth_month_placeholder
 import caromobile.feature.profile.generated.resources.create_profile_birth_year
+import caromobile.feature.profile.generated.resources.create_profile_birth_year_placeholder
 import caromobile.feature.profile.generated.resources.create_profile_finish
 import caromobile.feature.profile.generated.resources.create_profile_next
 import caromobile.feature.profile.generated.resources.create_profile_nickname_check_failed
@@ -83,6 +88,7 @@ internal fun CreateProfileScreen(
         modifier =
             Modifier
                 .fillMaxSize()
+                .imePadding()
                 .background(CaroTheme.color.background.primary),
     ) {
         CaroTopBar(
@@ -114,7 +120,14 @@ internal fun CreateProfileScreen(
         )
 
         val isNickname = state.step == CreateProfileStep.Nickname
-        Column(modifier = Modifier.fillMaxWidth().padding(horizontal = PageHorizontalPadding)) {
+        Column(
+            modifier =
+                Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = PageHorizontalPadding),
+        ) {
             Spacer(Modifier.height(32.dp))
             Text(
                 text =
@@ -184,18 +197,21 @@ internal fun CreateProfileScreen(
                     BirthDateField(
                         state.year,
                         stringResource(ProfileRes.string.create_profile_birth_year),
+                        stringResource(ProfileRes.string.create_profile_birth_year_placeholder),
                         !state.isLoading,
                         Modifier.weight(1.25f),
                     ) { onIntent(CreateProfileIntent.UpdateYear(it)) }
                     BirthDateField(
                         state.month,
                         stringResource(ProfileRes.string.create_profile_birth_month),
+                        stringResource(ProfileRes.string.create_profile_birth_month_placeholder),
                         !state.isLoading,
                         Modifier.weight(1f),
                     ) { onIntent(CreateProfileIntent.UpdateMonth(it)) }
                     BirthDateField(
                         state.day,
                         stringResource(ProfileRes.string.create_profile_birth_day),
+                        stringResource(ProfileRes.string.create_profile_birth_day_placeholder),
                         !state.isLoading,
                         Modifier.weight(1f),
                         isLastField = true,
@@ -234,8 +250,6 @@ internal fun CreateProfileScreen(
             }
         }
 
-        Spacer(modifier = Modifier.weight(1f))
-
         if (isNickname && state.validationResult == NicknameValidationResult.CheckFailed) {
             Row(
                 modifier =
@@ -273,7 +287,6 @@ internal fun CreateProfileScreen(
             modifier =
                 Modifier
                     .fillMaxWidth()
-                    .imePadding()
                     .padding(
                         horizontal = PageHorizontalPadding,
                         vertical = CaroTheme.spacing.l,
@@ -300,6 +313,7 @@ internal fun CreateProfileScreen(
 private fun BirthDateField(
     value: String,
     label: String,
+    placeholder: String,
     enabled: Boolean,
     modifier: Modifier,
     isLastField: Boolean = false,
@@ -309,7 +323,7 @@ private fun BirthDateField(
         value = value,
         onValueChange = onValueChange,
         modifier = modifier.semantics { contentDescription = label },
-        placeholder = label,
+        placeholder = placeholder,
         enabled = enabled,
         keyboardOptions =
             KeyboardOptions(

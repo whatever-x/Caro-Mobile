@@ -20,4 +20,7 @@
 	<string name="create_profile_relogin_body">다시 로그인하면 이 화면에 입력한 정보가 사라져요.</string>
 	<string name="create_profile_relogin_cancel">취소</string>
 	<string name="create_profile_relogin_failed">로그인 화면으로 이동하지 못했어요. 다시 시도해 주세요.</string>
+	<string name="create_profile_birth_year_placeholder">YYYY</string>
+	<string name="create_profile_birth_month_placeholder">MM</string>
+	<string name="create_profile_birth_day_placeholder">DD</string>
 </resources>
