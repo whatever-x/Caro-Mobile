@@ -13,7 +13,7 @@ class GoogleCredentialErrorTest :
             NoCredentialException().toSocialLoginResult() shouldBe SocialLoginResult.NoCredential
         }
 
-        test("계정 선택 취소는 재시도 중에도 사용자 취소로 구분한다") {
+        test("취소 예외를 UserCancelled로 변환한다") {
             GetCredentialCancellationException().toSocialLoginResult() shouldBe SocialLoginResult.UserCancelled
         }
 

@@ -8,6 +8,7 @@ import androidx.credentials.Credential
 import androidx.credentials.CredentialManager
 import androidx.credentials.CustomCredential
 import androidx.credentials.GetCredentialRequest
+import androidx.credentials.GetCredentialResponse
 import androidx.credentials.exceptions.GetCredentialCancellationException
 import androidx.credentials.exceptions.GetCredentialException
 import androidx.credentials.exceptions.NoCredentialException
@@ -28,22 +29,23 @@ class GoogleAuthProviderImpl : GoogleAuthProvider {
         return remember(context) {
             GoogleAuthenticator(
                 context = context,
-                credentialManager = CredentialManager.create(context),
+                getCredential = CredentialManager.create(context)::getCredential,
             )
         }
     }
 }
 
-private class GoogleAuthenticator(
+internal class GoogleAuthenticator(
     private val context: Context,
-    private val credentialManager: CredentialManager,
+    private val serverClientId: String = BuildKonfig.GOOGLE_WEB_CLIENT_ID,
+    private val getCredential: suspend (Context, GetCredentialRequest) -> GetCredentialResponse,
 ) : SocialAuthenticator<GoogleUser> {
     override suspend fun authenticate(): SocialLoginResult<GoogleUser> {
         val option =
             GetGoogleIdOption
                 .Builder()
                 .setFilterByAuthorizedAccounts(true)
-                .setServerClientId(BuildKonfig.GOOGLE_WEB_CLIENT_ID)
+                .setServerClientId(serverClientId)
                 .setAutoSelectEnabled(true)
                 .setNonce(generateNonce())
                 .build()
@@ -55,11 +57,7 @@ private class GoogleAuthenticator(
                 .build()
         return try {
             val credential =
-                credentialManager
-                    .getCredential(
-                        context = context,
-                        request = request,
-                    ).credential
+                getCredential(context, request).credential
             val user = getGoogleUserFromCredential(credential) ?: return SocialLoginResult.Failed
             SocialLoginResult.Success(user)
         } catch (_: NoCredentialException) {
@@ -67,7 +65,7 @@ private class GoogleAuthenticator(
             val fallbackOption =
                 GetGoogleIdOption
                     .Builder()
-                    .setServerClientId(BuildKonfig.GOOGLE_WEB_CLIENT_ID)
+                    .setServerClientId(serverClientId)
                     .setFilterByAuthorizedAccounts(false)
                     .setAutoSelectEnabled(false)
                     .build()
@@ -80,11 +78,7 @@ private class GoogleAuthenticator(
 
             try {
                 val credential =
-                    credentialManager
-                        .getCredential(
-                            request = fallbackRequest,
-                            context = context,
-                        ).credential
+                    getCredential(context, fallbackRequest).credential
                 val user =
                     getGoogleUserFromCredential(credential) ?: return SocialLoginResult.Failed
                 SocialLoginResult.Success(user)
