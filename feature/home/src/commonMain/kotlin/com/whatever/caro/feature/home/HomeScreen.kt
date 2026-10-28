@@ -54,6 +54,7 @@ import com.whatever.caro.core.model.deck.Deck
 import com.whatever.caro.core.model.deck.DeckState
 import com.whatever.caro.core.ui.loading.CaroLoadingOverlayBox
 import com.whatever.caro.feature.home.component.Deck
+import com.whatever.caro.feature.home.library.HomeLibraryCard
 import com.whatever.caro.feature.home.mvi.HomeIntent
 import com.whatever.caro.feature.home.mvi.HomeState
 import com.whatever.caro.feature.home.mvi.HomeStreakState
@@ -154,6 +155,9 @@ internal fun HomeScreen(
                 ) {
                     item {
                         HomeStreakBanner(state = state)
+                    }
+                    item("library") {
+                        HomeLibraryCard { onIntent(HomeIntent.ClickLibrary) }
                     }
 
                     itemsIndexed(
