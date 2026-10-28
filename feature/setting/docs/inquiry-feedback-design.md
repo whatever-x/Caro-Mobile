@@ -14,8 +14,8 @@
 
 - `setting_menu_report_bug`: 한국어 ‘문의 및 버그 제보’, 기본 언어 ‘Contact Us and Report Bugs’.
 - `values-ko/strings.xml`의 `setting_report_bug_url`은 기존 한국어 고객용 폼을 사용한다.
-- 기본 언어의 같은 키는 해외 폼용 교체 위치다. 번역된 폼이 준비될 때까지 기존 한국어 폼을 임시로 사용한다.
-- 현재 폼의 제목·질문·선택지는 한국어다. URL 리소스 분리는 해외 문의 흐름의 번역 완료를 의미하지 않는다.
+- 기본 언어의 같은 키는 한국어 폼 설명에 연결된 [영문 고객용 폼](https://docs.google.com/forms/d/e/1FAIpQLSeTkuyIor0qCRH1zFNTo2lgjGuvJS3kBbTzCeZLfVjsB2KMzg/viewform)을 사용한다.
+- 영문 폼의 제목은 ‘Caro | Customer Support & Feedback’이며 질문과 선택지도 영어로 제공한다. 한국어 이외의 앱 언어에서는 기본 리소스에 따라 이 폼을 바로 연다.
 
 ## 이벤트와 상태 전이
 
