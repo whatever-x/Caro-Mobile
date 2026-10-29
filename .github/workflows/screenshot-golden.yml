@@ -20,15 +20,21 @@ jobs:
       matrix:
         include:
           - platform: android
+            profile: pixel10-pro
             target: androidHostTest
             test-task: testAndroidHostTest
             task: recordRoborazziAndroidHostTest
             runner: ubuntu-24.04
           - platform: ios
+            profile: iphone18-pro
             target: iosSimulatorArm64
             test-task: iosSimulatorArm64Test
             task: recordRoborazziIosSimulatorArm64
             runner: macos-26
+    env:
+      PLATFORM: ${{ matrix.platform }}
+      TARGET: ${{ matrix.target }}
+      PROFILE: ${{ matrix.profile }}
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-java@v5
@@ -71,9 +77,41 @@ jobs:
           done < <(jq -r 'keys[]' scripts/screenshot/scenarios.json)
           ./gradlew '${{ matrix.task }}' "${test_tasks[@]}" --stacktrace --profile --console=plain
       - name: Validate and collect multilingual Golden
-        run: >-
-          python3 scripts/screenshot/pipeline.py golden
-          --platform '${{ matrix.platform }}' --source-sha "$GITHUB_SHA"
+        shell: bash
+        run: |
+          export LC_ALL=C
+          jq -e '
+          def valid_registry:
+            def safe: type == "string" and test("^[A-Za-z0-9][A-Za-z0-9._-]*\\z") and
+              (contains("__") | not) and (test("_(actual|compare|before)\\z") | not);
+            type == "object" and length > 0 and all(to_entries[];
+              (.key | safe) and (.value | type == "array" and length > 0 and all(.[]; safe))) and
+            ([.[][]] | length == (unique | length));
+            valid_registry' scripts/screenshot/scenarios.json > /dev/null
+          [[ "$GITHUB_SHA" =~ ^[a-f0-9]{40}$ ]] || { echo "::error::Invalid Golden source SHA." >&2; exit 1; }
+          [[ ! -e build/screenshot-golden && ! -L build/screenshot-golden ]] || { echo "::error::Required screenshot input/output path condition failed." >&2; exit 1; }
+          mkdir -p build/screenshot-golden
+          while IFS= read -r module; do
+            capture_source="feature/$module/build/outputs/roborazzi/$TARGET"
+            [[ -d "$capture_source" && ! -L "$capture_source" ]] || { echo "::error::Required screenshot input/output path condition failed." >&2; exit 1; }
+            test -z "$(find "$capture_source" ! -type d ! -type f -print)"
+            jq -r --arg module "$module" --arg profile "$PROFILE" '
+              .[$module][] as $id | ["ko", "en"][] as $language |
+              $id + "__" + $language + "__" + $profile +
+              (if $id == "setting.notification.small.large-font" then "-small-large-font" else "" end) + ".png"
+            ' scripts/screenshot/scenarios.json | sort > "$RUNNER_TEMP/screenshot-module-files"
+            diff -u "$RUNNER_TEMP/screenshot-module-files" <(find "$capture_source" -type f | sed "s|^$capture_source/||" | sort)
+            mkdir -p "build/screenshot-golden/$module"
+            while IFS= read -r image; do
+              [[ -f "$capture_source/$image" && -s "$capture_source/$image" && ! -L "$capture_source/$image" ]] || { echo "::error::Required screenshot input/output path condition failed." >&2; exit 1; }
+              cp "$capture_source/$image" "build/screenshot-golden/$module/"
+            done < "$RUNNER_TEMP/screenshot-module-files"
+          done < <(jq -r 'keys[]' scripts/screenshot/scenarios.json)
+          jq -n --arg platform "$PLATFORM" --arg source "$GITHUB_SHA" --arg profile "$PROFILE" \
+            --slurpfile scenarios scripts/screenshot/scenarios.json '
+            {schema_version: 5, platform: $platform, source_sha: $source, languages: ["ko", "en"],
+             profiles: {default: $profile, "small-large-font": ($profile + "-small-large-font")}, scenarios: $scenarios[0]}
+          ' > build/screenshot-golden/metadata.json
       - uses: actions/upload-artifact@v6
         with:
           name: screenshot-golden-${{ matrix.platform }}

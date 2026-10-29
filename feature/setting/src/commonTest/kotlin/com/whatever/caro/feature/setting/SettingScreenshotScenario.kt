@@ -11,7 +11,6 @@ import com.whatever.caro.core.model.auth.SocialLoginType
 import com.whatever.caro.feature.setting.mvi.SettingIntent
 import com.whatever.caro.feature.setting.mvi.SettingState
 import com.whatever.caro.feature.setting.route.NotificationPermissionDialog
-import com.whatever.caro.screenshot.ScreenshotScenario
 
 internal object SettingScreenshotScenario {
     const val ID = "setting.setting.account"

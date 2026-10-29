@@ -3,7 +3,6 @@ package com.whatever.caro.feature.login
 import androidx.compose.runtime.Composable
 import com.whatever.caro.core.designsystem.themes.CaroTheme
 import com.whatever.caro.feature.login.mvi.LoginState
-import com.whatever.caro.screenshot.ScreenshotScenario
 
 internal object LoginScreenshotScenario {
     const val ID = "login.login.initial"

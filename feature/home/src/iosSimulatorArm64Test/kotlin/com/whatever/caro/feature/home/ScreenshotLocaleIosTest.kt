@@ -1,4 +1,4 @@
-package com.whatever.caro.screenshot
+package com.whatever.caro.feature.home
 
 import platform.Foundation.NSUserDefaults
 import kotlin.test.Test

@@ -1,4 +1,4 @@
-package com.whatever.caro.screenshot
+package com.whatever.caro.feature.home
 
 import android.os.LocaleList
 import org.junit.Assert.assertEquals

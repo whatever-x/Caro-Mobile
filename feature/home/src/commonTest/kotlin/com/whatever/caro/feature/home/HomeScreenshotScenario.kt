@@ -8,7 +8,6 @@ import com.whatever.caro.core.model.deck.Deck
 import com.whatever.caro.core.model.deck.DeckState
 import com.whatever.caro.feature.home.mvi.HomeState
 import com.whatever.caro.feature.home.mvi.HomeStreakState
-import com.whatever.caro.screenshot.ScreenshotScenario
 import kotlinx.collections.immutable.persistentListOf
 
 internal object HomeScreenshotScenario {

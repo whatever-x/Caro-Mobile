@@ -4,7 +4,6 @@ import androidx.compose.runtime.Composable
 import com.whatever.caro.core.designsystem.themes.CaroTheme
 import com.whatever.caro.core.model.learning.StudyCard
 import com.whatever.caro.feature.learning.mvi.LearningState
-import com.whatever.caro.screenshot.ScreenshotScenario
 
 internal object LearningScreenshotScenario {
     const val ID = "learning.learning.front"

@@ -1,6 +1,6 @@
 package com.whatever.caro.feature.deck.create
 
-import com.whatever.caro.screenshot.captureIosScreenshots
+import com.whatever.caro.feature.deck.captureIosScreenshots
 import kotlin.test.Test
 
 class CreateDeckScreenshotIosTest {

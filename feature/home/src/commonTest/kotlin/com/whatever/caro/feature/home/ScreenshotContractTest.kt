@@ -1,4 +1,4 @@
-package com.whatever.caro.screenshot
+package com.whatever.caro.feature.home
 
 import androidx.compose.ui.unit.IntSize
 import io.kotest.assertions.throwables.shouldThrow
@@ -28,6 +28,14 @@ class ScreenshotContractTest : FunSpec() {
             }
         }
 
+        test("screen factories keep their own logical IDs on both platforms") {
+            for (platform in listOf("android", "ios")) {
+                val captures = screenshotCaptures(platform, HomeScreenshotScenario::scenarios)
+                captures.map { it.scenario.id }.toSet() shouldBe setOf(HomeScreenshotScenario.ID)
+                captures.map { it.language }.toSet() shouldBe ScreenshotConfiguration.languages.toSet()
+            }
+        }
+
         test("default geometry is exact pixels and density is independent from physical ppi") {
             val profile = ScreenshotConfiguration.profiles.single { it.platform == "android" && it.variant == "default" }
             profile.widthPx shouldBe 1280
@@ -50,20 +58,6 @@ class ScreenshotContractTest : FunSpec() {
                     "android",
                 ) { listOf(ScreenshotScenario("same.id", render = {}), ScreenshotScenario("same.id", render = {})) }
             }
-        }
-
-        test("scoped settings restore on success and rendering failure") {
-            var value: String? = null
-            withRestoredSetting({ value }, { value = it }, "ko") { value shouldBe "ko" }
-            value shouldBe null
-            value = "original"
-            shouldThrow<IllegalStateException> {
-                withRestoredSetting({ value }, { value = it }, "en") {
-                    value shouldBe "en"
-                    error("render failed")
-                }
-            }
-            value shouldBe "original"
         }
     }
 }

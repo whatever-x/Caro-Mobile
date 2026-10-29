@@ -1,6 +1,6 @@
 package com.whatever.caro.feature.profile.edit
 
-import com.whatever.caro.screenshot.captureIosScreenshots
+import com.whatever.caro.feature.profile.captureIosScreenshots
 import kotlin.test.Test
 
 class EditProfileScreenshotIosTest {

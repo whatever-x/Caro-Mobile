@@ -3,7 +3,6 @@ package com.whatever.caro.feature.splash
 import androidx.compose.runtime.Composable
 import com.whatever.caro.core.designsystem.themes.CaroTheme
 import com.whatever.caro.feature.splash.mvi.SplashState
-import com.whatever.caro.screenshot.ScreenshotScenario
 
 internal object SplashScreenshotScenario {
     const val ID = "splash.splash.initial"

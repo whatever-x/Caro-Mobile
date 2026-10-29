@@ -25,7 +25,7 @@
 | --- | --- |
 | [개발 환경과 빌드](development/build.md) | 필수 도구·환경 설정·Android/iOS 빌드·포맷 명령 |
 | [테스트 안내](development/testing.md) | 테스트 도구·소스셋·실행 명령·커버리지 |
-| [스크린샷 테스트 개발](development/screenshot-testing.md) | 공통 시나리오·Android/iOS·ko/en 캡처 작성·로컬 검증 |
+| [스크린샷 테스트 규칙](development/screenshot-testing.md) | 소스셋 책임·공통 시나리오·로케일·치수·결과 해석 |
 
 ## ci/ — CI 운영
 

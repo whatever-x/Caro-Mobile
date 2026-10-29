@@ -2,9 +2,10 @@ package com.whatever.caro.feature.profile.edit
 
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
-import com.whatever.caro.screenshot.ScreenshotCapture
-import com.whatever.caro.screenshot.captureAndroidScreenshot
-import com.whatever.caro.screenshot.screenshotCaptures
+import com.whatever.caro.feature.profile.ScreenshotCapture
+import com.whatever.caro.feature.profile.captureAndroidScreenshot
+import com.whatever.caro.feature.profile.screenshotAndroidRule
+import com.whatever.caro.feature.profile.screenshotCaptures
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -14,12 +15,13 @@ import org.robolectric.annotation.GraphicsMode
 
 @RunWith(ParameterizedRobolectricTestRunner::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
-@Config(sdk = [35], qualifiers = "w427dp-h952dp-xxhdpi")
+@Config(sdk = [35])
 internal class EditProfileScreenshotAndroidTest(
     private val capture: ScreenshotCapture,
 ) {
-    @get:Rule
-    val composeRule = createAndroidComposeRule<ComponentActivity>()
+    private val composeRule = createAndroidComposeRule<ComponentActivity>()
+
+    @get:Rule val captureRule = screenshotAndroidRule(capture, composeRule)
 
     @Test
     fun capture() = captureAndroidScreenshot(composeRule, capture)

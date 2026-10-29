@@ -95,15 +95,25 @@ jobs:
       matrix:
         include:
           - platform: android
+            profile: pixel10-pro
             target: androidHostTest
             test-task: testAndroidHostTest
             task: compareRoborazziAndroidHostTest
             runner: ubuntu-24.04
           - platform: ios
+            profile: iphone18-pro
             target: iosSimulatorArm64
             test-task: iosSimulatorArm64Test
             task: compareRoborazziIosSimulatorArm64
             runner: macos-26
+    env:
+      PLATFORM: ${{ matrix.platform }}
+      TARGET: ${{ matrix.target }}
+      PROFILE: ${{ matrix.profile }}
+      PR_NUMBER: ${{ needs.prepare.outputs.pr_number }}
+      BASE_SHA: ${{ needs.prepare.outputs.base_sha }}
+      HEAD_SHA: ${{ needs.prepare.outputs.head_sha }}
+      SOURCE_SHA: ${{ needs.prepare.outputs.merge_sha }}
     steps:
       - uses: actions/checkout@v6
         with:
@@ -152,8 +162,8 @@ jobs:
           done
           printf '%s\n' "$golden" > "$RUNNER_TEMP/screenshot-golden-run.json"
           gh api "repos/$GITHUB_REPOSITORY/actions/runs/$run_id/artifacts?per_page=100" > "$RUNNER_TEMP/screenshot-golden-artifacts.json"
-          python3 scripts/screenshot/pipeline.py validate-run --platform "$PLATFORM" --base-sha "$BASE_SHA" \
-            --run "$RUNNER_TEMP/screenshot-golden-run.json" --artifacts "$RUNNER_TEMP/screenshot-golden-artifacts.json"
+          jq -e --arg sha "$BASE_SHA" '.head_sha == $sha and .head_branch == "develop" and .event == "push" and .status == "completed" and .conclusion == "success"' "$RUNNER_TEMP/screenshot-golden-run.json" > /dev/null
+          jq -e --arg name "screenshot-golden-$PLATFORM" '[.artifacts[] | select(.name == $name)] | length == 1 and .[0].expired == false' "$RUNNER_TEMP/screenshot-golden-artifacts.json" > /dev/null
           if ! gh run download "$run_id" --repo "$GITHUB_REPOSITORY" -n "screenshot-golden-$PLATFORM" -D build/screenshot-baseline; then
             echo "::error::Golden artifact for base SHA $BASE_SHA is missing, expired, or unavailable. See $run_url"
             exit 1
@@ -181,10 +191,47 @@ jobs:
         with:
           path: ~/.konan
           key: konan-v2-${{ matrix.runner }}-${{ runner.os }}-${{ runner.arch }}-${{ steps.xcode.outputs.version }}-${{ steps.xcode.outputs.dependency_hash }}
-      - name: Validate v2 identity and restore exact-base Golden images
-        run: >-
-          python3 scripts/screenshot/pipeline.py restore
-          --platform '${{ matrix.platform }}' --base-sha '${{ needs.prepare.outputs.base_sha }}'
+      - name: Validate v5 identity and restore exact-base Golden images
+        shell: bash
+        run: |
+          export LC_ALL=C
+          metadata=build/screenshot-baseline/metadata.json
+          [[ -d build/screenshot-baseline && ! -L build/screenshot-baseline ]] || { echo "::error::Required screenshot input/output path condition failed." >&2; exit 1; }
+          [[ -f "$metadata" && ! -L "$metadata" ]] || { echo "::error::Required screenshot input/output path condition failed." >&2; exit 1; }
+          test -z "$(find build/screenshot-baseline ! -type d ! -type f -print)"
+          jq -e --arg sha "$BASE_SHA" --arg platform "$PLATFORM" --arg profile "$PROFILE" \
+            --slurpfile current scripts/screenshot/scenarios.json '
+          def valid_registry:
+            def safe: type == "string" and test("^[A-Za-z0-9][A-Za-z0-9._-]*\\z") and
+              (contains("__") | not) and (test("_(actual|compare|before)\\z") | not);
+            type == "object" and length > 0 and all(to_entries[];
+              (.key | safe) and (.value | type == "array" and length > 0 and all(.[]; safe))) and
+            ([.[][]] | length == (unique | length));
+            .schema_version == 5 and .source_sha == $sha and .platform == $platform and
+            .languages == ["ko", "en"] and
+            .profiles == {default: $profile, "small-large-font": ($profile + "-small-large-font")} and
+            (.scenarios | valid_registry) and ($current[0] | valid_registry)
+          ' "$metadata" > /dev/null || { echo "::error::Missing or incompatible exact-base Golden; schema v5 is required."; exit 1; }
+          jq -r --arg profile "$PROFILE" '.scenarios |
+          to_entries[] | .key as $module | .value[] as $id | ["ko", "en"][] as $language |
+            $module + "/" + $id + "__" + $language + "__" + $profile +
+            (if $id == "setting.notification.small.large-font" then "-small-large-font" else "" end) + ".png"
+          ' "$metadata" | sort > "$RUNNER_TEMP/screenshot-base-files"
+          jq -r --arg profile "$PROFILE" '
+          to_entries[] | .key as $module | .value[] as $id | ["ko", "en"][] as $language |
+            $module + "/" + $id + "__" + $language + "__" + $profile +
+            (if $id == "setting.notification.small.large-font" then "-small-large-font" else "" end) + ".png"
+          ' scripts/screenshot/scenarios.json | sort > "$RUNNER_TEMP/screenshot-current-files"
+          diff -u <({ echo metadata.json; cat "$RUNNER_TEMP/screenshot-base-files"; } | sort) \
+            <(find build/screenshot-baseline -type f | sed 's|^build/screenshot-baseline/||' | sort)
+          while IFS= read -r image; do
+            [[ -f "build/screenshot-baseline/$image" && -s "build/screenshot-baseline/$image" && ! -L "build/screenshot-baseline/$image" ]] || { echo "::error::Required screenshot input/output path condition failed." >&2; exit 1; }
+            module=${image%%/*}
+            if [[ ! -f "feature/$module/build.gradle.kts" ]]; then continue; fi
+            destination="feature/$module/build/outputs/roborazzi/$TARGET"
+            mkdir -p "$destination"
+            cp "build/screenshot-baseline/$image" "$destination/"
+          done < "$RUNNER_TEMP/screenshot-base-files"
       - name: Configure offline screenshot fixtures
         run: |
           cat > local.properties <<'EOF'
@@ -202,13 +249,69 @@ jobs:
           done < <(jq -r 'keys[]' scripts/screenshot/scenarios.json)
           ./gradlew '${{ matrix.task }}' "${test_tasks[@]}" --stacktrace --profile --console=plain
       - name: Validate multilingual results and collect changed originals
-        run: >-
-          python3 scripts/screenshot/pipeline.py collect
-          --platform '${{ matrix.platform }}'
-          --pr-number '${{ needs.prepare.outputs.pr_number }}'
-          --base-sha '${{ needs.prepare.outputs.base_sha }}'
-          --head-sha '${{ needs.prepare.outputs.head_sha }}'
-          --source-sha '${{ needs.prepare.outputs.merge_sha }}'
+        shell: bash
+        run: |
+          export LC_ALL=C
+          [[ ! -e build/screenshot-report && ! -L build/screenshot-report ]] || { echo "::error::Required screenshot input/output path condition failed." >&2; exit 1; }
+          [[ ! -e build/screenshot-before-after && ! -L build/screenshot-before-after ]] || { echo "::error::Required screenshot input/output path condition failed." >&2; exit 1; }
+          mkdir -p build/screenshot-report build/screenshot-before-after
+          : > "$RUNNER_TEMP/screenshot-results.jsonl"
+          while IFS= read -r module; do
+            capture_source="feature/$module/build/outputs/roborazzi/$TARGET"
+            results="feature/$module/build/test-results/roborazzi/$TARGET/results-summary.json"
+            [[ -d "$capture_source" && ! -L "$capture_source" ]] || { echo "::error::Required screenshot input/output path condition failed." >&2; exit 1; }
+            [[ -f "$results" && ! -L "$results" ]] || { echo "::error::Required screenshot input/output path condition failed." >&2; exit 1; }
+            test -z "$(find "$capture_source" ! -type d ! -type f -print)"
+            jq -Rr --arg module "$module" 'select(startswith($module + "/")) | ltrimstr($module + "/")' \
+              "$RUNNER_TEMP/screenshot-current-files" > "$RUNNER_TEMP/screenshot-module-files"
+            jq -e --rawfile expected "$RUNNER_TEMP/screenshot-module-files" '
+              (.results | type == "array") and
+              ([.results[].golden_file_path | split("/")[-1]] | sort) == ($expected | split("\n") | map(select(length > 0)) | sort) and
+              all(.results[]; .type == "changed" or .type == "added" or .type == "unchanged")
+            ' "$results" > /dev/null
+            jq -Rr --arg module "$module" 'select(startswith($module + "/")) | ltrimstr($module + "/")' \
+              "$RUNNER_TEMP/screenshot-base-files" > "$RUNNER_TEMP/screenshot-allowed-files"
+            while IFS=$'\t' read -r image kind; do
+              key="$module/$image"
+              if grep -Fxq -- "$key" "$RUNNER_TEMP/screenshot-base-files"; then test "$kind" != added
+              else test "$kind" = added; fi
+              stem=${image%.png}
+              if [[ "$kind" == unchanged ]]; then
+                [[ -f "$capture_source/$image" && -s "$capture_source/$image" && ! -L "$capture_source/$image" ]] || { echo "::error::Required screenshot input/output path condition failed." >&2; exit 1; }
+                continue
+              fi
+              printf '%s\n' "${stem}_actual.png" "${stem}_compare.png" >> "$RUNNER_TEMP/screenshot-allowed-files"
+              actual="$capture_source/${stem}_actual.png"
+              [[ -f "$actual" && -s "$actual" && ! -L "$actual" ]] || { echo "::error::Required screenshot input/output path condition failed." >&2; exit 1; }
+              mkdir -p "build/screenshot-before-after/$module" "build/screenshot-report/$module"
+              cp "$actual" "build/screenshot-before-after/$module/"
+              if [[ "$kind" == changed ]]; then
+                cp "build/screenshot-baseline/$key" "build/screenshot-before-after/$module/${stem}_before.png"
+                diagnostic="${stem}_compare.png"
+              else diagnostic="${stem}_actual.png"; fi
+              [[ -f "$capture_source/$diagnostic" && -s "$capture_source/$diagnostic" && ! -L "$capture_source/$diagnostic" ]] || { echo "::error::Required screenshot input/output path condition failed." >&2; exit 1; }
+              cp "$capture_source/$diagnostic" "build/screenshot-report/$module/"
+            done < <(jq -r '.results[] | [(.golden_file_path | split("/")[-1]), .type] | @tsv' "$results")
+            sort -u "$RUNNER_TEMP/screenshot-allowed-files" > "$RUNNER_TEMP/screenshot-allowed-sorted"
+            find "$capture_source" -type f | sed "s|^$capture_source/||" | sort > "$RUNNER_TEMP/screenshot-actual-files"
+            test -z "$(comm -23 "$RUNNER_TEMP/screenshot-actual-files" "$RUNNER_TEMP/screenshot-allowed-sorted")"
+            while IFS= read -r image; do test -s "$capture_source/$image"; done < "$RUNNER_TEMP/screenshot-actual-files"
+            jq -c --arg module "$module" '.results[] |
+              {key: ($module + "/" + (.golden_file_path | split("/")[-1] | rtrimstr(".png"))), type}' \
+              "$results" >> "$RUNNER_TEMP/screenshot-results.jsonl"
+          done < <(jq -r 'keys[]' scripts/screenshot/scenarios.json)
+          comm -23 "$RUNNER_TEMP/screenshot-base-files" "$RUNNER_TEMP/screenshot-current-files" | \
+            jq -Rsc 'split("\n") | map(select(length > 0) | rtrimstr(".png"))' > "$RUNNER_TEMP/screenshot-removed.json"
+          jq -s --arg platform "$PLATFORM" --arg profile "$PROFILE" --argjson number "$PR_NUMBER" \
+            --arg base "$BASE_SHA" --arg head "$HEAD_SHA" --arg source "$SOURCE_SHA" \
+            --slurpfile current scripts/screenshot/scenarios.json --slurpfile baseline build/screenshot-baseline/metadata.json \
+            --slurpfile removed "$RUNNER_TEMP/screenshot-removed.json" '
+            {schema_version: 5, platform: $platform, pr_number: $number, base_sha: $base, head_sha: $head, source_sha: $source,
+             languages: ["ko", "en"], profiles: {default: $profile, "small-large-font": ($profile + "-small-large-font")},
+             scenarios: $current[0], baseline_scenarios: $baseline[0].scenarios, total: length,
+             changed: [.[] | select(.type == "changed") | .key], added: [.[] | select(.type == "added") | .key], removed: $removed[0]}
+          ' "$RUNNER_TEMP/screenshot-results.jsonl" > build/screenshot-report/summary.json
+          cp build/screenshot-report/summary.json build/screenshot-before-after/summary.json
       - uses: actions/upload-artifact@v6
         with:
           name: screenshot-report-${{ matrix.platform }}
