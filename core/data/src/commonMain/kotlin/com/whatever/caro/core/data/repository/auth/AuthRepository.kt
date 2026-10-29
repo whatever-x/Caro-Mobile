@@ -16,6 +16,7 @@ interface AuthRepository {
     suspend fun completeRegistration(
         nickname: String,
         termsAgreed: Boolean,
+        birthDate: String,
     ): AuthSession
 
     /**

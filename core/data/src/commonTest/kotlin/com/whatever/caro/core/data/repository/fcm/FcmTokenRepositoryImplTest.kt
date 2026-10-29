@@ -230,8 +230,10 @@ class FcmTokenRepositoryImplTest : FunSpec() {
                             every { observeRegisteredAccessToken() } returns session
                             everySuspend { fetchAccessToken() } calls { savedAccess }
                             everySuspend { clear() } calls { session.value = null }
-                            everySuspend { saveTokens("new-access", "refresh") } calls { savedAccess = "new-access" }
-                            everySuspend { saveRegistrationComplete(true) } calls { session.value = savedAccess }
+                            everySuspend { saveSession("new-access", "refresh", true) } calls {
+                                savedAccess = "new-access"
+                                session.value = savedAccess
+                            }
                         }
                     val remote =
                         mock<NotificationDataSource> {
@@ -257,6 +259,9 @@ class FcmTokenRepositoryImplTest : FunSpec() {
                                 },
                             localAuthDataSource = local,
                             fcmTokenRepository = fcm,
+                            adEligibilityGate =
+                                com.whatever.caro.core.data.repository.ads
+                                    .AdEligibilityGate(),
                         )
                     backgroundScope.launch { fcm.syncTokens(MutableStateFlow("fcm-token")) }
                     runCurrent()
@@ -266,7 +271,7 @@ class FcmTokenRepositoryImplTest : FunSpec() {
                     if (loginPath == "소셜 로그인") {
                         auth.loginWithSocial(SocialLoginType.GOOGLE, "id-token")
                     } else {
-                        auth.completeRegistration("caro", true)
+                        auth.completeRegistration("caro", true, "2000-01-01")
                     }
                     runCurrent()
 

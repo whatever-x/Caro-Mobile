@@ -258,4 +258,5 @@
     <string name="setting_notification_permission_content">알림을 받으려면 권한을 허용해야 해요. 기기 설정에서 Caro의 알림을 허용해 주세요.</string>
     <string name="setting_notification_open_settings">앱 설정으로</string>
     <string name="setting_notification_changing">알림 설정 변경 중</string>
+    <string name="setting_menu_ad_privacy_options">광고 개인정보 설정</string>
 </resources>

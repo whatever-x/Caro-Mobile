@@ -27,6 +27,9 @@ jobs:
       - name: Spotless check
         run: ./gradlew spotlessCheck --stacktrace
 
+      - name: Validate iOS AdMob configuration
+        run: sh scripts/ads/test-validate-ios-app-id.sh
+
   test-coverage:
     name: Kover Test Coverage Measure
     runs-on: ubuntu-latest

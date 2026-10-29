@@ -263,4 +263,5 @@
 	<string name="setting_notification_permission_content">To receive notifications, allow notifications for Caro in your device settings.</string>
 	<string name="setting_notification_open_settings">App settings</string>
 	<string name="setting_notification_changing">Updating notification settings</string>
+	<string name="setting_menu_ad_privacy_options">Ad privacy options</string>
 </resources>

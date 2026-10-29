@@ -36,6 +36,36 @@ class SettingScreenshotAndroidTest {
     val composeRule = createComposeRule()
 
     @Test
+    fun adPrivacyMenuDispatchesOneAction() {
+        var clicks = 0
+        composeRule.setContent {
+            CaroTheme {
+                SettingScreen(
+                    state = SettingState(isLoading = false),
+                    appVersion = "1.0",
+                    showAdPrivacyOptions = true,
+                    onIntent = { if (it == SettingIntent.ClickAdPrivacyOptions) clicks++ },
+                )
+            }
+        }
+        composeRule
+            .onNodeWithText("광고 개인정보 설정")
+            .performScrollTo()
+            .assertIsDisplayed()
+            .performClick()
+        assertEquals(1, clicks)
+        composeRule.onRoot().captureRoboImage("setting.ad-privacy.required.png")
+    }
+
+    @Test
+    fun adPrivacyMenuIsAbsentWhenNotRequired() {
+        composeRule.setContent {
+            CaroTheme { SettingScreen(SettingState(isLoading = false), "1.0", onIntent = {}) }
+        }
+        composeRule.onNodeWithText("광고 개인정보 설정").assertDoesNotExist()
+    }
+
+    @Test
     fun notificationToggleHasStateAndOneAction() {
         var clicks = 0
         composeRule.setContent {
@@ -52,7 +82,15 @@ class SettingScreenshotAndroidTest {
 
     @Test
     fun notificationBusyBlocksChanges() {
-        composeRule.setContent { CaroTheme { SettingScreen(SettingState(isLoading = false, isNotificationLoading = true), "1.0", {}) } }
+        composeRule.setContent {
+            CaroTheme {
+                SettingScreen(
+                    SettingState(isLoading = false, isNotificationLoading = true),
+                    "1.0",
+                    onIntent = {},
+                )
+            }
+        }
         composeRule.onNodeWithText("알림 수신").assertIsNotEnabled()
         composeRule.onRoot().captureRoboImage("setting.notification.busy.png")
     }
@@ -67,7 +105,7 @@ class SettingScreenshotAndroidTest {
                         SettingScreen(
                             SettingState(isLoading = false, nickname = "현란하게_춤추는_연", emailAddress = "caro@example.com"),
                             "1.0",
-                            {},
+                            onIntent = {},
                         )
                     }
                 }

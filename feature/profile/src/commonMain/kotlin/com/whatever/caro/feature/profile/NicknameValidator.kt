@@ -43,6 +43,8 @@ sealed interface NicknameValidationResult {
 
     data object Checking : NicknameValidationResult
 
+    data object CheckFailed : NicknameValidationResult
+
     val isValid: Boolean
         get() = this is Valid
 }

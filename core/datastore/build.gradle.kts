@@ -15,6 +15,7 @@ kotlin {
         commonMain.dependencies {
             implementation(libs.bundles.datastore)
             implementation(libs.kotlinx.coroutines.core)
+            implementation(libs.kotlinx.date.time)
         }
         androidMain.dependencies {
             implementation(libs.kotlinx.coroutines.android)

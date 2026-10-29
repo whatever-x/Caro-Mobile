@@ -21,6 +21,7 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             implementation(projects.core.model)
+            implementation(projects.core.ads)
         }
     }
 }

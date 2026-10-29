@@ -1,6 +1,7 @@
 package com.whatever.caro.core.test.module
 
 import com.whatever.caro.core.remote.auth.AuthTokenProvider
+import com.whatever.caro.core.remote.auth.AuthTokenSnapshot
 import com.whatever.caro.core.remote.di.networkModule
 import com.whatever.caro.core.remote.di.qualifier.NetworkClient
 import com.whatever.caro.core.remote.network.device.DeviceIdProvider
@@ -36,11 +37,13 @@ class NetworkModuleTest :
                 }
                 single<AuthTokenProvider> {
                     object : AuthTokenProvider {
+                        override suspend fun getSessionSnapshot() = AuthTokenSnapshot(null, 0)
+
                         override suspend fun getAccessToken(): String? = null
 
                         override suspend fun getRefreshToken(): String? = null
 
-                        override suspend fun refresh(): String = ""
+                        override suspend fun refresh(expectedGeneration: Long): String = ""
 
                         override suspend fun clearTokens() = Unit
                     }

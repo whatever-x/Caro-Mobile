@@ -191,6 +191,7 @@ fun SettingRoute(
     SettingScreen(
         state = state,
         appVersion = AppConfig.appVersion,
+        showAdPrivacyOptions = state.adPrivacyOptionsRequired,
         onIntent = viewModel::intent,
     )
     if (state.notificationPermissionDialogVisible) {

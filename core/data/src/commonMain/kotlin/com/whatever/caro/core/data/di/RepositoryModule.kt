@@ -1,5 +1,9 @@
 package com.whatever.caro.core.data.di
 
+import com.whatever.caro.core.data.repository.ads.AdEligibilityGate
+import com.whatever.caro.core.data.repository.ads.AdEligibilityMonitor
+import com.whatever.caro.core.data.repository.ads.InterstitialFrequencyRepository
+import com.whatever.caro.core.data.repository.ads.InterstitialFrequencyRepositoryImpl
 import com.whatever.caro.core.data.repository.auth.AuthRepository
 import com.whatever.caro.core.data.repository.auth.AuthRepositoryImpl
 import com.whatever.caro.core.data.repository.card.CardRepository
@@ -22,6 +26,9 @@ import org.koin.plugin.module.dsl.single
 
 val repositoryModule =
     module {
+        single { AdEligibilityGate() }
+        single { AdEligibilityMonitor(get(), get(), get()) }
+        single<InterstitialFrequencyRepositoryImpl>() bind InterstitialFrequencyRepository::class
         single<FcmTokenRepositoryImpl>() bind FcmTokenRepository::class
         single<AuthRepositoryImpl>() bind AuthRepository::class
         single<ProfileRepositoryImpl>() bind ProfileRepository::class

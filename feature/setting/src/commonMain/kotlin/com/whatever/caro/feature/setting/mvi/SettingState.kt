@@ -13,6 +13,7 @@ data class SettingState(
     val notificationEnabled: Boolean = false,
     val isNotificationLoading: Boolean = false,
     val notificationPermissionDialogVisible: Boolean = false,
+    val adPrivacyOptionsRequired: Boolean = false,
 ) : UiState {
     val isUserInfoVisible: Boolean
         get() = isLoading || nickname.isNotBlank()
