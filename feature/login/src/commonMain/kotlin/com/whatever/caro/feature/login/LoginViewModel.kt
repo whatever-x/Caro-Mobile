@@ -50,6 +50,11 @@ class LoginViewModel(
 
     private suspend fun loginWithGoogle(intent: LoginIntent.ClickGoogleLoginButton) {
         when (intent.result) {
+            SocialLoginResult.NoCredential -> {
+                reduce { copy(isLoading = false) }
+                postSideEffect(LoginSideEffect.ShowErrorSnackbar(error = LoginError.NO_CREDENTIAL))
+            }
+
             SocialLoginResult.Failed -> {
                 reduce { copy(isLoading = false) }
                 postSideEffect(LoginSideEffect.ShowErrorSnackbar(error = LoginError.UNKNOWN))
@@ -71,7 +76,7 @@ class LoginViewModel(
 
     private suspend fun loginWithApple(intent: LoginIntent.ClickAppleLoginButton) {
         when (intent.result) {
-            SocialLoginResult.Failed -> {
+            SocialLoginResult.Failed, SocialLoginResult.NoCredential -> {
                 reduce { copy(isLoading = false) }
                 postSideEffect(LoginSideEffect.ShowErrorSnackbar(error = LoginError.UNKNOWN))
             }
