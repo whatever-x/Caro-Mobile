@@ -38,7 +38,8 @@ description: >
    정확한 window px와 Compose density/fontScale을 적용한다. 일반 root의 측정값은 canvas px와 같아야 한다.
    언어·프로필 ID를 바꾸면 세 워크플로의 Bash·jq 기대 파일명 규칙도 함께 수정한다. CI는 파일·결과 목록을 대조한다.
    root·density/fontScale 단언은 Kotlin 테스트에 유지한다. CI가 PNG 치수나 geometry 로그를 검사한다고 보고하지 않는다.
-   작은 화면에는 명시된 variant만 사용한다. 320×480 논리 크기/fontScale1.5와 계정탈퇴 스크롤을 유지한다.
+   명시된 variant만 사용한다. Setting은 320×480/fontScale1.5와 계정탈퇴 스크롤, Library narrow는 320×700/fontScale1을 유지한다.
+   Library의 `english` ID는 데이터 variant다. 리소스 로케일을 en으로 강제하지 않는다.
    Android Locale·LocaleList·qualifiers와 iOS의 **앱 도메인에 저장된** AppleLanguages 값을 finally에서 복원한다.
    시스템 fallback을 앱 설정으로 저장하지 않는다. Home/Setting은 실제 리소스의 ko/en 텍스트도 단언한다.
 7. **Dialog를 명시한다.** 공통 case에 `isDialog = true`를 지정한다. Dialog ID는 feature의 `ScreenshotConfiguration.contentSizedScenarios`에도 등록한다.

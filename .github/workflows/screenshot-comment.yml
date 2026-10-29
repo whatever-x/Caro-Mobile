@@ -105,12 +105,14 @@ jobs:
               def captures:
                 [to_entries[] | .key as $module | .value[] as $id | ["ko", "en"][] as $language |
                   $module + "/" + $id + "__" + $language + "__" + $profile +
-                  (if $id == "setting.notification.small.large-font" then "-small-large-font" else "" end)] | sort;
+                  (if $id == "setting.notification.small.large-font" then "-small-large-font"
+               elif (["library.preview.narrow", "library.preview.english.narrow", "library.preview.english.error"] | index($id)) != null then "-narrow"
+               else "" end)] | sort;
               ($registry[0] | captures) as $expected | (.baseline_scenarios | captures) as $previous |
               .schema_version == 5 and .platform == $platform and
               .pr_number == $context[0].pr_number and .base_sha == $context[0].base_sha and
               .head_sha == $context[0].head_sha and .source_sha == $context[0].merge_sha and
-              .languages == ["ko", "en"] and .profiles == {default: $profile, "small-large-font": ($profile + "-small-large-font")} and
+              .languages == ["ko", "en"] and .profiles == {default: $profile, "small-large-font": ($profile + "-small-large-font"), narrow: ($profile + "-narrow")} and
               ($registry[0] | valid_registry) and (.baseline_scenarios | valid_registry) and .scenarios == $registry[0] and
               .total == ($expected | length) and all(.changed, .added, .removed; type == "array") and
               ((.changed + .added + .removed) | length == (unique | length)) and

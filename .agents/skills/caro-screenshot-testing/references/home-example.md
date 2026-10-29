@@ -116,12 +116,19 @@ internal object ScreenshotConfiguration {
     val languages = listOf("ko", "en")
     val profiles = listOf(
         ScreenshotProfile("android", "default", "pixel10-pro", 1280, 2856, 3f, 1f),
+        ScreenshotProfile("android", "narrow", "pixel10-pro-narrow", 960, 2100, 3f, 1f),
         ScreenshotProfile("android", "small-large-font", "pixel10-pro-small-large-font", 960, 1440, 3f, 1.5f),
         ScreenshotProfile("ios", "default", "iphone18-pro", 1206, 2622, 3f, 1f),
+        ScreenshotProfile("ios", "narrow", "iphone18-pro-narrow", 960, 2100, 3f, 1f),
         ScreenshotProfile("ios", "small-large-font", "iphone18-pro-small-large-font", 960, 1440, 3f, 1.5f),
     )
-    val variants = mapOf("setting.notification.small.large-font" to "small-large-font")
-    val contentSizedScenarios = setOf("setting.notification.permission")
+    val variants = mapOf(
+        "setting.notification.small.large-font" to "small-large-font",
+        LibraryScreenshotScenario.NARROW_ID to "narrow",
+        LibraryScreenshotScenario.ENGLISH_NARROW_ID to "narrow",
+        LibraryScreenshotScenario.ENGLISH_ERROR_ID to "narrow",
+    )
+    val contentSizedScenarios = setOf("setting.notification.permission", LibraryScreenshotScenario.ENGLISH_ERROR_ID)
 }
 
 internal class ScreenshotScenario(
@@ -245,6 +252,7 @@ idle까지 기다린다. finally에서 이전 값을 복원한다. 스크롤 완
 
 기본 프로필을 모든 ID에 사용한다. `ScreenshotConfiguration.variants`에 명시된 작은 화면 case만 별도 profile로 대체한다.
 `setting.notification.small.large-font`는 320×480 논리 크기/fontScale1.5이며 계정탈퇴까지 스크롤한다.
+Library narrow는 320×700/fontScale1이다. `english` ID의 데이터도 ko/en 리소스로 각각 실행한다.
 Dialog는 `isDialog`와 `ScreenshotConfiguration.contentSizedScenarios`를 함께 유지한다. 실사용 fixture 문자열은 번역하지 않아도 된다.
 Home/Setting 리소스 문자열의 ko/en 전환은 의미 단언으로 확인한다.
 

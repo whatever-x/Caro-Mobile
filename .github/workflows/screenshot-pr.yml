@@ -209,18 +209,22 @@ jobs:
             ([.[][]] | length == (unique | length));
             .schema_version == 5 and .source_sha == $sha and .platform == $platform and
             .languages == ["ko", "en"] and
-            .profiles == {default: $profile, "small-large-font": ($profile + "-small-large-font")} and
+            .profiles == {default: $profile, "small-large-font": ($profile + "-small-large-font"), narrow: ($profile + "-narrow")} and
             (.scenarios | valid_registry) and ($current[0] | valid_registry)
           ' "$metadata" > /dev/null || { echo "::error::Missing or incompatible exact-base Golden; schema v5 is required."; exit 1; }
           jq -r --arg profile "$PROFILE" '.scenarios |
           to_entries[] | .key as $module | .value[] as $id | ["ko", "en"][] as $language |
             $module + "/" + $id + "__" + $language + "__" + $profile +
-            (if $id == "setting.notification.small.large-font" then "-small-large-font" else "" end) + ".png"
+            (if $id == "setting.notification.small.large-font" then "-small-large-font"
+               elif (["library.preview.narrow", "library.preview.english.narrow", "library.preview.english.error"] | index($id)) != null then "-narrow"
+               else "" end) + ".png"
           ' "$metadata" | sort > "$RUNNER_TEMP/screenshot-base-files"
           jq -r --arg profile "$PROFILE" '
           to_entries[] | .key as $module | .value[] as $id | ["ko", "en"][] as $language |
             $module + "/" + $id + "__" + $language + "__" + $profile +
-            (if $id == "setting.notification.small.large-font" then "-small-large-font" else "" end) + ".png"
+            (if $id == "setting.notification.small.large-font" then "-small-large-font"
+               elif (["library.preview.narrow", "library.preview.english.narrow", "library.preview.english.error"] | index($id)) != null then "-narrow"
+               else "" end) + ".png"
           ' scripts/screenshot/scenarios.json | sort > "$RUNNER_TEMP/screenshot-current-files"
           diff -u <({ echo metadata.json; cat "$RUNNER_TEMP/screenshot-base-files"; } | sort) \
             <(find build/screenshot-baseline -type f | sed 's|^build/screenshot-baseline/||' | sort)
@@ -307,7 +311,7 @@ jobs:
             --slurpfile current scripts/screenshot/scenarios.json --slurpfile baseline build/screenshot-baseline/metadata.json \
             --slurpfile removed "$RUNNER_TEMP/screenshot-removed.json" '
             {schema_version: 5, platform: $platform, pr_number: $number, base_sha: $base, head_sha: $head, source_sha: $source,
-             languages: ["ko", "en"], profiles: {default: $profile, "small-large-font": ($profile + "-small-large-font")},
+             languages: ["ko", "en"], profiles: {default: $profile, "small-large-font": ($profile + "-small-large-font"), narrow: ($profile + "-narrow")},
              scenarios: $current[0], baseline_scenarios: $baseline[0].scenarios, total: length,
              changed: [.[] | select(.type == "changed") | .key], added: [.[] | select(.type == "added") | .key], removed: $removed[0]}
           ' "$RUNNER_TEMP/screenshot-results.jsonl" > build/screenshot-report/summary.json

@@ -27,12 +27,20 @@ internal object ScreenshotConfiguration {
     val profiles =
         listOf(
             ScreenshotProfile("android", "default", "pixel10-pro", 1280, 2856, 3f, 1f),
+            ScreenshotProfile("android", "narrow", "pixel10-pro-narrow", 960, 2100, 3f, 1f),
             ScreenshotProfile("android", "small-large-font", "pixel10-pro-small-large-font", 960, 1440, 3f, 1.5f),
             ScreenshotProfile("ios", "default", "iphone18-pro", 1206, 2622, 3f, 1f),
+            ScreenshotProfile("ios", "narrow", "iphone18-pro-narrow", 960, 2100, 3f, 1f),
             ScreenshotProfile("ios", "small-large-font", "iphone18-pro-small-large-font", 960, 1440, 3f, 1.5f),
         )
-    val variants = mapOf("setting.notification.small.large-font" to "small-large-font")
-    val contentSizedScenarios = setOf("setting.notification.permission")
+    val variants =
+        mapOf(
+            "setting.notification.small.large-font" to "small-large-font",
+            LibraryScreenshotScenario.NARROW_ID to "narrow",
+            LibraryScreenshotScenario.ENGLISH_NARROW_ID to "narrow",
+            LibraryScreenshotScenario.ENGLISH_ERROR_ID to "narrow",
+        )
+    val contentSizedScenarios = setOf("setting.notification.permission", LibraryScreenshotScenario.ENGLISH_ERROR_ID)
 }
 
 internal class ScreenshotScenario(

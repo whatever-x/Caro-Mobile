@@ -11,6 +11,7 @@ CI·Golden·수동 실행·게시 승인 절차의 원본 문서입니다. 작�
 언어·기기 값은 각 feature의 `commonTest/ScreenshotCapture.kt`에 Kotlin으로 직접 선언합니다. 설정 JSON·코드 생성은 사용하지 않습니다.
 세 워크플로의 Bash·jq는 기대 언어·프로필 ID와 파일명을 검사합니다. 이 이름을 바꾸면 Kotlin과 CI의 파일명 규칙을 함께 수정합니다.
 공통 ID N개를 ko/en으로 확장하면 플랫폼별 2N개, 전체 4N개의 캡처가 됩니다.
+현재 기대 목록은 9개 모듈·24개 논리 ID이며, 플랫폼별 48개·전체 96개입니다. 실제 출력 수와 구분합니다.
 작은 화면·큰 글꼴 시나리오는 명시된 variant 하나를 사용합니다. 모든 시나리오를 모든 variant로 곱하지 않습니다.
 파일명은 `<scenario-id>__<language>__<profile-id>.png`입니다. 플랫폼은 출력 경로와 메타데이터에 포함합니다.
 
@@ -50,7 +51,7 @@ Golden 조회는 `branch=develop&head_sha=<PR-base-SHA>`의 실행만 찾습니�
 v5 Golden metadata에는 다음 값만 포함합니다.
 
 - schema version 5, source SHA(정확한 PR base), platform
-- languages `["ko", "en"]`, 기본·작은 화면 profile ID
+- languages `["ko", "en"]`, 기본·small-large-font·narrow profile ID
 - scenarios: 모듈별 기대 논리 ID registry
 
 다운로드한 파일 목록을 registry에서 확장한 기대 목록과 대조한 뒤 복원합니다. schema·SHA·플랫폼·언어·프로필 ID가 다르면 실패합니다.
@@ -67,6 +68,7 @@ v5 Golden metadata에는 다음 값만 포함합니다.
 별도로 승인받아 develop에 병합한 뒤 **실제 병합 결과 SHA**의 자동 push Golden이 v5 기준을 생성해야 합니다.
 해당 원본의 시각 검토와 Golden 성공을 확인한 후 다음 PR에서 exact-base 비교를 수행합니다.
 이전 SHA를 재실행해도 새 스키마 코드는 생기지 않습니다. 다른 SHA의 Golden으로 대체하지 않습니다.
+profiles 목록에는 Library의 `narrow`도 포함합니다. 이전 v5 Golden에 이 프로필이 없으면 기본 호환성 검사에서 실패합니다.
 언어·프로필 ID·schema를 바꾸면 같은 호환성 경계를 다시 적용합니다. 같은 프로필 ID의 기기값 변경은 CI metadata로 판별하지 못합니다.
 
 ## 결과와 댓글

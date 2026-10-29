@@ -43,7 +43,8 @@ Android Dialog는 같은 semantics owner의 연결된 View가 같은 치수인�
 `SCREENSHOT_GEOMETRY`는 Kotlin 테스트가 단언한 root·적용된 Compose density/fontScale의 로그입니다. CI는 이 로그나 PNG 내용·치수를 해석하지 않습니다.
 메타데이터의 languages·profiles는 기대 파일명 라벨입니다. 실제 기기 모델·OS·치수·density·fontScale의 측정값이 아닙니다.
 
-작은 화면 case만 `small-large-font` variant를 사용합니다. 320×480 논리 크기/fontScale1.5와 계정탈퇴 스크롤을 유지합니다.
+Setting의 작은 화면 case는 `small-large-font`를 사용합니다. 320×480 논리 크기/fontScale1.5와 계정탈퇴 스크롤을 유지합니다.
+Library의 세 narrow case는 `narrow`로 320×700 논리 크기/fontScale1을 유지합니다. `english` ID는 고정 데이터 variant이며 리소스 로케일은 ko/en으로 실행합니다.
 모든 시나리오에 모든 variant를 곱하지 않습니다. 상호작용 중에는 clock을 진행합니다. 캡처 때는 일시정지 상태로 복원합니다.
 
 Android Locale·LocaleList·qualifiers는 예외가 나도 복원합니다. iOS는 앱 도메인에 저장된 AppleLanguages만 보관합니다.

@@ -98,7 +98,9 @@ jobs:
             jq -r --arg module "$module" --arg profile "$PROFILE" '
               .[$module][] as $id | ["ko", "en"][] as $language |
               $id + "__" + $language + "__" + $profile +
-              (if $id == "setting.notification.small.large-font" then "-small-large-font" else "" end) + ".png"
+              (if $id == "setting.notification.small.large-font" then "-small-large-font"
+               elif (["library.preview.narrow", "library.preview.english.narrow", "library.preview.english.error"] | index($id)) != null then "-narrow"
+               else "" end) + ".png"
             ' scripts/screenshot/scenarios.json | sort > "$RUNNER_TEMP/screenshot-module-files"
             diff -u "$RUNNER_TEMP/screenshot-module-files" <(find "$capture_source" -type f | sed "s|^$capture_source/||" | sort)
             mkdir -p "build/screenshot-golden/$module"
@@ -110,7 +112,7 @@ jobs:
           jq -n --arg platform "$PLATFORM" --arg source "$GITHUB_SHA" --arg profile "$PROFILE" \
             --slurpfile scenarios scripts/screenshot/scenarios.json '
             {schema_version: 5, platform: $platform, source_sha: $source, languages: ["ko", "en"],
-             profiles: {default: $profile, "small-large-font": ($profile + "-small-large-font")}, scenarios: $scenarios[0]}
+             profiles: {default: $profile, "small-large-font": ($profile + "-small-large-font"), narrow: ($profile + "-narrow")}, scenarios: $scenarios[0]}
           ' > build/screenshot-golden/metadata.json
       - uses: actions/upload-artifact@v6
         with:
