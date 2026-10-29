@@ -1,95 +1,30 @@
 package com.whatever.caro.feature.home
 
-import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.assertIsNotEnabled
-import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.test.onNodeWithText
-import androidx.compose.ui.test.onRoot
-import androidx.compose.ui.test.performClick
-import com.github.takahirom.roborazzi.captureRoboImage
-import com.whatever.caro.core.designsystem.themes.CaroTheme
-import com.whatever.caro.feature.home.library.LibraryPreviewScreen
-import com.whatever.caro.feature.home.library.mvi.LibraryPreviewIntent
-import com.whatever.caro.feature.home.library.mvi.LibraryPreviewState
-import com.whatever.caro.feature.home.library.mvi.toUiContent
-import org.junit.Assert.assertEquals
+import androidx.activity.ComponentActivity
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
+import org.robolectric.ParameterizedRobolectricTestRunner
 import org.robolectric.annotation.Config
 import org.robolectric.annotation.GraphicsMode
 
-@RunWith(RobolectricTestRunner::class)
+@RunWith(ParameterizedRobolectricTestRunner::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
-@Config(sdk = [35], qualifiers = "ko-rKR-w402dp-h790dp-xxhdpi")
-class LibraryScreenAndroidTest {
-    @get:Rule val composeRule = createComposeRule()
-    private val detail = LibraryScreenshotScenario.detail
+@Config(sdk = [35])
+internal class LibraryScreenAndroidTest(
+    private val capture: ScreenshotCapture,
+) {
+    private val composeRule = createAndroidComposeRule<ComponentActivity>()
 
-    @Test fun preview() {
-        composeRule.setContent { LibraryScreenshotScenario.Preview() }
-        composeRule.onNodeWithText("내 덱에 추가").assertIsDisplayed()
-        composeRule.onRoot().captureRoboImage("library.preview.normal.png")
-    }
-
-    @Test fun list() {
-        composeRule.setContent { LibraryScreenshotScenario.List() }
-        composeRule.onRoot().captureRoboImage("library.list.normal.png")
-    }
+    @get:Rule val captureRule = screenshotAndroidRule(capture, composeRule)
 
     @Test
-    @Config(qualifiers = "en-rUS-w320dp-h700dp-xxhdpi")
-    fun englishPreviewOnNarrowScreen() {
-        composeRule.setContent { LibraryScreenshotScenario.EnglishPreview() }
-        composeRule.onNodeWithText("Add to my decks").assertIsDisplayed()
-        composeRule.onNodeWithText("Cards: 1").assertIsDisplayed()
-        composeRule.onRoot().captureRoboImage("library.preview.english.narrow.png")
-    }
+    fun capture() = captureAndroidScreenshot(composeRule, capture)
 
-    @Test
-    @Config(qualifiers = "en-rUS-w320dp-h700dp-xxhdpi")
-    fun englishErrorOnlyClosesPopup() {
-        val intents = mutableListOf<LibraryPreviewIntent>()
-        composeRule.setContent { LibraryScreenshotScenario.EnglishError { intents.add(it) } }
-        composeRule.onNodeWithText("Couldn't add deck").assertIsDisplayed()
-        composeRule.onRoot().captureRoboImage("library.preview.english.error.png")
-        composeRule.onNodeWithText("OK").performClick()
-        assertEquals(listOf(LibraryPreviewIntent.DismissError), intents)
-    }
-
-    @Test
-    @Config(qualifiers = "ko-rKR-w320dp-h700dp-xxhdpi")
-    fun narrowLongTitle() {
-        composeRule.setContent { LibraryScreenshotScenario.Preview(narrow = true) }
-        composeRule.onNodeWithText("내 덱에 추가").assertIsDisplayed()
-        composeRule.onRoot().captureRoboImage("library.preview.narrow.png")
-    }
-
-    @Test fun addingPreventsClick() {
-        composeRule.setContent {
-            CaroTheme {
-                LibraryPreviewScreen(
-                    LibraryPreviewState(detail.toUiContent(), loading = false, adding = true),
-                ) {}
-            }
-        }
-        composeRule.onNodeWithText("추가 중…").assertIsNotEnabled()
-    }
-
-    @Test
-    @Config(qualifiers = "ko-rKR-w320dp-h700dp-xxhdpi")
-    fun errorConfirmOnlyClosesPopup() {
-        val intents = mutableListOf<LibraryPreviewIntent>()
-        composeRule.setContent {
-            CaroTheme {
-                LibraryPreviewScreen(
-                    LibraryPreviewState(detail.toUiContent(), loading = false, showAddError = true),
-                ) { intents.add(it) }
-            }
-        }
-        composeRule.onNodeWithText("덱 추가 중 오류가 발생했어요").assertIsDisplayed()
-        composeRule.onNodeWithText("확인").performClick()
-        assertEquals(listOf(LibraryPreviewIntent.DismissError), intents)
+    companion object {
+        @JvmStatic
+        @ParameterizedRobolectricTestRunner.Parameters(name = "{0}")
+        fun captures(): List<Array<Any>> = screenshotCaptures("android", LibraryScreenshotScenario::scenarios).map { arrayOf(it) }
     }
 }

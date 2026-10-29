@@ -18,6 +18,11 @@ class ScreenshotPlugin : Plugin<Project> {
             }
 
             kotlin {
+                sourceSets.getByName("commonTest") {
+                    dependencies {
+                        implementation(libs.library("compose-ui-test"))
+                    }
+                }
                 sourceSets.getByName("androidHostTest") {
                     dependencies {
                         implementation(libs.library("robolectric"))
@@ -30,7 +35,6 @@ class ScreenshotPlugin : Plugin<Project> {
                 }
                 sourceSets.getByName("iosSimulatorArm64Test") {
                     dependencies {
-                        implementation(libs.library("compose-ui-test"))
                         implementation(libs.library("roborazzi-compose-ios"))
                     }
                 }

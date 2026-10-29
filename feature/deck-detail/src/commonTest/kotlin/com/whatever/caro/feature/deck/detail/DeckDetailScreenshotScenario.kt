@@ -10,10 +10,13 @@ import kotlinx.collections.immutable.persistentListOf
 
 internal object DeckDetailScreenshotScenario {
     const val ID = "deck_detail.detail.empty"
-    const val FILE_NAME = "$ID.png"
-    const val WIDTH_DP = 393
-    const val HEIGHT_DP = 852
-    const val LOCALE = "ko"
+    const val LIBRARY_COPY_ID = "deck_detail.library_copy"
+
+    fun scenarios() =
+        listOf(
+            ScreenshotScenario(ID, render = { Render() }),
+            ScreenshotScenario(LIBRARY_COPY_ID, render = { LibraryCopy() }),
+        )
 
     @Composable
     fun Render() {

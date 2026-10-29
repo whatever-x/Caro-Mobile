@@ -6,10 +6,8 @@ import com.whatever.caro.feature.card.mvi.CreateCardState
 
 internal object CreateCardScreenshotScenario {
     const val ID = "card.create.draft"
-    const val FILE_NAME = "$ID.png"
-    const val WIDTH_DP = 393
-    const val HEIGHT_DP = 852
-    const val LOCALE = "ko"
+
+    fun scenarios() = listOf(ScreenshotScenario(ID, render = { Render() }))
 
     @Composable
     fun Render() {

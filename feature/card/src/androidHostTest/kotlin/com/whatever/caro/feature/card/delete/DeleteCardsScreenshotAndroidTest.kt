@@ -1,26 +1,34 @@
 package com.whatever.caro.feature.card.delete
 
-import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.test.onRoot
-import com.github.takahirom.roborazzi.captureRoboImage
+import androidx.activity.ComponentActivity
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import com.whatever.caro.feature.card.ScreenshotCapture
+import com.whatever.caro.feature.card.captureAndroidScreenshot
+import com.whatever.caro.feature.card.screenshotAndroidRule
+import com.whatever.caro.feature.card.screenshotCaptures
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
+import org.robolectric.ParameterizedRobolectricTestRunner
 import org.robolectric.annotation.Config
 import org.robolectric.annotation.GraphicsMode
 
-@RunWith(RobolectricTestRunner::class)
+@RunWith(ParameterizedRobolectricTestRunner::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
-@Config(sdk = [35], qualifiers = "ko-rKR-w393dp-h852dp-xxhdpi")
-class DeleteCardsScreenshotAndroidTest {
-    @get:Rule
-    val composeRule = createComposeRule()
+@Config(sdk = [35])
+internal class DeleteCardsScreenshotAndroidTest(
+    private val capture: ScreenshotCapture,
+) {
+    private val composeRule = createAndroidComposeRule<ComponentActivity>()
+
+    @get:Rule val captureRule = screenshotAndroidRule(capture, composeRule)
 
     @Test
-    fun initial() {
-        composeRule.setContent { DeleteCardsScreenshotScenario.Render() }
-        composeRule.waitForIdle()
-        composeRule.onRoot().captureRoboImage(DeleteCardsScreenshotScenario.FILE_NAME)
+    fun capture() = captureAndroidScreenshot(composeRule, capture)
+
+    companion object {
+        @JvmStatic
+        @ParameterizedRobolectricTestRunner.Parameters(name = "{0}")
+        fun captures(): List<Array<Any>> = screenshotCaptures("android", DeleteCardsScreenshotScenario::scenarios).map { arrayOf(it) }
     }
 }

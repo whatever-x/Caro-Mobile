@@ -73,6 +73,7 @@ build/generated/
 !/docs/collaboration/git-workflow.md
 !/docs/development/build.md
 !/docs/development/testing.md
+!/docs/development/screenshot-testing.md
 !/docs/index.md
 
 # Local agent configuration; shared sources live in .agents/.

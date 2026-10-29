@@ -1,6 +1,8 @@
 package com.whatever.caro.feature.home
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.onNodeWithText
 import com.whatever.caro.core.designsystem.themes.CaroTheme
 import com.whatever.caro.core.model.deck.Deck
 import com.whatever.caro.core.model.deck.DeckState
@@ -10,10 +12,17 @@ import kotlinx.collections.immutable.persistentListOf
 
 internal object HomeScreenshotScenario {
     const val ID = "home.home.with_deck"
-    const val FILE_NAME = "$ID.png"
-    const val WIDTH_DP = 393
-    const val HEIGHT_DP = 852
-    const val LOCALE = "ko"
+
+    fun scenarios() =
+        listOf(
+            ScreenshotScenario(
+                ID,
+                render = { Render() },
+                beforeCapture = { language ->
+                    onNodeWithText(if (language == "ko") "덱 만들기" else "Create Deck").assertIsDisplayed()
+                },
+            ),
+        )
 
     @Composable
     fun Render() {

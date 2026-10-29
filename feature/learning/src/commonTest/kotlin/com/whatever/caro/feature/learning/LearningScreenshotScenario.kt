@@ -7,10 +7,8 @@ import com.whatever.caro.feature.learning.mvi.LearningState
 
 internal object LearningScreenshotScenario {
     const val ID = "learning.learning.front"
-    const val FILE_NAME = "$ID.png"
-    const val WIDTH_DP = 393
-    const val HEIGHT_DP = 852
-    const val LOCALE = "ko"
+
+    fun scenarios() = listOf(ScreenshotScenario(ID, render = { Render() }))
 
     @Composable
     fun Render() {
