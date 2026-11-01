@@ -10,8 +10,8 @@ class ScreenshotContractTest : FunSpec() {
         test("both platforms expand every common scenario to one capture per language") {
             val scenarios = {
                 listOf(
-                    ScreenshotScenario("fixture.initial", render = {}),
-                    ScreenshotScenario("setting.notification.small.large-font", render = {}),
+                    ScreenshotScenario("fixture.initial", render = {}, expectedStrings = emptyList()),
+                    ScreenshotScenario("setting.notification.small.large-font", render = {}, expectedStrings = emptyList()),
                 )
             }
             val android = screenshotCaptures("android", scenarios)
@@ -41,13 +41,19 @@ class ScreenshotContractTest : FunSpec() {
             profile.widthPx shouldBe 1280
             profile.heightPx shouldBe 2856
             profile.density shouldBe 3f
-            val capture = screenshotCaptures("android") { listOf(ScreenshotScenario("fixture.initial", render = {})) }.first()
+            val capture =
+                screenshotCaptures("android") {
+                    listOf(ScreenshotScenario("fixture.initial", render = {}, expectedStrings = emptyList()))
+                }.first()
             assertScreenshotGeometry(capture, IntSize(1280, 2856))
             shouldThrow<IllegalStateException> { assertScreenshotGeometry(capture, IntSize(1281, 2856)) }
         }
 
         test("content-sized roots are measured and cannot exceed their virtual canvas") {
-            val capture = screenshotCaptures("ios") { listOf(ScreenshotScenario("setting.notification.permission", render = {})) }.first()
+            val capture =
+                screenshotCaptures("ios") {
+                    listOf(ScreenshotScenario("setting.notification.permission", render = {}, expectedStrings = emptyList()))
+                }.first()
             assertScreenshotGeometry(capture, IntSize(990, 600))
             shouldThrow<IllegalStateException> { assertScreenshotGeometry(capture, IntSize(1207, 600)) }
         }
@@ -56,7 +62,12 @@ class ScreenshotContractTest : FunSpec() {
             shouldThrow<IllegalArgumentException> {
                 screenshotCaptures(
                     "android",
-                ) { listOf(ScreenshotScenario("same.id", render = {}), ScreenshotScenario("same.id", render = {})) }
+                ) {
+                    listOf(
+                        ScreenshotScenario("same.id", render = {}, expectedStrings = emptyList()),
+                        ScreenshotScenario("same.id", render = {}, expectedStrings = emptyList()),
+                    )
+                }
             }
         }
     }

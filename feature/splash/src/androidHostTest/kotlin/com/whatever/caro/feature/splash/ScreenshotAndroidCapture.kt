@@ -9,11 +9,11 @@ import androidx.compose.ui.test.isDialog
 import androidx.compose.ui.test.junit4.AndroidComposeTestRule
 import androidx.compose.ui.test.onRoot
 import com.github.takahirom.roborazzi.captureRoboImage
+import org.jetbrains.compose.resources.ResourceEnvironment
+import org.jetbrains.compose.resources.getSystemResourceEnvironment
 import org.junit.rules.RuleChain
 import org.junit.rules.TestRule
 import org.junit.runners.model.Statement
-import org.jetbrains.compose.resources.ResourceEnvironment
-import org.jetbrains.compose.resources.getSystemResourceEnvironment
 import org.robolectric.RuntimeEnvironment
 import java.util.Locale
 
