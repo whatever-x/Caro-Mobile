@@ -25,7 +25,7 @@ internal fun screenshotAndroidRule(
         .outerRule(
             TestRule { base, _ ->
                 object : Statement() {
-                    override fun evaluate() = withAndroidScreenshotLocale(capture.language) { base.evaluate() }
+                    override fun evaluate() = withAndroidScreenshotLocale(capture.language, capture.profile) { base.evaluate() }
                 }
             },
         ).around(composeRule)
@@ -82,14 +82,12 @@ private fun interaction(
 
 internal fun <T> withAndroidScreenshotLocale(
     language: String,
+    profile: ScreenshotProfile = ScreenshotConfiguration.profiles.single { it.platform == "android" && it.variant == "default" },
     block: () -> T,
 ): T {
     val previousLocale = Locale.getDefault()
     val previousLocales = LocaleList.getDefault()
     val previousQualifiers = RuntimeEnvironment.getQualifiers()
-    val profile =
-        ScreenshotConfiguration.profiles
-            .single { it.platform == "android" && it.variant == "default" }
     try {
         // Integer host bounds enclose the exact virtual window; profile values stay in this feature's Kotlin configuration.
         val width = kotlin.math.ceil(profile.widthPx / profile.density.toDouble()).toInt()
