@@ -49,7 +49,12 @@ Library의 세 narrow case는 `narrow`로 320×700 논리 크기/fontScale1을 �
 
 Android Locale·LocaleList·qualifiers는 예외가 나도 복원합니다. iOS는 앱 도메인에 저장된 AppleLanguages만 보관합니다.
 원래 key가 없으면 다시 제거합니다. 시스템 fallback을 앱 override로 저장하지 않습니다.
-Home/Setting의 실제 리소스 ko/en 전환도 의미 단언으로 확인합니다. 고정 사용자 입력 문자열은 번역하지 않아도 됩니다.
+모든 공통 시나리오는 `expectedStrings`에 대표 `StringResource`와 필요한 포맷 인자를 선언합니다.
+각 플랫폼은 캡처용 로케일 적용 함수와 분리된 준비 단계에서 ko/en의 `ResourceEnvironment`를 확보합니다.
+준비 중 변경한 로케일은 `finally`에서 복원하고, UI 렌더링 전에 명시적인 환경으로 `getString(environment, resource)`를 호출합니다.
+선택한 리소스의 ko/en 결과가 같으면 번역과 기대 언어 환경을 확인하도록 실패시킵니다.
+`beforeCapture`·`afterCapture`는 준비된 `ScreenshotStrings`를 리소스 키로 조회합니다. 문구·줄바꿈은 XML에서 관리합니다.
+현재 화면의 로케일로 기대값을 다시 읽지 않습니다. 고정 사용자 입력 문자열은 번역하지 않아도 됩니다.
 
 ## 검증과 보고
 

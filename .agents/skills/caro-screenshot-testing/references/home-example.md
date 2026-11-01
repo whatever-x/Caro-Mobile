@@ -63,6 +63,8 @@ package com.whatever.caro.feature.home
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.onNodeWithText
+import caromobile.core.designsystem.generated.resources.Res
+import caromobile.core.designsystem.generated.resources.deck_title_create
 import com.whatever.caro.core.designsystem.themes.CaroTheme
 import com.whatever.caro.core.model.deck.Deck
 import com.whatever.caro.core.model.deck.DeckState
@@ -79,8 +81,9 @@ internal object HomeScreenshotScenario {
             ScreenshotScenario(
                 ID,
                 render = { Render() },
-                beforeCapture = { language ->
-                    onNodeWithText(if (language == "ko") "덱 만들기" else "Create Deck").assertIsDisplayed()
+                expectedStrings = listOf(ScreenshotString(Res.string.deck_title_create)),
+                beforeCapture = { strings ->
+                    onNodeWithText(strings[Res.string.deck_title_create]).assertIsDisplayed()
                 },
             ),
         )
@@ -131,12 +134,22 @@ internal object ScreenshotConfiguration {
     val contentSizedScenarios = setOf("setting.notification.permission", LibraryScreenshotScenario.ENGLISH_ERROR_ID)
 }
 
+internal data class ScreenshotString(
+    val resource: StringResource,
+    val formatArgs: List<Any> = emptyList(),
+)
+
+internal class ScreenshotStrings(private val values: Map<StringResource, String>) {
+    operator fun get(resource: StringResource): String = values.getValue(resource)
+}
+
 internal class ScreenshotScenario(
     val id: String,
     val render: @Composable () -> Unit,
+    val expectedStrings: List<ScreenshotString>,
     val isDialog: Boolean = false,
-    val beforeCapture: SemanticsNodeInteractionsProvider.(String) -> Unit = {},
-    val afterCapture: SemanticsNodeInteractionsProvider.(String) -> Unit = {},
+    val beforeCapture: SemanticsNodeInteractionsProvider.(ScreenshotStrings) -> Unit = {},
+    val afterCapture: SemanticsNodeInteractionsProvider.(ScreenshotStrings) -> Unit = {},
 )
 
 internal data class ScreenshotCapture(
@@ -210,7 +223,9 @@ internal class HomeScreenshotAndroidTest(
 [로케일·clock·캡처 보조](../../../../feature/home/src/androidHostTest/kotlin/com/whatever/caro/feature/home/ScreenshotAndroidCapture.kt)는
 같은 feature의 플랫폼 소스셋에 둔다. `screenshotAndroidRule`의 바깥 rule은 로케일을 적용한다. 안쪽 rule은 Compose Activity를 실행한다.
 feature Kotlin 프로필의 host qualifiers와 언어를 Activity 시작 전에 적용한다. 종료할 때 Locale·LocaleList·qualifiers를 복원한다.
-`captureAndroidScreenshot`은 정확한 window px와 `ScreenshotCanvas`를 적용한다. before/after 단언과 기하 검사를 유지한다.
+`captureAndroidScreenshot`은 화면 렌더링 전에 `expectedAndroidResourceEnvironments`로 기대 환경을 확보하고 로케일을 복원한다.
+`prepareScreenshotStrings`가 명시적인 환경으로 기대 문자열을 읽은 뒤 정확한 window px와 `ScreenshotCanvas`를 적용한다.
+before/after 콜백에는 이 기대값을 전달한다. 기존 상호작용 단언과 기하 검사를 유지한다.
 
 캡처 import는 `com.github.takahirom.roborazzi.captureRoboImage`다. 테스트 메서드마다 새 Compose rule을 사용한다.
 하나의 rule에서 setContent를 여러 번 호출하지 않는다. Dialog 소유 View의 치수가 다르면 실패시킨다. 출력 치수를 조작하지 않는다.
@@ -235,6 +250,8 @@ class HomeScreenshotIosTest {
 `screenshotCaptures("ios", scenarios)`로 해당 화면 목록을 확장한다. 각 case는 독립된 Skiko 세션을 실행한다.
 캡처 import는 `io.github.takahirom.roborazzi.captureRoboImage`다. 보조 함수는 프로필의 px Size와 Density를 전달한다.
 `isDialog()` 또는 `onRoot()`로 선택한 같은 컴포넌트를 측정하고 캡처한다.
+캡처 로케일을 적용하기 전에 `expectedIosResourceEnvironments`로 기대 환경을 확보하고 저장된 로케일을 복원한다.
+`prepareScreenshotStrings`가 명시적인 환경으로 기대 문자열을 읽는다. before/after 콜백은 준비된 값만 조회한다.
 
 Skiko Size는 px다. 프로필의 density/fontScale도 전달한다. AppleLanguages는
 `persistentDomainForName(domain)["AppleLanguages"]`의 저장된 값만 보관한다. objectForKey의 유효 fallback은 보관하지 않는다. domain은 main bundle ID가 없으면 processName을 쓴다.
@@ -254,7 +271,9 @@ idle까지 기다린다. finally에서 이전 값을 복원한다. 스크롤 완
 `setting.notification.small.large-font`는 320×480 논리 크기/fontScale1.5이며 계정탈퇴까지 스크롤한다.
 Library narrow는 320×700/fontScale1이다. `english` ID의 데이터도 ko/en 리소스로 각각 실행한다.
 Dialog는 `isDialog`와 `ScreenshotConfiguration.contentSizedScenarios`를 함께 유지한다. 실사용 fixture 문자열은 번역하지 않아도 된다.
-Home/Setting 리소스 문자열의 ko/en 전환은 의미 단언으로 확인한다.
+모든 시나리오는 `expectedStrings`에 선언한 대표 리소스의 ko/en 전환을 의미 단언으로 확인한다.
+선택한 리소스의 ko/en 값이 같으면 준비가 실패한다. 문구·줄바꿈 변경은 XML에만 반영한다.
+`library_card_count`처럼 인자가 필요한 리소스는 `ScreenshotString(Res.string.library_card_count, formatArgs = listOf(1))`로 선언한다.
 
 ## 명령과 산출물
 

@@ -12,6 +12,8 @@ import com.github.takahirom.roborazzi.captureRoboImage
 import org.junit.rules.RuleChain
 import org.junit.rules.TestRule
 import org.junit.runners.model.Statement
+import org.jetbrains.compose.resources.ResourceEnvironment
+import org.jetbrains.compose.resources.getSystemResourceEnvironment
 import org.robolectric.RuntimeEnvironment
 import java.util.Locale
 
@@ -32,6 +34,7 @@ internal fun captureAndroidScreenshot(
     composeRule: AndroidComposeTestRule<*, ComponentActivity>,
     capture: ScreenshotCapture,
 ) {
+    val strings = prepareScreenshotStrings(capture, expectedAndroidResourceEnvironments())
     composeRule.runOnUiThread {
         composeRule.activity.window.setDecorFitsSystemWindows(false)
         composeRule.activity.window.setLayout(capture.profile.widthPx, capture.profile.heightPx)
@@ -45,7 +48,7 @@ internal fun captureAndroidScreenshot(
     }
     composeRule.mainClock.advanceTimeBy(1_000)
     composeRule.waitForIdle()
-    interaction(composeRule) { capture.scenario.beforeCapture(composeRule, capture.language) }
+    interaction(composeRule) { capture.scenario.beforeCapture(composeRule, strings) }
     val component = if (capture.scenario.isDialog) composeRule.onNode(isDialog()) else composeRule.onRoot()
     val node = component.fetchSemanticsNode()
     val size = node.size
@@ -60,7 +63,7 @@ internal fun captureAndroidScreenshot(
     } else {
         component.captureRoboImage(capture.fileName)
     }
-    interaction(composeRule) { capture.scenario.afterCapture(composeRule, capture.language) }
+    interaction(composeRule) { capture.scenario.afterCapture(composeRule, strings) }
 }
 
 private fun interaction(
@@ -97,6 +100,24 @@ internal fun <T> withAndroidScreenshotLocale(
         return block()
     } finally {
         RuntimeEnvironment.setQualifiers(previousQualifiers)
+        LocaleList.setDefault(previousLocales)
+        Locale.setDefault(previousLocale)
+    }
+}
+
+// Independent from withAndroidScreenshotLocale: only prepare expected resource environments here.
+private fun expectedAndroidResourceEnvironments(): Map<String, ResourceEnvironment> {
+    val previousLocale = Locale.getDefault()
+    val previousLocales = LocaleList.getDefault()
+    try {
+        return ScreenshotConfiguration.languages.associateWith { language ->
+            val locale = Locale.forLanguageTag(language)
+            Locale.setDefault(locale)
+            LocaleList.setDefault(LocaleList(locale))
+            check(Locale.getDefault().language == language) { "Expected resource language was not applied: $language" }
+            getSystemResourceEnvironment()
+        }
+    } finally {
         LocaleList.setDefault(previousLocales)
         Locale.setDefault(previousLocale)
     }

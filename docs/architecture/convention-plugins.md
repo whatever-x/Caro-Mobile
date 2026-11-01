@@ -58,6 +58,8 @@ KMP 타깃·Compose·DI·테스트 등의 공통 설정을 통일합니다.
 
 **새 feature 모듈의 `build.gradle.kts` 템플릿:**
 
+스크린샷 테스트를 작성하는 모듈은 아래 `plugins` 블록에 `id("caro.screenshot")`도 추가합니다.
+
 ```kotlin
 plugins {
     id("caro.kmp")

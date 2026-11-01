@@ -1,6 +1,11 @@
 package com.whatever.caro.feature.deck.detail
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.onNodeWithText
+import caromobile.core.designsystem.generated.resources.Res
+import caromobile.core.designsystem.generated.resources.deck_detail_button_empty_guid
+import caromobile.core.designsystem.generated.resources.deck_detail_title_daily_learning
 import com.whatever.caro.core.designsystem.themes.CaroTheme
 import com.whatever.caro.core.model.deck.Deck
 import com.whatever.caro.core.model.deck.DeckState
@@ -14,8 +19,22 @@ internal object DeckDetailScreenshotScenario {
 
     fun scenarios() =
         listOf(
-            ScreenshotScenario(ID, render = { Render() }),
-            ScreenshotScenario(LIBRARY_COPY_ID, render = { LibraryCopy() }),
+            ScreenshotScenario(
+                ID,
+                render = { Render() },
+                expectedStrings = listOf(ScreenshotString(Res.string.deck_detail_button_empty_guid)),
+                beforeCapture = { strings ->
+                    onNodeWithText(strings[Res.string.deck_detail_button_empty_guid]).assertIsDisplayed()
+                },
+            ),
+            ScreenshotScenario(
+                LIBRARY_COPY_ID,
+                render = { LibraryCopy() },
+                expectedStrings = listOf(ScreenshotString(Res.string.deck_detail_title_daily_learning)),
+                beforeCapture = { strings ->
+                    onNodeWithText(strings[Res.string.deck_detail_title_daily_learning]).assertIsDisplayed()
+                },
+            ),
         )
 
     @Composable

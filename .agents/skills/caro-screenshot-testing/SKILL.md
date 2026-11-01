@@ -41,7 +41,14 @@ description: >
    명시된 variant만 사용한다. Setting은 320×480/fontScale1.5와 계정탈퇴 스크롤, Library narrow는 320×700/fontScale1을 유지한다.
    Library의 `english` ID는 데이터 variant다. 리소스 로케일을 en으로 강제하지 않는다.
    Android Locale·LocaleList·qualifiers와 iOS의 **앱 도메인에 저장된** AppleLanguages 값을 finally에서 복원한다.
-   시스템 fallback을 앱 설정으로 저장하지 않는다. Home/Setting은 실제 리소스의 ko/en 텍스트도 단언한다.
+   시스템 fallback을 앱 설정으로 저장하지 않는다. 모든 공통 시나리오는 `expectedStrings`에
+   `ScreenshotString(Res.string.key)`를 선언한다. 포맷 인자는 `formatArgs`에 둔다.
+   플랫폼 보조 코드는 캡처용 로케일 함수와 분리해 ko/en `ResourceEnvironment`를 확보하고 로케일을 복원한다.
+   `prepareScreenshotStrings`가 UI 렌더링 전에 `getString(environment, resource)`로 기대값을 읽는다.
+   선택한 리소스의 ko/en 값이 같으면 준비를 실패시킨다. 의미 있는 번역 차이가 있는 대표 문구를 선택한다.
+   before/after 콜백은 `ScreenshotStrings`를 받아 `strings[Res.string.key]`로 조회한다.
+   대표 문구는 `onNodeWithText(strings[Res.string.key]).assertIsDisplayed()`로 확인한다.
+   현재 화면 로케일로 기대값을 다시 읽거나 번역 문구를 테스트에 복사하지 않는다. 고정 사용자 입력 데이터와 구분한다.
 7. **Dialog를 명시한다.** 공통 case에 `isDialog = true`를 지정한다. Dialog ID는 feature의 `ScreenshotConfiguration.contentSizedScenarios`에도 등록한다.
    `isDialog()`로 선택한 컴포넌트를 측정·캡처한다. Android에서는 같은 semantics owner의 View가 연결되고 치수가 같은지 확인한다.
    확인한 View를 Roborazzi로 캡처한다. 임의 root 인덱스, 여러 window 합성, 후처리 crop/scale로 맞추지 않는다.

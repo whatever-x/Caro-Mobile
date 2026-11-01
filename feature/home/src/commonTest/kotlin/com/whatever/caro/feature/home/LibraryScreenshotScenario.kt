@@ -8,6 +8,13 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import caromobile.core.designsystem.generated.resources.Res
+import caromobile.core.designsystem.generated.resources.library_add
+import caromobile.core.designsystem.generated.resources.library_add_error_title
+import caromobile.core.designsystem.generated.resources.library_adding
+import caromobile.core.designsystem.generated.resources.library_card_count
+import caromobile.core.designsystem.generated.resources.library_confirm
+import caromobile.core.designsystem.generated.resources.library_title
 import com.whatever.caro.core.designsystem.themes.CaroTheme
 import com.whatever.caro.core.model.library.LibraryCard
 import com.whatever.caro.core.model.library.LibraryDeck
@@ -34,39 +41,68 @@ internal object LibraryScreenshotScenario {
             ScreenshotScenario(
                 PREVIEW_ID,
                 render = { Preview(adding = adding) },
-                beforeCapture = { language ->
-                    onNodeWithText(if (language == "ko") "내 덱에 추가" else "Add to my decks").assertIsDisplayed()
+                expectedStrings =
+                    listOf(
+                        ScreenshotString(Res.string.library_add),
+                        ScreenshotString(Res.string.library_adding),
+                    ),
+                beforeCapture = { strings ->
+                    onNodeWithText(strings[Res.string.library_add]).assertIsDisplayed()
                 },
-                afterCapture = { language ->
+                afterCapture = { strings ->
                     adding = true
-                    onNodeWithText(if (language == "ko") "추가 중…" else "Adding…").assertIsNotEnabled()
+                    onNodeWithText(strings[Res.string.library_adding]).assertIsNotEnabled()
                 },
             ),
-            ScreenshotScenario(LIST_ID, render = { List() }),
+            ScreenshotScenario(
+                LIST_ID,
+                render = { List() },
+                expectedStrings =
+                    listOf(
+                        ScreenshotString(Res.string.library_title),
+                    ),
+                beforeCapture = { strings ->
+                    onNodeWithText(strings[Res.string.library_title]).assertIsDisplayed()
+                },
+            ),
             ScreenshotScenario(
                 NARROW_ID,
                 render = { Preview(narrow = true) },
-                beforeCapture = { language ->
-                    onNodeWithText(if (language == "ko") "내 덱에 추가" else "Add to my decks").assertIsDisplayed()
+                expectedStrings =
+                    listOf(
+                        ScreenshotString(Res.string.library_add),
+                    ),
+                beforeCapture = { strings ->
+                    onNodeWithText(strings[Res.string.library_add]).assertIsDisplayed()
                 },
             ),
             ScreenshotScenario(
                 ENGLISH_NARROW_ID,
                 render = { EnglishPreview() },
-                beforeCapture = { language ->
-                    onNodeWithText(if (language == "ko") "내 덱에 추가" else "Add to my decks").assertIsDisplayed()
-                    onNodeWithText(if (language == "ko") "1개 카드" else "Cards: 1").assertIsDisplayed()
+                expectedStrings =
+                    listOf(
+                        ScreenshotString(Res.string.library_add),
+                        ScreenshotString(Res.string.library_card_count, formatArgs = listOf(1)),
+                    ),
+                beforeCapture = { strings ->
+                    onNodeWithText(strings[Res.string.library_add]).assertIsDisplayed()
+                    onNodeWithText(strings[Res.string.library_card_count]).assertIsDisplayed()
                 },
             ),
             ScreenshotScenario(
                 ENGLISH_ERROR_ID,
                 render = { EnglishError { intents.add(it) } },
+                expectedStrings =
+                    listOf(
+                        ScreenshotString(Res.string.library_add_error_title),
+                        ScreenshotString(Res.string.library_confirm),
+                    ),
                 isDialog = true,
-                beforeCapture = { language ->
-                    onNodeWithText(if (language == "ko") "덱 추가 중 오류가 발생했어요" else "Couldn't add deck").assertIsDisplayed()
+                beforeCapture = { strings ->
+                    onNodeWithText(strings[Res.string.library_add_error_title]).assertIsDisplayed()
                 },
-                afterCapture = { language ->
-                    onNodeWithText(if (language == "ko") "확인" else "OK").performClick()
+                afterCapture = { strings ->
+                    onNodeWithText(strings[Res.string.library_confirm]).performClick()
                     check(intents == listOf(LibraryPreviewIntent.DismissError)) { "Error confirmation must only dismiss the popup" }
                 },
             ),

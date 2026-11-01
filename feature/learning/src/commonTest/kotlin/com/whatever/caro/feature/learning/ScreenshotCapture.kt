@@ -11,6 +11,10 @@ import androidx.compose.ui.test.SemanticsNodeInteractionsProvider
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.test.runTest
+import org.jetbrains.compose.resources.ResourceEnvironment
+import org.jetbrains.compose.resources.StringResource
+import org.jetbrains.compose.resources.getString
 
 internal data class ScreenshotProfile(
     val platform: String,
@@ -35,12 +39,52 @@ internal object ScreenshotConfiguration {
     val contentSizedScenarios = setOf("setting.notification.permission")
 }
 
+internal data class ScreenshotString(
+    val resource: StringResource,
+    val formatArgs: List<Any> = emptyList(),
+)
+
+internal class ScreenshotStrings(
+    private val values: Map<StringResource, String>,
+) {
+    operator fun get(resource: StringResource): String = values.getValue(resource)
+}
+
+// Resolve both languages before rendering; callbacks only read these prepared values.
+internal fun prepareScreenshotStrings(
+    capture: ScreenshotCapture,
+    environments: Map<String, ResourceEnvironment>,
+): ScreenshotStrings {
+    val requests = capture.scenario.expectedStrings
+    require(requests.isNotEmpty()) { "${capture.fileName}: no expected string resources" }
+    require(requests.map { it.resource }.distinct().size == requests.size) {
+        "${capture.fileName}: duplicate expected string resources"
+    }
+    lateinit var localized: Map<String, Map<StringResource, String>>
+    runTest {
+        localized =
+            ScreenshotConfiguration.languages.associateWith { language ->
+                val environment = environments.getValue(language)
+                requests.associate { request ->
+                    request.resource to getString(environment, request.resource, *request.formatArgs.toTypedArray())
+                }
+            }
+    }
+    for (request in requests) {
+        check(localized.getValue("ko").getValue(request.resource) != localized.getValue("en").getValue(request.resource)) {
+            "${capture.fileName}: ${request.resource.key} must distinguish ko/en; check translations and expected environments"
+        }
+    }
+    return ScreenshotStrings(localized.getValue(capture.language))
+}
+
 internal class ScreenshotScenario(
     val id: String,
     val render: @Composable () -> Unit,
+    val expectedStrings: List<ScreenshotString>,
     val isDialog: Boolean = false,
-    val beforeCapture: SemanticsNodeInteractionsProvider.(String) -> Unit = {},
-    val afterCapture: SemanticsNodeInteractionsProvider.(String) -> Unit = {},
+    val beforeCapture: SemanticsNodeInteractionsProvider.(ScreenshotStrings) -> Unit = {},
+    val afterCapture: SemanticsNodeInteractionsProvider.(ScreenshotStrings) -> Unit = {},
 )
 
 internal data class ScreenshotCapture(

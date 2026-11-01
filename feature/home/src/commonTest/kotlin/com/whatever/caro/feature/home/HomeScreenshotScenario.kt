@@ -3,6 +3,8 @@ package com.whatever.caro.feature.home
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.onNodeWithText
+import caromobile.core.designsystem.generated.resources.Res
+import caromobile.core.designsystem.generated.resources.deck_title_create
 import com.whatever.caro.core.designsystem.themes.CaroTheme
 import com.whatever.caro.core.model.deck.Deck
 import com.whatever.caro.core.model.deck.DeckState
@@ -18,8 +20,9 @@ internal object HomeScreenshotScenario {
             ScreenshotScenario(
                 ID,
                 render = { Render() },
-                beforeCapture = { language ->
-                    onNodeWithText(if (language == "ko") "덱 만들기" else "Create Deck").assertIsDisplayed()
+                expectedStrings = listOf(ScreenshotString(Res.string.deck_title_create)),
+                beforeCapture = { strings ->
+                    onNodeWithText(strings[Res.string.deck_title_create]).assertIsDisplayed()
                 },
             ),
         )

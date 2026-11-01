@@ -6,6 +6,13 @@ import androidx.compose.ui.test.assertIsOn
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
+import caromobile.core.designsystem.generated.resources.Res
+import caromobile.core.designsystem.generated.resources.setting_dialog_button_cancel
+import caromobile.core.designsystem.generated.resources.setting_menu_delete_account
+import caromobile.core.designsystem.generated.resources.setting_notification_label
+import caromobile.core.designsystem.generated.resources.setting_notification_open_settings
+import caromobile.core.designsystem.generated.resources.setting_notification_permission_title
+import caromobile.core.designsystem.generated.resources.setting_title
 import com.whatever.caro.core.designsystem.themes.CaroTheme
 import com.whatever.caro.core.model.auth.SocialLoginType
 import com.whatever.caro.feature.setting.mvi.SettingIntent
@@ -37,7 +44,8 @@ internal object SettingScreenshotScenario {
                         )
                     }
                 },
-                beforeCapture = { language -> onNodeWithText(if (language == "ko") "설정" else "Settings").assertIsDisplayed() },
+                expectedStrings = listOf(ScreenshotString(Res.string.setting_title)),
+                beforeCapture = { strings -> onNodeWithText(strings[Res.string.setting_title]).assertIsDisplayed() },
             ),
             ScreenshotScenario(
                 "setting.notification.on",
@@ -48,16 +56,18 @@ internal object SettingScreenshotScenario {
                         }
                     }
                 },
-                beforeCapture = { language ->
-                    onNodeWithText(if (language == "ko") "알림 수신" else "Notifications").assertIsOn().performClick()
+                expectedStrings = listOf(ScreenshotString(Res.string.setting_notification_label)),
+                beforeCapture = { strings ->
+                    onNodeWithText(strings[Res.string.setting_notification_label]).assertIsOn().performClick()
                     check(clicks == 1) { "Notification toggle must emit exactly one action" }
                 },
             ),
             ScreenshotScenario(
                 "setting.notification.busy",
                 render = { CaroTheme { SettingScreen(SettingState(isLoading = false, isNotificationLoading = true), "1.0", {}) } },
-                beforeCapture = { language ->
-                    onNodeWithText(if (language == "ko") "알림 수신" else "Notifications").assertIsNotEnabled()
+                expectedStrings = listOf(ScreenshotString(Res.string.setting_notification_label)),
+                beforeCapture = { strings ->
+                    onNodeWithText(strings[Res.string.setting_notification_label]).assertIsNotEnabled()
                 },
             ),
             ScreenshotScenario(
@@ -71,20 +81,27 @@ internal object SettingScreenshotScenario {
                         )
                     }
                 },
-                beforeCapture = { language ->
-                    onNodeWithText(if (language == "ko") "계정탈퇴" else "Delete Account").performScrollTo().assertIsDisplayed()
+                expectedStrings = listOf(ScreenshotString(Res.string.setting_menu_delete_account)),
+                beforeCapture = { strings ->
+                    onNodeWithText(strings[Res.string.setting_menu_delete_account]).performScrollTo().assertIsDisplayed()
                 },
             ),
             ScreenshotScenario(
                 "setting.notification.permission",
                 render = { CaroTheme { NotificationPermissionDialog({ cancelled++ }, { opened++ }) } },
                 isDialog = true,
-                beforeCapture = { language ->
-                    onNodeWithText(if (language == "ko") "알림 권한이 필요해요" else "Notification permission required").assertIsDisplayed()
+                expectedStrings =
+                    listOf(
+                        ScreenshotString(Res.string.setting_notification_permission_title),
+                        ScreenshotString(Res.string.setting_dialog_button_cancel),
+                        ScreenshotString(Res.string.setting_notification_open_settings),
+                    ),
+                beforeCapture = { strings ->
+                    onNodeWithText(strings[Res.string.setting_notification_permission_title]).assertIsDisplayed()
                 },
-                afterCapture = { language ->
-                    onNodeWithText(if (language == "ko") "취소" else "Cancel").performClick()
-                    onNodeWithText(if (language == "ko") "앱 설정으로" else "App settings").performClick()
+                afterCapture = { strings ->
+                    onNodeWithText(strings[Res.string.setting_dialog_button_cancel]).performClick()
+                    onNodeWithText(strings[Res.string.setting_notification_open_settings]).performClick()
                     check(cancelled == 1 && opened == 1) { "Permission dialog callbacks must each run once" }
                 },
             ),
