@@ -249,8 +249,12 @@ class LearningReportViewModel(
     private fun selectPreset(preset: ReportPeriodPreset) {
         val filter = currentState.filter
         if (preset == ReportPeriodPreset.CUSTOM) {
-            // 직접 설정한 기간이 없으면 지금 보고 있는 기간으로 채운다
-            val customPeriod = currentState.customPeriod ?: filter.period
+            // 직접 설정한 기간이 없으면 지금 보고 있는 기간으로 채운다. 전체 기간은 서버가 준 첫 학습일부터 오늘까지다
+            val range = currentState.summary?.range
+            val customPeriod =
+                currentState.customPeriod
+                    ?: filter.period
+                    ?: range?.startDate?.let { ReportPeriod(it, range.endDate) }
             val today = reportToday.today()
             reduce {
                 copy(

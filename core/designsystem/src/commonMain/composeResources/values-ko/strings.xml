@@ -290,8 +290,6 @@
     <string name="report_history_title">학습 기록</string>
     <string name="report_history_date">%1$d월 %2$d일 (%3$s)</string>
     <string name="report_history_count">%1$s회</string>
-    <string name="report_history_distribution">%1$s %2$s · %3$s %4$s · %5$s %6$s</string>
-    <string name="report_history_caption">일일 학습에서 저장한 평가만 보여요.</string>
     <string name="report_card_reviews_title">카드 평가 이력</string>
     <string name="report_card_reviews_current">현재 카드 내용</string>
     <string name="report_card_reviews_count">%1$s · 평가 %2$d회</string>

@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -22,24 +23,20 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import caromobile.core.designsystem.generated.resources.Res
-import caromobile.core.designsystem.generated.resources.learning_again
-import caromobile.core.designsystem.generated.resources.learning_easy
-import caromobile.core.designsystem.generated.resources.learning_fair
 import caromobile.core.designsystem.generated.resources.report_all_period_link
 import caromobile.core.designsystem.generated.resources.report_empty_period_description
 import caromobile.core.designsystem.generated.resources.report_empty_period_title
 import caromobile.core.designsystem.generated.resources.report_error_description
 import caromobile.core.designsystem.generated.resources.report_error_title
-import caromobile.core.designsystem.generated.resources.report_history_caption
 import caromobile.core.designsystem.generated.resources.report_history_count
 import caromobile.core.designsystem.generated.resources.report_history_date
-import caromobile.core.designsystem.generated.resources.report_history_distribution
 import caromobile.core.designsystem.generated.resources.report_history_title
 import caromobile.core.designsystem.generated.resources.report_load_more_error
 import caromobile.core.designsystem.generated.resources.report_retry
 import caromobile.core.designsystem.generated.resources.report_scope_all
 import caromobile.core.designsystem.generated.resources.report_scope_deleted_deck
 import com.whatever.caro.core.designsystem.themes.CaroTheme
+import com.whatever.caro.core.model.learning.StudyRating
 import com.whatever.caro.core.model.report.ReportSession
 import com.whatever.caro.feature.learning.report.components.ReportLinkRow
 import com.whatever.caro.feature.learning.report.components.ReportLoadMoreError
@@ -159,21 +156,12 @@ internal fun LearningHistoryScreen(
                     }
                 }
             }
-            if (state.hasLoaded && state.hasMore.not()) {
+            if (state.hasLoaded && state.hasMore.not() && state.period != null) {
                 item(key = "footer") {
-                    Column(verticalArrangement = Arrangement.spacedBy(CaroTheme.spacing.m)) {
-                        if (state.period != null) {
-                            ReportLinkRow(
-                                text = stringResource(Res.string.report_all_period_link),
-                                onClick = { onIntent(LearningHistoryIntent.ClickAllPeriod) },
-                            )
-                        }
-                        Text(
-                            text = stringResource(Res.string.report_history_caption),
-                            style = CaroTheme.typography.caption1.regular,
-                            color = CaroTheme.color.text.tertiary,
-                        )
-                    }
+                    ReportLinkRow(
+                        text = stringResource(Res.string.report_all_period_link),
+                        onClick = { onIntent(LearningHistoryIntent.ClickAllPeriod) },
+                    )
                 }
             }
         }
@@ -205,21 +193,38 @@ private fun SessionRow(session: ReportSession) {
                 color = CaroTheme.color.text.primary,
             )
         }
-        Text(
-            text =
-                stringResource(
-                    Res.string.report_history_distribution,
-                    stringResource(Res.string.learning_easy),
-                    ratings.easy.formatCount(),
-                    stringResource(Res.string.learning_fair),
-                    ratings.fair.formatCount(),
-                    stringResource(Res.string.learning_again),
-                    ratings.again.formatCount(),
-                ),
-            style = CaroTheme.typography.caption1.regular,
-            color = CaroTheme.color.text.secondary,
-        )
+        // 좁은 화면이나 큰 글자에서는 배지를 다음 줄로 넘긴다
+        FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(CaroTheme.spacing.s),
+            verticalArrangement = Arrangement.spacedBy(CaroTheme.spacing.s),
+        ) {
+            RatingCountBadge(rating = StudyRating.EASY, count = ratings.easy)
+            RatingCountBadge(rating = StudyRating.FAIR, count = ratings.fair)
+            RatingCountBadge(rating = StudyRating.AGAIN, count = ratings.again)
+        }
     }
+}
+
+@Composable
+private fun RatingCountBadge(
+    rating: StudyRating,
+    count: Long,
+) {
+    val (textColor, backgroundColor) =
+        when (rating) {
+            StudyRating.EASY -> CaroTheme.color.text.review to CaroTheme.color.surface.review
+            StudyRating.FAIR -> CaroTheme.color.text.secondary to CaroTheme.color.surface.complete
+            StudyRating.AGAIN -> CaroTheme.color.text.error to CaroTheme.color.surface.error
+        }
+    Text(
+        text = "${stringResource(rating.label())} ${count.formatCount()}",
+        modifier =
+            Modifier
+                .background(color = backgroundColor, shape = CaroTheme.shape.l)
+                .padding(horizontal = CaroTheme.spacing.s, vertical = CaroTheme.spacing.xs),
+        style = CaroTheme.typography.caption1.regular,
+        color = textColor,
+    )
 }
 
 @Composable

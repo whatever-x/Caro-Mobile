@@ -192,12 +192,16 @@ class LearningReportViewModelTest : FunSpec() {
 
                 viewModel.intent(LearningReportIntent.DismissDateEditor)
                 viewModel.intent(LearningReportIntent.SelectPreset(ReportPeriodPreset.ALL))
+                advanceUntilIdle()
                 viewModel.intent(LearningReportIntent.SelectPreset(ReportPeriodPreset.CUSTOM))
                 advanceUntilIdle()
 
-                viewModel.state.value.dateEditor
-                    ?.startDate
-                    .shouldBeNull()
+                // 전체 기간에서는 화면에 보이는 첫 학습일부터 오늘까지를 채운다
+                val all =
+                    viewModel.state.value.dateEditor
+                        .shouldNotBeNull()
+                all.startDate shouldBe LocalDate(2026, 9, 1)
+                all.endDate shouldBe today
             }
         }
 
@@ -440,7 +444,8 @@ private class FakeStudyReportRepository(
             scope = ReportScope(deckId = deckId, deckName = scopeName, deleted = false),
             range =
                 ReportRange(
-                    startDate = period?.startDate,
+                    // 전체 기간은 첫 학습일(9.1)부터 오늘까지다
+                    startDate = period?.startDate ?: LocalDate(2026, 9, 1),
                     endDate = LocalDate(2026, 10, 21),
                     // 전체 기간은 월 단위 차트로 둔다
                     bucketUnit = if (period == null) ReportBucketUnit.MONTH else ReportBucketUnit.DAY,
