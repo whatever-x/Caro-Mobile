@@ -6,7 +6,7 @@ import platform.UIKit.UIViewController
 import kotlin.experimental.ExperimentalNativeApi
 
 @OptIn(ExperimentalNativeApi::class)
-fun mainViewController(onRequestStoreReview: (UIViewController) -> Unit) =
+fun mainViewController(onRequestStoreReview: (UIViewController) -> Boolean) =
     ComposeUIViewController {
         ProvideIosInAppReviewRequester(onRequestStoreReview) {
             CaroApp()

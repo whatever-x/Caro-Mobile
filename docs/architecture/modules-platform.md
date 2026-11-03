@@ -126,13 +126,17 @@ ViewModel은 요청할 시점을 일회성 SideEffect로 전달하고, Route는 
 `requester.requestReview()`를 호출합니다. 호출자는 취소를 전파하고, 화면이 사라진 뒤 요청을 계속하지 않습니다.
 
 공용 모듈은 Google Play·StoreKit 호출과 앱 전체의 최소 30일 재요청 간격을 관리합니다.
-`:core:data`의 Repository와 `:core:datastore`의 단일 저장 트랜잭션으로 요청 시각을 예약합니다.
+`:core:data`의 Repository와 `:core:datastore`의 트랜잭션으로 요청 시각을 예약·확정·취소합니다.
+예약 ID와 이전 시각을 보존하고, SDK 미호출 때 같은 ID의 예약만 취소합니다.
+SDK 호출 시도 후에는 UI 표시 여부와 관계없이 요청 시각을 확정합니다.
+예약 중 프로세스가 종료되면 임시 시각을 보수적으로 유지하며 같은 30일 간격 이후 교체합니다.
+30일 경과 자체는 트리거가 아니며, 문의 기능의 경우 새 문의 후 실제 앱 복귀가 필요합니다.
 서로 다른 feature나 requester 인스턴스가 동시에 호출해도 같은 기록을 사용합니다.
 기록은 인증 정보와 별개이므로 로그아웃 후에도 유지합니다.
 이는 앱의 요청 시도를 제한하는 정책이며, 평가창 표시나 평가 완료를 저장한 값이 아닙니다.
 
 iOS는 `:composeApp`의 진입점에서 Swift 콜백을 받아 공용 모듈의 provider에 전달합니다.
-Swift는 요청 시점의 활성 `windowScene`에서 `AppStore.requestReview(in:)`를 호출합니다.
+Swift는 요청 시점의 활성 `windowScene`에서 `AppStore.requestReview(in:)`를 호출하고, UI 표시 결과와 구분되는 API 호출 여부를 Boolean으로 반환합니다.
 플랫폼 타입은 `iosMain` 안에만 두고 feature를 Swift framework의 공개 의존성으로 추가하지 않습니다.
 
 스토어 쿼터와 사용자 설정 때문에 호출 후 평가창이 나타나지 않을 수 있습니다.

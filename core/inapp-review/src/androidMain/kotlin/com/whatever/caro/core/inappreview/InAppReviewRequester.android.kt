@@ -51,10 +51,14 @@ internal class AndroidInAppReviewRequester(
                 val reviewInfo = reviewManager.requestReviewFlow().awaitCancellable()
                 currentCoroutineContext().ensureActive()
                 if (activity()?.canRequestReview() != true) return@withContext
-                if (!gate.tryReserve()) return@withContext
-                currentCoroutineContext().ensureActive()
-                val currentActivity = activity()?.takeIf { it.canRequestReview() } ?: return@withContext
-                reviewManager.launchReviewFlow(currentActivity, reviewInfo).awaitCancellable()
+                var launchTask: Task<Void>? = null
+                gate.requestIfAllowed {
+                    val currentActivity = activity()?.takeIf { it.canRequestReview() } ?: return@requestIfAllowed false
+                    launchTask = reviewManager.launchReviewFlow(currentActivity, reviewInfo)
+                    true
+                }
+                // The attempt is finalized before waiting for a result that cannot confirm UI display.
+                launchTask?.awaitCancellable()
             } catch (cancellation: CancellationException) {
                 throw cancellation
             } catch (exception: Exception) {

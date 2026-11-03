@@ -7,10 +7,12 @@ struct ComposeView: UIViewControllerRepresentable {
     func makeUIViewController(context: Context) -> UIViewController {
         MainViewControllerKt.mainViewController { controller in
             MainActor.assumeIsolated {
-                if let scene = controller.viewIfLoaded?.window?.windowScene,
-                   scene.activationState == .foregroundActive {
-                    AppStore.requestReview(in: scene)
+                guard let scene = controller.viewIfLoaded?.window?.windowScene,
+                      scene.activationState == .foregroundActive else {
+                    return KotlinBoolean(bool: false)
                 }
+                AppStore.requestReview(in: scene)
+                return KotlinBoolean(bool: true)
             }
         }
     }

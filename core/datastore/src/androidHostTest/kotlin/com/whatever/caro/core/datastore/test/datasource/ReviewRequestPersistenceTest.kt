@@ -28,7 +28,9 @@ class ReviewRequestPersistenceTest : FunSpec() {
                             scope = CoroutineScope(firstJob + Dispatchers.IO),
                             produceFile = { file.absolutePath.toPath() },
                         )
-                    LocalReviewRequestDataSourceImpl(firstStore).tryReserveRequest(10_000, 1_000) shouldBe true
+                    val firstSource = LocalReviewRequestDataSourceImpl(firstStore)
+                    firstSource.tryReserveRequest("first", 10_000, 1_000) shouldBe true
+                    firstSource.commitRequest("first", 10_100) shouldBe true
                     firstJob.cancelAndJoin()
 
                     val reopenedStore =
@@ -37,8 +39,8 @@ class ReviewRequestPersistenceTest : FunSpec() {
                             produceFile = { file.absolutePath.toPath() },
                         )
                     val reopenedSource = LocalReviewRequestDataSourceImpl(reopenedStore)
-                    reopenedSource.tryReserveRequest(10_999, 1_000) shouldBe false
-                    reopenedSource.tryReserveRequest(11_000, 1_000) shouldBe true
+                    reopenedSource.tryReserveRequest("next", 11_099, 1_000) shouldBe false
+                    reopenedSource.tryReserveRequest("next", 11_100, 1_000) shouldBe true
                 } finally {
                     firstJob.cancelAndJoin()
                     secondJob.cancelAndJoin()
@@ -60,7 +62,7 @@ class ReviewRequestPersistenceTest : FunSpec() {
                     val results =
                         List(32) {
                             async(Dispatchers.Default) {
-                                LocalReviewRequestDataSourceImpl(store).tryReserveRequest(10_000, 1_000)
+                                LocalReviewRequestDataSourceImpl(store).tryReserveRequest("reservation-$it", 10_000, 1_000)
                             }
                         }.awaitAll()
 

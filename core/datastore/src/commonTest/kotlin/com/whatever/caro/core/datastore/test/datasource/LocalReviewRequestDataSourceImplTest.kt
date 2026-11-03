@@ -2,7 +2,9 @@ package com.whatever.caro.core.datastore.test.datasource
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
+import androidx.datastore.preferences.core.longPreferencesKey
 import com.whatever.caro.core.datastore.datasource.LocalAuthDataSourceImpl
 import com.whatever.caro.core.datastore.datasource.LocalReviewRequestDataSourceImpl
 import io.kotest.assertions.throwables.shouldThrow
@@ -24,19 +26,34 @@ class LocalReviewRequestDataSourceImplTest : FunSpec() {
         test("첫 예약을 저장하고 새 DataSource도 직전 예약을 공유한다") {
             runTest {
                 val store = TransactionalPreferencesStore()
-                LocalReviewRequestDataSourceImpl(store).tryReserveRequest(10_000, 1_000) shouldBe true
-                LocalReviewRequestDataSourceImpl(store).tryReserveRequest(10_999, 1_000) shouldBe false
-                LocalReviewRequestDataSourceImpl(store).tryReserveRequest(11_000, 1_000) shouldBe true
+                val source = LocalReviewRequestDataSourceImpl(store)
+                source.tryReserveRequest("first", 10_000, 1_000) shouldBe true
+                source.commitRequest("first", 10_000) shouldBe true
+                LocalReviewRequestDataSourceImpl(store).tryReserveRequest("reservation", 10_999, 1_000) shouldBe false
+                LocalReviewRequestDataSourceImpl(store).tryReserveRequest("reservation", 11_000, 1_000) shouldBe true
             }
         }
 
         test("시계가 뒤로 이동하면 예약을 차단하고 이전 시각을 보존한다") {
             runTest {
                 val source = LocalReviewRequestDataSourceImpl(TransactionalPreferencesStore())
-                source.tryReserveRequest(10_000, 1_000) shouldBe true
-                source.tryReserveRequest(9_000, 1_000) shouldBe false
-                source.tryReserveRequest(10_999, 1_000) shouldBe false
-                source.tryReserveRequest(11_000, 1_000) shouldBe true
+                source.tryReserveRequest("reservation", 10_000, 1_000) shouldBe true
+                source.tryReserveRequest("reservation", 9_000, 1_000) shouldBe false
+                source.tryReserveRequest("reservation", 10_999, 1_000) shouldBe false
+                source.tryReserveRequest("reservation", 11_000, 1_000) shouldBe true
+            }
+        }
+
+        test("기존 버전의 마지막 요청 키는 유지하고 취소 시에도 복원한다") {
+            runTest {
+                val store = TransactionalPreferencesStore()
+                store.edit { it[longPreferencesKey("last_in_app_review_request_epoch_milliseconds")] = 10_000 }
+                val source = LocalReviewRequestDataSourceImpl(store)
+                source.tryReserveRequest("blocked", 10_999, 1_000) shouldBe false
+                source.tryReserveRequest("owner", 11_000, 1_000) shouldBe true
+                source.cancelRequest("owner") shouldBe true
+                source.tryReserveRequest("still-blocked", 10_999, 1_000) shouldBe false
+                source.tryReserveRequest("next", 11_000, 1_000) shouldBe true
             }
         }
 
@@ -46,7 +63,7 @@ class LocalReviewRequestDataSourceImplTest : FunSpec() {
                 val results =
                     List(32) {
                         async {
-                            LocalReviewRequestDataSourceImpl(store).tryReserveRequest(10_000, 1_000)
+                            LocalReviewRequestDataSourceImpl(store).tryReserveRequest("reservation-$it", 10_000, 1_000)
                         }
                     }.awaitAll()
 
@@ -60,12 +77,71 @@ class LocalReviewRequestDataSourceImplTest : FunSpec() {
                 val source = LocalReviewRequestDataSourceImpl(store)
                 val auth = LocalAuthDataSourceImpl(store)
                 auth.saveTokens("access", "refresh")
-                source.tryReserveRequest(10_000, 1_000) shouldBe true
+                source.tryReserveRequest("reservation", 10_000, 1_000) shouldBe true
+                source.commitRequest("reservation", 10_000) shouldBe true
 
                 auth.clear()
 
                 auth.fetchAccessToken() shouldBe null
-                source.tryReserveRequest(10_001, 1_000) shouldBe false
+                source.tryReserveRequest("reservation", 10_001, 1_000) shouldBe false
+            }
+        }
+
+        test("취소는 이전 확정 시각을 복원하고 최초 예약은 기록을 제거한다") {
+            runTest {
+                val source = LocalReviewRequestDataSourceImpl(TransactionalPreferencesStore())
+                source.tryReserveRequest("first", 10_000, 1_000) shouldBe true
+                source.cancelRequest("first") shouldBe true
+                source.tryReserveRequest("second", 10_000, 1_000) shouldBe true
+                source.commitRequest("second", 10_100) shouldBe true
+                source.tryReserveRequest("third", 11_100, 1_000) shouldBe true
+                source.cancelRequest("third") shouldBe true
+                source.tryReserveRequest("fourth", 11_099, 1_000) shouldBe false
+                source.tryReserveRequest("fifth", 11_100, 1_000) shouldBe true
+            }
+        }
+
+        test("다른 예약 ID와 확정 이후의 늦은 취소는 기록을 바꾸지 않는다") {
+            runTest {
+                val source = LocalReviewRequestDataSourceImpl(TransactionalPreferencesStore())
+                source.tryReserveRequest("owner", 10_000, 1_000) shouldBe true
+                source.cancelRequest("other") shouldBe false
+                source.commitRequest("other", 20_000) shouldBe false
+                source.commitRequest("owner", 10_100) shouldBe true
+                source.cancelRequest("owner") shouldBe false
+                source.commitRequest("owner", 20_000) shouldBe false
+                source.tryReserveRequest("next", 11_099, 1_000) shouldBe false
+                source.tryReserveRequest("next", 11_100, 1_000) shouldBe true
+            }
+        }
+
+        test("프로세스가 남긴 임시 기록은 간격 이후 교체되며 오래된 취소가 새 예약을 되돌리지 않는다") {
+            runTest {
+                val store = TransactionalPreferencesStore()
+                val previous = LocalReviewRequestDataSourceImpl(store)
+                previous.tryReserveRequest("orphan", 10_000, 1_000) shouldBe true
+                val restarted = LocalReviewRequestDataSourceImpl(store)
+                restarted.tryReserveRequest("new", 10_999, 1_000) shouldBe false
+                restarted.tryReserveRequest("new", 11_000, 1_000) shouldBe true
+                previous.cancelRequest("orphan") shouldBe false
+                previous.commitRequest("orphan", 12_000) shouldBe false
+                restarted.cancelRequest("new") shouldBe true
+                restarted.tryReserveRequest("retry", 10_999, 1_000) shouldBe false
+                restarted.tryReserveRequest("retry", 11_000, 1_000) shouldBe true
+            }
+        }
+
+        test("확정과 취소가 경합해도 하나의 소유권 변경만 성공한다") {
+            runTest {
+                repeat(20) { index ->
+                    val source = LocalReviewRequestDataSourceImpl(TransactionalPreferencesStore())
+                    val id = "race-$index"
+                    source.tryReserveRequest(id, 10_000, 1_000) shouldBe true
+                    val committed = async { source.commitRequest(id, 10_100) }
+                    val cancelled = async { source.cancelRequest(id) }
+                    listOf(committed.await(), cancelled.await()).count { it } shouldBe 1
+                    source.tryReserveRequest("after", 10_101, 1_000) shouldBe !committed.await()
+                }
             }
         }
 
@@ -73,7 +149,7 @@ class LocalReviewRequestDataSourceImplTest : FunSpec() {
             runTest {
                 val source = LocalReviewRequestDataSourceImpl(TransactionalPreferencesStore(IOException("disk full")))
 
-                shouldThrow<IOException> { source.tryReserveRequest(10_000, 1_000) }
+                shouldThrow<IOException> { source.tryReserveRequest("reservation", 10_000, 1_000) }
             }
         }
 
@@ -81,7 +157,7 @@ class LocalReviewRequestDataSourceImplTest : FunSpec() {
             runTest {
                 val source = LocalReviewRequestDataSourceImpl(TransactionalPreferencesStore(CancellationException("cancelled")))
 
-                shouldThrow<CancellationException> { source.tryReserveRequest(10_000, 1_000) }
+                shouldThrow<CancellationException> { source.tryReserveRequest("reservation", 10_000, 1_000) }
             }
         }
     }

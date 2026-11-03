@@ -17,11 +17,11 @@ import org.koin.compose.koinInject
 import platform.UIKit.UISceneActivationStateForegroundActive
 import platform.UIKit.UIViewController
 
-private val LocalRequestStoreReview = staticCompositionLocalOf<((UIViewController) -> Unit)?> { null }
+private val LocalRequestStoreReview = staticCompositionLocalOf<((UIViewController) -> Boolean)?> { null }
 
 @Composable
 fun ProvideIosInAppReviewRequester(
-    onRequestStoreReview: (UIViewController) -> Unit,
+    onRequestStoreReview: (UIViewController) -> Boolean,
     content: @Composable () -> Unit,
 ) {
     CompositionLocalProvider(LocalRequestStoreReview provides onRequestStoreReview, content = content)
@@ -43,19 +43,20 @@ actual fun rememberInAppReviewRequester(): InAppReviewRequester {
 
 internal class IosInAppReviewRequester(
     private val controller: () -> UIViewController,
-    private val requestStoreReview: () -> ((UIViewController) -> Unit)?,
+    private val requestStoreReview: () -> ((UIViewController) -> Boolean)?,
     private val gate: InAppReviewGate,
+    private val canRequestReview: (UIViewController) -> Boolean = { it.canRequestReview() },
 ) : InAppReviewRequester {
     override suspend fun requestReview() =
         withContext(Dispatchers.Main.immediate) {
             try {
                 currentCoroutineContext().ensureActive()
-                if (requestStoreReview() == null || !controller().canRequestReview()) return@withContext
-                if (!gate.tryReserve()) return@withContext
-                currentCoroutineContext().ensureActive()
-                val currentController = controller()
-                if (currentController.canRequestReview()) {
-                    requestStoreReview()?.invoke(currentController)
+                if (requestStoreReview() == null || !canRequestReview(controller())) return@withContext
+                gate.requestIfAllowed {
+                    val currentController = controller()
+                    if (!canRequestReview(currentController)) return@requestIfAllowed false
+                    // True means StoreKit was invoked, never that a review UI was displayed.
+                    requestStoreReview()?.invoke(currentController) ?: false
                 }
             } catch (cancellation: CancellationException) {
                 throw cancellation

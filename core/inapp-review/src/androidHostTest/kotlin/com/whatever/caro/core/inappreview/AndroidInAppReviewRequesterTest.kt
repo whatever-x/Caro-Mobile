@@ -8,9 +8,9 @@ import com.google.android.gms.tasks.Tasks
 import com.google.android.play.core.review.ReviewInfo
 import com.google.android.play.core.review.ReviewManager
 import com.google.android.play.core.review.testing.FakeReviewManager
-import com.whatever.caro.core.data.repository.review.ReviewRequestRepository
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancelAndJoin
@@ -44,6 +44,7 @@ class AndroidInAppReviewRequesterTest {
             requester.requestReview()
 
             repository.reservations shouldBe 1
+            repository.commits shouldBe 1
             manager.launchedActivity shouldBe activity
             controller.pause().stop().destroy()
         }
@@ -161,21 +162,79 @@ class AndroidInAppReviewRequesterTest {
             val activity = controller.get()
             val manager = RecordingReviewManager()
             manager.completeInfo(activity)
-            val repository =
-                object : ReviewRequestRepository {
-                    override suspend fun tryReserveRequest(
-                        nowEpochMilliseconds: Long,
-                        minimumIntervalMilliseconds: Long,
-                    ): Boolean {
-                        controller.pause().stop()
-                        return true
-                    }
-                }
+            val repository = RecordingReviewRepository(onReserve = { controller.pause().stop() })
 
             AndroidInAppReviewRequester({ activity }, manager, InAppReviewGate(repository, ReviewClock(1_000))).requestReview()
 
             manager.launchedActivity shouldBe null
+            repository.requestRecorded shouldBe false
             controller.destroy()
+        }
+
+    @Test
+    fun `예약 저장 중 취소하면 SDK 호출 없이 예약을 취소한다`() =
+        runReviewTest {
+            val controller = Robolectric.buildActivity(ComponentActivity::class.java).setup()
+            val activity = controller.get()
+            val manager = RecordingReviewManager()
+            manager.completeInfo(activity)
+            val release = CompletableDeferred<Unit>()
+            val repository = RecordingReviewRepository(onReserve = { release.await() })
+            val job =
+                launch {
+                    AndroidInAppReviewRequester({ activity }, manager, InAppReviewGate(repository)).requestReview()
+                }
+            runCurrent()
+            job.cancel()
+            release.complete(Unit)
+            job.join()
+            job.isCancelled shouldBe true
+            manager.launchedActivity shouldBe null
+            repository.requestRecorded shouldBe false
+            repository.cancellations shouldBe 1
+            controller.pause().stop().destroy()
+        }
+
+    @Test
+    fun `launch SDK 호출 후 Task 오류와 동기 예외도 기록을 유지한다`() =
+        runReviewTest {
+            val controller = Robolectric.buildActivity(ComponentActivity::class.java).setup()
+            val activity = controller.get()
+            listOf(false, true).forEach { synchronousFailure ->
+                val manager = RecordingReviewManager()
+                manager.completeInfo(activity)
+                manager.launchFailure = IllegalStateException("SDK error")
+                manager.throwOnLaunch = synchronousFailure
+                val repository = RecordingReviewRepository()
+                AndroidInAppReviewRequester({ activity }, manager, InAppReviewGate(repository)).requestReview()
+                manager.launchedActivity shouldBe activity
+                repository.requestRecorded shouldBe true
+                repository.commits shouldBe 1
+                repository.cancellations shouldBe 0
+            }
+            controller.pause().stop().destroy()
+        }
+
+    @Test
+    fun `launch Task 대기 중 취소되어도 호출 기록은 유지한다`() =
+        runReviewTest {
+            val controller = Robolectric.buildActivity(ComponentActivity::class.java).setup()
+            val activity = controller.get()
+            val manager = RecordingReviewManager()
+            manager.completeInfo(activity)
+            manager.launchTask = TaskCompletionSource<Void>().task
+            val repository = RecordingReviewRepository()
+            val job =
+                launch {
+                    AndroidInAppReviewRequester({ activity }, manager, InAppReviewGate(repository)).requestReview()
+                }
+            runCurrent()
+            job.cancelAndJoin()
+            manager.launchedActivity shouldBe activity
+            repository.requestRecorded shouldBe true
+            repository.commits shouldBe 1
+            repository.cancellations shouldBe 0
+            controller.pause().stop().destroy()
         }
 
     @Test
@@ -211,6 +270,9 @@ private fun runReviewTest(block: suspend TestScope.() -> Unit) =
 private class RecordingReviewManager : ReviewManager {
     private val info = TaskCompletionSource<ReviewInfo>()
     var launchedActivity: Activity? = null
+    var launchFailure: Exception? = null
+    var throwOnLaunch = false
+    var launchTask: Task<Void> = Tasks.forResult(null)
 
     fun completeInfo(activity: Activity) {
         info.setResult(FakeReviewManager(activity).requestReviewFlow().result)
@@ -223,22 +285,7 @@ private class RecordingReviewManager : ReviewManager {
         reviewInfo: ReviewInfo,
     ): Task<Void> {
         launchedActivity = activity
-        return Tasks.forResult(null)
-    }
-}
-
-private class RecordingReviewRepository(
-    private val failure: Throwable? = null,
-    private val allowed: Boolean = true,
-) : ReviewRequestRepository {
-    var reservations = 0
-
-    override suspend fun tryReserveRequest(
-        nowEpochMilliseconds: Long,
-        minimumIntervalMilliseconds: Long,
-    ): Boolean {
-        failure?.let { throw it }
-        reservations++
-        return allowed
+        launchFailure?.let { if (throwOnLaunch) throw it else return Tasks.forException(it) }
+        return launchTask
     }
 }

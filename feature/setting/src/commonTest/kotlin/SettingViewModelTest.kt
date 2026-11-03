@@ -29,6 +29,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runCurrent
@@ -396,6 +397,36 @@ class SettingViewModelTest : FunSpec() {
                         awaitItem() shouldBe SettingSideEffect.RequestStoreReview(requestId)
                         expectNoEvents()
                     }
+                }
+            }
+        }
+
+        test("30일 경과와 일반 복귀는 요청을 만들지 않고 새 문의 후 복귀가 필요하다") {
+            runTest {
+                val (viewModel) = createViewModel()
+                viewModel.sideEffect.test {
+                    val firstId = startInquiry(viewModel, this@runTest)
+                    viewModel.intent(SettingIntent.InquiryOpenResult(firstId, true))
+                    viewModel.intent(SettingIntent.AppBackgrounded)
+                    viewModel.intent(SettingIntent.AppResumed)
+                    runCurrent()
+                    awaitItem() shouldBe SettingSideEffect.RequestStoreReview(firstId)
+
+                    advanceTimeBy(2_592_000_000L)
+                    runCurrent()
+                    expectNoEvents()
+                    viewModel.intent(SettingIntent.AppBackgrounded)
+                    viewModel.intent(SettingIntent.AppResumed)
+                    runCurrent()
+                    expectNoEvents()
+
+                    val nextId = startInquiry(viewModel, this@runTest)
+                    viewModel.intent(SettingIntent.InquiryOpenResult(nextId, true))
+                    viewModel.intent(SettingIntent.AppBackgrounded)
+                    viewModel.intent(SettingIntent.AppResumed)
+                    runCurrent()
+                    awaitItem() shouldBe SettingSideEffect.RequestStoreReview(nextId)
+                    expectNoEvents()
                 }
             }
         }
