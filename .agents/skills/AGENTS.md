@@ -12,6 +12,7 @@
 6. 복사 설치본은 공유 원본이 변경되면 다시 설치해 갱신합니다.
 
 프로젝트 로컬 설치는 공식 지침에서 경로를 확인합니다.
+Claude Code는 `.agents/skills/`를 자동으로 찾지 않습니다. 저장소 루트에서 `mkdir -p .claude/skills && for d in .agents/skills/*/; do n=$(basename "$d"); ln -sfn "../../.agents/skills/$n" ".claude/skills/$n"; done`로 상대 symlink를 만들면 공유 원본을 그대로 씁니다. `.claude/`는 `.gitignore` 대상이라 커밋되지 않습니다.
 개발자별 로컬 설정·설치본은 Git 공유 대상에서 제외합니다.
 
 ## 스킬 선택 및 사용
