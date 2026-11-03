@@ -15,6 +15,10 @@ import caromobile.core.designsystem.generated.resources.setting_notification_per
 import caromobile.core.designsystem.generated.resources.setting_title
 import com.whatever.caro.core.designsystem.themes.CaroTheme
 import com.whatever.caro.core.model.auth.SocialLoginType
+import com.whatever.caro.core.screenshot.testing.ScreenshotScenario
+import com.whatever.caro.core.screenshot.testing.ScreenshotString
+import com.whatever.caro.core.screenshot.testing.ScreenshotTarget
+import com.whatever.caro.core.screenshot.testing.ScreenshotVariant
 import com.whatever.caro.feature.setting.mvi.SettingIntent
 import com.whatever.caro.feature.setting.mvi.SettingState
 import com.whatever.caro.feature.setting.route.NotificationPermissionDialog
@@ -72,6 +76,7 @@ internal object SettingScreenshotScenario {
             ),
             ScreenshotScenario(
                 "setting.notification.small.large-font",
+                variant = ScreenshotVariant.SMALL_LARGE_FONT,
                 render = {
                     CaroTheme {
                         SettingScreen(
@@ -89,7 +94,7 @@ internal object SettingScreenshotScenario {
             ScreenshotScenario(
                 "setting.notification.permission",
                 render = { CaroTheme { NotificationPermissionDialog({ cancelled++ }, { opened++ }) } },
-                isDialog = true,
+                target = ScreenshotTarget.DIALOG,
                 expectedStrings =
                     listOf(
                         ScreenshotString(Res.string.setting_notification_permission_title),

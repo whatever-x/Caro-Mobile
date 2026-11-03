@@ -46,12 +46,12 @@ KMP 타깃·Compose·DI·테스트 등의 공통 설정을 통일합니다.
 |---|---|
 | `caro.kmp` | KMP 기본 설정(코루틴, Napier 로깅, `-Xexpect-actual-classes`) |
 | `caro.kmp.android` | Android KMP 타깃 설정(compileSdk 36, minSdk 28, JVM 17) |
-| `caro.kmp.ios` | iOS 타깃 설정(x64, arm64, simulatorArm64) |
+| `caro.kmp.ios` | iOS arm64·simulatorArm64 타깃과 앱 framework export 설정 |
 | `caro.cmp` | Compose Multiplatform 의존성(material3, resources, foundation)과 컴파일러 설정 |
 | `caro.feature` | feature 모듈에 core 의존성(designsystem, data, ui, viewmodel, navigator)을 자동 추가. koin-compose-viewmodel도 추가 |
 | `caro.koin` | Koin Kotlin 컴파일러 플러그인(`io.insert-koin.compiler.plugin`) 적용. commonMain에 `koin-core` 추가. 단축 DSL(`single<X>()`, `viewModel<X>()`) 사용 지원 |
 | `caro.kmp.test` | 테스트 의존성(Kotest, Mokkery, Turbine, coroutines-test, koin-test), Android `withHostTest`·resources 포함·JUnit 호스트 실행 설정 |
-| `caro.screenshot` | Roborazzi와 플랫폼별 테스트 의존성 연결. [스크린샷 규칙](../development/screenshot-testing.md) 참고 |
+| `caro.screenshot` | Roborazzi 플러그인·출력 분리, `commonTest`의 `:core:screenshot-testing`, Host Test manifest·Vintage 연결. [스크린샷 규칙](../development/screenshot-testing.md) 참고 |
 | `caro.kover` | `:core:data`와 `:feature:*`에 Kover 적용. 라인 커버리지 최소 50% 검사 |
 | `caro.kotlin.serialization` | kotlinx.serialization 플러그인과 JSON 의존성 추가 |
 | `caro.android.application` | Android 애플리케이션 설정 |
@@ -72,3 +72,23 @@ plugins {
     id("caro.kover")
 }
 ```
+
+## 스크린샷 인프라 모듈
+
+[:core:screenshot-testing](../../core/screenshot-testing/build.gradle.kts)은 `caro.kmp`·`caro.kmp.android`·`caro.cmp`·`caro.kmp.test`를 사용합니다.
+앱 조립용 framework export를 피하기 위해 `caro.kmp.ios`를 적용하지 않습니다.
+대신 `iosArm64()`와 `iosSimulatorArm64()`를 직접 선언합니다.
+이 모듈은 앱·Feature·다른 core 모듈에 의존하지 않습니다. 해당 모듈을 framework로 export하지도 않습니다.
+`caro.feature`·`caro.koin`·`caro.screenshot`은 적용하지 않습니다.
+
+공통 API와 Compose test/resources는 `commonMain`에 둡니다.
+Android Compose Rule·Robolectric·Roborazzi는 `androidMain`에 둡니다.
+iOS Roborazzi와 Skiko 실행 코드는 `iosMain`에 둡니다.
+공통 문자열 준비에 쓰는 coroutines-test는 이 라이브러리의 내부 의존성입니다.
+공개 API에서 쓰는 Compose test/resources·Android Rule·Robolectric은 `api`로 노출합니다.
+Feature는 `caro.screenshot`이 추가한 **commonTest 의존성**으로만 플랫폼 variant를 사용합니다.
+따라서 이 의존성은 앱의 main 런타임에 전파되지 않습니다.
+
+Kotest·JUnit Platform은 `caro.kmp.test`, JUnit4 Robolectric 실행용 Vintage·Compose manifest는 Host Test에 유지합니다.
+Roborazzi 플러그인은 Feature에만 적용하며 기존 record/compare 태스크와 `separateOutputDirs=true`를 유지합니다.
+프로필·소스 배치·Dialog Window 계약은 [스크린샷 규칙](../development/screenshot-testing.md)이 원본입니다.

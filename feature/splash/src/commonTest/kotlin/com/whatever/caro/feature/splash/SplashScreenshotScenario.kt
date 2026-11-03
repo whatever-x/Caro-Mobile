@@ -6,6 +6,8 @@ import androidx.compose.ui.test.onNodeWithText
 import caromobile.core.designsystem.generated.resources.Res
 import caromobile.core.designsystem.generated.resources.splash_content
 import com.whatever.caro.core.designsystem.themes.CaroTheme
+import com.whatever.caro.core.screenshot.testing.ScreenshotScenario
+import com.whatever.caro.core.screenshot.testing.ScreenshotString
 import com.whatever.caro.feature.splash.mvi.SplashState
 
 internal object SplashScreenshotScenario {

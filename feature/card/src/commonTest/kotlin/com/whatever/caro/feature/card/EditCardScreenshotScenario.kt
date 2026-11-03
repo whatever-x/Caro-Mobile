@@ -6,6 +6,8 @@ import androidx.compose.ui.test.onNodeWithText
 import caromobile.core.designsystem.generated.resources.Res
 import caromobile.core.designsystem.generated.resources.card_title_edit_content
 import com.whatever.caro.core.designsystem.themes.CaroTheme
+import com.whatever.caro.core.screenshot.testing.ScreenshotScenario
+import com.whatever.caro.core.screenshot.testing.ScreenshotString
 import com.whatever.caro.feature.card.mvi.EditCardState
 
 internal object EditCardScreenshotScenario {

@@ -9,6 +9,8 @@ import caromobile.core.designsystem.generated.resources.deck_detail_title_daily_
 import com.whatever.caro.core.designsystem.themes.CaroTheme
 import com.whatever.caro.core.model.deck.Deck
 import com.whatever.caro.core.model.deck.DeckState
+import com.whatever.caro.core.screenshot.testing.ScreenshotScenario
+import com.whatever.caro.core.screenshot.testing.ScreenshotString
 import com.whatever.caro.feature.deck.detail.model.CardItem
 import com.whatever.caro.feature.deck.detail.mvi.DeckDetailState
 import kotlinx.collections.immutable.persistentListOf

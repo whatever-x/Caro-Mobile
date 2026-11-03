@@ -6,8 +6,8 @@ import androidx.compose.ui.test.onNodeWithText
 import caromobile.core.designsystem.generated.resources.Res
 import caromobile.core.designsystem.generated.resources.deck_edit_title
 import com.whatever.caro.core.designsystem.themes.CaroTheme
-import com.whatever.caro.feature.deck.ScreenshotScenario
-import com.whatever.caro.feature.deck.ScreenshotString
+import com.whatever.caro.core.screenshot.testing.ScreenshotScenario
+import com.whatever.caro.core.screenshot.testing.ScreenshotString
 import com.whatever.caro.feature.deck.edit.mvi.EditDeckState
 
 internal object EditDeckScreenshotScenario {

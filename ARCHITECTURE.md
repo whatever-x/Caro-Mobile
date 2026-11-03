@@ -90,6 +90,7 @@ flowchart TB
 | `:core:crashlytics` | 오류·크래시 수집 |
 | `:core:messaging` | 푸시 알림 |
 | `:core:util` | 숫자 포맷 등의 공통 유틸리티 |
+| `:core:screenshot-testing` | Feature 테스트에서만 사용하는 공유 스크린샷 인프라 |
 | `:build-logic` | 공유 Gradle 플러그인과 빌드 설정 제공 |
 
 `:composeApp`은 feature와 앱 구성에 필요한 core 모듈을 조립합니다.
@@ -118,6 +119,7 @@ flowchart LR
 `:core:navigator`는 화면 이동에 필요한 모델을 사용합니다. 이 모델은 `api` 의존성으로 호출 모듈에도 노출합니다.
 
 `:core:viewmodel`·`:core:util`과 분석·오류 수집·푸시 모듈은 현재 다른 프로젝트 모듈에 직접 의존하지 않습니다.
+`:core:screenshot-testing`은 다른 프로젝트 모듈에 직접 의존하지 않습니다. Feature의 테스트 소스셋에서만 이 모듈을 사용합니다.
 전체 목록과 선언 방식은 [core 내부 의존 관계](docs/architecture/modules-platform.md#core-내부-의존-관계)를 확인합니다.
 
 ### 2.2 feature와 core 관계

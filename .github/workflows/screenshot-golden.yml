@@ -71,7 +71,7 @@ jobs:
       - name: Record all scenarios
         shell: bash
         run: |
-          test_tasks=()
+          test_tasks=(":core:screenshot-testing:${{ matrix.test-task }}" --rerun)
           while IFS= read -r module; do
             test_tasks+=(":feature:$module:${{ matrix.test-task }}" --rerun)
           done < <(jq -r 'keys[]' scripts/screenshot/scenarios.json)

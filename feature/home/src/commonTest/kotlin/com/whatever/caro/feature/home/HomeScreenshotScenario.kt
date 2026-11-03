@@ -8,6 +8,8 @@ import caromobile.core.designsystem.generated.resources.deck_title_create
 import com.whatever.caro.core.designsystem.themes.CaroTheme
 import com.whatever.caro.core.model.deck.Deck
 import com.whatever.caro.core.model.deck.DeckState
+import com.whatever.caro.core.screenshot.testing.ScreenshotScenario
+import com.whatever.caro.core.screenshot.testing.ScreenshotString
 import com.whatever.caro.feature.home.mvi.HomeState
 import com.whatever.caro.feature.home.mvi.HomeStreakState
 import kotlinx.collections.immutable.persistentListOf

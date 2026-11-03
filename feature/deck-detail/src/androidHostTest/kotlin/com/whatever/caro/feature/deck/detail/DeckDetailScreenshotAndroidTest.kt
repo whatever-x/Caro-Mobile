@@ -2,6 +2,10 @@ package com.whatever.caro.feature.deck.detail
 
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import com.whatever.caro.core.screenshot.testing.ScreenshotCapture
+import com.whatever.caro.core.screenshot.testing.captureAndroidScreenshot
+import com.whatever.caro.core.screenshot.testing.screenshotAndroidRule
+import com.whatever.caro.core.screenshot.testing.screenshotCaptures
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -20,7 +24,7 @@ internal class DeckDetailScreenshotAndroidTest(
     @get:Rule val captureRule = screenshotAndroidRule(capture, composeRule)
 
     @Test
-    fun capture() = captureAndroidScreenshot(composeRule, capture)
+    fun `지정한 언어와 프로필로 시나리오 스크린샷을 캡처한다`() = captureAndroidScreenshot(composeRule, capture)
 
     companion object {
         @JvmStatic

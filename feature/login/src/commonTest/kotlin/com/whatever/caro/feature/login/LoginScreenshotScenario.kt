@@ -6,6 +6,8 @@ import androidx.compose.ui.test.onNodeWithText
 import caromobile.core.designsystem.generated.resources.Res
 import caromobile.core.designsystem.generated.resources.login_button_google
 import com.whatever.caro.core.designsystem.themes.CaroTheme
+import com.whatever.caro.core.screenshot.testing.ScreenshotScenario
+import com.whatever.caro.core.screenshot.testing.ScreenshotString
 import com.whatever.caro.feature.login.mvi.LoginState
 
 internal object LoginScreenshotScenario {

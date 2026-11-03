@@ -19,6 +19,10 @@ import com.whatever.caro.core.designsystem.themes.CaroTheme
 import com.whatever.caro.core.model.library.LibraryCard
 import com.whatever.caro.core.model.library.LibraryDeck
 import com.whatever.caro.core.model.library.LibraryDetail
+import com.whatever.caro.core.screenshot.testing.ScreenshotScenario
+import com.whatever.caro.core.screenshot.testing.ScreenshotString
+import com.whatever.caro.core.screenshot.testing.ScreenshotTarget
+import com.whatever.caro.core.screenshot.testing.ScreenshotVariant
 import com.whatever.caro.feature.home.library.LibraryPreviewScreen
 import com.whatever.caro.feature.home.library.LibraryScreen
 import com.whatever.caro.feature.home.library.mvi.LibraryPreviewIntent
@@ -67,6 +71,7 @@ internal object LibraryScreenshotScenario {
             ),
             ScreenshotScenario(
                 NARROW_ID,
+                variant = ScreenshotVariant.NARROW,
                 render = { Preview(narrow = true) },
                 expectedStrings =
                     listOf(
@@ -78,6 +83,7 @@ internal object LibraryScreenshotScenario {
             ),
             ScreenshotScenario(
                 ENGLISH_NARROW_ID,
+                variant = ScreenshotVariant.NARROW,
                 render = { EnglishPreview() },
                 expectedStrings =
                     listOf(
@@ -91,13 +97,14 @@ internal object LibraryScreenshotScenario {
             ),
             ScreenshotScenario(
                 ENGLISH_ERROR_ID,
+                variant = ScreenshotVariant.NARROW,
                 render = { EnglishError { intents.add(it) } },
                 expectedStrings =
                     listOf(
                         ScreenshotString(Res.string.library_add_error_title),
                         ScreenshotString(Res.string.library_confirm),
                     ),
-                isDialog = true,
+                target = ScreenshotTarget.DIALOG,
                 beforeCapture = { strings ->
                     onNodeWithText(strings[Res.string.library_add_error_title]).assertIsDisplayed()
                 },

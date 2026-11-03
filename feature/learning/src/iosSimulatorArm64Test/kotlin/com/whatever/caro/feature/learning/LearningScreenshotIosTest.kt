@@ -1,8 +1,9 @@
 package com.whatever.caro.feature.learning
 
+import com.whatever.caro.core.screenshot.testing.captureIosScreenshots
 import kotlin.test.Test
 
 class LearningScreenshotIosTest {
     @Test
-    fun captures() = captureIosScreenshots(LearningScreenshotScenario::scenarios)
+    fun `모든 시나리오의 한국어와 영어 스크린샷을 캡처한다`() = captureIosScreenshots(LearningScreenshotScenario::scenarios)
 }

@@ -9,8 +9,8 @@ import com.whatever.caro.core.designsystem.themes.CaroTheme
 import com.whatever.caro.core.model.card.CardBadge
 import com.whatever.caro.core.model.card.CardContent
 import com.whatever.caro.core.model.card.DeckCard
-import com.whatever.caro.feature.card.ScreenshotScenario
-import com.whatever.caro.feature.card.ScreenshotString
+import com.whatever.caro.core.screenshot.testing.ScreenshotScenario
+import com.whatever.caro.core.screenshot.testing.ScreenshotString
 import com.whatever.caro.feature.card.detail.mvi.CardDetailState
 import kotlinx.collections.immutable.persistentListOf
 

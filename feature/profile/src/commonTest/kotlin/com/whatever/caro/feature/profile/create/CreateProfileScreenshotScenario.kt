@@ -6,8 +6,8 @@ import androidx.compose.ui.test.onNodeWithText
 import caromobile.core.designsystem.generated.resources.Res
 import caromobile.core.designsystem.generated.resources.profile_title_create
 import com.whatever.caro.core.designsystem.themes.CaroTheme
-import com.whatever.caro.feature.profile.ScreenshotScenario
-import com.whatever.caro.feature.profile.ScreenshotString
+import com.whatever.caro.core.screenshot.testing.ScreenshotScenario
+import com.whatever.caro.core.screenshot.testing.ScreenshotString
 import com.whatever.caro.feature.profile.create.mvi.CreateProfileState
 
 internal object CreateProfileScreenshotScenario {

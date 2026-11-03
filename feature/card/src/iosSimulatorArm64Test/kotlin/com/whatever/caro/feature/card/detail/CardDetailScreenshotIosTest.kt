@@ -1,9 +1,9 @@
 package com.whatever.caro.feature.card.detail
 
-import com.whatever.caro.feature.card.captureIosScreenshots
+import com.whatever.caro.core.screenshot.testing.captureIosScreenshots
 import kotlin.test.Test
 
 class CardDetailScreenshotIosTest {
     @Test
-    fun captures() = captureIosScreenshots(CardDetailScreenshotScenario::scenarios)
+    fun `모든 시나리오의 한국어와 영어 스크린샷을 캡처한다`() = captureIosScreenshots(CardDetailScreenshotScenario::scenarios)
 }

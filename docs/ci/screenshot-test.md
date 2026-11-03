@@ -8,10 +8,13 @@ CI·Golden·수동 실행·게시 승인 절차의 원본 문서입니다. 작�
 ## 캡처 계약
 
 [scenarios.json](../../scripts/screenshot/scenarios.json)은 실행 코드와 대조할 기대 ID 목록입니다.
-언어·기기 값은 각 feature의 `commonTest/ScreenshotCapture.kt`에 Kotlin으로 직접 선언합니다. 설정 JSON·코드 생성은 사용하지 않습니다.
+언어·기기 값은 `:core:screenshot-testing`의 `commonMain/ScreenshotProfile.kt`에 선언합니다. 설정 JSON·코드 생성은 사용하지 않습니다.
+각 Feature 시나리오가 캡처 대상과 Variant를 선언합니다.
+CI는 같은 ID의 기대 profile 접미사를 검사합니다.
 세 워크플로의 Bash·jq는 기대 언어·프로필 ID와 파일명을 검사합니다. 이 이름을 바꾸면 Kotlin과 CI의 파일명 규칙을 함께 수정합니다.
 공통 ID N개를 ko/en으로 확장하면 플랫폼별 2N개, 전체 4N개의 캡처가 됩니다.
-현재 기대 목록은 9개 모듈·24개 논리 ID이며, 플랫폼별 48개·전체 96개입니다. 실제 출력 수와 구분합니다.
+현재 기대 목록에는 9개 모듈과 24개 논리 ID가 있습니다.
+기대 캡처 수는 플랫폼별 48개, 전체 96개입니다. 실제 출력 수와 구분합니다.
 작은 화면·큰 글꼴 시나리오는 명시된 variant 하나를 사용합니다. 모든 시나리오를 모든 variant로 곱하지 않습니다.
 파일명은 `<scenario-id>__<language>__<profile-id>.png`입니다. 플랫폼은 출력 경로와 메타데이터에 포함합니다.
 
@@ -23,12 +26,16 @@ CI·Golden·수동 실행·게시 승인 절차의 원본 문서입니다. 작�
 ## 세 워크플로와 권한
 
 1. **Screenshot Golden** (`screenshot-golden.yml`): 모든 `develop` push에서 두 플랫폼을 기록합니다.
+   공통 모듈과 registry에 등록된 모든 Feature의 플랫폼별 테스트를 실행합니다.
    등록 ID를 언어·프로필로 확장합니다. 누락·중복·미등록 파일명을 검사합니다.
    `screenshot-golden-android/ios` 아티팩트는 PNG와 `metadata.json`을 90일 보관합니다.
 2. **Screenshot PR** (`screenshot-pr.yml`): `develop`에서 수동 실행합니다. PR head/base SHA를 고정합니다. 병합 커밋의 부모가
    `[base, head]`인지 확인합니다. 체크아웃 대상은 **고정한 병합 커밋**입니다. PR head로 바꾸지 않습니다.
    읽기 권한으로 정확한 base SHA의 Golden을 복원합니다. 두 플랫폼의 Roborazzi 비교를 실행합니다.
-   캐시를 유지하면서 registry에 있는 각 feature 테스트 태스크에만 `--rerun`을 붙입니다.
+   캐시를 유지하면서 공통 모듈과 registry에 있는 각 Feature 테스트 태스크에 `--rerun`을 붙입니다.
+   변경 경로로 대상 모듈을 줄이지 않습니다. 공통 인프라만 변경해도 수동 비교는 등록된 9개 Feature 전체를 대상으로 합니다.
+   공통 모듈의 라이브러리 variant는 Feature 테스트의 의존성으로 컴파일됩니다.
+   공통 모듈에서 별도로 Golden을 수집하지 않습니다.
 3. **Screenshot Comment** (`screenshot-comment.yml`): 비교 완료의 `workflow_run`으로 실행합니다.
    비교가 실패해도 요청 identity 아티팩트로 PR을 식별합니다. 이미지·댓글은 비교가 성공하고 보고서·현재 PR 검증이 통과해야 게시합니다.
    기본 브랜치의 **신뢰한 워크플로 코드**만 실행합니다. 게시용 소스 체크아웃은 하지 않습니다.
@@ -78,7 +85,11 @@ CI는 기대 파일명·결과 목록·비어 있지 않은 regular file·symlin
 PNG header·내용·치수·CRC·픽셀 디코딩, JUnit geometry 로그, 중복 JSON member key 검사는 하지 않습니다.
 JSON 구문과 배열의 중복 ID/결과는 jq로 검사하지만 중복 object key는 마지막 값으로 해석할 수 있습니다.
 metadata의 languages·profiles는 기대 라벨입니다. 실제 로케일·치수·density/fontScale·기기 모델·OS의 측정값으로 보고하지 않습니다.
-기기값·root·실제 리소스 전환 단언은 기존 Kotlin 테스트에 유지합니다.
+기기값·root·실제 리소스 전환 단언은 공통 모듈과 Feature의 Kotlin 테스트에 유지합니다.
+공통화는 v5 schema·24개 ID·6개 profile ID·파일명·Feature별 수집 경로를 바꾸지 않습니다.
+Android Dialog의 Window 선택 수정만으로 이미지가 동일하다고 확인할 수 없습니다.
+기존 Golden과 실제 이미지를 비교해야 합니다. 원본 이미지도 검토해야 합니다.
+Dialog 선택 계약과 미확정 원인은 [개발자 지침](../development/screenshot-testing.md#android-dialog의-view와-window)을 확인합니다.
 
 | 결과 | 플랫폼 댓글 |
 | --- | --- |
@@ -140,7 +151,10 @@ gh run list --repo whatever-x/Caro-Mobile --workflow screenshot-pr.yml \
 
 요청 ID도 선택 사항입니다. 생략하면 실행 ID를 사용합니다. 에이전트는 항상 승인받은 SHA 쌍과 고유 요청 ID를 제공합니다.
 
-준비 단계는 잘못된 입력, 닫힌 PR, 다른 대상 브랜치, 예상 SHA 불일치, 병합 커밋 조회 불가, 병합 부모 불일치를 거부합니다. 비교 단계는 체크아웃한 SHA를 검증하고 고정된 병합 커밋을 사용합니다. Golden이 없거나 만료되면 다른 SHA로 대체하지 않고 실패합니다.
+준비 단계는 잘못된 입력과 닫힌 PR을 거부합니다. 대상 브랜치가 다르거나 예상 SHA가 일치하지 않아도 거부합니다.
+병합 커밋을 조회할 수 없거나 병합 부모가 일치하지 않아도 거부합니다.
+비교 단계는 체크아웃한 SHA를 검증합니다. 고정된 병합 커밋을 사용합니다.
+Golden이 없거나 만료되면 실패합니다. 다른 SHA의 Golden으로 대체하지 않습니다.
 
 비교가 실패해도 준비 단계의 요청 메타데이터로 대상 PR을 식별합니다.
 게시 작업은 원본 실행 ID와 두 플랫폼 보고서가 메타데이터에 일치하는지 검증합니다. 이미지·댓글을 쓰기 전에 현재 PR을 다시 확인합니다.

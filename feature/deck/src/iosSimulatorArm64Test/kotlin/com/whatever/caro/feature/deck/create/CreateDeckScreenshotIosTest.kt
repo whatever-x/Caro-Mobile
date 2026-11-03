@@ -1,9 +1,9 @@
 package com.whatever.caro.feature.deck.create
 
-import com.whatever.caro.feature.deck.captureIosScreenshots
+import com.whatever.caro.core.screenshot.testing.captureIosScreenshots
 import kotlin.test.Test
 
 class CreateDeckScreenshotIosTest {
     @Test
-    fun captures() = captureIosScreenshots(CreateDeckScreenshotScenario::scenarios)
+    fun `모든 시나리오의 한국어와 영어 스크린샷을 캡처한다`() = captureIosScreenshots(CreateDeckScreenshotScenario::scenarios)
 }

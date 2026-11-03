@@ -1,59 +1,29 @@
 # Home 스크린샷 작성 예제
 
-시나리오를 처음 만들거나 화면별 목록·플랫폼 실행을 바꿀 때 읽는다. 명령은 저장소 루트에서 실행한다.
-사용자가 캡처 실행을 중지했다면 아래 record/compare 명령은 실행하지 않는다.
+신규 Feature의 시나리오·플랫폼 진입점을 작성하거나 기존 화면 목록을 변경할 때 읽는다.
+명령은 저장소 루트에서 사용자에게 허용된 경우에만 실행한다. 빌드·테스트·캡처 실행 금지는 예제 명령보다 우선한다.
 
-## 실제 화면·상태
+## 코드와 의존성
 
-```kotlin
-internal fun HomeScreen(state: HomeState, onIntent: (HomeIntent) -> Unit)
+Feature는 기존 KMP·CMP·Feature 설정에 `caro.kmp.test`와 `caro.screenshot`을 적용한다.
+플러그인은 `commonTest`에 공통 모듈 의존성을 연결한다.
+Feature의 main에 테스트 모듈을 추가하지 않는다.
+프로필·캡처·문자열·Geometry 보조는 복사하지 않고 `com.whatever.caro.core.screenshot.testing`에서 import한다.
 
-data class HomeState(
-    val nickname: String = "",
-    val streakState: HomeStreakState = HomeStreakState.Loading,
-    val decks: ImmutableList<Deck> = persistentListOf(),
-    val isLoading: Boolean = true,
-    val hasLoadError: Boolean = false,
-)
+공통 구현 원본:
 
-data class Deck(
-    val id: Long,
-    val title: String,
-    val description: String,
-    val cardTotalCount: Int,
-    val todayLearningCount: Int,
-    val todayCompleteCount: Int,
-    val state: DeckState,
-)
-```
+- [프로필·Variant](../../../../core/screenshot-testing/src/commonMain/kotlin/com/whatever/caro/core/screenshot/testing/ScreenshotProfile.kt)
+- [시나리오·대상·언어 확장·파일명](../../../../core/screenshot-testing/src/commonMain/kotlin/com/whatever/caro/core/screenshot/testing/ScreenshotScenario.kt)
+- [문자열 준비](../../../../core/screenshot-testing/src/commonMain/kotlin/com/whatever/caro/core/screenshot/testing/ScreenshotStrings.kt)
+- [Canvas·Geometry](../../../../core/screenshot-testing/src/commonMain/kotlin/com/whatever/caro/core/screenshot/testing/ScreenshotCanvas.kt)
+- [Android Rule·Locale·Clock·Dialog Window](../../../../core/screenshot-testing/src/androidMain/kotlin/com/whatever/caro/core/screenshot/testing/ScreenshotAndroidCapture.kt)
+- [iOS 실행·AppleLanguages 복원](../../../../core/screenshot-testing/src/iosMain/kotlin/com/whatever/caro/core/screenshot/testing/ScreenshotIosCapture.kt)
 
-`isLoadedContentVisible`, `isDeckEmpty`는 HomeState의 파생 값이다. 화면 상태를 렌더링할 때 isLoading을 명시한다.
-모델과 Screen의 현재 선언을 확인한 뒤 예제를 적용한다.
+## Home 상태와 시나리오
 
-## 기대 목록과 실행 코드
-
-`scripts/screenshot/scenarios.json`에 등록한다.
-
-```json
-{"home": ["home.home.with_deck"]}
-```
-
-CI는 JSON의 ID를 언어·프로필로 확장해 실제 출력과 대조한다. JSON은 코드를 생성하거나 테스트를 실행하지 않는다.
-화면별 `***ScreenshotScenario.scenarios()`를 해당 Android/iOS 래퍼가 직접 전달한다.
-
-```mermaid
-flowchart LR
-    registry["scenarios.json: 기대 목록"] --> reconcile["CI 출력 검증"]
-    code["HomeScreenshotScenario: 화면별 목록"] --> android["Android ko / en"]
-    code --> ios["iOS ko / en"]
-    config["feature Kotlin 설정"] --> android
-    config --> ios
-    android --> reconcile
-    ios --> reconcile
-    expected["CI 기대 파일명"] --> reconcile
-```
-
-## 고정 렌더러와 공유 의미 단언
+현재 Home은 `HomeScreen(state: HomeState, onIntent: (HomeIntent) -> Unit)`을 사용한다.
+콘텐츠 fixture에서는 기본값이 true인 `isLoading`을 false로 지정한다. State·Fixture·렌더러·동작 단언은 Feature에 둔다.
+다른 화면의 파라미터를 Home과 같다고 가정하지 않는다.
 
 [HomeScreenshotScenario.kt](../../../../feature/home/src/commonTest/kotlin/com/whatever/caro/feature/home/HomeScreenshotScenario.kt):
 
@@ -68,9 +38,10 @@ import caromobile.core.designsystem.generated.resources.deck_title_create
 import com.whatever.caro.core.designsystem.themes.CaroTheme
 import com.whatever.caro.core.model.deck.Deck
 import com.whatever.caro.core.model.deck.DeckState
+import com.whatever.caro.core.screenshot.testing.ScreenshotScenario
+import com.whatever.caro.core.screenshot.testing.ScreenshotString
 import com.whatever.caro.feature.home.mvi.HomeState
 import com.whatever.caro.feature.home.mvi.HomeStreakState
-
 import kotlinx.collections.immutable.persistentListOf
 
 internal object HomeScreenshotScenario {
@@ -107,91 +78,35 @@ internal object HomeScreenshotScenario {
 }
 ```
 
-`ScreenshotCapture.kt`에는 feature-local Kotlin 설정·case 모델·확장·캔버스·기하 보조 코드를 둔다. 화면의 목록은 `HomeScreenshotScenario.kt`에 둔다.
+`expectedStrings`의 대표 리소스는 의미 있는 ko/en 번역 차이가 있어야 한다.
+포맷 인자는 `ScreenshotString(Res.string.library_card_count, formatArgs = listOf(1))`처럼 전달한다.
+실제 문구와 줄바꿈은 XML에서 관리한다. 단언에 번역 문구를 복사하지 않는다.
 
-```kotlin
-internal data class ScreenshotProfile(
-    val platform: String, val variant: String, val id: String,
-    val widthPx: Int, val heightPx: Int, val density: Float, val fontScale: Float,
-)
+## 기대 목록
 
-internal object ScreenshotConfiguration {
-    val languages = listOf("ko", "en")
-    val profiles = listOf(
-        ScreenshotProfile("android", "default", "pixel10-pro", 1280, 2856, 3f, 1f),
-        ScreenshotProfile("android", "narrow", "pixel10-pro-narrow", 960, 2100, 3f, 1f),
-        ScreenshotProfile("android", "small-large-font", "pixel10-pro-small-large-font", 960, 1440, 3f, 1.5f),
-        ScreenshotProfile("ios", "default", "iphone18-pro", 1206, 2622, 3f, 1f),
-        ScreenshotProfile("ios", "narrow", "iphone18-pro-narrow", 960, 2100, 3f, 1f),
-        ScreenshotProfile("ios", "small-large-font", "iphone18-pro-small-large-font", 960, 1440, 3f, 1.5f),
-    )
-    val variants = mapOf(
-        "setting.notification.small.large-font" to "small-large-font",
-        LibraryScreenshotScenario.NARROW_ID to "narrow",
-        LibraryScreenshotScenario.ENGLISH_NARROW_ID to "narrow",
-        LibraryScreenshotScenario.ENGLISH_ERROR_ID to "narrow",
-    )
-    val contentSizedScenarios = setOf("setting.notification.permission", LibraryScreenshotScenario.ENGLISH_ERROR_ID)
-}
+`scripts/screenshot/scenarios.json`의 해당 모듈 배열에 논리 ID를 등록한다.
+다음은 Home 목록의 일부다. 기존 Library ID는 삭제하지 않는다.
 
-internal data class ScreenshotString(
-    val resource: StringResource,
-    val formatArgs: List<Any> = emptyList(),
-)
-
-internal class ScreenshotStrings(private val values: Map<StringResource, String>) {
-    operator fun get(resource: StringResource): String = values.getValue(resource)
-}
-
-internal class ScreenshotScenario(
-    val id: String,
-    val render: @Composable () -> Unit,
-    val expectedStrings: List<ScreenshotString>,
-    val isDialog: Boolean = false,
-    val beforeCapture: SemanticsNodeInteractionsProvider.(ScreenshotStrings) -> Unit = {},
-    val afterCapture: SemanticsNodeInteractionsProvider.(ScreenshotStrings) -> Unit = {},
-)
-
-internal data class ScreenshotCapture(
-    val scenario: ScreenshotScenario,
-    val language: String,
-    val profile: ScreenshotProfile,
-) {
-    var renderedDensity: Density? = null
-    val fileName = "${scenario.id}__${language}__${profile.id}.png"
-    override fun toString(): String = fileName
-}
-
-internal fun screenshotCaptures(
-    platform: String,
-    scenarios: () -> List<ScreenshotScenario>,
-): List<ScreenshotCapture> = ScreenshotConfiguration.languages.flatMap { language ->
-    val fresh = scenarios()
-    require(fresh.map { it.id }.distinct().size == fresh.size)
-    fresh.map { scenario ->
-        val variant = ScreenshotConfiguration.variants[scenario.id] ?: "default"
-        val profile = ScreenshotConfiguration.profiles.single { it.platform == platform && it.variant == variant }
-        ScreenshotCapture(scenario, language, profile)
-    }
-}
+```json
+{"home": ["home.home.with_deck"]}
 ```
 
-`ScreenshotConfiguration`와 `ScreenshotProfile`은 해당 feature에 직접 선언한다. `caro.screenshot`은 Roborazzi·테스트 의존성만 연결한다.
-언어·프로필 ID를 바꾸면 세 워크플로의 Bash·jq 기대 파일명 규칙도 함께 수정한다. 이 규칙은 테스트 설정을 생성하지 않는다.
-[Home의 캡처 보조 코드](../../../../feature/home/src/commonTest/kotlin/com/whatever/caro/feature/home/ScreenshotCapture.kt)는
-같은 profile로 `ScreenshotCanvas`의 requiredSize·LocalDensity를 설정한다. 적용된 LocalDensity를 `SideEffect`로 보관한다.
-실행 보조는 root px·관측 density/fontScale을 단언하고 `SCREENSHOT_GEOMETRY`로 기록한다. CI는 이 로그나 PNG 내용·치수를 해석하지 않는다.
+registry는 기대 목록이며 코드를 생성하지 않는다. 화면별 factory를 두 플랫폼 진입점에 직접 전달한다.
+ID는 전체 모듈에서 고유해야 한다. `__` 및 `_actual`·`_compare`·`_before` 접미사는 예약한다.
 
-## Android 배선
+## Android 진입점
 
-[HomeScreenshotAndroidTest.kt](../../../../feature/home/src/androidHostTest/kotlin/com/whatever/caro/feature/home/HomeScreenshotAndroidTest.kt)는
-Home 팩토리만 직접 전달한다. 다른 화면의 목록을 합치지 않는다.
+[HomeScreenshotAndroidTest.kt](../../../../feature/home/src/androidHostTest/kotlin/com/whatever/caro/feature/home/HomeScreenshotAndroidTest.kt):
 
 ```kotlin
 package com.whatever.caro.feature.home
 
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import com.whatever.caro.core.screenshot.testing.ScreenshotCapture
+import com.whatever.caro.core.screenshot.testing.captureAndroidScreenshot
+import com.whatever.caro.core.screenshot.testing.screenshotAndroidRule
+import com.whatever.caro.core.screenshot.testing.screenshotCaptures
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -210,7 +125,7 @@ internal class HomeScreenshotAndroidTest(
     @get:Rule val captureRule = screenshotAndroidRule(capture, composeRule)
 
     @Test
-    fun capture() = captureAndroidScreenshot(composeRule, capture)
+    fun `지정한 언어와 프로필로 시나리오 스크린샷을 캡처한다`() = captureAndroidScreenshot(composeRule, capture)
 
     companion object {
         @JvmStatic
@@ -220,69 +135,57 @@ internal class HomeScreenshotAndroidTest(
 }
 ```
 
-[로케일·clock·캡처 보조](../../../../feature/home/src/androidHostTest/kotlin/com/whatever/caro/feature/home/ScreenshotAndroidCapture.kt)는
-같은 feature의 플랫폼 소스셋에 둔다. `screenshotAndroidRule`의 바깥 rule은 로케일을 적용한다. 안쪽 rule은 Compose Activity를 실행한다.
-feature Kotlin 프로필의 host qualifiers와 언어를 Activity 시작 전에 적용한다. 종료할 때 Locale·LocaleList·qualifiers를 복원한다.
-`captureAndroidScreenshot`은 화면 렌더링 전에 `expectedAndroidResourceEnvironments`로 기대 환경을 확보하고 로케일을 복원한다.
-`prepareScreenshotStrings`가 명시적인 환경으로 기대 문자열을 읽은 뒤 정확한 window px와 `ScreenshotCanvas`를 적용한다.
-before/after 콜백에는 이 기대값을 전달한다. 기존 상호작용 단언과 기하 검사를 유지한다.
+각 case는 새 Compose Rule을 사용한다.
+바깥 Locale Rule은 Activity 실행 전에 프로필과 언어를 설정한다. 예외가 발생해도 원래 설정을 복원한다.
+문자열 준비와 Canvas·Geometry·Clock·캡처 처리는 공통 실행기에 위임한다.
 
-캡처 import는 `com.github.takahirom.roborazzi.captureRoboImage`다. 테스트 메서드마다 새 Compose rule을 사용한다.
-하나의 rule에서 setContent를 여러 번 호출하지 않는다. Dialog 소유 View의 치수가 다르면 실패시킨다. 출력 치수를 조작하지 않는다.
+## iOS 진입점
 
-## iOS 배선과 저장된 로케일 복원
-
-[HomeScreenshotIosTest.kt](../../../../feature/home/src/iosSimulatorArm64Test/kotlin/com/whatever/caro/feature/home/HomeScreenshotIosTest.kt)도
-같은 Home 팩토리를 직접 전달한다.
+[HomeScreenshotIosTest.kt](../../../../feature/home/src/iosSimulatorArm64Test/kotlin/com/whatever/caro/feature/home/HomeScreenshotIosTest.kt):
 
 ```kotlin
 package com.whatever.caro.feature.home
 
+import com.whatever.caro.core.screenshot.testing.captureIosScreenshots
 import kotlin.test.Test
 
 class HomeScreenshotIosTest {
     @Test
-    fun captures() = captureIosScreenshots(HomeScreenshotScenario::scenarios)
+    fun `모든 시나리오의 한국어와 영어 스크린샷을 캡처한다`() = captureIosScreenshots(HomeScreenshotScenario::scenarios)
 }
 ```
 
-[로케일·clock·캡처 보조](../../../../feature/home/src/iosSimulatorArm64Test/kotlin/com/whatever/caro/feature/home/ScreenshotIosCapture.kt)는
-`screenshotCaptures("ios", scenarios)`로 해당 화면 목록을 확장한다. 각 case는 독립된 Skiko 세션을 실행한다.
-캡처 import는 `io.github.takahirom.roborazzi.captureRoboImage`다. 보조 함수는 프로필의 px Size와 Density를 전달한다.
-`isDialog()` 또는 `onRoot()`로 선택한 같은 컴포넌트를 측정하고 캡처한다.
-캡처 로케일을 적용하기 전에 `expectedIosResourceEnvironments`로 기대 환경을 확보하고 저장된 로케일을 복원한다.
-`prepareScreenshotStrings`가 명시적인 환경으로 기대 문자열을 읽는다. before/after 콜백은 준비된 값만 조회한다.
+각 ko/en capture는 별도 Skiko 세션을 사용한다. `iosMain` 실행기는 px Size와 Density를 전달한다.
+실행기는 앱 도메인에 저장된 AppleLanguages를 finally에서 복원한다.
+원래 key가 없으면 key를 제거한다. 이렇게 시스템 fallback을 유지한다.
 
-Skiko Size는 px다. 프로필의 density/fontScale도 전달한다. AppleLanguages는
-`persistentDomainForName(domain)["AppleLanguages"]`의 저장된 값만 보관한다. objectForKey의 유효 fallback은 보관하지 않는다. domain은 main bundle ID가 없으면 processName을 쓴다.
-finally에서 원래 key가 없으면 제거한다. 원래 값이 있으면 복원한다. 성공과 예외 양쪽을 회귀 테스트한다.
+## Variant와 Dialog 추가
 
-두 플랫폼 모두 `mainClock.autoAdvance=false`로 고정된 초기 시점을 사용한다. before/after 상호작용 scope에서는 true로 설정해
-idle까지 기다린다. finally에서 이전 값을 복원한다. 스크롤 완료 전에 시계를 계속 멈추면 performScrollTo가 진행하지 못한다.
+일반 화면은 기본 `SCREEN`·`DEFAULT`를 사용한다. 작은 화면은 시나리오 생성자에 다음 중 필요한 값만 선언한다.
 
-## 파일명·variant·확인
+```kotlin
+variant = ScreenshotVariant.NARROW // 320×700 논리 크기, fontScale 1
+variant = ScreenshotVariant.SMALL_LARGE_FONT // 320×480 논리 크기, fontScale 1.5
+```
 
-- `home.home.with_deck__ko__pixel10-pro.png`
-- `home.home.with_deck__en__pixel10-pro.png`
-- `home.home.with_deck__ko__iphone18-pro.png`
-- `home.home.with_deck__en__iphone18-pro.png`
+새 ID에 Variant를 지정하면 세 워크플로의 모든 기대 파일명 분기에 같은 ID와 접미사를 반영한다.
+새 Variant 자체를 만들 때는 공통 enum·양 플랫폼 프로필과 CI profile 목록·metadata 검사도 갱신한다.
+Library의 `english` ID는 고정 데이터 variant이며 리소스 로케일은 ko/en 모두 실행한다.
 
-기본 프로필을 모든 ID에 사용한다. `ScreenshotConfiguration.variants`에 명시된 작은 화면 case만 별도 profile로 대체한다.
-`setting.notification.small.large-font`는 320×480 논리 크기/fontScale1.5이며 계정탈퇴까지 스크롤한다.
-Library narrow는 320×700/fontScale1이다. `english` ID의 데이터도 ko/en 리소스로 각각 실행한다.
-Dialog는 `isDialog`와 `ScreenshotConfiguration.contentSizedScenarios`를 함께 유지한다. 실사용 fixture 문자열은 번역하지 않아도 된다.
-모든 시나리오는 `expectedStrings`에 선언한 대표 리소스의 ko/en 전환을 의미 단언으로 확인한다.
-선택한 리소스의 ko/en 값이 같으면 준비가 실패한다. 문구·줄바꿈 변경은 XML에만 반영한다.
-`library_card_count`처럼 인자가 필요한 리소스는 `ScreenshotString(Res.string.library_card_count, formatArgs = listOf(1))`로 선언한다.
+Dialog는 시나리오 생성자에 `target = ScreenshotTarget.DIALOG`를 선언한다. 별도 content-sized ID 목록은 없다.
+Home 오류·Setting 권한 Dialog처럼 beforeCapture는 표시를, afterCapture는 콜백 횟수를 확인한다.
+Android는 유일한 Dialog semantics 노드의 소유 View와 그 Window의 decor를 함께 선택한다.
+iOS는 같은 Dialog 노드를 측정·캡처한다. 상세 전제와 미확정 원인은
+[Dialog View·Window 계약](../../../../docs/development/screenshot-testing.md#android-dialog의-view와-window)을 따른다.
 
 ## 명령과 산출물
 
-사용자가 허용한 범위에서만 실행한다. 명령이 있다는 이유로 로컬 캡처 중지나 CI 승인 경계를 넘지 않는다.
-CI의 등록·Golden·결과·게시 검사는 세 워크플로의 Bash·jq에서 수행한다. 별도 실행 스크립트는 없다.
-
-캡처를 명시적으로 허용한 작업에서만 다음 로컬 명령을 사용한다. 루트 record/compare 태스크에도 같은 실행 경계를 적용한다.
+다음 명령은 실행이 허용된 작업에서만 사용한다. 공통 모듈을 변경한 경우 Home만으로 회귀 검증을 끝내지 않는다.
+등록된 9개 Feature의 Android/iOS·ko/en 전체가 대상이다. CI는 경로 필터 없이 모두 실행한다.
 
 ```bash
+./gradlew :core:screenshot-testing:testAndroidHostTest
+./gradlew :core:screenshot-testing:iosSimulatorArm64Test
 ./gradlew :feature:home:recordRoborazziAndroidHostTest :feature:home:testAndroidHostTest --rerun
 ./gradlew :feature:home:recordRoborazziIosSimulatorArm64 :feature:home:iosSimulatorArm64Test --rerun
 ./gradlew :feature:home:compareRoborazziAndroidHostTest :feature:home:testAndroidHostTest --rerun
@@ -290,8 +193,9 @@ CI의 등록·Golden·결과·게시 검사는 세 워크플로의 Bash·jq에�
 ```
 
 출력은 `feature/home/build/outputs/roborazzi/androidHostTest/`와 `iosSimulatorArm64/`에 있다.
-JSON 결과는 `build/test-results/roborazzi/<target>/results-summary.json`, HTML은 `build/reports/roborazzi/<target>/index.html`이다.
-`SCREENSHOT_GEOMETRY`는 Kotlin 테스트의 단언 로그다. CI는 PNG 내용·치수를 검사하지 않는다. 실제 파일·결과가 registry의 기대 목록과 다르면 실패해야 한다.
-record 후 compare 통과는 같은 기준을 비교한 결과일 수 있다. 원본 시각 검토는 별도로 보고한다.
-
+파일명은 `home.home.with_deck__ko__pixel10-pro.png`처럼 `<scenario-id>__<language>__<profile-id>.png`다.
+JSON은 Feature의 `build/test-results/roborazzi/<target>/results-summary.json`, HTML은 `build/reports/roborazzi/<target>/index.html`이다.
+공통 모듈에는 Roborazzi Gradle 플러그인을 적용하지 않으며 Golden 이미지도 수집하지 않는다.
+`SCREENSHOT_GEOMETRY`는 Kotlin 단언 로그다. CI는 PNG 내용·치수나 이 로그를 해석하지 않는다.
+기존 PNG·record 직후 compare 통과·정적 점검을 변경된 코드의 실행 성공이나 시각적 승인으로 보고하지 않는다.
 CI 실행·Golden·이미지 게시 승인은 [스크린샷 CI](../../../../docs/ci/screenshot-test.md)가 원본이다.
