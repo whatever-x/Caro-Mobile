@@ -27,6 +27,7 @@
 | `:core:crashlytics` | 오류·크래시 수집의 공통 계약과 플랫폼별 Firebase 연동 |
 | `:core:messaging` | 푸시 토큰·메시지 수신·알림 표시와 플랫폼별 Firebase 연동 |
 | `:core:util` | 숫자 포맷 등의 공통 유틸리티와 플랫폼별 구현 |
+| `:core:screenshot-testing` | Feature 테스트에서만 사용하는 KMP 스크린샷 캡처 인프라 |
 | `:feature:*` | home·login 등의 기능별 화면·상태·ViewModel. `caro.feature` 플러그인으로 core 의존성을 자동 주입 |
 | `build-logic/convention/` | 모듈 설정을 표준화하는 Gradle 컨벤션 플러그인 |
 
@@ -42,7 +43,8 @@
 :composeApp → 앱 구성에 필요한 core 모듈 + 모든 feature 모듈
 ```
 
-`:composeApp`은 `:core:util`을 제외한 core 모듈에 직접 의존합니다. `:core:util`은 `:feature:home`의 의존성으로 연결됩니다.
+`:composeApp`은 `:core:util`과 `:core:screenshot-testing`을 제외한 core 모듈에 직접 의존합니다.
+`:feature:home`은 `:core:util`에 의존합니다.
 `:core:analytics`·`:core:crashlytics`·`:core:messaging`과 `:feature:login`은 `api`, 나머지 프로젝트 모듈은 `implementation`으로 선언합니다.
 등록 원본은 [composeApp의 빌드 설정](../../composeApp/build.gradle.kts)과 [Android 앱의 빌드 설정](../../androidApp/build.gradle.kts)입니다.
 iOS는 Gradle 앱 모듈 대신 Xcode 프로젝트에서 공유 KMP 프레임워크를 연동합니다.
@@ -65,6 +67,7 @@ iOS는 Gradle 앱 모듈 대신 Xcode 프로젝트에서 공유 KMP 프레임워
 | `:core:crashlytics` | 없음 | — |
 | `:core:messaging` | 없음 | — |
 | `:core:util` | 없음 | — |
+| `:core:screenshot-testing` | 없음 | — |
 
 `api` 의존성은 호출 모듈에도 노출됩니다. `implementation` 의존성은 호출 모듈의 컴파일 의존성으로 자동 노출되지 않습니다.
 예를 들어 `:core:navigator`를 사용하는 feature에서는 `:core:model` 타입을 사용할 수 있지만, `:core:data`를 사용한다는 이유로 `:core:remote`를 직접 사용할 수 있다고 가정하지 않습니다.
@@ -93,6 +96,11 @@ iOS는 Gradle 앱 모듈 대신 Xcode 프로젝트에서 공유 KMP 프레임워
 | `:feature:profile` | `:core:model` |
 | `:feature:setting` | `:core:model` |
 | `:feature:splash` | 없음 |
+
+위 표는 main 소스셋의 의존성입니다. `caro.screenshot`을 적용하면 Feature의 `commonTest`에
+`:core:screenshot-testing`이 `implementation` 의존성으로 추가됩니다. 플랫폼 테스트는 해당 Android/iOS 라이브러리 variant를 사용합니다.
+공통 모듈의 main에 있는 테스트 라이브러리를 앱·Feature main으로 연결하지 않습니다.
+세부 구성은 [스크린샷 인프라 모듈](convention-plugins.md#스크린샷-인프라-모듈)을 확인합니다.
 
 추가 의존성은 모두 `implementation`으로 선언합니다.
 `:core:navigator`의 `:core:model` 노출(`api`)은 위 표의 직접 추가와 별개입니다.

@@ -251,7 +251,7 @@ firebase-crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "
 
 # Test
 mokkery = { id = "dev.mokkery", version.ref = "mokkery" }
-spotless = { id = "com.diffplug.gradle.spotless", version.ref = "spotless" }
+spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
 kotest = { id = "io.kotest", version.ref = "kotest" }
 kover = { id = "org.jetbrains.kotlinx.kover", version.ref = "kover" }
 
