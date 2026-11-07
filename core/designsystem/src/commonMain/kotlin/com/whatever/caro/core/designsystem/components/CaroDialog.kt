@@ -13,9 +13,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -24,6 +26,11 @@ import androidx.compose.ui.window.DialogProperties
 import com.whatever.caro.core.designsystem.themes.CaroTheme
 
 private val CaroDialogWidth = 330.dp
+
+/** Allows screenshot fixtures to render the dialog surface in isolation. */
+val LocalCaroDialogContentOnly = staticCompositionLocalOf { false }
+
+const val CARO_DIALOG_CONTENT_TAG = "caro-dialog-content"
 
 /**
  * 슬롯 API 기반의 공용 다이얼로그.
@@ -47,16 +54,19 @@ fun CaroDialog(
     buttons: (@Composable () -> Unit)? = null,
     content: @Composable () -> Unit,
 ) {
-    Dialog(
-        onDismissRequest = onDismissRequest,
-        properties = properties,
-    ) {
+    val contentOnly = LocalCaroDialogContentOnly.current
+    val dialogContent: @Composable () -> Unit = {
         CaroDialogContent(
-            modifier = modifier,
+            modifier = if (contentOnly) Modifier.testTag(CARO_DIALOG_CONTENT_TAG).then(modifier) else modifier,
             title = title,
             buttons = buttons,
             content = content,
         )
+    }
+    if (contentOnly) {
+        dialogContent()
+    } else {
+        Dialog(onDismissRequest = onDismissRequest, properties = properties, content = dialogContent)
     }
 }
 

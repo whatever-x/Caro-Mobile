@@ -7,7 +7,8 @@ CI·Golden·수동 실행·게시 승인 절차의 원본 문서입니다. 작�
 
 ## 캡처 계약
 
-[scenarios.json](../../scripts/screenshot/scenarios.json)은 실행 코드와 대조할 기대 ID 목록입니다.
+[scenarios.json](../../scripts/screenshot/scenarios.json)은 실행 코드와 대조할 모듈별 기대 ID와 variant 목록입니다.
+각 항목의 variant는 `default`, `narrow`, `small-large-font` 중 하나입니다. Kotlin 시나리오의 Variant와 일치해야 합니다.
 언어·기기 값은 `:core:screenshot-testing`의 `commonMain/ScreenshotProfile.kt`에 선언합니다. 설정 JSON·코드 생성은 사용하지 않습니다.
 각 Feature 시나리오가 캡처 대상과 Variant를 선언합니다.
 CI는 같은 ID의 기대 profile 접미사를 검사합니다.
@@ -59,16 +60,18 @@ v5 Golden metadata에는 다음 값만 포함합니다.
 
 - schema version 5, source SHA(정확한 PR base), platform
 - languages `["ko", "en"]`, 기본·small-large-font·narrow profile ID
-- scenarios: 모듈별 기대 논리 ID registry
+- scenarios: 모듈별 기대 논리 ID와 variant registry
 
 다운로드한 파일 목록을 registry에서 확장한 기대 목록과 대조한 뒤 복원합니다. schema·SHA·플랫폼·언어·프로필 ID가 다르면 실패합니다.
-같은 호환성 기준에서 새 ID가 생긴 경우에만 `added`로 허용합니다.
-이미 Golden registry에 있는 캡처가 `added`로 보고되면 기존 기준 이미지 누락으로 실패합니다.
-삭제 ID는 baseline과 현재 기대 목록의 차이로 계산합니다.
+같은 호환성 기준에서 각 registry의 ID·언어·variant를 캡처 파일명으로 확장합니다.
+두 파일명 목록의 차이로 `added`와 `removed`를 계산합니다.
+기존 ID의 variant가 바뀌면 이전 파일은 삭제로 처리합니다. 새 파일은 추가로 처리합니다.
+Golden에 있어야 할 파일이 `added`로 보고되면 기준 이미지가 누락된 것으로 처리합니다. 이 경우 검사는 실패합니다.
 
 ### v5 Golden 전환
 
-기존 `<ID>.png` Golden과 v2/v3/v4 artifact는 v5 형식과 호환되지 않습니다. 별도 registry/config snapshot도 허용하지 않습니다.
+기존 `<ID>.png` Golden과 v2/v3/v4 artifact는 v5 형식과 호환되지 않습니다.
+variant가 없는 구형 registry도 v5 형식과 호환되지 않습니다. 별도 registry/config snapshot도 허용하지 않습니다.
 새 파일명을 모두 신규 이미지로 취급하지 않고 metadata 누락 또는 schema·identity 오류로 중단합니다.
 이 전환 변경은 로컬에서 검증할 수 있지만 기존 스키마의 exact-base Golden과 새 캡처를 비교할 수는 없습니다.
 
@@ -86,7 +89,7 @@ PNG header·내용·치수·CRC·픽셀 디코딩, JUnit geometry 로그, 중복
 JSON 구문과 배열의 중복 ID/결과는 jq로 검사하지만 중복 object key는 마지막 값으로 해석할 수 있습니다.
 metadata의 languages·profiles는 기대 라벨입니다. 실제 로케일·치수·density/fontScale·기기 모델·OS의 측정값으로 보고하지 않습니다.
 기기값·root·실제 리소스 전환 단언은 공통 모듈과 Feature의 Kotlin 테스트에 유지합니다.
-공통화는 v5 schema·24개 ID·6개 profile ID·파일명·Feature별 수집 경로를 바꾸지 않습니다.
+이번 변경은 v5 registry에 variant를 포함합니다. 24개 ID·6개 profile ID·파일명·Feature별 수집 경로는 유지합니다.
 Android Dialog의 Window 선택 수정만으로 이미지가 동일하다고 확인할 수 없습니다.
 기존 Golden과 실제 이미지를 비교해야 합니다. 원본 이미지도 검토해야 합니다.
 Dialog 선택 계약과 미확정 원인은 [개발자 지침](../development/screenshot-testing.md#android-dialog의-view와-window)을 확인합니다.

@@ -14,7 +14,7 @@ Golden·수동 실행·게시와 승인은 [스크린샷 CI](../ci/screenshot-te
 | `feature/<module>/src/commonTest/` | 화면별 `***ScreenshotScenario.kt`의 Screen·State·Fixture·ID·렌더러·동작 단언 |
 | `feature/<module>/src/androidHostTest/` | 화면별 Android 테스트 진입점 |
 | `feature/<module>/src/iosSimulatorArm64Test/` | 화면별 iOS 테스트 진입점 |
-| `scripts/screenshot/scenarios.json` | 모듈별 기대 논리 ID |
+| `scripts/screenshot/scenarios.json` | 모듈별 기대 논리 ID와 variant |
 | `.github/workflows/screenshot-*.yml` | Bash·jq의 기대 파일명·Golden·결과·게시 검증과 댓글 생성 |
 
 `caro.screenshot`은 Roborazzi 플러그인과 `commonTest`의 `:core:screenshot-testing` 의존성을 연결합니다.
@@ -40,7 +40,7 @@ Feature와 앱의 main 소스셋은 이 모듈에 의존하지 않습니다.
 
 - 양쪽 플랫폼은 feature의 `commonTest`에 있는 상태·ID·고정 데이터·렌더러·의미 단언을 공유합니다.
 - 화면별 Android·iOS 래퍼가 해당 `***ScreenshotScenario::scenarios`를 직접 전달합니다. ko/en Screen 복사본을 만들지 않습니다.
-- ID 추가·삭제는 해당 화면의 목록과 registry에 함께 반영합니다. JSON 자체는 테스트를 생성하거나 실행하지 않습니다.
+- ID 또는 variant 변경은 해당 화면의 목록과 registry에 함께 반영합니다. JSON 자체는 테스트를 생성하거나 실행하지 않습니다.
 - 시간·날짜·난수·이미지·네트워크·애니메이션은 고정합니다. Screen에 상태·콜백을 전달합니다. production DI는 사용하지 않습니다.
 - 언어별 새 case로 콜백 카운터를 격리합니다. 클릭 횟수·로딩 비활성화·작은 화면 스크롤·Dialog 콜백 단언을 보존합니다.
 
@@ -55,8 +55,10 @@ Skiko Size는 px입니다. Density도 지정합니다. 물리 ppi를 Compose den
 프로필 이름은 실제 Simulator 모델·OS 실행 증거가 아닙니다. 전체 기기의 시스템 바를 캡처하는 테스트도 아닙니다.
 
 `SCREEN` root의 측정 px는 프로필 캔버스와 정확히 같아야 합니다.
-`DIALOG`는 `isDialog()`로 유일한 노드를 선택합니다. 노드의 폭과 높이는 각각 1px 이상이어야 합니다.
-두 값은 각각 프로필 캔버스의 폭과 높이를 넘을 수 없습니다. `target`이 노드 선택과 Geometry 정책을 결정합니다.
+Android의 `DIALOG`는 `isDialog()`로 유일한 노드를 선택합니다. iOS는 격리 렌더링한 콘텐츠의 태그로 노드를 선택합니다.
+두 플랫폼의 PNG는 Dialog 콘텐츠만 포함합니다. 스크림은 포함하지 않습니다.
+노드의 폭과 높이는 각각 1px 이상이어야 합니다. 각 값은 프로필 캔버스의 폭과 높이를 넘을 수 없습니다.
+노드의 폭과 높이가 캔버스 전체 크기와 동시에 같을 수 없습니다. `target`이 노드 선택과 크기 검사 기준을 결정합니다.
 Android Dialog는 아래 Window 선택 계약을 사용합니다.
 임의 root 인덱스·여러 window 합성·후처리 crop/scale로 치수를 맞추지 않습니다.
 `SCREENSHOT_GEOMETRY`는 Kotlin 테스트가 단언한 root·적용된 Compose density/fontScale의 로그입니다. CI는 이 로그나 PNG 내용·치수를 해석하지 않습니다.
@@ -115,6 +117,10 @@ UI thread에서 부모 계층의 `DialogWindowProvider`가 유일한지 확인�
 - Espresso가 연결된 Window를 탐색할 수 있어야 합니다.
 
 전제가 맞지 않으면 실패합니다. root 인덱스·fallback·다중 Window 합성·PNG crop/scale로 보정하지 않습니다.
+iOS의 Skiko 캡처는 선택한 경계 안의 장면을 합성합니다. 스크림이 있는 화면에서는 노드만 선택해도 배경이 남을 수 있습니다.
+iOS Dialog 시나리오는 `iosDialogContent`로 실제 화면과 같은 Dialog 콘텐츠를 격리 렌더링합니다. 같은 콜백을 사용합니다.
+`LocalCaroDialogContentOnly`는 `CaroDialog`의 Window와 스크림을 생략합니다. 같은 콘텐츠를 렌더링합니다.
+`iosDialogContentTag`로 콘텐츠를 선택합니다. 태그가 없거나 콘텐츠가 전체 캔버스 크기이면 검사는 실패합니다.
 `ScreenshotDialogAndroidTest`는 같은 선택 함수가 Dialog owner를 찾는지 확인하는 회귀 테스트 소스이며 이미지 성공을 증명하지 않습니다.
 수정된 Home/Setting ko/en의 실제 Roborazzi record/compare, PNG 치수·내용과 기존 Golden의 시각 비교는 실행 후 별도 확인해야 합니다.
 

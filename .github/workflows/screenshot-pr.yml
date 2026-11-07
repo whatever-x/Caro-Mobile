@@ -199,32 +199,32 @@ jobs:
           [[ -d build/screenshot-baseline && ! -L build/screenshot-baseline ]] || { echo "::error::Required screenshot input/output path condition failed." >&2; exit 1; }
           [[ -f "$metadata" && ! -L "$metadata" ]] || { echo "::error::Required screenshot input/output path condition failed." >&2; exit 1; }
           test -z "$(find build/screenshot-baseline ! -type d ! -type f -print)"
+          jq -es 'length == 1' "$metadata" > /dev/null
+          jq -es 'length == 1' scripts/screenshot/scenarios.json > /dev/null
           jq -e --arg sha "$BASE_SHA" --arg platform "$PLATFORM" --arg profile "$PROFILE" \
             --slurpfile current scripts/screenshot/scenarios.json '
           def valid_registry:
             def safe: type == "string" and test("^[A-Za-z0-9][A-Za-z0-9._-]*\\z") and
               (contains("__") | not) and (test("_(actual|compare|before)\\z") | not);
             type == "object" and length > 0 and all(to_entries[];
-              (.key | safe) and (.value | type == "array" and length > 0 and all(.[]; safe))) and
-            ([.[][]] | length == (unique | length));
+              (.key | safe) and (.value | type == "array" and length > 0 and all(.[];
+                type == "object" and (keys == ["id", "variant"]) and (.id | safe) and
+                (.variant == "default" or .variant == "narrow" or .variant == "small-large-font")))) and
+            ([.[][].id] | length == (unique | length));
             .schema_version == 5 and .source_sha == $sha and .platform == $platform and
             .languages == ["ko", "en"] and
             .profiles == {default: $profile, "small-large-font": ($profile + "-small-large-font"), narrow: ($profile + "-narrow")} and
             (.scenarios | valid_registry) and ($current[0] | valid_registry)
           ' "$metadata" > /dev/null || { echo "::error::Missing or incompatible exact-base Golden; schema v5 is required."; exit 1; }
           jq -r --arg profile "$PROFILE" '.scenarios |
-          to_entries[] | .key as $module | .value[] as $id | ["ko", "en"][] as $language |
+          to_entries[] | .key as $module | .value[] | .id as $id | .variant as $variant | ["ko", "en"][] as $language |
             $module + "/" + $id + "__" + $language + "__" + $profile +
-            (if $id == "setting.notification.small.large-font" then "-small-large-font"
-               elif (["library.preview.narrow", "library.preview.english.narrow", "library.preview.english.error"] | index($id)) != null then "-narrow"
-               else "" end) + ".png"
+            (if $variant == "default" then "" else "-" + $variant end) + ".png"
           ' "$metadata" | sort > "$RUNNER_TEMP/screenshot-base-files"
           jq -r --arg profile "$PROFILE" '
-          to_entries[] | .key as $module | .value[] as $id | ["ko", "en"][] as $language |
+          to_entries[] | .key as $module | .value[] | .id as $id | .variant as $variant | ["ko", "en"][] as $language |
             $module + "/" + $id + "__" + $language + "__" + $profile +
-            (if $id == "setting.notification.small.large-font" then "-small-large-font"
-               elif (["library.preview.narrow", "library.preview.english.narrow", "library.preview.english.error"] | index($id)) != null then "-narrow"
-               else "" end) + ".png"
+            (if $variant == "default" then "" else "-" + $variant end) + ".png"
           ' scripts/screenshot/scenarios.json | sort > "$RUNNER_TEMP/screenshot-current-files"
           diff -u <({ echo metadata.json; cat "$RUNNER_TEMP/screenshot-base-files"; } | sort) \
             <(find build/screenshot-baseline -type f | sed 's|^build/screenshot-baseline/||' | sort)

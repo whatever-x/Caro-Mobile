@@ -84,11 +84,11 @@ internal object HomeScreenshotScenario {
 
 ## 기대 목록
 
-`scripts/screenshot/scenarios.json`의 해당 모듈 배열에 논리 ID를 등록한다.
+`scripts/screenshot/scenarios.json`의 해당 모듈 배열에 논리 ID와 Kotlin 선언에 맞는 variant를 등록한다.
 다음은 Home 목록의 일부다. 기존 Library ID는 삭제하지 않는다.
 
 ```json
-{"home": ["home.home.with_deck"]}
+{"home": [{"id": "home.home.with_deck", "variant": "default"}]}
 ```
 
 registry는 기대 목록이며 코드를 생성하지 않는다. 화면별 factory를 두 플랫폼 진입점에 직접 전달한다.
@@ -168,14 +168,15 @@ variant = ScreenshotVariant.NARROW // 320×700 논리 크기, fontScale 1
 variant = ScreenshotVariant.SMALL_LARGE_FONT // 320×480 논리 크기, fontScale 1.5
 ```
 
-새 ID에 Variant를 지정하면 세 워크플로의 모든 기대 파일명 분기에 같은 ID와 접미사를 반영한다.
+새 ID에 Variant를 지정하면 registry 항목의 `variant`를 Kotlin 선언과 일치시킨다.
 새 Variant 자체를 만들 때는 공통 enum·양 플랫폼 프로필과 CI profile 목록·metadata 검사도 갱신한다.
 Library의 `english` ID는 고정 데이터 variant이며 리소스 로케일은 ko/en 모두 실행한다.
 
 Dialog는 시나리오 생성자에 `target = ScreenshotTarget.DIALOG`를 선언한다. 별도 content-sized ID 목록은 없다.
 Home 오류·Setting 권한 Dialog처럼 beforeCapture는 표시를, afterCapture는 콜백 횟수를 확인한다.
 Android는 유일한 Dialog semantics 노드의 소유 View와 그 Window의 decor를 함께 선택한다.
-iOS는 같은 Dialog 노드를 측정·캡처한다. 상세 전제와 미확정 원인은
+iOS는 실제 Dialog와 같은 콘텐츠를 화면과 스크림 없이 격리 렌더링한다. 같은 콜백을 사용한다.
+iOS는 콘텐츠 태그로 대상을 선택한다. 선택한 콘텐츠를 측정하고 캡처한다. 상세 전제와 미확정 원인은
 [Dialog View·Window 계약](../../../../docs/development/screenshot-testing.md#android-dialog의-view와-window)을 따른다.
 
 ## 명령과 산출물

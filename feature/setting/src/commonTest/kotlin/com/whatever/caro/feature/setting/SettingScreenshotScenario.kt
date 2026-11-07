@@ -1,5 +1,6 @@
 package com.whatever.caro.feature.setting
 
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.assertIsOn
@@ -13,6 +14,8 @@ import caromobile.core.designsystem.generated.resources.setting_notification_lab
 import caromobile.core.designsystem.generated.resources.setting_notification_open_settings
 import caromobile.core.designsystem.generated.resources.setting_notification_permission_title
 import caromobile.core.designsystem.generated.resources.setting_title
+import com.whatever.caro.core.designsystem.components.CARO_DIALOG_CONTENT_TAG
+import com.whatever.caro.core.designsystem.components.LocalCaroDialogContentOnly
 import com.whatever.caro.core.designsystem.themes.CaroTheme
 import com.whatever.caro.core.model.auth.SocialLoginType
 import com.whatever.caro.core.screenshot.testing.ScreenshotScenario
@@ -95,6 +98,12 @@ internal object SettingScreenshotScenario {
                 "setting.notification.permission",
                 render = { CaroTheme { NotificationPermissionDialog({ cancelled++ }, { opened++ }) } },
                 target = ScreenshotTarget.DIALOG,
+                iosDialogContentTag = CARO_DIALOG_CONTENT_TAG,
+                iosDialogContent = {
+                    CompositionLocalProvider(LocalCaroDialogContentOnly provides true) {
+                        CaroTheme { NotificationPermissionDialog({ cancelled++ }, { opened++ }) }
+                    }
+                },
                 expectedStrings =
                     listOf(
                         ScreenshotString(Res.string.setting_notification_permission_title),

@@ -19,6 +19,8 @@ class ScreenshotScenario(
     val expectedStrings: List<ScreenshotString>,
     val target: ScreenshotTarget = ScreenshotTarget.SCREEN,
     val variant: ScreenshotVariant = ScreenshotVariant.DEFAULT,
+    val iosDialogContent: (@Composable () -> Unit)? = null,
+    val iosDialogContentTag: String? = null,
     val beforeCapture: SemanticsNodeInteractionsProvider.(ScreenshotStrings) -> Unit = {},
     val afterCapture: SemanticsNodeInteractionsProvider.(ScreenshotStrings) -> Unit = {},
 )

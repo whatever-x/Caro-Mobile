@@ -2,7 +2,7 @@ package com.whatever.caro.core.screenshot.testing
 
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.test.ExperimentalTestApi
-import androidx.compose.ui.test.isDialog
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.v2.runSkikoComposeUiTest
 import androidx.compose.ui.unit.Density
@@ -41,7 +41,12 @@ fun captureIosScreenshots(scenarios: () -> List<ScreenshotScenario>) {
                 mainClock.advanceTimeBy(1_000)
                 waitForIdle()
                 interaction { capture.scenario.beforeCapture(this, strings) }
-                val component = if (capture.scenario.target == ScreenshotTarget.DIALOG) onNode(isDialog()) else onRoot()
+                val component =
+                    if (capture.scenario.target == ScreenshotTarget.DIALOG) {
+                        onNodeWithTag(checkNotNull(capture.scenario.iosDialogContentTag))
+                    } else {
+                        onRoot()
+                    }
                 reportScreenshotGeometry(capture, component.fetchSemanticsNode().size)
                 component.captureRoboImage(this, filePath = capture.fileName)
                 interaction { capture.scenario.afterCapture(this, strings) }

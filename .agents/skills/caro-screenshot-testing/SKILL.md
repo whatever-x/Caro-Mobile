@@ -23,7 +23,8 @@ description: >
 2. **시각 계약·고정 데이터·ID를 정한다.** 예: `home.home.with_deck`. 로딩·오류·빈 상태 등 구별할 상태만 추가한다.
    시간·날짜·난수·네트워크·이미지 로더·애니메이션의 변동을 제거한다. Screen에 상태와 콜백을 직접 전달한다.
    fixture 렌더링에 production DI·ViewModel·다른 feature를 연결하지 않는다.
-3. **기대 ID를 등록한다.** `scripts/screenshot/scenarios.json`의 해당 모듈 배열에 ID를 추가하거나 삭제한다.
+3. **기대 ID를 등록한다.** `scripts/screenshot/scenarios.json`의 해당 모듈 배열에 `{"id": "...", "variant": "default"}` 항목을 추가하거나 삭제한다.
+   `variant`는 `default`, `narrow`, `small-large-font` 중 하나를 사용한다. Kotlin 시나리오의 Variant와 일치시킨다.
    JSON은 기대 목록일 뿐 Kotlin 테스트를 생성하지 않는다. 등록된 모든 모듈을 통틀어 ID를 고유하게 작성한다.
    `__`, `_actual`·`_compare`·`_before` 접미사는 사용하지 않는다.
 4. **화면별 시나리오를 구현한다.** feature의 `commonTest`에 있는 화면별 `***ScreenshotScenario.kt`를 수정한다.
@@ -50,7 +51,7 @@ description: >
    정확한 window px와 Compose density/fontScale을 적용한다. 일반 root의 측정값은 canvas px와 같아야 한다.
    언어·프로필 ID를 바꾸면 세 워크플로의 Bash·jq 기대 파일명 규칙도 함께 수정한다. CI는 파일·결과 목록을 대조한다.
    root·density/fontScale 단언은 Kotlin 테스트에 유지한다. CI가 PNG 치수나 geometry 로그를 검사한다고 보고하지 않는다.
-   새 ID에 기존 Variant를 적용하면 세 워크플로의 모든 기대 파일명 분기에도 같은 ID·접미사를 반영한다.
+   새 ID에 기존 Variant를 적용하면 registry의 `variant`를 Kotlin 선언과 일치시킨다.
    새 Variant가 필요하면 공통 enum·양 플랫폼 프로필과 세 워크플로의 profile 목록·metadata 검사를 함께 갱신한다.
    profile ID나 기기값 변경의 Golden 전환은 CI 정책을 따른다. 명시된 variant만 사용한다. Setting은 320×480/fontScale1.5와 계정탈퇴 스크롤, Library narrow는 320×700/fontScale1을 유지한다.
    Library의 `english` ID는 데이터 variant다. 리소스 로케일을 en으로 강제하지 않는다.
@@ -65,9 +66,11 @@ description: >
    대표 문구는 `onNodeWithText(strings[Res.string.key]).assertIsDisplayed()`로 확인한다.
    현재 화면 로케일로 기대값을 다시 읽거나 번역 문구를 테스트에 복사하지 않는다. 고정 사용자 입력 데이터와 구분한다.
 7. **Dialog를 명시한다.** 공통 case에 `target = ScreenshotTarget.DIALOG`를 지정한다.
-   target이 `isDialog()` 선택과 콘텐츠 크기 Geometry 정책을 함께 결정한다. 별도 ID 분류 목록은 없다.
+   target이 플랫폼별 Dialog 콘텐츠 선택과 크기 검사 기준을 결정한다. 별도 ID 분류 목록은 없다.
    Android 공통 실행기는 해당 노드의 소유 View·부모의 `DialogWindowProvider`·decor 동일성·치수를 확인한다.
    `onView(sameInstance(view)).inRoot(withDecorView(sameInstance(decor)))`의 ViewInteraction을 캡처한다.
+   iOS는 `iosDialogContent`로 실제 Dialog와 같은 콘텐츠를 스크림 없이 격리 렌더링한다. 같은 콜백을 사용한다.
+   `iosDialogContentTag`로 콘텐츠를 선택한다. 화면이나 별도 UI 복사본으로 대체하지 않는다.
    연결된 View의 Roborazzi overload도 Espresso를 호출하므로 `view.captureRoboImage()`로 대체하지 않는다.
    전제조건이 맞지 않으면 실패시킨다. 임의 root 인덱스를 사용하지 않는다.
    여러 Window를 합성하거나 PNG를 crop/scale해서 맞추지 않는다.

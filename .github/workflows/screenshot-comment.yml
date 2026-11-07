@@ -85,6 +85,7 @@ jobs:
           export LC_ALL=C
           merge=$(jq -r .merge_sha build/screenshot-context/context.json)
           gh api "repos/$GITHUB_REPOSITORY/contents/scripts/screenshot/scenarios.json?ref=$merge" --jq .content | base64 --decode > "$RUNNER_TEMP/screenshot-current-scenarios.json"
+          jq -es 'length == 1' "$RUNNER_TEMP/screenshot-current-scenarios.json" > /dev/null
           [[ -d build/screenshot-publish && ! -L build/screenshot-publish ]] || { echo "::error::Required screenshot input/output path condition failed." >&2; exit 1; }
           test -z "$(find build/screenshot-publish ! -type d ! -type f -print)"
           : > "$RUNNER_TEMP/screenshot-publication-files"
@@ -94,20 +95,21 @@ jobs:
             summary="$directory/summary.json"
             [[ -d "$directory" && ! -L "$directory" ]] || { echo "::error::Required screenshot input/output path condition failed." >&2; exit 1; }
             [[ -f "$summary" && ! -L "$summary" ]] || { echo "::error::Required screenshot input/output path condition failed." >&2; exit 1; }
+            jq -es 'length == 1' "$summary" > /dev/null
             jq -e --arg platform "$platform" --arg profile "$profile" \
               --slurpfile context build/screenshot-context/context.json --slurpfile registry "$RUNNER_TEMP/screenshot-current-scenarios.json" '
           def valid_registry:
             def safe: type == "string" and test("^[A-Za-z0-9][A-Za-z0-9._-]*\\z") and
               (contains("__") | not) and (test("_(actual|compare|before)\\z") | not);
             type == "object" and length > 0 and all(to_entries[];
-              (.key | safe) and (.value | type == "array" and length > 0 and all(.[]; safe))) and
-            ([.[][]] | length == (unique | length));
+              (.key | safe) and (.value | type == "array" and length > 0 and all(.[];
+                type == "object" and (keys == ["id", "variant"]) and (.id | safe) and
+                (.variant == "default" or .variant == "narrow" or .variant == "small-large-font")))) and
+            ([.[][].id] | length == (unique | length));
               def captures:
-                [to_entries[] | .key as $module | .value[] as $id | ["ko", "en"][] as $language |
+                [to_entries[] | .key as $module | .value[] | .id as $id | .variant as $variant | ["ko", "en"][] as $language |
                   $module + "/" + $id + "__" + $language + "__" + $profile +
-                  (if $id == "setting.notification.small.large-font" then "-small-large-font"
-               elif (["library.preview.narrow", "library.preview.english.narrow", "library.preview.english.error"] | index($id)) != null then "-narrow"
-               else "" end)] | sort;
+                  (if $variant == "default" then "" else "-" + $variant end)] | sort;
               ($registry[0] | captures) as $expected | (.baseline_scenarios | captures) as $previous |
               .schema_version == 5 and .platform == $platform and
               .pr_number == $context[0].pr_number and .base_sha == $context[0].base_sha and

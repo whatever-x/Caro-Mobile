@@ -1,44 +1,116 @@
 {
   "card": [
-    "card.create.draft",
-    "card.edit.existing",
-    "card.delete.selected",
-    "card.detail.front"
+    {
+      "id": "card.create.draft",
+      "variant": "default"
+    },
+    {
+      "id": "card.edit.existing",
+      "variant": "default"
+    },
+    {
+      "id": "card.delete.selected",
+      "variant": "default"
+    },
+    {
+      "id": "card.detail.front",
+      "variant": "default"
+    }
   ],
   "deck": [
-    "deck.create.initial",
-    "deck.edit.existing"
+    {
+      "id": "deck.create.initial",
+      "variant": "default"
+    },
+    {
+      "id": "deck.edit.existing",
+      "variant": "default"
+    }
   ],
   "deck-detail": [
-    "deck_detail.detail.empty",
-    "deck_detail.library_copy"
+    {
+      "id": "deck_detail.detail.empty",
+      "variant": "default"
+    },
+    {
+      "id": "deck_detail.library_copy",
+      "variant": "default"
+    }
   ],
   "home": [
-    "home.home.with_deck",
-    "library.preview.normal",
-    "library.list.normal",
-    "library.preview.narrow",
-    "library.preview.english.narrow",
-    "library.preview.english.error"
+    {
+      "id": "home.home.with_deck",
+      "variant": "default"
+    },
+    {
+      "id": "library.preview.normal",
+      "variant": "default"
+    },
+    {
+      "id": "library.list.normal",
+      "variant": "default"
+    },
+    {
+      "id": "library.preview.narrow",
+      "variant": "narrow"
+    },
+    {
+      "id": "library.preview.english.narrow",
+      "variant": "narrow"
+    },
+    {
+      "id": "library.preview.english.error",
+      "variant": "narrow"
+    }
   ],
   "learning": [
-    "learning.learning.front"
+    {
+      "id": "learning.learning.front",
+      "variant": "default"
+    }
   ],
   "login": [
-    "login.login.initial"
+    {
+      "id": "login.login.initial",
+      "variant": "default"
+    }
   ],
   "profile": [
-    "profile.create.initial",
-    "profile.edit.existing"
+    {
+      "id": "profile.create.initial",
+      "variant": "default"
+    },
+    {
+      "id": "profile.edit.existing",
+      "variant": "default"
+    }
   ],
   "setting": [
-    "setting.setting.account",
-    "setting.notification.on",
-    "setting.notification.busy",
-    "setting.notification.small.large-font",
-    "setting.notification.permission"
+    {
+      "id": "setting.setting.account",
+      "variant": "default"
+    },
+    {
+      "id": "setting.notification.on",
+      "variant": "default"
+    },
+    {
+      "id": "setting.notification.busy",
+      "variant": "default"
+    },
+    {
+      "id": "setting.notification.small.large-font",
+      "variant": "small-large-font"
+    },
+    {
+      "id": "setting.notification.permission",
+      "variant": "default"
+    }
   ],
   "splash": [
-    "splash.splash.initial"
+    {
+      "id": "splash.splash.initial",
+      "variant": "default"
+    }
   ]
 }

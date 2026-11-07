@@ -1,6 +1,7 @@
 package com.whatever.caro.feature.home
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -15,6 +16,8 @@ import caromobile.core.designsystem.generated.resources.library_adding
 import caromobile.core.designsystem.generated.resources.library_card_count
 import caromobile.core.designsystem.generated.resources.library_confirm
 import caromobile.core.designsystem.generated.resources.library_title
+import com.whatever.caro.core.designsystem.components.CARO_DIALOG_CONTENT_TAG
+import com.whatever.caro.core.designsystem.components.LocalCaroDialogContentOnly
 import com.whatever.caro.core.designsystem.themes.CaroTheme
 import com.whatever.caro.core.model.library.LibraryCard
 import com.whatever.caro.core.model.library.LibraryDeck
@@ -23,6 +26,7 @@ import com.whatever.caro.core.screenshot.testing.ScreenshotScenario
 import com.whatever.caro.core.screenshot.testing.ScreenshotString
 import com.whatever.caro.core.screenshot.testing.ScreenshotTarget
 import com.whatever.caro.core.screenshot.testing.ScreenshotVariant
+import com.whatever.caro.feature.home.library.LibraryAddErrorDialog
 import com.whatever.caro.feature.home.library.LibraryPreviewScreen
 import com.whatever.caro.feature.home.library.LibraryScreen
 import com.whatever.caro.feature.home.library.mvi.LibraryPreviewIntent
@@ -105,6 +109,12 @@ internal object LibraryScreenshotScenario {
                         ScreenshotString(Res.string.library_confirm),
                     ),
                 target = ScreenshotTarget.DIALOG,
+                iosDialogContentTag = CARO_DIALOG_CONTENT_TAG,
+                iosDialogContent = {
+                    CompositionLocalProvider(LocalCaroDialogContentOnly provides true) {
+                        CaroTheme { LibraryAddErrorDialog { intents.add(LibraryPreviewIntent.DismissError) } }
+                    }
+                },
                 beforeCapture = { strings ->
                     onNodeWithText(strings[Res.string.library_add_error_title]).assertIsDisplayed()
                 },

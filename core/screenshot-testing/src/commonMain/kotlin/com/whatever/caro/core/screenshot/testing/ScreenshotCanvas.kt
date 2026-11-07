@@ -18,7 +18,11 @@ internal fun ScreenshotCanvas(capture: ScreenshotCapture) {
         val density = LocalDensity.current
         SideEffect { capture.renderedDensity = density }
         Box(Modifier.requiredSize((profile.widthPx / profile.density).dp, (profile.heightPx / profile.density).dp)) {
-            capture.scenario.render()
+            if (profile.platform == "ios" && capture.scenario.target == ScreenshotTarget.DIALOG) {
+                checkNotNull(capture.scenario.iosDialogContent) { "${capture.fileName}: missing isolated iOS dialog content" }.invoke()
+            } else {
+                capture.scenario.render()
+            }
         }
     }
 }
@@ -29,8 +33,11 @@ internal fun assertScreenshotGeometry(
 ) {
     val profile = capture.profile
     if (capture.scenario.target == ScreenshotTarget.DIALOG) {
-        check(size.width in 1..profile.widthPx && size.height in 1..profile.heightPx) {
-            "${capture.fileName}: content root $size exceeds virtual canvas"
+        check(
+            size.width in 1..profile.widthPx && size.height in 1..profile.heightPx &&
+                size != IntSize(profile.widthPx, profile.heightPx),
+        ) {
+            "${capture.fileName}: dialog content root $size is empty, full-canvas, or exceeds virtual canvas"
         }
     } else {
         check(size == IntSize(profile.widthPx, profile.heightPx)) {

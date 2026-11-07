@@ -61,6 +61,9 @@ class ScreenshotContractTest : FunSpec() {
             assertScreenshotGeometry(capture, IntSize(990, 600))
             shouldThrow<IllegalStateException> { assertScreenshotGeometry(capture, IntSize(0, 600)) }
             shouldThrow<IllegalStateException> { assertScreenshotGeometry(capture, IntSize(1207, 600)) }
+            shouldThrow<IllegalStateException> {
+                assertScreenshotGeometry(capture, IntSize(capture.profile.widthPx, capture.profile.heightPx))
+            }
         }
 
         test("좁은 화면 변형은 시나리오 ID와 관계없이 직접 선언한다") {

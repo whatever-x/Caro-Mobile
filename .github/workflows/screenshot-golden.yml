@@ -80,13 +80,16 @@ jobs:
         shell: bash
         run: |
           export LC_ALL=C
+          jq -es 'length == 1' scripts/screenshot/scenarios.json > /dev/null
           jq -e '
           def valid_registry:
             def safe: type == "string" and test("^[A-Za-z0-9][A-Za-z0-9._-]*\\z") and
               (contains("__") | not) and (test("_(actual|compare|before)\\z") | not);
             type == "object" and length > 0 and all(to_entries[];
-              (.key | safe) and (.value | type == "array" and length > 0 and all(.[]; safe))) and
-            ([.[][]] | length == (unique | length));
+              (.key | safe) and (.value | type == "array" and length > 0 and all(.[];
+                type == "object" and (keys == ["id", "variant"]) and (.id | safe) and
+                (.variant == "default" or .variant == "narrow" or .variant == "small-large-font")))) and
+            ([.[][].id] | length == (unique | length));
             valid_registry' scripts/screenshot/scenarios.json > /dev/null
           [[ "$GITHUB_SHA" =~ ^[a-f0-9]{40}$ ]] || { echo "::error::Invalid Golden source SHA." >&2; exit 1; }
           [[ ! -e build/screenshot-golden && ! -L build/screenshot-golden ]] || { echo "::error::Required screenshot input/output path condition failed." >&2; exit 1; }
@@ -96,11 +99,9 @@ jobs:
             [[ -d "$capture_source" && ! -L "$capture_source" ]] || { echo "::error::Required screenshot input/output path condition failed." >&2; exit 1; }
             test -z "$(find "$capture_source" ! -type d ! -type f -print)"
             jq -r --arg module "$module" --arg profile "$PROFILE" '
-              .[$module][] as $id | ["ko", "en"][] as $language |
+              .[$module][] | .id as $id | .variant as $variant | ["ko", "en"][] as $language |
               $id + "__" + $language + "__" + $profile +
-              (if $id == "setting.notification.small.large-font" then "-small-large-font"
-               elif (["library.preview.narrow", "library.preview.english.narrow", "library.preview.english.error"] | index($id)) != null then "-narrow"
-               else "" end) + ".png"
+              (if $variant == "default" then "" else "-" + $variant end) + ".png"
             ' scripts/screenshot/scenarios.json | sort > "$RUNNER_TEMP/screenshot-module-files"
             diff -u "$RUNNER_TEMP/screenshot-module-files" <(find "$capture_source" -type f | sed "s|^$capture_source/||" | sort)
             mkdir -p "build/screenshot-golden/$module"
