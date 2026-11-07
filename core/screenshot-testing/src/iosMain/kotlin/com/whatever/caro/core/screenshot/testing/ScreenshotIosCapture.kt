@@ -14,6 +14,7 @@ import platform.Foundation.NSBundle
 import platform.Foundation.NSLocale
 import platform.Foundation.NSProcessInfo
 import platform.Foundation.NSUserDefaults
+import platform.Foundation.preferredLanguages
 
 @OptIn(ExperimentalTestApi::class, ExperimentalRoborazziApi::class)
 fun captureIosScreenshots(scenarios: () -> List<ScreenshotScenario>) {

@@ -14,9 +14,9 @@ import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.ViewInteraction
 import androidx.test.espresso.matcher.RootMatchers.withDecorView
 import com.github.takahirom.roborazzi.captureRoboImage
+import org.hamcrest.core.IsSame.sameInstance
 import org.jetbrains.compose.resources.ResourceEnvironment
 import org.jetbrains.compose.resources.getSystemResourceEnvironment
-import org.hamcrest.core.IsSame.sameInstance
 import org.junit.rules.RuleChain
 import org.junit.rules.TestRule
 import org.junit.runners.model.Statement
@@ -110,7 +110,11 @@ private fun interaction(
 
 internal fun <T> withAndroidScreenshotLocale(
     language: String,
-    profile: ScreenshotProfile = ScreenshotConfiguration.profiles.single { it.platform == "android" && it.variant == ScreenshotVariant.DEFAULT },
+    profile: ScreenshotProfile =
+        ScreenshotConfiguration.profiles.single {
+            it.platform == "android" &&
+                it.variant == ScreenshotVariant.DEFAULT
+        },
     block: () -> T,
 ): T {
     val previousLocale = Locale.getDefault()
