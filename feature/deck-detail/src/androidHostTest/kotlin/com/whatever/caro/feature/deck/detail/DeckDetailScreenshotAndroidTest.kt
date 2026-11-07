@@ -23,4 +23,11 @@ class DeckDetailScreenshotAndroidTest {
         composeRule.waitForIdle()
         composeRule.onRoot().captureRoboImage(DeckDetailScreenshotScenario.FILE_NAME)
     }
+
+    @Test
+    fun libraryCopy() {
+        composeRule.setContent { DeckDetailScreenshotScenario.LibraryCopy() }
+        composeRule.waitForIdle()
+        composeRule.onRoot().captureRoboImage("deck_detail.library_copy.png")
+    }
 }

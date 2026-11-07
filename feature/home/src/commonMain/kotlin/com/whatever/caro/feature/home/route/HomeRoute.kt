@@ -15,6 +15,7 @@ import com.whatever.caro.core.navigator.dispatcher.NavigationDispatcher
 import com.whatever.caro.core.navigator.entries.CreateDeckEntry
 import com.whatever.caro.core.navigator.entries.DeckDetailEntry
 import com.whatever.caro.core.navigator.entries.LearningEntry
+import com.whatever.caro.core.navigator.entries.LibraryEntry
 import com.whatever.caro.core.navigator.entries.SettingEntry
 import com.whatever.caro.core.ui.snackbar.SnackBarMessage
 import com.whatever.caro.core.ui.snackbar.SnackbarController
@@ -40,6 +41,10 @@ fun HomeRoute(
     LaunchedEffect(Unit) {
         viewModel.sideEffect.collect { sideEffect ->
             when (sideEffect) {
+                HomeSideEffect.NavigateToLibrary -> {
+                    navDispatcher.emit(command = To(key = LibraryEntry))
+                }
+
                 is HomeSideEffect.NavigateToDailyLearning -> {
                     navDispatcher.emit(
                         command =

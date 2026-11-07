@@ -68,15 +68,15 @@ internal fun DeckCardItem(
                 ).clip(shape = CaroTheme.shape.m)
                 .noRippleClickable(onClick = onClick)
                 .padding(
-                    horizontal = CaroTheme.spacing.xl,
-                    vertical = CaroTheme.spacing.xl,
+                    horizontal = CaroTheme.spacing.xl2,
+                    vertical = CaroTheme.spacing.l,
                 ),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Column(
             modifier = Modifier.weight(1f),
-            verticalArrangement = Arrangement.spacedBy(CaroTheme.spacing.xxs),
+            verticalArrangement = Arrangement.spacedBy(CaroTheme.spacing.s),
         ) {
             Text(
                 text = card.front,
@@ -89,7 +89,7 @@ internal fun DeckCardItem(
             Text(
                 text = card.back,
                 color = CaroTheme.color.text.secondary,
-                style = CaroTheme.typography.label2,
+                style = CaroTheme.typography.body2.medium,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )

@@ -8,6 +8,8 @@ import com.whatever.caro.core.remote.datasource.card.CardDataSource
 import com.whatever.caro.core.remote.datasource.card.RemoteCardDataSourceImpl
 import com.whatever.caro.core.remote.datasource.deck.DeckDataSource
 import com.whatever.caro.core.remote.datasource.deck.RemoteDeckDataSourceImpl
+import com.whatever.caro.core.remote.datasource.library.LibraryDataSource
+import com.whatever.caro.core.remote.datasource.library.RemoteLibraryDataSourceImpl
 import com.whatever.caro.core.remote.datasource.notification.NotificationDataSource
 import com.whatever.caro.core.remote.datasource.notification.RemoteNotificationDataSourceImpl
 import com.whatever.caro.core.remote.datasource.profile.ProfileDataSource
@@ -39,6 +41,7 @@ val remoteModule =
         single<RemoteProfileDataSourceImpl>() bind ProfileDataSource::class
 
         single<RemoteCardDataSourceImpl>() bind CardDataSource::class
+        single<RemoteLibraryDataSourceImpl>() bind LibraryDataSource::class
         single<RemoteDeckDataSourceImpl>() bind DeckDataSource::class
         single<RemoteStreakDataSourceImpl>() bind StreakDataSource::class
         single<RemoteStudySessionDataSourceImpl>() bind StudySessionDataSource::class
