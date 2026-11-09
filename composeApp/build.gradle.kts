@@ -25,6 +25,7 @@ kotlin {
             implementation(projects.core.viewmodel)
             implementation(projects.core.navigator)
             implementation(projects.core.model)
+            implementation(projects.core.inappReview)
             implementation(projects.core.remote)
             api(projects.core.analytics)
             api(projects.core.crashlytics)
