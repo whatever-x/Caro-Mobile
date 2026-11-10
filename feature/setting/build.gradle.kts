@@ -22,6 +22,7 @@ kotlin {
         commonMain.dependencies {
             implementation(projects.core.model)
             implementation(projects.core.ads)
+            implementation(projects.core.inappReview)
         }
     }
 }

@@ -19,6 +19,21 @@ sealed interface SettingIntent : UiIntent {
 
     data object NotificationPermissionFailed : SettingIntent
 
+    data class InquiryOpenResult(
+        val requestId: Long,
+        val opened: Boolean,
+    ) : SettingIntent
+
+    data class InquiryOpenCancelled(
+        val requestId: Long,
+    ) : SettingIntent
+
+    data object CancelPendingInquiry : SettingIntent
+
+    data object AppBackgrounded : SettingIntent
+
+    data object AppResumed : SettingIntent
+
     data object Initialize : SettingIntent
 
     data object ClickNicknameChange : SettingIntent

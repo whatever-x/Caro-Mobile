@@ -13,13 +13,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.style.TextAlign
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LifecycleEventEffect
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.withResumed
 import androidx.navigationevent.NavigationEventInfo
 import androidx.navigationevent.compose.NavigationBackHandler
 import androidx.navigationevent.compose.rememberNavigationEventState
@@ -44,6 +48,8 @@ import com.whatever.caro.core.designsystem.components.CaroDialogButton
 import com.whatever.caro.core.designsystem.components.CaroSnackbarStyle
 import com.whatever.caro.core.designsystem.modifier.noRippleClickable
 import com.whatever.caro.core.designsystem.themes.CaroTheme
+import com.whatever.caro.core.inappreview.InAppReviewRequester
+import com.whatever.caro.core.inappreview.rememberInAppReviewRequester
 import com.whatever.caro.core.navigator.contract.NavCommand
 import com.whatever.caro.core.navigator.dispatcher.NavigationDispatcher
 import com.whatever.caro.core.navigator.entries.EditProfileEntry
@@ -58,7 +64,12 @@ import com.whatever.caro.feature.setting.model.SnackbarType
 import com.whatever.caro.feature.setting.model.WebViewType
 import com.whatever.caro.feature.setting.mvi.SettingIntent
 import com.whatever.caro.feature.setting.mvi.SettingSideEffect
+import com.whatever.caro.feature.setting.platform.InquiryLifecycleEffect
+import com.whatever.caro.feature.setting.platform.rememberOpenInquiry
+import com.whatever.caro.feature.setting.platform.rememberShouldPreserveInquiryOnDispose
+import io.github.aakira.napier.Napier
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 
@@ -67,16 +78,22 @@ fun SettingRoute(
     viewModel: SettingViewModel,
     navDispatcher: NavigationDispatcher,
     snackbarController: SnackbarController,
+    inquiryOpener: suspend (String) -> Boolean = rememberOpenInquiry(),
+    inAppReviewRequester: InAppReviewRequester = rememberInAppReviewRequester(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val backState = rememberNavigationEventState(currentInfo = NavigationEventInfo.None)
     val uriHandler = LocalUriHandler.current
-    val permissionController = rememberNotificationPermissionController()
+    val permissionController by rememberUpdatedState(rememberNotificationPermissionController())
     val scope = rememberCoroutineScope()
     val notificationErrorMessage = stringResource(Res.string.setting_notification_error)
+    val reviewRequester by rememberUpdatedState(inAppReviewRequester)
+    val openInquiry by rememberUpdatedState(inquiryOpener)
+    val shouldPreserveInquiryOnDispose by rememberUpdatedState(rememberShouldPreserveInquiryOnDispose())
+    val routeLifecycle = LocalLifecycleOwner.current.lifecycle
     val privacyPolicyUrl = stringResource(resource = Res.string.setting_privcay_policy_url)
     val termsOfServiceUrl = stringResource(resource = Res.string.setting_terms_of_service_url)
-    val reportBugUrl = stringResource(resource = Res.string.setting_report_bug_url)
+    val reportBugUrl by rememberUpdatedState(stringResource(resource = Res.string.setting_report_bug_url))
     val logoutSnackbarMessage = stringResource(resource = Res.string.setting_snackbar_logout)
     val deleteAccountSnackbarMessage =
         stringResource(resource = Res.string.setting_snackbar_delete_account)
@@ -84,6 +101,11 @@ fun SettingRoute(
         stringResource(resource = Res.string.setting_snackbar_delete_account_error)
     val userInfoLoadErrorSnackbarMessage =
         stringResource(resource = Res.string.setting_snackbar_user_info_load_error)
+
+    InquiryLifecycleEffect(
+        onBackground = { viewModel.intent(SettingIntent.AppBackgrounded) },
+        onForeground = { viewModel.intent(SettingIntent.AppResumed) },
+    )
 
     NavigationBackHandler(
         state = backState,
@@ -106,85 +128,129 @@ fun SettingRoute(
         }
     }
 
-    LaunchedEffect(viewModel, permissionController) {
-        viewModel.sideEffect.collect { sideEffect ->
-            when (sideEffect) {
-                SettingSideEffect.RequestNotificationPermission -> {
-                    scope.launch {
+    LaunchedEffect(viewModel, routeLifecycle) {
+        var openingJob: Job? = null
+        var reviewJob: Job? = null
+        val reviewObserver =
+            LifecycleEventObserver { _, event ->
+                if (event == Lifecycle.Event.ON_PAUSE) reviewJob?.cancel()
+            }
+        routeLifecycle.addObserver(reviewObserver)
+        try {
+            viewModel.sideEffect.collect { sideEffect ->
+                when (sideEffect) {
+                    SettingSideEffect.RequestNotificationPermission -> {
+                        scope.launch {
+                            try {
+                                viewModel.intent(SettingIntent.NotificationPermissionResult(permissionController.request()))
+                            } catch (exception: CancellationException) {
+                                viewModel.intent(SettingIntent.DismissNotificationPermissionDialog)
+                                throw exception
+                            } catch (exception: Exception) {
+                                viewModel.intent(SettingIntent.NotificationPermissionFailed)
+                            }
+                        }
+                    }
+
+                    SettingSideEffect.OpenNotificationSettings -> {
                         try {
-                            viewModel.intent(SettingIntent.NotificationPermissionResult(permissionController.request()))
-                        } catch (exception: CancellationException) {
-                            viewModel.intent(SettingIntent.DismissNotificationPermissionDialog)
-                            throw exception
-                        } catch (exception: Exception) {
+                            permissionController.openSettings()
+                        } catch (_: Exception) {
                             viewModel.intent(SettingIntent.NotificationPermissionFailed)
                         }
                     }
-                }
 
-                SettingSideEffect.OpenNotificationSettings -> {
-                    try {
-                        permissionController.openSettings()
-                    } catch (_: Exception) {
-                        viewModel.intent(SettingIntent.NotificationPermissionFailed)
+                    is SettingSideEffect.NavigateToEditNickName -> {
+                        navDispatcher.emit(
+                            NavCommand.To(
+                                key = EditProfileEntry(nickname = sideEffect.currentNickname),
+                            ),
+                        )
+                    }
+
+                    SettingSideEffect.NavigateToLogin -> {
+                        navDispatcher.emit(
+                            NavCommand.ResetTo(
+                                key = LoginEntry,
+                            ),
+                        )
+                    }
+
+                    is SettingSideEffect.NavigateWebView -> {
+                        val url =
+                            when (sideEffect.type) {
+                                WebViewType.TERMS_OF_SERVICE -> termsOfServiceUrl
+                                WebViewType.PRIVACY_POLICY -> privacyPolicyUrl
+                                WebViewType.REPORT_BUG -> reportBugUrl
+                            }
+                        uriHandler.openUri(url)
+                    }
+
+                    is SettingSideEffect.OpenInquiry -> {
+                        if (!viewModel.isCurrentInquiryRequest(sideEffect.requestId)) return@collect
+                        openingJob?.cancel()
+                        reviewJob?.cancel()
+                        openingJob =
+                            launch {
+                                try {
+                                    val opened = openInquiry(reportBugUrl)
+                                    viewModel.intent(SettingIntent.InquiryOpenResult(sideEffect.requestId, opened))
+                                } catch (cancellation: CancellationException) {
+                                    viewModel.intent(SettingIntent.InquiryOpenCancelled(sideEffect.requestId))
+                                    throw cancellation
+                                } catch (exception: Exception) {
+                                    Napier.w(throwable = exception) { "Could not open the inquiry form" }
+                                    viewModel.intent(SettingIntent.InquiryOpenResult(sideEffect.requestId, false))
+                                }
+                            }
+                    }
+
+                    is SettingSideEffect.RequestStoreReview -> {
+                        reviewJob?.cancel()
+                        reviewJob =
+                            launch {
+                                routeLifecycle.withResumed { }
+                                if (viewModel.isCurrentInquiryRequest(sideEffect.requestId)) {
+                                    reviewRequester.requestReview()
+                                }
+                            }
+                    }
+
+                    SettingSideEffect.PopBackStack -> {
+                        navDispatcher.emit(
+                            NavCommand.Back,
+                        )
+                    }
+
+                    is SettingSideEffect.ShowSnackbar -> {
+                        val message =
+                            when (sideEffect.type) {
+                                SnackbarType.LOGOUT -> logoutSnackbarMessage
+                                SnackbarType.DELETE_ACCOUNT -> deleteAccountSnackbarMessage
+                                SnackbarType.DELETE_ACCOUNT_ERROR -> deleteAccountErrorSnackbarMessage
+                                SnackbarType.USER_INFO_LOAD_ERROR -> userInfoLoadErrorSnackbarMessage
+                                SnackbarType.NOTIFICATION_CHANGE_ERROR -> notificationErrorMessage
+                            }
+                        val style =
+                            when (sideEffect.type) {
+                                SnackbarType.NOTIFICATION_CHANGE_ERROR,
+                                SnackbarType.DELETE_ACCOUNT_ERROR,
+                                SnackbarType.USER_INFO_LOAD_ERROR,
+                                -> CaroSnackbarStyle.Error
+
+                                SnackbarType.LOGOUT,
+                                SnackbarType.DELETE_ACCOUNT,
+                                -> CaroSnackbarStyle.Normal
+                            }
+                        snackbarController.show(SnackBarMessage(message = message, style = style))
                     }
                 }
-
-                is SettingSideEffect.NavigateToEditNickName -> {
-                    navDispatcher.emit(
-                        NavCommand.To(
-                            key = EditProfileEntry(nickname = sideEffect.currentNickname),
-                        ),
-                    )
-                }
-
-                SettingSideEffect.NavigateToLogin -> {
-                    navDispatcher.emit(
-                        NavCommand.ResetTo(
-                            key = LoginEntry,
-                        ),
-                    )
-                }
-
-                is SettingSideEffect.NavigateWebView -> {
-                    val url =
-                        when (sideEffect.type) {
-                            WebViewType.TERMS_OF_SERVICE -> termsOfServiceUrl
-                            WebViewType.PRIVACY_POLICY -> privacyPolicyUrl
-                            WebViewType.REPORT_BUG -> reportBugUrl
-                        }
-                    uriHandler.openUri(url)
-                }
-
-                SettingSideEffect.PopBackStack -> {
-                    navDispatcher.emit(
-                        NavCommand.Back,
-                    )
-                }
-
-                is SettingSideEffect.ShowSnackbar -> {
-                    val message =
-                        when (sideEffect.type) {
-                            SnackbarType.LOGOUT -> logoutSnackbarMessage
-                            SnackbarType.DELETE_ACCOUNT -> deleteAccountSnackbarMessage
-                            SnackbarType.DELETE_ACCOUNT_ERROR -> deleteAccountErrorSnackbarMessage
-                            SnackbarType.USER_INFO_LOAD_ERROR -> userInfoLoadErrorSnackbarMessage
-                            SnackbarType.NOTIFICATION_CHANGE_ERROR -> notificationErrorMessage
-                        }
-                    val style =
-                        when (sideEffect.type) {
-                            SnackbarType.NOTIFICATION_CHANGE_ERROR,
-                            SnackbarType.DELETE_ACCOUNT_ERROR,
-                            SnackbarType.USER_INFO_LOAD_ERROR,
-                            -> CaroSnackbarStyle.Error
-
-                            SnackbarType.LOGOUT,
-                            SnackbarType.DELETE_ACCOUNT,
-                            -> CaroSnackbarStyle.Normal
-                        }
-                    snackbarController.show(SnackBarMessage(message = message, style = style))
-                }
             }
+        } finally {
+            routeLifecycle.removeObserver(reviewObserver)
+            openingJob?.cancel()
+            reviewJob?.cancel()
+            if (!shouldPreserveInquiryOnDispose()) viewModel.intent(SettingIntent.CancelPendingInquiry)
         }
     }
 

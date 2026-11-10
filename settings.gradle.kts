@@ -55,6 +55,7 @@ include(":core:ads")
 include(":core:crashlytics")
 include(":core:messaging")
 include(":core:util")
+include(":core:inapp-review")
 
 // :Feature
 include(":feature:home")
