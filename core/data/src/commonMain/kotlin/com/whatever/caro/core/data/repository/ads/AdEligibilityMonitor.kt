@@ -83,6 +83,8 @@ class AdEligibilityMonitor(
                                 return@collect
                             }
                         if (current != session) return@collect
+                        // Rotating tokens for an already verified session must keep its prepared ad.
+                        if (budget.value.sessionGeneration == session.generation && state.value.allowed) return@collect
                     }
                     budget.update { current ->
                         if (current.sessionGeneration != session?.generation || current.check != check) {

@@ -116,10 +116,9 @@ class AdEligibilityMonitorTest :
             }
         }
 
-        test("정상 성인은 같은 로그인 세션에서 여러 번 토큰을 갱신해도 광고를 다시 허용한다") {
+        test("정상 성인은 같은 로그인 세션에서 여러 번 토큰을 갱신해도 준비된 광고의 세션을 유지한다") {
             runTest {
                 val token = MutableStateFlow<AuthTokens?>(AuthTokens("adult", "refresh", 1))
-                val access = AdEligibilityGate()
                 val auth =
                     mock<LocalAuthDataSource> {
                         every { observeRegisteredSession() } returns token
@@ -129,15 +128,14 @@ class AdEligibilityMonitorTest :
                     mock<ProfileRepository> {
                         everySuspend { getMyInfo() } calls { info(true) }
                     }
-                val gate = AdEligibilityMonitor(auth, profile, access, backgroundScope)
+                val gate = AdEligibilityMonitor(auth, profile, AdEligibilityGate(), backgroundScope)
                 runCurrent()
-                gate.state.value.allowed shouldBe true
+                val verified = gate.state.value
+                verified.allowed shouldBe true
                 repeat(3) { i ->
-                    access.beginTransition()
                     token.value = AuthTokens("adult-$i", "refresh-$i", 1)
-                    access.endTransition()
                     runCurrent()
-                    gate.state.value.allowed shouldBe true
+                    gate.state.value shouldBe verified
                 }
             }
         }

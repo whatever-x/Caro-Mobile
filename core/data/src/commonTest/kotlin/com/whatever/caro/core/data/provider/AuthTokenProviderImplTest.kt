@@ -1,12 +1,15 @@
 package com.whatever.caro.core.data.provider
 
+import com.whatever.caro.core.data.repository.ads.AdEligibilityGate
 import com.whatever.caro.core.datastore.datasource.AuthTokens
 import com.whatever.caro.core.datastore.datasource.LocalAuthDataSource
+import com.whatever.caro.core.model.auth.AuthSessionEvent
 import com.whatever.caro.core.model.auth.AuthSessionEventBus
 import com.whatever.caro.core.model.exception.CaroAuthException
 import com.whatever.caro.core.remote.datasource.auth.NonAuthDataSource
 import com.whatever.caro.core.remote.dto.auth.response.TokenResponse
 import dev.mokkery.answering.calls
+import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
 import dev.mokkery.mock
@@ -32,8 +35,7 @@ class AuthTokenProviderImplTest : FunSpec() {
                     local,
                     mock(),
                     mock(),
-                    com.whatever.caro.core.data.repository.ads
-                        .AdEligibilityGate(),
+                    AdEligibilityGate(),
                 )
             provider.getSessionSnapshot().isRegistrationComplete shouldBe false
         }
@@ -49,11 +51,57 @@ class AuthTokenProviderImplTest : FunSpec() {
                         local,
                         mock(),
                         mock(),
-                        com.whatever.caro.core.data.repository.ads
-                            .AdEligibilityGate(),
+                        AdEligibilityGate(),
                     )
                 shouldThrow<CaroAuthException.TokenExpired> { provider.refresh(1) }
             }
+        }
+
+        test("현재 계정의 자동 토큰 갱신은 광고 허용과 세션을 유지한다") {
+            val current = AuthTokens("old", "oldRefresh", 1, true)
+            val local =
+                mock<LocalAuthDataSource> {
+                    everySuspend { fetchTokens() } returns current
+                    everySuspend { replaceTokensIfCurrent(current, "new", "newRefresh") } returns true
+                }
+            val remote =
+                mock<NonAuthDataSource> {
+                    everySuspend { refreshToken(any()) } returns TokenResponse("new", "newRefresh")
+                }
+            val gate = AdEligibilityGate()
+            gate.allowIfCurrent(gate.state.value.generation)
+            val allowed = gate.state.value
+            val provider = AuthTokenProviderImpl(local, remote, mock(), gate)
+
+            provider.refresh(current.generation) shouldBe "new"
+            gate.state.value shouldBe allowed
+        }
+
+        test("현재 계정의 자동 토큰 갱신이 실패하면 세션을 지우기 전에 광고를 차단한다") {
+            val current = AuthTokens("old", "oldRefresh", 1, true)
+            val gate = AdEligibilityGate()
+            gate.allowIfCurrent(gate.state.value.generation)
+            val local =
+                mock<LocalAuthDataSource> {
+                    everySuspend { fetchTokens() } returns current
+                    everySuspend { clearIfCurrent(current) } calls {
+                        gate.state.value.allowed shouldBe false
+                        true
+                    }
+                }
+            val remote =
+                mock<NonAuthDataSource> {
+                    everySuspend { refreshToken(any()) } calls { error("refresh rejected") }
+                }
+            val events =
+                mock<AuthSessionEventBus> {
+                    everySuspend { publish(AuthSessionEvent.Expired(2)) } returns Unit
+                }
+            val provider = AuthTokenProviderImpl(local, remote, events, gate)
+
+            shouldThrow<CaroAuthException.TokenExpired> { provider.refresh(current.generation) }
+            gate.state.value.allowed shouldBe false
+            gate.state.value.transitions shouldBe 0
         }
 
         listOf(false, true).forEach { fail ->
@@ -96,8 +144,7 @@ class AuthTokenProviderImplTest : FunSpec() {
                             local,
                             remote,
                             events,
-                            com.whatever.caro.core.data.repository.ads
-                                .AdEligibilityGate(),
+                            AdEligibilityGate(),
                         )
                     val refresh = async { runCatching { provider.refresh(1) } }
                     runCurrent()

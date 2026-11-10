@@ -26,55 +26,46 @@ internal class AuthTokenProviderImpl(
     override suspend fun getRefreshToken(): String? = localAuthDataSource.fetchRefreshToken()
 
     override suspend fun refresh(expectedGeneration: Long): String {
-        val before = localAuthDataSource.fetchTokens()
-        if (before.generation != expectedGeneration) {
+        val current = localAuthDataSource.fetchTokens()
+        if (current.generation != expectedGeneration) {
             throw CaroAuthException.TokenExpired(debugMessage = "Session changed before refresh")
         }
-        adEligibilityGate.beginTransition()
-        try {
-            val current = localAuthDataSource.fetchTokens()
-            if (current.generation != expectedGeneration) {
-                throw CaroAuthException.TokenExpired(debugMessage = "Session changed before refresh")
-            }
-            val currentRefresh = current.refreshToken
-            if (currentRefresh.isNullOrBlank()) {
-                notifySessionExpired(current)
-                throw CaroAuthException.TokenExpired(
-                    debugMessage = "RefreshToken이 존재하지 않습니다.",
+        val currentRefresh = current.refreshToken
+        if (currentRefresh.isNullOrBlank()) {
+            notifySessionExpired(current)
+            throw CaroAuthException.TokenExpired(
+                debugMessage = "RefreshToken이 존재하지 않습니다.",
+            )
+        }
+
+        return runCatching {
+            val currentAccess = current.accessToken.orEmpty()
+            val refreshed =
+                remoteNonAuthDataSource.refreshToken(
+                    request =
+                        RefreshTokenRequest(
+                            accessToken = currentAccess,
+                            refreshToken = currentRefresh,
+                        ),
                 )
+            if (!localAuthDataSource.replaceTokensIfCurrent(current, refreshed.accessToken, refreshed.refreshToken)) {
+                throw CaroAuthException.TokenExpired(debugMessage = "Session changed during refresh")
             }
+            refreshed.accessToken
+        }.getOrElse { throwable ->
+            when (throwable) {
+                is CancellationException -> {
+                    throw throwable
+                }
 
-            return runCatching {
-                val currentAccess = current.accessToken.orEmpty()
-                val refreshed =
-                    remoteNonAuthDataSource.refreshToken(
-                        request =
-                            RefreshTokenRequest(
-                                accessToken = currentAccess,
-                                refreshToken = currentRefresh,
-                            ),
+                else -> {
+                    notifySessionExpired(current)
+                    throw CaroAuthException.TokenExpired(
+                        debugMessage = "Token 재발급 요청에 실패했습니다. cause=${throwable.message.orEmpty()}",
+                        throwable = throwable,
                     )
-                if (!localAuthDataSource.replaceTokensIfCurrent(current, refreshed.accessToken, refreshed.refreshToken)) {
-                    throw CaroAuthException.TokenExpired(debugMessage = "Session changed during refresh")
-                }
-                refreshed.accessToken
-            }.getOrElse { throwable ->
-                when (throwable) {
-                    is CancellationException -> {
-                        throw throwable
-                    }
-
-                    else -> {
-                        notifySessionExpired(current)
-                        throw CaroAuthException.TokenExpired(
-                            debugMessage = "Token 재발급 요청에 실패했습니다. cause=${throwable.message.orEmpty()}",
-                            throwable = throwable,
-                        )
-                    }
                 }
             }
-        } finally {
-            adEligibilityGate.endTransition()
         }
     }
 
@@ -84,8 +75,14 @@ internal class AuthTokenProviderImpl(
     }
 
     private suspend fun notifySessionExpired(current: AuthTokens) {
-        if (localAuthDataSource.clearIfCurrent(current)) {
-            authSessionEventBus.publish(AuthSessionEvent.Expired(current.generation + 1))
+        if (localAuthDataSource.fetchTokens() != current) return
+        adEligibilityGate.beginTransition()
+        try {
+            if (localAuthDataSource.clearIfCurrent(current)) {
+                authSessionEventBus.publish(AuthSessionEvent.Expired(current.generation + 1))
+            }
+        } finally {
+            adEligibilityGate.endTransition()
         }
     }
 }
