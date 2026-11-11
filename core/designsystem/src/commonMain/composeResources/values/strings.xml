@@ -263,4 +263,7 @@
 	<string name="setting_notification_permission_content">To receive notifications, allow notifications for Caro in your device settings.</string>
 	<string name="setting_notification_open_settings">App settings</string>
 	<string name="setting_notification_changing">Updating notification settings</string>
+	<string name="home_my_decks">My decks</string>
+	<string name="home_banner_page">Banner %1$d of %2$d</string>
+	<string name="home_banner_position">%1$d/%2$d</string>
 </resources>

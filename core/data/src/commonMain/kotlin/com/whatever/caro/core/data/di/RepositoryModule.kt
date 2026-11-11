@@ -2,6 +2,8 @@ package com.whatever.caro.core.data.di
 
 import com.whatever.caro.core.data.repository.auth.AuthRepository
 import com.whatever.caro.core.data.repository.auth.AuthRepositoryImpl
+import com.whatever.caro.core.data.repository.banner.HomeBannerRepository
+import com.whatever.caro.core.data.repository.banner.HomeBannerRepositoryImpl
 import com.whatever.caro.core.data.repository.card.CardRepository
 import com.whatever.caro.core.data.repository.card.CardRepositoryImpl
 import com.whatever.caro.core.data.repository.deck.DeckRepository
@@ -28,6 +30,7 @@ val repositoryModule =
         single<AuthRepositoryImpl>() bind AuthRepository::class
         single<ProfileRepositoryImpl>() bind ProfileRepository::class
         single<CardRepositoryImpl>() bind CardRepository::class
+        single<HomeBannerRepositoryImpl>() bind HomeBannerRepository::class
         single<LibraryRepositoryImpl>() bind LibraryRepository::class
         single<DeckRepositoryImpl>() bind DeckRepository::class
         single<StreakRepositoryImpl>() bind StreakRepository::class

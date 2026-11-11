@@ -67,6 +67,12 @@ buildkonfig {
     packageName = "com.whatever.caro.core.remote.generated"
 
     defaultConfigs {
+        buildConfigField(
+            FieldSpec.Type.STRING,
+            "APP_VERSION",
+            libs.versions.version.name
+                .get(),
+        )
         buildConfigField(FieldSpec.Type.STRING, "SERVER_BASE_URL", "")
         buildConfigField(FieldSpec.Type.BOOLEAN, "IS_DEBUG", "true")
     }
