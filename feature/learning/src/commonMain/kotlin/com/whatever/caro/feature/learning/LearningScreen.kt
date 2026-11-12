@@ -63,7 +63,7 @@ fun LearningScreen(
     onIntent: (LearningIntent) -> Unit,
 ) {
     when {
-        state.isLoading -> {
+        state.isLoading || state.isAwaitingCompletionAd -> {
             LoadingContent()
         }
 

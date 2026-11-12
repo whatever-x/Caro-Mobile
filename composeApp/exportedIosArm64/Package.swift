@@ -12,13 +12,13 @@ let package = Package(
             targets: ["CaroNativeDependencies"])
     ],
     dependencies: [
-        .package(url: "https://github.com/firebase/firebase-ios-sdk", exact: "12.14.0"),.package(url: "https://github.com/google/GoogleSignIn-iOS", exact: "9.1.0")
+        .package(url: "https://github.com/firebase/firebase-ios-sdk", exact: "12.14.0"),.package(url: "https://github.com/google/GoogleSignIn-iOS", exact: "9.1.0"),.package(url: "https://github.com/googleads/swift-package-manager-google-mobile-ads.git", exact: "13.11.0"),.package(url: "https://github.com/googleads/swift-package-manager-google-user-messaging-platform.git", exact: "3.1.0")
     ],
     targets: [
         .target(
             name: "CaroNativeDependencies",
             dependencies: [
-                .product(name: "FirebaseCore", package: "firebase-ios-sdk"),.product(name: "FirebaseAnalytics", package: "firebase-ios-sdk"),.product(name: "FirebaseCrashlytics", package: "firebase-ios-sdk"),.product(name: "FirebaseMessaging", package: "firebase-ios-sdk"),.product(name: "GoogleSignIn", package: "GoogleSignIn-iOS")
+                .product(name: "FirebaseCore", package: "firebase-ios-sdk"),.product(name: "FirebaseAnalytics", package: "firebase-ios-sdk"),.product(name: "FirebaseCrashlytics", package: "firebase-ios-sdk"),.product(name: "FirebaseMessaging", package: "firebase-ios-sdk"),.product(name: "GoogleSignIn", package: "GoogleSignIn-iOS"),.product(name: "GoogleMobileAds", package: "swift-package-manager-google-mobile-ads"),.product(name: "GoogleUserMessagingPlatform", package: "swift-package-manager-google-user-messaging-platform")
             ],
             path: "Sources"
             

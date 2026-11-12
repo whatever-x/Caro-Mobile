@@ -1,0 +1,26 @@
+<resources>
+	<string name="create_profile_nickname_heading">어떤 이름으로 불러드릴까요?</string>
+	<string name="create_profile_nickname_description">카로에서 사용할 닉네임을 정해 주세요.</string>
+	<string name="create_profile_birth_heading">생년월일을 알려 주세요</string>
+	<string name="create_profile_birth_description">연령에 맞는 서비스 제공에 사용해요.</string>
+	<string name="create_profile_birth_label">생년월일 *</string>
+	<string name="create_profile_birth_year">년 (YYYY)</string>
+	<string name="create_profile_birth_month">월 (MM)</string>
+	<string name="create_profile_birth_day">일 (DD)</string>
+	<string name="create_profile_birth_invalid">존재하지 않는 날짜예요. 다시 확인해 주세요.</string>
+	<string name="create_profile_registration_failed">가입을 완료하지 못했어요. 다시 시도해 주세요.</string>
+	<string name="create_profile_next">다음</string>
+	<string name="create_profile_finish">가입 완료</string>
+	<string name="create_profile_nickname_checking">닉네임을 확인하고 있어요.</string>
+	<string name="create_profile_nickname_check_failed">닉네임 확인에 실패했어요.</string>
+	<string name="create_profile_nickname_retry">다시 시도</string>
+	<string name="create_profile_nickname_duplicate">이미 사용 중인 닉네임이에요.</string>
+	<string name="create_profile_relogin">다시 로그인</string>
+	<string name="create_profile_relogin_title">다시 로그인할까요?</string>
+	<string name="create_profile_relogin_body">다시 로그인하면 이 화면에 입력한 정보가 사라져요.</string>
+	<string name="create_profile_relogin_cancel">취소</string>
+	<string name="create_profile_relogin_failed">로그인 화면으로 이동하지 못했어요. 다시 시도해 주세요.</string>
+	<string name="create_profile_birth_year_placeholder">YYYY</string>
+	<string name="create_profile_birth_month_placeholder">MM</string>
+	<string name="create_profile_birth_day_placeholder">DD</string>
+</resources>

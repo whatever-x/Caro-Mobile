@@ -22,5 +22,7 @@ sealed interface LearningIntent : UiIntent {
 
     data object RetryError : LearningIntent
 
+    data object CompletionAdFinished : LearningIntent
+
     data object ClickNavigateToHome : LearningIntent
 }

@@ -6,4 +6,6 @@ sealed interface LearningSideEffect : UiSideEffect {
     data object PopBackStack : LearningSideEffect
 
     data object NavigateToHome : LearningSideEffect
+
+    data object ShowDailyCompletionAd : LearningSideEffect
 }

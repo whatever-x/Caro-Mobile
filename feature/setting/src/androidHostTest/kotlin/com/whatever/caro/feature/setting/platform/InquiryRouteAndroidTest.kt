@@ -10,6 +10,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import caromobile.core.designsystem.generated.resources.Res
 import caromobile.core.designsystem.generated.resources.setting_report_bug_url
+import com.whatever.caro.core.ads.InterstitialAdController
 import com.whatever.caro.core.data.repository.auth.AuthRepository
 import com.whatever.caro.core.data.repository.fcm.FcmTokenRepository
 import com.whatever.caro.core.data.repository.profile.ProfileRepository
@@ -289,6 +290,10 @@ private fun createViewModel(): SettingViewModel =
             mock<FcmTokenRepository> {
                 every { observeNotificationEnabled() } returns MutableStateFlow(false)
                 every { updateNotificationPermission(any()) } returns Unit
+            },
+        adsController =
+            mock<InterstitialAdController> {
+                every { privacyOptionsRequired } returns MutableStateFlow(false)
             },
     )
 
