@@ -22,6 +22,8 @@ kotlin {
             implementation(libs.compottie)
             implementation(libs.compottie.lite)
             implementation(libs.compottie.resources)
+            implementation(libs.coil.compose)
+            implementation(libs.coil.mp)
         }
     }
 }
