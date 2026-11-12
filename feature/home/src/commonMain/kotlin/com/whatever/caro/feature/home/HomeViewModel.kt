@@ -1,5 +1,6 @@
 package com.whatever.caro.feature.home
 
+import com.whatever.caro.core.data.repository.banner.HomeBannerRepository
 import com.whatever.caro.core.data.repository.deck.DeckRepository
 import com.whatever.caro.core.data.repository.profile.ProfileRepository
 import com.whatever.caro.core.data.repository.streak.StreakRepository
@@ -12,14 +13,17 @@ import com.whatever.caro.feature.home.mvi.HomeIntent
 import com.whatever.caro.feature.home.mvi.HomeSideEffect
 import com.whatever.caro.feature.home.mvi.HomeState
 import com.whatever.caro.feature.home.mvi.HomeStreakState
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
+import kotlin.time.Clock
 
 class HomeViewModel(
     private val deckRepository: DeckRepository,
     private val streakRepository: StreakRepository,
     private val profileRepository: ProfileRepository,
+    private val homeBannerRepository: HomeBannerRepository,
     exceptionFilter: ExceptionFilter,
 ) : BaseViewModel<HomeState, HomeIntent, HomeSideEffect>(
         initialState = HomeState(),
@@ -33,6 +37,17 @@ class HomeViewModel(
 
     override suspend fun handleIntent(intent: HomeIntent) {
         when (intent) {
+            is HomeIntent.ClickBanner -> {
+                val banner =
+                    state.value.banners.firstOrNull {
+                        it.id == intent.bannerId && it.revision == intent.revision && it.expiresAt > Clock.System.now()
+                    } ?: return
+                postSideEffect(
+                    banner.libraryDeckId?.let { HomeSideEffect.NavigateToLibraryPreview(it) }
+                        ?: HomeSideEffect.NavigateToLibrary,
+                )
+            }
+
             HomeIntent.ClickLibrary -> {
                 postSideEffect(HomeSideEffect.NavigateToLibrary)
             }
@@ -101,6 +116,10 @@ class HomeViewModel(
                         profileRepository.getMyNickname()
                     }
                 }
+            val bannersDeferred =
+                async {
+                    suspendRunCatching { homeBannerRepository.list().toImmutableList() }
+                }
 
             val decksResult = decksDeferred.await()
             val streakResult = streakDeferred.await()
@@ -135,6 +154,10 @@ class HomeViewModel(
                 primary.addSuppressedExceptions(exceptions.drop(1))
                 throw primary
             }
+
+            // 배너 응답을 기다리는 동안에도 덱 조회와 학습 진입은 먼저 표시한다.
+            val banners = bannersDeferred.await().getOrDefault(persistentListOf())
+            if (generation == initializationGeneration) reduce { copy(banners = banners) }
         }
 
     private fun Streak.toHomeStreakState(): HomeStreakState =

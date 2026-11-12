@@ -5,4 +5,6 @@ import com.whatever.caro.core.remote.generated.BuildKonfig
 actual object CaroNetworkConfig {
     actual val BASE_URL: String = BuildKonfig.SERVER_BASE_URL
     actual val isDebug: Boolean = BuildKonfig.IS_DEBUG
+    actual val platform: String = "ANDROID"
+    actual val appVersion: String = BuildKonfig.APP_VERSION
 }

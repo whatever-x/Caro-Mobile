@@ -15,11 +15,16 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -53,8 +58,8 @@ import com.whatever.caro.core.designsystem.themes.CaroTheme
 import com.whatever.caro.core.model.deck.Deck
 import com.whatever.caro.core.model.deck.DeckState
 import com.whatever.caro.core.ui.loading.CaroLoadingOverlayBox
+import com.whatever.caro.feature.home.banner.HomeBannerSection
 import com.whatever.caro.feature.home.component.Deck
-import com.whatever.caro.feature.home.library.HomeLibraryCard
 import com.whatever.caro.feature.home.mvi.HomeIntent
 import com.whatever.caro.feature.home.mvi.HomeState
 import com.whatever.caro.feature.home.mvi.HomeStreakState
@@ -82,6 +87,19 @@ internal fun HomeScreen(
     state: HomeState,
     onIntent: (HomeIntent) -> Unit,
 ) {
+    val listState = rememberLazyListState()
+    var bannerAutoAdvanceStopped by remember { mutableStateOf(false) }
+    var selectedBannerKey by remember { mutableStateOf<String?>(null) }
+    val bannerVisibleAndIdle by remember {
+        derivedStateOf {
+            val layout = listState.layoutInfo
+            !listState.isScrollInProgress &&
+                layout.visibleItemsInfo.any { item ->
+                    item.key == "homeBanners" && item.offset >= layout.viewportStartOffset &&
+                        item.offset + item.size <= layout.viewportEndOffset
+                }
+        }
+    }
     val lottieComposition by rememberLottieComposition(
         LottieCompositionSpec.Resource(Res.getUri("files/arrow_down_bounce.json")),
     )
@@ -151,13 +169,23 @@ internal fun HomeScreen(
             if (state.isLoadedContentVisible) {
                 LazyColumn(
                     modifier = Modifier.fillMaxWidth(),
+                    state = listState,
                     overscrollEffect = null,
                 ) {
                     item {
                         HomeStreakBanner(state = state)
                     }
-                    item("library") {
-                        HomeLibraryCard { onIntent(HomeIntent.ClickLibrary) }
+                    item("homeBanners") {
+                        HomeBannerSection(
+                            banners = if (state.decks.isEmpty()) persistentListOf() else state.banners,
+                            isVisibleAndIdle = bannerVisibleAndIdle,
+                            autoAdvanceStopped = bannerAutoAdvanceStopped,
+                            selectedBannerKey = selectedBannerKey,
+                            onStopAutoAdvance = { bannerAutoAdvanceStopped = true },
+                            onSelectedBanner = { selectedBannerKey = it },
+                            onBannerClick = { onIntent(HomeIntent.ClickBanner(it.id, it.revision)) },
+                            onLibraryClick = { onIntent(HomeIntent.ClickLibrary) },
+                        )
                     }
 
                     itemsIndexed(
