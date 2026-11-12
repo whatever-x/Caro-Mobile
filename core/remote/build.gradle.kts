@@ -31,6 +31,7 @@ kotlin {
             implementation(libs.ktor.client.core)
             implementation(libs.ktor.serialization.kotlinx.json)
             implementation(libs.kotlinx.coroutines.core)
+            implementation(libs.kotlinx.date.time)
             implementation(libs.bundles.ktor.client.plugin)
             implementation(libs.ktorfit.lib)
         }

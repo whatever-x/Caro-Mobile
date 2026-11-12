@@ -79,6 +79,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = EBF6459A93FE8F75078BEB1C /* Build configuration list for PBXNativeTarget "iosApp" */;
 			buildPhases = (
+				A4D43BB62EB1469DA08F68C1 /* Validate AdMob App ID */,
 				BA798A9A710C9A8145018ACB /* Compile Kotlin */,
 				C152F0DBA6B8A43E606B0E23 /* Compile Kotlin Framework */,
 				8C58B56CFA16FE7E4B33EED6 /* Resources */,
@@ -150,6 +151,22 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		A4D43BB62EB1469DA08F68C1 /* Validate AdMob App ID */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"$(SRCROOT)/../scripts/ads/validate-ios-app-id.sh",
+			);
+			name = "Validate AdMob App ID";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "sh \"$SRCROOT/../scripts/ads/validate-ios-app-id.sh\"\n";
+		};
 		BA798A9A710C9A8145018ACB /* Compile Kotlin */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -273,6 +290,8 @@
 					"-ObjC",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.whatever.caro.dev;
+				CARO_ADMOB_APP_ID = "ca-app-pub-3940256099942544~1458002511";
+				CARO_ADMOB_INTERSTITIAL_ID = "ca-app-pub-3940256099942544/4411468910";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "match Development com.whatever.caro.dev";
@@ -386,6 +405,8 @@
 					"-ObjC",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.whatever.caro;
+				CARO_ADMOB_APP_ID = "";
+				CARO_ADMOB_INTERSTITIAL_ID = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "match AppStore com.whatever.caro";
@@ -499,6 +520,8 @@
 					"-ObjC",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.whatever.caro.qa;
+				CARO_ADMOB_APP_ID = "ca-app-pub-3940256099942544~1458002511";
+				CARO_ADMOB_INTERSTITIAL_ID = "ca-app-pub-3940256099942544/4411468910";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "match Development com.whatever.caro.qa";
@@ -612,6 +635,8 @@
 					"-ObjC",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.whatever.caro;
+				CARO_ADMOB_APP_ID = "";
+				CARO_ADMOB_INTERSTITIAL_ID = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "match Development com.whatever.caro";
@@ -777,6 +802,8 @@
 					"-ObjC",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.whatever.caro.dev;
+				CARO_ADMOB_APP_ID = "ca-app-pub-3940256099942544~1458002511";
+				CARO_ADMOB_INTERSTITIAL_ID = "ca-app-pub-3940256099942544/4411468910";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "match Development com.whatever.caro.dev";
@@ -883,6 +910,8 @@
 					"-ObjC",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.whatever.caro.qa;
+				CARO_ADMOB_APP_ID = "ca-app-pub-3940256099942544~1458002511";
+				CARO_ADMOB_INTERSTITIAL_ID = "ca-app-pub-3940256099942544/4411468910";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "match AppStore com.whatever.caro.qa";

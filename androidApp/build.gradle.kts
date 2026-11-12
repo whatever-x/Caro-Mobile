@@ -21,3 +21,21 @@ dependencies {
 
     implementation(libs.androidx.startup)
 }
+
+android {
+    productFlavors.all {
+        val testAds = name == "dev" || name == "qa"
+        manifestPlaceholders["admobAppId"] =
+            if (testAds) "ca-app-pub-3940256099942544~3347511713" else providers.gradleProperty("caro.admob.android.appId").orElse("").get()
+        manifestPlaceholders["admobInterstitialId"] =
+            if (testAds) {
+                "ca-app-pub-3940256099942544/1033173712"
+            } else {
+                providers
+                    .gradleProperty(
+                        "caro.admob.android.interstitialId",
+                    ).orElse("")
+                    .get()
+            }
+    }
+}

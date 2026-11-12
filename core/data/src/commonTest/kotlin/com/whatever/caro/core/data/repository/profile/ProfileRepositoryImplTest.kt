@@ -29,6 +29,7 @@ class ProfileRepositoryImplTest : FunSpec() {
                                 nickname = "캐로",
                                 email = "caro@example.com",
                                 loginPlatform = SocialLoginType.APPLE,
+                                isAdult = null,
                             )
                     }
                 val repository = ProfileRepositoryImpl(profileDataSource)
@@ -64,6 +65,7 @@ class ProfileRepositoryImplTest : FunSpec() {
                                 nickname = "캐로",
                                 email = "caro@example.com",
                                 loginPlatform = null,
+                                isAdult = null,
                             )
                     }
                 val repository = ProfileRepositoryImpl(profileDataSource)
@@ -82,6 +84,7 @@ class ProfileRepositoryImplTest : FunSpec() {
                                 nickname = null,
                                 email = null,
                                 loginPlatform = null,
+                                isAdult = null,
                             )
                     }
                 val repository = ProfileRepositoryImpl(profileDataSource)

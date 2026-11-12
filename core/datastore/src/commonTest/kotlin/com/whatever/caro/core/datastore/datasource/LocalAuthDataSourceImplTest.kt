@@ -41,6 +41,26 @@ class LocalAuthDataSourceImplTest : FunSpec() {
             }
         }
 
+        test("새 세션 저장과 이전 세션의 조건부 변경은 분리된다") {
+            runTest {
+                val source = LocalAuthDataSourceImpl(MemoryDataStore())
+                source.saveSession("oldAccess", "oldRefresh", true)
+                val old = source.fetchTokens()
+                source.saveSession("newAccess", "newRefresh", false)
+                source.observeRegisteredAccessToken().first() shouldBe null
+                source.replaceTokensIfCurrent(old, "staleAccess", "staleRefresh") shouldBe false
+                source.clearIfCurrent(old) shouldBe false
+                source.fetchTokens() shouldBe AuthTokens("newAccess", "newRefresh", 2, false)
+                source.fetchRegistrationComplete() shouldBe false
+                val current = source.fetchTokens()
+                source.replaceTokensIfCurrent(current, "rotatedAccess", "rotatedRefresh") shouldBe true
+                source.fetchTokens() shouldBe AuthTokens("rotatedAccess", "rotatedRefresh", 2, false)
+                val beforeSameLogin = source.fetchTokens()
+                source.saveSession("rotatedAccess", "rotatedRefresh", true)
+                source.clearIfCurrent(beforeSameLogin) shouldBe false
+            }
+        }
+
         test("인증 토큰과 회원가입 완료 상태가 모두 있어야 등록 가능한 세션이다") {
             runTest {
                 val source = LocalAuthDataSourceImpl(MemoryDataStore())
