@@ -128,35 +128,40 @@ internal fun LibraryPreviewScreen(
         }
     }
     if (state.showAddError) {
-        CaroDialog(
-            modifier = Modifier.padding(horizontal = CaroTheme.spacing.xl2),
-            onDismissRequest = { onIntent(LibraryPreviewIntent.DismissError) },
-            title = {
-                Text(
-                    stringResource(Res.string.library_add_error_title),
-                    Modifier.fillMaxWidth(),
-                    style = CaroTheme.typography.heading2,
-                    color = CaroTheme.color.text.primary,
-                )
-            },
-            buttons = {
-                Spacer(Modifier.height(CaroTheme.spacing.xl))
-                CaroDialogButton(
-                    stringResource(Res.string.library_confirm),
-                    CaroTheme.color.surface.brand,
-                    CaroTheme.color.text.inverse,
-                    { onIntent(LibraryPreviewIntent.DismissError) },
-                    Modifier.fillMaxWidth(),
-                )
-            },
-        ) {
-            Spacer(Modifier.height(CaroTheme.spacing.s))
+        LibraryAddErrorDialog { onIntent(LibraryPreviewIntent.DismissError) }
+    }
+}
+
+@Composable
+internal fun LibraryAddErrorDialog(onDismiss: () -> Unit) {
+    CaroDialog(
+        modifier = Modifier.padding(horizontal = CaroTheme.spacing.xl2),
+        onDismissRequest = onDismiss,
+        title = {
             Text(
-                stringResource(Res.string.library_retry_body),
+                stringResource(Res.string.library_add_error_title),
                 Modifier.fillMaxWidth(),
-                style = CaroTheme.typography.body2.medium,
-                color = CaroTheme.color.text.secondary,
+                style = CaroTheme.typography.heading2,
+                color = CaroTheme.color.text.primary,
             )
-        }
+        },
+        buttons = {
+            Spacer(Modifier.height(CaroTheme.spacing.xl))
+            CaroDialogButton(
+                stringResource(Res.string.library_confirm),
+                CaroTheme.color.surface.brand,
+                CaroTheme.color.text.inverse,
+                onDismiss,
+                Modifier.fillMaxWidth(),
+            )
+        },
+    ) {
+        Spacer(Modifier.height(CaroTheme.spacing.s))
+        Text(
+            stringResource(Res.string.library_retry_body),
+            Modifier.fillMaxWidth(),
+            style = CaroTheme.typography.body2.medium,
+            color = CaroTheme.color.text.secondary,
+        )
     }
 }

@@ -1,7 +1,7 @@
 ---
 name: compose-ui-testing-patterns
 description: >
-  Compose UI/상태홀더 동작 테스트(상태 분기, 콜백/Intent 배선, sideEffect 검증, semantics, 스크린샷)를
+  Compose UI/상태홀더 동작 테스트(상태 분기, 콜백/Intent 배선, sideEffect 검증, semantics)를
   작성·리뷰할 때 사용한다. "UI 테스트", "ViewModel 테스트", "Compose 테스트", "Turbine", "Kotest로 테스트",
   "상태 검증", "sideEffect 테스트" 맥락에서 발동. Caro의 Kotest + Mokkery + Turbine + KoinTest 스택에 맞춰 각색됨.
 ---
@@ -18,8 +18,9 @@ description: >
   `commonTest`에서 검증하면 플랫폼 무관하게 빠르게 돈다.
 - 스택: **Kotest** `FunSpec` + `init { }`, **KoinTest**(`KoinExtension`), **Mokkery**(repository 모킹),
   **Turbine**(`sideEffect`/flow), `StandardTestDispatcher` + `Dispatchers.setMain/resetMain` + `runTest`.
-- Compose `composeTestRule` UI 테스트는 Android instrumented 경로라 현재 기본 흐름이 아니다. 가능한 한 로직을
-  ViewModel/상태로 끌어내려 `commonTest`에서 검증하고, 진짜 레이아웃/시각 계약만 UI/스크린샷 테스트로.
+- Compose `composeTestRule`은 Android 호스트의 **Robolectric + JUnit4**에서도 사용한다. instrumented 전용으로
+  분류하지 않는다. 현재 `androidHostTest`는 JUnit Platform과 Vintage 엔진으로 이 테스트를 실행한다.
+- iOS UI 테스트는 `iosSimulatorArm64Test`의 Skiko Compose 테스트를 사용한다. 공통 시나리오의 의미와 플랫폼 실행 API를 구분한다.
 
 ## Core principle
 
@@ -33,8 +34,8 @@ description: >
 | Intent → 상태 전이, 분기, 로딩/에러 상태 | **ViewModel 단위 테스트**(Kotest + Mokkery) |
 | 1회성 이벤트(네비게이션/토스트) 방출 | **ViewModel + Turbine**으로 `sideEffect` 검증 |
 | repository 호출/매핑 | repository/datasource 단위 테스트(Mokkery) |
-| 텍스트·버튼·로딩/에러 분기·조건부 content | plain UI Compose 테스트(`composeTestRule`, Android) |
-| 시각 레이아웃·타이포·elevation | 스크린샷 테스트 |
+| 텍스트·버튼·로딩/에러 분기·조건부 content | **UI 동작 테스트**(`composeTestRule`의 Android 호스트 또는 iOS Skiko) |
+| 시각 레이아웃·타이포·elevation | **스크린샷 테스트**([전용 스킬](../caro-screenshot-testing/SKILL.md)) |
 | 네비게이션·lifecycle·DI 통합 | 통합 테스트 |
 
 ## ViewModel 상태 테스트 (Caro 기본)
@@ -63,7 +64,10 @@ class LoginViewModelTest : FunSpec(), KoinTest {
 ```
 
 핵심: `runTest { }` 안에서 `intent()` 호출 → `advanceUntilIdle()`로 `launch` 완료 대기 → `state.value` 단언.
-`shouldBe`(Kotest matcher) 사용.
+`shouldBe`(Kotest matcher)를 사용한다. 성공뿐 아니라 오류·취소·빈 입력·경계값·중복 요청 등 실제 분기를 선택한다.
+로딩 시작/종료, 데이터 유지 여부, 오류 이벤트처럼 외부에서 관찰할 수 있는 결과를 단언한다.
+구현의 분기표를 테스트에 복사하지 않는다. 호출 한 번을 위해 전체 DI 그래프를 구성하지 않는다.
+생성자로 의존성을 전달할 수 있으면 필요한 fake/mock만 사용한다. DI 바인딩 자체가 대상일 때 Koin 구성을 검증한다.
 
 ## sideEffect 검증 (Turbine)
 
@@ -92,9 +96,9 @@ val authRepository = mock<AuthRepository> {
 verifySuspend { authRepository.loginWithSocial(SocialLoginType.GOOGLE, any()) }
 ```
 
-## Compose UI 테스트 (필요 시, Android)
+## Compose UI 동작 테스트
 
-상태홀더/UI 분리가 돼 있으면 **plain UI composable(Screen)**을 테스트한다 — ViewModel·DI·네비게이션 구성 불필요:
+상태홀더와 UI를 분리했다면 **plain UI composable(Screen)**을 테스트한다. ViewModel·DI·네비게이션을 구성할 필요는 없다:
 
 ```kotlin
 composeTestRule.setContent {
@@ -112,14 +116,22 @@ captured shouldBe ProfileIntent.ClickSave
 
 - **semantics 우선**: `onNodeWithText`, `assertIsEnabled/assertIsNotEnabled`, `assertDoesNotExist`. 안정적 텍스트가
   없을 때만 test tag.
-- **콜백/Intent는 캡처해 단언**: 노드 존재만이 아니라 콜백이 호출됐는지/상태가 바뀌었는지 확인.
-- **interaction 상태**(hover/press/focus)는 `MutableInteractionSource`를 주입해 `emit`. 포인터 이벤트 시뮬레이션 금지.
-- 문자열은 `stringResource(Res.string...)` 기반이므로 테스트에서도 리소스 키와 일치하는 실제 문자열로 단언.
+- **콜백/Intent를 캡처해 단언한다**. 노드 존재 외에 콜백 호출이나 상태 변경을 확인한다.
+- **interaction 상태**(hover/press/focus)는 `MutableInteractionSource`를 주입해 `emit`. 포인터 이벤트를 시뮬레이션하지 않는다.
+- 테스트에서도 `stringResource(Res.string...)`의 리소스 키와 일치하는 실제 문자열을 단언한다.
 
-## 스크린샷 테스트
+## 스크린샷과 통합 테스트의 경계
 
-semantics로 증명 못 하는 시각 계약(간격·테마 색·타이포·elevation)에만. 상태를 결정적으로 고정(고정 데이터,
-클록/애니메이션 고정, 네트워크/이미지 로딩은 fake).
+UI 동작 테스트는 표시 상태·활성화 여부·콜백 횟수·Intent 전달을 검증한다. 스크린샷 테스트는 간격·색·타이포 같은
+시각 계약을 비교한다. 한 캡처가 두 역할을 함께 맡으면 동작 단언을 유지한다. PNG 존재만으로 동작을 증명하지 않는다.
+
+스크린샷 시나리오·캡처 추가/수정/삭제와 플랫폼 범위 점검은 [caro-screenshot-testing](../caro-screenshot-testing/SKILL.md)을
+사용한다. 작성 절차·코드·명령은 해당 스킬의 Home 참고자료, 공통 규칙은
+[개발자 지침](../../../docs/development/screenshot-testing.md), CI·Golden·게시는
+[스크린샷 CI](../../../docs/ci/screenshot-test.md)가 원본이다.
+
+lifecycle·네비게이션·플랫폼 SDK·DI 조립의 연결 자체가 대상이면 통합 테스트를 추가한다. ViewModel 단위 테스트,
+UI 동작 단언, PNG 비교 결과를 실제 로그인·서버 저장·스토어 동작의 완료로 해석하지 않는다.
 
 ## 흔한 실수
 

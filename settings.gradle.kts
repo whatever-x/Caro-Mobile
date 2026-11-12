@@ -56,6 +56,7 @@ include(":core:crashlytics")
 include(":core:messaging")
 include(":core:util")
 include(":core:inapp-review")
+include(":core:screenshot-testing")
 
 // :Feature
 include(":feature:home")

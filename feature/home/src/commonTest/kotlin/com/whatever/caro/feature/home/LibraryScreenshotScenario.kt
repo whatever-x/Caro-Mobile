@@ -1,10 +1,32 @@
 package com.whatever.caro.feature.home
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsNotEnabled
+import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
+import caromobile.core.designsystem.generated.resources.Res
+import caromobile.core.designsystem.generated.resources.library_add
+import caromobile.core.designsystem.generated.resources.library_add_error_title
+import caromobile.core.designsystem.generated.resources.library_adding
+import caromobile.core.designsystem.generated.resources.library_card_count
+import caromobile.core.designsystem.generated.resources.library_confirm
+import caromobile.core.designsystem.generated.resources.library_title
+import com.whatever.caro.core.designsystem.components.CARO_DIALOG_CONTENT_TAG
+import com.whatever.caro.core.designsystem.components.LocalCaroDialogContentOnly
 import com.whatever.caro.core.designsystem.themes.CaroTheme
 import com.whatever.caro.core.model.library.LibraryCard
 import com.whatever.caro.core.model.library.LibraryDeck
 import com.whatever.caro.core.model.library.LibraryDetail
+import com.whatever.caro.core.screenshot.testing.ScreenshotScenario
+import com.whatever.caro.core.screenshot.testing.ScreenshotString
+import com.whatever.caro.core.screenshot.testing.ScreenshotTarget
+import com.whatever.caro.core.screenshot.testing.ScreenshotVariant
+import com.whatever.caro.feature.home.library.LibraryAddErrorDialog
 import com.whatever.caro.feature.home.library.LibraryPreviewScreen
 import com.whatever.caro.feature.home.library.LibraryScreen
 import com.whatever.caro.feature.home.library.mvi.LibraryPreviewIntent
@@ -14,6 +36,96 @@ import com.whatever.caro.feature.home.library.mvi.toUiContent
 import kotlinx.collections.immutable.persistentListOf
 
 internal object LibraryScreenshotScenario {
+    const val PREVIEW_ID = "library.preview.normal"
+    const val LIST_ID = "library.list.normal"
+    const val NARROW_ID = "library.preview.narrow"
+    const val ENGLISH_NARROW_ID = "library.preview.english.narrow"
+    const val ENGLISH_ERROR_ID = "library.preview.english.error"
+
+    fun scenarios(): List<ScreenshotScenario> {
+        var adding by mutableStateOf(false)
+        val intents = mutableListOf<LibraryPreviewIntent>()
+        return listOf(
+            ScreenshotScenario(
+                PREVIEW_ID,
+                render = { Preview(adding = adding) },
+                expectedStrings =
+                    listOf(
+                        ScreenshotString(Res.string.library_add),
+                        ScreenshotString(Res.string.library_adding),
+                    ),
+                beforeCapture = { strings ->
+                    onNodeWithText(strings[Res.string.library_add]).assertIsDisplayed()
+                },
+                afterCapture = { strings ->
+                    adding = true
+                    onNodeWithText(strings[Res.string.library_adding]).assertIsNotEnabled()
+                },
+            ),
+            ScreenshotScenario(
+                LIST_ID,
+                render = { List() },
+                expectedStrings =
+                    listOf(
+                        ScreenshotString(Res.string.library_title),
+                    ),
+                beforeCapture = { strings ->
+                    onNodeWithText(strings[Res.string.library_title]).assertIsDisplayed()
+                },
+            ),
+            ScreenshotScenario(
+                NARROW_ID,
+                variant = ScreenshotVariant.NARROW,
+                render = { Preview(narrow = true) },
+                expectedStrings =
+                    listOf(
+                        ScreenshotString(Res.string.library_add),
+                    ),
+                beforeCapture = { strings ->
+                    onNodeWithText(strings[Res.string.library_add]).assertIsDisplayed()
+                },
+            ),
+            ScreenshotScenario(
+                ENGLISH_NARROW_ID,
+                variant = ScreenshotVariant.NARROW,
+                render = { EnglishPreview() },
+                expectedStrings =
+                    listOf(
+                        ScreenshotString(Res.string.library_add),
+                        ScreenshotString(Res.string.library_card_count, formatArgs = listOf(1)),
+                    ),
+                beforeCapture = { strings ->
+                    onNodeWithText(strings[Res.string.library_add]).assertIsDisplayed()
+                    onNodeWithText(strings[Res.string.library_card_count]).assertIsDisplayed()
+                },
+            ),
+            ScreenshotScenario(
+                ENGLISH_ERROR_ID,
+                variant = ScreenshotVariant.NARROW,
+                render = { EnglishError { intents.add(it) } },
+                expectedStrings =
+                    listOf(
+                        ScreenshotString(Res.string.library_add_error_title),
+                        ScreenshotString(Res.string.library_confirm),
+                    ),
+                target = ScreenshotTarget.DIALOG,
+                iosDialogContentTag = CARO_DIALOG_CONTENT_TAG,
+                iosDialogContent = {
+                    CompositionLocalProvider(LocalCaroDialogContentOnly provides true) {
+                        CaroTheme { LibraryAddErrorDialog { intents.add(LibraryPreviewIntent.DismissError) } }
+                    }
+                },
+                beforeCapture = { strings ->
+                    onNodeWithText(strings[Res.string.library_add_error_title]).assertIsDisplayed()
+                },
+                afterCapture = { strings ->
+                    onNodeWithText(strings[Res.string.library_confirm]).performClick()
+                    check(intents == listOf(LibraryPreviewIntent.DismissError)) { "Error confirmation must only dismiss the popup" }
+                },
+            ),
+        )
+    }
+
     private val deck = LibraryDeck(1, "토익 출제 단어 200개", "토익 준비를 위한 단어와 뜻", 200)
     val detail =
         LibraryDetail(
@@ -38,9 +150,12 @@ internal object LibraryScreenshotScenario {
         )
 
     @Composable
-    fun Preview(narrow: Boolean = false) {
+    fun Preview(
+        narrow: Boolean = false,
+        adding: Boolean = false,
+    ) {
         val content = if (narrow) detail.copy(deck = deck.copy(name = "아주 긴 제목의 단어 학습용 제공 덱 이름을 표시하는 예시", description = "")) else detail
-        CaroTheme { LibraryPreviewScreen(LibraryPreviewState(content.toUiContent(), loading = false)) {} }
+        CaroTheme { LibraryPreviewScreen(LibraryPreviewState(content.toUiContent(), loading = false, adding = adding)) {} }
     }
 
     @Composable
