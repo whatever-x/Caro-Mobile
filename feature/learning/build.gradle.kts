@@ -14,6 +14,7 @@ kotlin {
     android { namespace = "com.whatever.caro.feature.learning" }
     sourceSets.commonMain.dependencies {
         implementation(projects.core.model)
+        implementation(projects.core.ads)
         implementation(libs.jetbrains.androidx.navigation3.event)
         implementation(libs.compottie.lite)
     }

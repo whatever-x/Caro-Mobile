@@ -5,11 +5,13 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
+import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.whatever.caro.core.datastore.read
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import okio.IOException
 
@@ -23,6 +25,67 @@ internal class LocalAuthDataSourceImpl(
             }.map { preferences ->
                 preferences[KEY_ACCESS_TOKEN]?.takeIf { it.isNotBlank() && preferences[KEY_REGISTRATION_COMPLETE] == true }
             }.distinctUntilChanged()
+
+    override fun observeRegisteredSession(): Flow<AuthTokens?> =
+        dataStore.data
+            .catch { cause ->
+                if (cause is IOException) emit(emptyPreferences()) else throw cause
+            }.map { preferences ->
+                val access = preferences[KEY_ACCESS_TOKEN]
+                if (!access.isNullOrBlank() && preferences[KEY_REGISTRATION_COMPLETE] == true) {
+                    preferences.authTokens()
+                } else {
+                    null
+                }
+            }.distinctUntilChanged()
+
+    override suspend fun fetchTokens(): AuthTokens =
+        dataStore.data.first().let { prefs ->
+            prefs.authTokens()
+        }
+
+    override suspend fun saveSession(
+        accessToken: String,
+        refreshToken: String,
+        isRegistrationComplete: Boolean,
+    ) {
+        dataStore.edit { prefs ->
+            prefs[KEY_ACCESS_TOKEN] = accessToken
+            prefs[KEY_REFRESH_TOKEN] = refreshToken
+            prefs[KEY_REGISTRATION_COMPLETE] = isRegistrationComplete
+            prefs[KEY_GENERATION] = (prefs[KEY_GENERATION] ?: 0) + 1
+        }
+    }
+
+    override suspend fun replaceTokensIfCurrent(
+        expected: AuthTokens,
+        accessToken: String,
+        refreshToken: String,
+    ): Boolean {
+        var replaced = false
+        dataStore.edit { prefs ->
+            if (prefs.authTokens() == expected) {
+                prefs[KEY_ACCESS_TOKEN] = accessToken
+                prefs[KEY_REFRESH_TOKEN] = refreshToken
+                replaced = true
+            }
+        }
+        return replaced
+    }
+
+    override suspend fun clearIfCurrent(expected: AuthTokens): Boolean {
+        var cleared = false
+        dataStore.edit { prefs ->
+            if (prefs.authTokens() == expected) {
+                prefs.remove(KEY_ACCESS_TOKEN)
+                prefs.remove(KEY_REFRESH_TOKEN)
+                prefs.remove(KEY_REGISTRATION_COMPLETE)
+                prefs[KEY_GENERATION] = (prefs[KEY_GENERATION] ?: 0) + 1
+                cleared = true
+            }
+        }
+        return cleared
+    }
 
     override suspend fun fetchAccessToken(): String? = dataStore.read(KEY_ACCESS_TOKEN)
 
@@ -51,10 +114,15 @@ internal class LocalAuthDataSourceImpl(
             prefs.remove(KEY_ACCESS_TOKEN)
             prefs.remove(KEY_REFRESH_TOKEN)
             prefs.remove(KEY_REGISTRATION_COMPLETE)
+            prefs[KEY_GENERATION] = (prefs[KEY_GENERATION] ?: 0) + 1
         }
     }
 
+    private fun Preferences.authTokens(): AuthTokens =
+        AuthTokens(this[KEY_ACCESS_TOKEN], this[KEY_REFRESH_TOKEN], this[KEY_GENERATION] ?: 0, this[KEY_REGISTRATION_COMPLETE])
+
     private companion object {
+        private val KEY_GENERATION = longPreferencesKey("auth_session_generation")
         private val KEY_ACCESS_TOKEN = stringPreferencesKey("auth_access_token")
         private val KEY_REFRESH_TOKEN = stringPreferencesKey("auth_refresh_token")
         private val KEY_REGISTRATION_COMPLETE = booleanPreferencesKey("auth_registration_complete")

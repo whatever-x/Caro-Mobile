@@ -91,6 +91,10 @@
       "variant": "default"
     },
     {
+      "id": "setting.ad-privacy.required",
+      "variant": "default"
+    },
+    {
       "id": "setting.notification.on",
       "variant": "default"
     },

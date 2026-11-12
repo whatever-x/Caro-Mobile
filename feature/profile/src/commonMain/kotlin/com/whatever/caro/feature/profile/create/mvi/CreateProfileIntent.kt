@@ -7,9 +7,29 @@ sealed interface CreateProfileIntent : UiIntent {
         val nickname: String,
     ) : CreateProfileIntent
 
+    data class UpdateYear(
+        val value: String,
+    ) : CreateProfileIntent
+
+    data class UpdateMonth(
+        val value: String,
+    ) : CreateProfileIntent
+
+    data class UpdateDay(
+        val value: String,
+    ) : CreateProfileIntent
+
+    data object RetryNicknameCheck : CreateProfileIntent
+
     data object ClickRefresh : CreateProfileIntent
 
     data object ClickConfirm : CreateProfileIntent
+
+    data object ClickRelogin : CreateProfileIntent
+
+    data object ConfirmRelogin : CreateProfileIntent
+
+    data object DismissRelogin : CreateProfileIntent
 
     data object ClickBack : CreateProfileIntent
 

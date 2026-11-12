@@ -14,8 +14,8 @@ CI·Golden·수동 실행·게시 승인 절차의 원본 문서입니다. 작�
 CI는 같은 ID의 기대 profile 접미사를 검사합니다.
 세 워크플로의 Bash·jq는 기대 언어·프로필 ID와 파일명을 검사합니다. 이 이름을 바꾸면 Kotlin과 CI의 파일명 규칙을 함께 수정합니다.
 공통 ID N개를 ko/en으로 확장하면 플랫폼별 2N개, 전체 4N개의 캡처가 됩니다.
-현재 기대 목록에는 9개 모듈과 24개 논리 ID가 있습니다.
-기대 캡처 수는 플랫폼별 48개, 전체 96개입니다. 실제 출력 수와 구분합니다.
+현재 기대 목록에는 9개 모듈과 25개 논리 ID가 있습니다.
+기대 캡처 수는 플랫폼별 50개, 전체 100개입니다. 실제 출력 수와 구분합니다.
 작은 화면·큰 글꼴 시나리오는 명시된 variant 하나를 사용합니다. 모든 시나리오를 모든 variant로 곱하지 않습니다.
 파일명은 `<scenario-id>__<language>__<profile-id>.png`입니다. 플랫폼은 출력 경로와 메타데이터에 포함합니다.
 
@@ -89,7 +89,7 @@ PNG header·내용·치수·CRC·픽셀 디코딩, JUnit geometry 로그, 중복
 JSON 구문과 배열의 중복 ID/결과는 jq로 검사하지만 중복 object key는 마지막 값으로 해석할 수 있습니다.
 metadata의 languages·profiles는 기대 라벨입니다. 실제 로케일·치수·density/fontScale·기기 모델·OS의 측정값으로 보고하지 않습니다.
 기기값·root·실제 리소스 전환 단언은 공통 모듈과 Feature의 Kotlin 테스트에 유지합니다.
-이번 변경은 v5 registry에 variant를 포함합니다. 24개 ID·6개 profile ID·파일명·Feature별 수집 경로는 유지합니다.
+이번 변경은 v5 registry에 variant를 포함합니다. 기존 24개 ID·6개 profile ID·파일명·Feature별 수집 경로는 유지합니다.
 Android Dialog의 Window 선택 수정만으로 이미지가 동일하다고 확인할 수 없습니다.
 기존 Golden과 실제 이미지를 비교해야 합니다. 원본 이미지도 검토해야 합니다.
 Dialog 선택 계약과 미확정 원인은 [개발자 지침](../development/screenshot-testing.md#android-dialog의-view와-window)을 확인합니다.

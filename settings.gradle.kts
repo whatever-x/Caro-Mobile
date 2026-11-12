@@ -8,6 +8,7 @@ pluginManagement {
                 includeGroupAndSubgroups("androidx")
                 includeGroupAndSubgroups("com.android")
                 includeGroupAndSubgroups("com.google")
+                includeGroupAndSubgroups("org.chromium.net")
             }
         }
         mavenCentral()
@@ -22,6 +23,7 @@ dependencyResolutionManagement {
                 includeGroupAndSubgroups("androidx")
                 includeGroupAndSubgroups("com.android")
                 includeGroupAndSubgroups("com.google")
+                includeGroupAndSubgroups("org.chromium.net")
             }
         }
         mavenCentral()
@@ -49,6 +51,7 @@ include(":core:viewmodel")
 include(":core:remote")
 include(":core:datastore")
 include(":core:analytics")
+include(":core:ads")
 include(":core:crashlytics")
 include(":core:messaging")
 include(":core:util")

@@ -19,6 +19,7 @@ kotlin {
         commonMain.dependencies {
             implementation(projects.core.model)
             implementation(libs.compottie.lite)
+            implementation(libs.kotlinx.date.time)
         }
     }
 }

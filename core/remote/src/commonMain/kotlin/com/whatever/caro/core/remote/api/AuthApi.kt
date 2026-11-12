@@ -1,6 +1,6 @@
 package com.whatever.caro.core.remote.api
 
-import com.whatever.caro.core.remote.dto.auth.request.CompleteRegistrationRequest
+import com.whatever.caro.core.remote.dto.auth.request.CompleteRegistrationV11Request
 import com.whatever.caro.core.remote.dto.auth.request.RefreshTokenRequest
 import com.whatever.caro.core.remote.dto.auth.request.SocialLoginRequest
 import com.whatever.caro.core.remote.dto.auth.response.SocialLoginResponse
@@ -23,10 +23,10 @@ internal interface AuthApi {
         @Body request: RefreshTokenRequest,
     ): TokenResponse
 
-    @Headers(ApiVersionHeaders.V1_0)
+    @Headers(ApiVersionHeaders.V1_1)
     @POST("auth/complete-registration")
     suspend fun requestCompleteRegistration(
-        @Body request: CompleteRegistrationRequest,
+        @Body request: CompleteRegistrationV11Request,
     ): TokenResponse
 
     @Headers(ApiVersionHeaders.V1_0)
