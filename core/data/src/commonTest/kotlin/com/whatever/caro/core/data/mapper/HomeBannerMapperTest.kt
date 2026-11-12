@@ -7,8 +7,8 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import kotlin.time.Instant
 
-class HomeBannerMapperTest :
-    FunSpec({
+class HomeBannerMapperTest : FunSpec() {
+    init {
         val serverTime = "2026-11-11T00:00:00Z"
         val receivedAt = Instant.parse("2030-01-01T00:00:00Z")
         val valid =
@@ -60,4 +60,5 @@ class HomeBannerMapperTest :
             response(*banners).toHomeBanners(receivedAt).map { it.id } shouldBe
                 listOf("library", "item-1", "item-2", "item-3", "item-4")
         }
-    })
+    }
+}

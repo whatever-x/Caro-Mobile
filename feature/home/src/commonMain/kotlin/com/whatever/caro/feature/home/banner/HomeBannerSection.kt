@@ -8,6 +8,7 @@ import androidx.compose.foundation.interaction.collectIsDraggedAsState
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
@@ -31,6 +32,7 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
@@ -48,17 +50,15 @@ import coil3.compose.LocalPlatformContext
 import coil3.compose.asPainter
 import coil3.request.ImageRequest
 import coil3.request.SuccessResult
-import coil3.size.Size
 import com.whatever.caro.core.data.util.suspendRunCatching
 import com.whatever.caro.core.designsystem.themes.CaroTheme
 import com.whatever.caro.core.model.banner.HomeBanner
 import com.whatever.caro.feature.home.library.HomeDeckHeader
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
 import org.jetbrains.compose.resources.stringResource
 import kotlin.time.Clock
@@ -83,58 +83,65 @@ internal fun HomeBannerSection(
     onBannerClick: (HomeBanner) -> Unit,
     onLibraryClick: () -> Unit,
 ) {
-    val context = LocalPlatformContext.current
-    val imageLoader = remember(context) { SingletonImageLoader.get(context) }
-    val loaded by produceState(emptyList<LoadedBanner>(), banners, context) {
-        value = emptyList()
-        value =
-            coroutineScope {
-                banners
-                    .map { banner ->
-                        async {
-                            val cacheKey = "${banner.key}:${banner.imageUrl}"
-                            val request =
-                                ImageRequest
-                                    .Builder(context)
-                                    .data(banner.imageUrl)
-                                    .memoryCacheKey(cacheKey)
-                                    .diskCacheKey(cacheKey)
-                                    .size(Size.ORIGINAL)
-                                    .build()
-                            val result =
-                                withTimeoutOrNull(IMAGE_PREPARATION_TIMEOUT_MILLIS) {
-                                    suspendRunCatching { imageLoader.execute(request) }.getOrNull()
-                                }
-                            (result as? SuccessResult)?.let { LoadedBanner(banner, it.image.asPainter(context)) }
-                        }
-                    }.awaitAll()
-                    .filterNotNull()
-            }
-    }
-    val now by produceState(Clock.System.now(), banners) {
-        while (true) {
-            value = Clock.System.now()
-            val nextExpiry = banners.map { it.expiresAt }.filter { it > value }.minOrNull() ?: break
-            delay((nextExpiry - value).inWholeMilliseconds.coerceAtLeast(1))
-        }
-    }
-    val visible = loaded.filter { it.banner.expiresAt > now }.toImmutableList()
-    Column(
+    BoxWithConstraints(
         modifier = Modifier.fillMaxWidth().padding(horizontal = CaroTheme.spacing.xl2).padding(top = CaroTheme.spacing.xl2),
-        verticalArrangement = Arrangement.spacedBy(CaroTheme.spacing.m),
     ) {
-        if (visible.isNotEmpty()) {
-            BannerPager(
-                items = visible,
-                isVisibleAndIdle = isVisibleAndIdle,
-                autoAdvanceStopped = autoAdvanceStopped,
-                selectedBannerKey = selectedBannerKey,
-                onStopAutoAdvance = onStopAutoAdvance,
-                onSelectedBanner = onSelectedBanner,
-                onBannerClick = onBannerClick,
-            )
+        val context = LocalPlatformContext.current
+        val imageLoader = remember(context) { SingletonImageLoader.get(context) }
+        val imageWidth = with(LocalDensity.current) { maxWidth.roundToPx() }.coerceAtLeast(1)
+        val imageHeight = (imageWidth / 3f).toInt().coerceAtLeast(1)
+        val loaded by produceState(emptyList<LoadedBanner>(), banners, context, imageWidth) {
+            value = emptyList()
+            coroutineScope {
+                val loadedByIndex = arrayOfNulls<LoadedBanner>(banners.size)
+                banners.forEachIndexed { index, banner ->
+                    launch {
+                        val cacheKey = "${banner.key}:${banner.imageUrl}"
+                        val request =
+                            ImageRequest
+                                .Builder(context)
+                                .data(banner.imageUrl)
+                                .memoryCacheKey("$cacheKey:$imageWidth:$imageHeight")
+                                .diskCacheKey(cacheKey)
+                                .size(imageWidth, imageHeight)
+                                .build()
+                        val result =
+                            withTimeoutOrNull(IMAGE_PREPARATION_TIMEOUT_MILLIS) {
+                                suspendRunCatching { imageLoader.execute(request) }.getOrNull()
+                            }
+                        if (result is SuccessResult) {
+                            loadedByIndex[index] = LoadedBanner(banner, result.image.asPainter(context))
+                            value = loadedByIndex.filterNotNull()
+                        }
+                    }
+                }
+            }
         }
-        HomeDeckHeader(onLibraryClick)
+        val now by produceState(Clock.System.now(), banners) {
+            while (true) {
+                value = Clock.System.now()
+                val nextExpiry = banners.map { it.expiresAt }.filter { it > value }.minOrNull() ?: break
+                delay((nextExpiry - value).inWholeMilliseconds.coerceAtLeast(1))
+            }
+        }
+        val visible = loaded.filter { it.banner.expiresAt > now }.toImmutableList()
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(CaroTheme.spacing.m),
+        ) {
+            if (visible.isNotEmpty()) {
+                BannerPager(
+                    items = visible,
+                    isVisibleAndIdle = isVisibleAndIdle,
+                    autoAdvanceStopped = autoAdvanceStopped,
+                    selectedBannerKey = selectedBannerKey,
+                    onStopAutoAdvance = onStopAutoAdvance,
+                    onSelectedBanner = onSelectedBanner,
+                    onBannerClick = onBannerClick,
+                )
+            }
+            HomeDeckHeader(onLibraryClick)
+        }
     }
 }
 
@@ -157,9 +164,6 @@ private fun BannerPager(
     val lifecycle by LocalLifecycleOwner.current.lifecycle.currentStateAsState()
     LaunchedEffect(dragged, accessibilityAllowsAutoAdvance) {
         if (dragged || !accessibilityAllowsAutoAdvance) onStopAutoAdvance()
-    }
-    LaunchedEffect(keys) {
-        pager.scrollToPage(keys.indexOf(selectedBannerKey).coerceAtLeast(0))
     }
     LaunchedEffect(pager, keys) {
         snapshotFlow { pager.settledPage }.collect { page -> keys.getOrNull(page)?.let(onSelectedBanner) }

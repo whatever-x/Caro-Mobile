@@ -16,8 +16,8 @@ import io.ktor.http.headersOf
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 
-class HomeBannerApiContractTest :
-    FunSpec({
+class HomeBannerApiContractTest : FunSpec() {
+    init {
         test("배너 조회에 API 버전과 플랫폼 및 앱 버전을 보내고 응답을 읽는다") {
             val parser = Json { ignoreUnknownKeys = true }
             val client =
@@ -52,4 +52,5 @@ class HomeBannerApiContractTest :
                 client.close()
             }
         }
-    })
+    }
+}
