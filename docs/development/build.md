@@ -70,4 +70,4 @@ Android와 iOS의 dev 및 QA 설정에는 Google 공식 테스트 광고 App ID�
 
 Android 운영 빌드는 Gradle property `caro.admob.android.appId`와 `caro.admob.android.interstitialId`를 사용합니다. iOS는 Xcode build setting `CARO_ADMOB_APP_ID`와 `CARO_ADMOB_INTERSTITIAL_ID`를 사용합니다. 실제 운영 값과 AdMob 개인정보 메시지는 배포 전에 계정에서 확인합니다.
 
-광고는 두 학습 모드에서 기기별 하루 최대 한 번, 실제 평가 20장 이상 완료 시 표시합니다. 개발 검증에도 테스트 광고만 사용하며 운영 광고를 직접 클릭하지 않습니다.
+광고는 장수와 무관하게 일일 학습의 완료 저장이 성공한 뒤 기기별 하루 최대 한 번 표시합니다. 전체 학습 완료에는 광고를 표시하지 않습니다. 개발 검증에도 테스트 광고만 사용하며 운영 광고를 직접 클릭하지 않습니다.

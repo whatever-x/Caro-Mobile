@@ -7,7 +7,5 @@ sealed interface LearningSideEffect : UiSideEffect {
 
     data object NavigateToHome : LearningSideEffect
 
-    data class ShowCompletionAd(
-        val evaluatedCardCount: Int,
-    ) : LearningSideEffect
+    data object ShowDailyCompletionAd : LearningSideEffect
 }

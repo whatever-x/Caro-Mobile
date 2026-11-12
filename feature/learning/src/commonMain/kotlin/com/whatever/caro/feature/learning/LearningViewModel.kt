@@ -207,8 +207,7 @@ class LearningViewModel(
             return
         }
         if (mode == LearningMode.ALL) {
-            reduce { copy(evaluations = all, isCompleted = true, isAwaitingCompletionAd = true, showStopDialog = false) }
-            postSideEffect(LearningSideEffect.ShowCompletionAd(all.size))
+            reduce { copy(evaluations = all, isCompleted = true, showStopDialog = false) }
             return
         }
         reduce { copy(evaluations = all) }
@@ -228,7 +227,7 @@ class LearningViewModel(
                 showStopDialog = false,
             )
         }
-        postSideEffect(LearningSideEffect.ShowCompletionAd(ratingCounts.again + ratingCounts.fair + ratingCounts.easy))
+        postSideEffect(LearningSideEffect.ShowDailyCompletionAd)
     }
 
     private suspend fun submitEvaluations(): StudyRatingCounts {

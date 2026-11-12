@@ -8,6 +8,7 @@ import androidx.navigationevent.NavigationEventInfo
 import androidx.navigationevent.compose.NavigationBackHandler
 import androidx.navigationevent.compose.rememberNavigationEventState
 import com.whatever.caro.core.ads.InterstitialAdController
+import com.whatever.caro.core.model.learning.LearningMode
 import com.whatever.caro.core.navigator.contract.NavCommand
 import com.whatever.caro.core.navigator.dispatcher.NavigationDispatcher
 import com.whatever.caro.core.navigator.entries.HomeEntry
@@ -30,7 +31,8 @@ fun LearningRoute(
         state = backState,
         onBackCompleted = { viewModel.intent(LearningIntent.RequestStop) },
     )
-    LaunchedEffect(adController) {
+    LaunchedEffect(adController, state.mode) {
+        if (state.mode != LearningMode.DAILY) return@LaunchedEffect
         try {
             adController.preload()
         } catch (exception: CancellationException) {
@@ -51,9 +53,9 @@ fun LearningRoute(
                     navDispatcher.emit(NavCommand.ResetTo(key = HomeEntry))
                 }
 
-                is LearningSideEffect.ShowCompletionAd -> {
+                LearningSideEffect.ShowDailyCompletionAd -> {
                     try {
-                        adController.showIfEligible(it.evaluatedCardCount)
+                        adController.showAfterDailyCompletion()
                     } catch (exception: CancellationException) {
                         throw exception
                     } catch (_: Exception) {

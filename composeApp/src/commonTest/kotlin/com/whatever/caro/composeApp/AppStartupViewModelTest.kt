@@ -243,7 +243,7 @@ private class FakeAdsController(
 
     override fun preload() = Unit
 
-    override suspend fun showIfEligible(evaluatedCardCount: Int) = Unit
+    override suspend fun showAfterDailyCompletion() = Unit
 
     override suspend fun showPrivacyOptions() = Unit
 }

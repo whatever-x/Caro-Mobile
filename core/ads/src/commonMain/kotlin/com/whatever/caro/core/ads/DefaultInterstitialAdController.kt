@@ -37,9 +37,9 @@ internal class DefaultInterstitialAdController(
         if (eligibility.value.allowed) provider.preload()
     }
 
-    override suspend fun showIfEligible(evaluatedCardCount: Int) {
+    override suspend fun showAfterDailyCompletion() {
         val access = eligibility.value
-        if (!access.allowed || evaluatedCardCount < 20 || !presentation.tryLock()) return
+        if (!access.allowed || !presentation.tryLock()) return
         try {
             if (eligibility.value != access) return
             val ad = provider.takeReadyAd() ?: return

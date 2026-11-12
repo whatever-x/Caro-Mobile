@@ -16,7 +16,7 @@ interface InterstitialAdController {
 
     fun preload()
 
-    suspend fun showIfEligible(evaluatedCardCount: Int)
+    suspend fun showAfterDailyCompletion()
 
     suspend fun showPrivacyOptions()
 }
