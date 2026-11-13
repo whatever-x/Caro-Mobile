@@ -9,9 +9,9 @@
 	<key>CaroInterstitialAdUnitID</key>
 	<string>$(CARO_ADMOB_INTERSTITIAL_ID)</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.0.2</string>
+	<string>$(MARKETING_VERSION)</string>
 	<key>CFBundleVersion</key>
-	<string>10000201</string>
+	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>GIDWebClientID</key>
 	<string>$(GID_WEB_CLIENT_ID)</string>
 	<key>CADisableMinimumFrameDurationOnPhone</key>

@@ -25,6 +25,12 @@ Android의 빌드 타입은 `debug`·`release`입니다. Debug는 디버깅을 �
 
 iOS의 빌드 구성 이름은 `DevDebug`·`DevRelease`·`QaDebug`·`QaRelease`·`ProdDebug`·`ProdRelease`입니다. Xcode 빌드 단계가 `KOTLIN_FRAMEWORK_BUILD_TYPE`을 설정하고 `:composeApp:embedAndSignAppleFrameworkForXcode`로 공유 프레임워크를 빌드합니다.
 
+## 앱 버전과 빌드 번호
+
+운영 빌드 번호는 플랫폼별 기존 릴리스 규칙을 따릅니다. `1.0.3`의 운영 번호는 Android `10003001`, iOS `10000301`입니다. QA는 별도 앱 ID로 배포하므로 운영 번호와 분리하며, 이미 배포한 `10100002`보다 낮추지 않습니다. Android QA 번호는 버전 카탈로그의 `qa-version-code`, iOS QA 번호는 QaDebug와 QaRelease의 `CURRENT_PROJECT_VERSION`에서 관리합니다. QA 재배포 시에는 이 번호를 올리고 운영 설정에 복사하지 않습니다.
+
+iOS Info.plist의 버전과 빌드 번호는 각각 `MARKETING_VERSION`과 `CURRENT_PROJECT_VERSION`을 참조합니다. 버전을 변경할 때 Info.plist에 별도의 숫자를 작성하지 않습니다.
+
 ## Android 빌드
 
 ```bash
