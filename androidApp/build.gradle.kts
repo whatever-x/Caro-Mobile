@@ -24,6 +24,12 @@ dependencies {
 
 android {
     productFlavors.all {
+        if (name == "qa") {
+            versionCode =
+                libs.versions.qa.version.code
+                    .get()
+                    .toInt()
+        }
         val testAds = name == "dev" || name == "qa"
         manifestPlaceholders["admobAppId"] =
             if (testAds) "ca-app-pub-3940256099942544~3347511713" else providers.gradleProperty("caro.admob.android.appId").orElse("").get()

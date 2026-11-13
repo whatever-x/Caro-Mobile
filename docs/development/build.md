@@ -25,6 +25,12 @@ Android의 빌드 타입은 `debug`·`release`입니다. Debug는 디버깅을 �
 
 iOS의 빌드 구성 이름은 `DevDebug`·`DevRelease`·`QaDebug`·`QaRelease`·`ProdDebug`·`ProdRelease`입니다. Xcode 빌드 단계가 `KOTLIN_FRAMEWORK_BUILD_TYPE`을 설정하고 `:composeApp:embedAndSignAppleFrameworkForXcode`로 공유 프레임워크를 빌드합니다.
 
+## 앱 버전과 빌드 번호
+
+운영 빌드 번호는 플랫폼별 기존 릴리스 규칙을 따릅니다. `1.0.3`의 운영 번호는 Android `10003001`, iOS `10000301`입니다. QA는 별도 앱 ID로 배포하므로 운영 번호와 분리하며, 해당 QA 앱에 이미 업로드한 번호보다 높여 재배포합니다. Android QA 번호는 버전 카탈로그의 `qa-version-code`, iOS QA 번호는 QaDebug와 QaRelease의 `CURRENT_PROJECT_VERSION`에서 관리합니다. QA 재배포 시에는 이 번호를 올리고 운영 설정에 복사하지 않습니다.
+
+iOS Info.plist의 버전과 빌드 번호는 각각 `MARKETING_VERSION`과 `CURRENT_PROJECT_VERSION`을 참조합니다. 버전을 변경할 때 Info.plist에 별도의 숫자를 작성하지 않습니다.
+
 ## Android 빌드
 
 ```bash
@@ -68,6 +74,8 @@ Spotless는 Kotlin·Gradle Kotlin DSL에 ktlint 1.8.0을 적용합니다. Compos
 
 Android와 iOS의 dev 및 QA 설정에는 Google 공식 테스트 광고 App ID와 전면광고 단위를 사용합니다. Android 운영 설정에서 App ID 또는 광고 단위가 없으면 SDK 초기화와 광고 요청을 생략합니다. iOS는 SDK가 시작 시 App ID를 검사하므로 운영 빌드에 형식에 맞는 App ID가 없거나 Google 테스트 App ID를 사용하면 빌드를 중단합니다. 이 검사는 ID가 실제 운영 계정에 속하는지 확인하지 않습니다. iOS에서 App ID가 있고 광고 단위가 없으면 앱의 광고 초기화와 요청을 생략합니다.
 
-Android 운영 빌드는 Gradle property `caro.admob.android.appId`와 `caro.admob.android.interstitialId`를 사용합니다. iOS는 Xcode build setting `CARO_ADMOB_APP_ID`와 `CARO_ADMOB_INTERSTITIAL_ID`를 사용합니다. 실제 운영 값과 AdMob 개인정보 메시지는 배포 전에 계정에서 확인합니다.
+Android 운영 빌드는 저장소 `gradle.properties`의 `caro.admob.android.appId`와 `caro.admob.android.interstitialId`에 Caro 운영 ID를 기본값으로 둡니다. 필요한 경우 Gradle `-P` 옵션으로 덮어쓸 수 있습니다. iOS는 Xcode 프로젝트의 ProdDebug와 ProdRelease에 `CARO_ADMOB_APP_ID`와 `CARO_ADMOB_INTERSTITIAL_ID`를 설정합니다. 개발 및 QA 구성은 Google 테스트 ID를 유지합니다. 운영 ID는 비밀키가 아니며, AdMob 앱과 광고 단위를 교체하면 이 기본값도 함께 갱신합니다.
+
+배포 전에는 AdMob에서 앱 승인과 app-ads.txt 인증, 각 Caro 앱에 연결된 동의 메시지의 게시 상태를 확인합니다. SDK 초기화 성공만으로 동의 메시지 설정이 완료됐다고 판단하지 않습니다. iOS는 App Store의 마케팅 URL에 app-ads.txt를 제공하는 호스트의 개발자 웹사이트를 연결해야 하며, 버전 초안에만 저장된 URL은 공개 스토어에 반영된 것으로 간주하지 않습니다.
 
 광고는 장수와 무관하게 일일 학습의 완료 저장이 성공한 뒤 기기별 하루 최대 한 번 표시합니다. 전체 학습 완료에는 광고를 표시하지 않습니다. 개발 검증에도 테스트 광고만 사용하며 운영 광고를 직접 클릭하지 않습니다.

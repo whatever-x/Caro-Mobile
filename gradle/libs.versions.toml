@@ -5,8 +5,9 @@ agp = "9.0.0"
 android-compileSdk = "36"
 android-minSdk = "28"
 android-targetSdk = "36"
-version-code = "10002001" # major(1), minor(2), patch(2), build(3)
-version-name = "1.0.2" # major(1), minor(1), patch(1)
+version-code = "10003001" # major(1), minor(2), patch(2), build(3)
+qa-version-code = "10100003" # QA 앱의 기존 배포 순서 유지
+version-name = "1.0.3" # major(1), minor(1), patch(1)
 
 # Multiplatform
 compose-multiplatform = "1.11.0"
