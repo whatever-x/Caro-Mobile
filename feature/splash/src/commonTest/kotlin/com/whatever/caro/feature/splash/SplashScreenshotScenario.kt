@@ -1,15 +1,31 @@
 package com.whatever.caro.feature.splash
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.onNodeWithText
+import caromobile.core.designsystem.generated.resources.Res
+import caromobile.core.designsystem.generated.resources.splash_content
 import com.whatever.caro.core.designsystem.themes.CaroTheme
+import com.whatever.caro.core.screenshot.testing.ScreenshotScenario
+import com.whatever.caro.core.screenshot.testing.ScreenshotString
 import com.whatever.caro.feature.splash.mvi.SplashState
 
 internal object SplashScreenshotScenario {
     const val ID = "splash.splash.initial"
-    const val FILE_NAME = "$ID.png"
-    const val WIDTH_DP = 393
-    const val HEIGHT_DP = 852
-    const val LOCALE = "ko"
+
+    fun scenarios() =
+        listOf(
+            ScreenshotScenario(
+                ID,
+                render = { Render() },
+                expectedStrings = listOf(ScreenshotString(Res.string.splash_content)),
+                beforeCapture = { strings ->
+                    onNodeWithText(
+                        strings[Res.string.splash_content],
+                    ).assertIsDisplayed()
+                },
+            ),
+        )
 
     @Composable
     fun Render() {

@@ -151,6 +151,28 @@ class LoginViewModelTest : FunSpec() {
             }
         }
 
+        test("구글 로그인 정보를 찾지 못하면 전용 안내를 표시하고 로딩을 해제하며 서버를 호출하지 않는다") {
+            runTest(testDispatcher) {
+                val authRepository = mock<AuthRepository>()
+                val viewModel = viewModelWith(authRepository)
+
+                viewModel.sideEffect.test {
+                    viewModel.intent(LoginIntent.ClickSocialLoginButton(SocialLoginType.GOOGLE))
+                    awaitItem() shouldBe LoginSideEffect.LaunchSocialAuthentication(SocialLoginType.GOOGLE)
+                    viewModel.state.value.isLoading shouldBe true
+
+                    viewModel.intent(LoginIntent.ClickGoogleLoginButton(SocialLoginResult.NoCredential))
+                    awaitItem() shouldBe LoginSideEffect.ShowErrorSnackbar(LoginError.NO_CREDENTIAL)
+                    viewModel.state.value.isLoading shouldBe false
+                    expectNoEvents()
+                }
+
+                verifySuspend(exactly(0)) {
+                    authRepository.loginWithSocial(any(), any())
+                }
+            }
+        }
+
         test("구글 로그인 결과가 Failed면 UNKNOWN 에러 스낵바를 방출하고 레포지토리를 호출하지 않는다") {
             runTest(testDispatcher) {
                 val authRepository = mock<AuthRepository>()

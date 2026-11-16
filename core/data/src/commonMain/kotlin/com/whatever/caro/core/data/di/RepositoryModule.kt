@@ -1,17 +1,27 @@
 package com.whatever.caro.core.data.di
 
+import com.whatever.caro.core.data.repository.ads.AdEligibilityGate
+import com.whatever.caro.core.data.repository.ads.AdEligibilityMonitor
+import com.whatever.caro.core.data.repository.ads.InterstitialFrequencyRepository
+import com.whatever.caro.core.data.repository.ads.InterstitialFrequencyRepositoryImpl
 import com.whatever.caro.core.data.repository.auth.AuthRepository
 import com.whatever.caro.core.data.repository.auth.AuthRepositoryImpl
+import com.whatever.caro.core.data.repository.banner.HomeBannerRepository
+import com.whatever.caro.core.data.repository.banner.HomeBannerRepositoryImpl
 import com.whatever.caro.core.data.repository.card.CardRepository
 import com.whatever.caro.core.data.repository.card.CardRepositoryImpl
 import com.whatever.caro.core.data.repository.deck.DeckRepository
 import com.whatever.caro.core.data.repository.deck.DeckRepositoryImpl
 import com.whatever.caro.core.data.repository.fcm.FcmTokenRepository
 import com.whatever.caro.core.data.repository.fcm.FcmTokenRepositoryImpl
+import com.whatever.caro.core.data.repository.library.LibraryRepository
+import com.whatever.caro.core.data.repository.library.LibraryRepositoryImpl
 import com.whatever.caro.core.data.repository.profile.ProfileRepository
 import com.whatever.caro.core.data.repository.profile.ProfileRepositoryImpl
 import com.whatever.caro.core.data.repository.report.StudyReportRepository
 import com.whatever.caro.core.data.repository.report.StudyReportRepositoryImpl
+import com.whatever.caro.core.data.repository.review.ReviewRequestRepository
+import com.whatever.caro.core.data.repository.review.ReviewRequestRepositoryImpl
 import com.whatever.caro.core.data.repository.streak.StreakRepository
 import com.whatever.caro.core.data.repository.streak.StreakRepositoryImpl
 import com.whatever.caro.core.data.repository.study.StudySessionRepository
@@ -22,12 +32,18 @@ import org.koin.plugin.module.dsl.single
 
 val repositoryModule =
     module {
+        single { AdEligibilityGate() }
+        single { AdEligibilityMonitor(get(), get(), get()) }
+        single<InterstitialFrequencyRepositoryImpl>() bind InterstitialFrequencyRepository::class
         single<FcmTokenRepositoryImpl>() bind FcmTokenRepository::class
         single<AuthRepositoryImpl>() bind AuthRepository::class
         single<ProfileRepositoryImpl>() bind ProfileRepository::class
         single<CardRepositoryImpl>() bind CardRepository::class
+        single<HomeBannerRepositoryImpl>() bind HomeBannerRepository::class
+        single<LibraryRepositoryImpl>() bind LibraryRepository::class
         single<DeckRepositoryImpl>() bind DeckRepository::class
         single<StreakRepositoryImpl>() bind StreakRepository::class
         single<StudySessionRepositoryImpl>() bind StudySessionRepository::class
         single<StudyReportRepositoryImpl>() bind StudyReportRepository::class
+        single<ReviewRequestRepositoryImpl>() bind ReviewRequestRepository::class
     }

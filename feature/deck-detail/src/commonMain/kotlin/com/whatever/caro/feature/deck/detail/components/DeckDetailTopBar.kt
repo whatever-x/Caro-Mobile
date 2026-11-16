@@ -41,7 +41,7 @@ internal fun DeckDetailTopBar(
                 .fillMaxWidth()
                 .height(56.dp)
                 .background(color = CaroTheme.color.background.brand)
-                .padding(horizontal = CaroTheme.spacing.xl),
+                .padding(horizontal = CaroTheme.spacing.xl2),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {

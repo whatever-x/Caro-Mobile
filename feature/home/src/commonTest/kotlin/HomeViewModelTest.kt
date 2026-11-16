@@ -1,7 +1,9 @@
 import app.cash.turbine.test
+import com.whatever.caro.core.data.repository.banner.HomeBannerRepository
 import com.whatever.caro.core.data.repository.deck.DeckRepository
 import com.whatever.caro.core.data.repository.profile.ProfileRepository
 import com.whatever.caro.core.data.repository.streak.StreakRepository
+import com.whatever.caro.core.model.banner.HomeBanner
 import com.whatever.caro.core.model.deck.Deck
 import com.whatever.caro.core.model.deck.DeckState
 import com.whatever.caro.core.model.streak.Streak
@@ -29,6 +31,7 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import kotlin.time.Instant
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class HomeViewModelTest : FunSpec() {
@@ -46,12 +49,89 @@ class HomeViewModelTest : FunSpec() {
             profileRepository: ProfileRepository =
                 mock { everySuspend { getMyNickname() } returns "캐로" },
             exceptionFilter: ExceptionFilter = ExceptionFilter.None,
+            bannerRepository: HomeBannerRepository = mock { everySuspend { list() } returns emptyList() },
         ) = HomeViewModel(
             deckRepository,
             streakRepository,
             profileRepository,
+            bannerRepository,
             exceptionFilter,
         )
+
+        test("배너 응답이 늦어도 홈 콘텐츠와 라이브러리 이동을 먼저 제공한다") {
+            runTest(testDispatcher) {
+                val pending = CompletableDeferred<List<HomeBanner>>()
+                val repository = mock<HomeBannerRepository> { everySuspend { list() } calls { pending.await() } }
+                val viewModel = viewModelWith(bannerRepository = repository)
+                viewModel.intent(HomeIntent.Initialize)
+                runCurrent()
+                viewModel.state.value.isLoading shouldBe false
+                viewModel.sideEffect.test {
+                    viewModel.intent(HomeIntent.ClickLibrary)
+                    runCurrent()
+                    awaitItem() shouldBe HomeSideEffect.NavigateToLibrary
+                }
+                pending.complete(emptyList())
+                advanceUntilIdle()
+            }
+        }
+
+        test("배너 조회 실패는 홈 오류로 처리하지 않는다") {
+            runTest(testDispatcher) {
+                val repository = mock<HomeBannerRepository> { everySuspend { list() } throws IllegalStateException("banner unavailable") }
+                val viewModel = viewModelWith(bannerRepository = repository)
+                viewModel.intent(HomeIntent.Initialize)
+                advanceUntilIdle()
+                viewModel.state.value.hasLoadError shouldBe false
+                viewModel.state.value.banners
+                    .isEmpty() shouldBe true
+            }
+        }
+
+        test("유효한 배너만 라이브러리 목록이나 제공 덱 미리보기로 이동한다") {
+            runTest(testDispatcher) {
+                val banner = HomeBanner("banner", 1, "https://caro.test/banner.png", "라이브러리", 42, Instant.parse("2099-01-01T00:00:00Z"))
+                val expired = banner.copy(id = "expired", expiresAt = Instant.parse("2000-01-01T00:00:00Z"))
+                val listing = banner.copy(id = "list", libraryDeckId = null)
+                val repository = mock<HomeBannerRepository> { everySuspend { list() } returns listOf(banner, expired, listing) }
+                val viewModel = viewModelWith(bannerRepository = repository)
+                viewModel.intent(HomeIntent.Initialize)
+                advanceUntilIdle()
+                viewModel.sideEffect.test {
+                    viewModel.intent(HomeIntent.ClickBanner("banner", 1))
+                    advanceUntilIdle()
+                    awaitItem() shouldBe HomeSideEffect.NavigateToLibraryPreview(42)
+                    viewModel.intent(HomeIntent.ClickBanner("list", 1))
+                    advanceUntilIdle()
+                    awaitItem() shouldBe HomeSideEffect.NavigateToLibrary
+                    viewModel.intent(HomeIntent.ClickBanner("expired", 1))
+                    viewModel.intent(HomeIntent.ClickBanner("banner", 2))
+                    advanceUntilIdle()
+                    expectNoEvents()
+                }
+            }
+        }
+
+        test("늦게 도착한 이전 배너 응답은 최신 목록을 덮어쓰지 않는다") {
+            runTest(testDispatcher) {
+                val oldRequest = CompletableDeferred<List<HomeBanner>>()
+                val latest = HomeBanner("latest", 1, "https://caro.test/banner.png", "라이브러리", null, Instant.parse("2099-01-01T00:00:00Z"))
+                var calls = 0
+                val repository =
+                    mock<HomeBannerRepository> {
+                        everySuspend { list() } calls { if (++calls == 1) oldRequest.await() else listOf(latest) }
+                    }
+                val viewModel = viewModelWith(bannerRepository = repository)
+                viewModel.intent(HomeIntent.Initialize)
+                runCurrent()
+                viewModel.intent(HomeIntent.Initialize)
+                runCurrent()
+                oldRequest.complete(listOf(latest.copy(id = "old")))
+                advanceUntilIdle()
+                viewModel.state.value.banners
+                    .map { it.id } shouldBe listOf("latest")
+            }
+        }
 
         beforeTest {
             Dispatchers.setMain(testDispatcher)

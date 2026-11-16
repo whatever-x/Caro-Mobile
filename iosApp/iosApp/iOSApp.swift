@@ -9,9 +9,10 @@ class CaroAppDelegate: NSObject, UIApplicationDelegate {
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
     ) -> Bool {
         IosMessagingAttacherKt.attachMessaging()
-        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { _, error in
-            if let error { print("Notification authorization failed: \(error)") }
-            DispatchQueue.main.async { application.registerForRemoteNotifications() }
+        UNUserNotificationCenter.current().getNotificationSettings { settings in
+            if settings.authorizationStatus == .authorized || settings.authorizationStatus == .provisional {
+                DispatchQueue.main.async { application.registerForRemoteNotifications() }
+            }
         }
         return true
     }

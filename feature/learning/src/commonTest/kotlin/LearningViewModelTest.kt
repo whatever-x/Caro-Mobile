@@ -424,6 +424,208 @@ class LearningViewModelTest : FunSpec() {
             }
         }
 
+        test("전체 학습 완료는 광고를 요청하거나 기다리지 않고 결과를 표시한다") {
+            runTest(dispatcher) {
+                val cards = (1L..20L).map { Card(it, CardContent("앞", "뒤")) }
+                val study = FakeStudyRepository()
+                val viewModel = createViewModel(cards, study, mode = LearningMode.ALL)
+                viewModel.intent(LearningIntent.Load)
+                advanceUntilIdle()
+
+                viewModel.sideEffect.test {
+                    repeat(20) {
+                        viewModel.intent(LearningIntent.Evaluate(StudyRating.EASY))
+                        advanceUntilIdle()
+                    }
+                    viewModel.state.value.isCompleted shouldBe true
+                    viewModel.state.value.isAwaitingCompletionAd shouldBe false
+                    viewModel.state.value.evaluations.size shouldBe 20
+                    study.submitCount shouldBe 0
+                    expectNoEvents()
+
+                    viewModel.intent(LearningIntent.ClickNavigateToHome)
+                    awaitItem() shouldBe LearningSideEffect.NavigateToHome
+                    expectNoEvents()
+                }
+            }
+        }
+
+        listOf(1, 19, 20).forEach { cardCount ->
+            test("일일 학습 ${cardCount}장 완료는 저장 성공 후 광고를 요청한다") {
+                runTest(dispatcher) {
+                    val cards = (1L..cardCount.toLong()).map { StudyCard(it, "앞", "뒤") }
+                    val study =
+                        FakeStudyRepository(
+                            session = activeDailyStudyResult(42L, 0, cardCount, cards),
+                            submitResult = StudyRatingCounts(easy = cardCount),
+                        )
+                    val viewModel = createViewModel(emptyList(), study, mode = LearningMode.DAILY)
+                    viewModel.intent(LearningIntent.Load)
+                    advanceUntilIdle()
+
+                    viewModel.sideEffect.test {
+                        repeat(cardCount) {
+                            viewModel.intent(LearningIntent.Evaluate(StudyRating.EASY))
+                            advanceUntilIdle()
+                        }
+                        awaitItem() shouldBe LearningSideEffect.ShowDailyCompletionAd
+                        study.submitCount shouldBe 1
+                        viewModel.state.value.isCompleted shouldBe true
+                        viewModel.state.value.isAwaitingCompletionAd shouldBe true
+                        expectNoEvents()
+                    }
+                }
+            }
+        }
+
+        test("재개한 일일 학습은 누적 결과 저장이 성공한 뒤 광고를 요청한다") {
+            runTest(dispatcher) {
+                val counts = StudyRatingCounts(again = 5, fair = 5, easy = 10)
+                val study =
+                    FakeStudyRepository(
+                        session = activeDailyStudyResult(42L, 19, 20, listOf(StudyCard(20L, "앞", "뒤"))),
+                        submitResult = counts,
+                    )
+                val viewModel = createViewModel(emptyList(), study, mode = LearningMode.DAILY)
+                viewModel.intent(LearningIntent.Load)
+                advanceUntilIdle()
+                study.submitGate = CompletableDeferred()
+
+                viewModel.sideEffect.test {
+                    viewModel.intent(LearningIntent.Evaluate(StudyRating.EASY))
+                    runCurrent()
+                    expectNoEvents()
+                    viewModel.state.value.isCompleted shouldBe false
+                    viewModel.state.value.isAwaitingCompletionAd shouldBe false
+
+                    study.submitGate?.complete(Unit)
+                    awaitItem() shouldBe LearningSideEffect.ShowDailyCompletionAd
+                    viewModel.state.value.ratingCounts shouldBe counts
+                    viewModel.state.value.evaluations.size shouldBe 1
+                    viewModel.state.value.isCompleted shouldBe true
+                    viewModel.state.value.isAwaitingCompletionAd shouldBe true
+                }
+            }
+        }
+
+        test("완료 제출 실패 후 재시도 성공에서만 광고를 한 번 요청한다") {
+            runTest(dispatcher) {
+                val study =
+                    FakeStudyRepository(
+                        session = activeDailyStudyResult(42L, 19, 20, listOf(StudyCard(20L, "앞", "뒤"))),
+                        submitResult = StudyRatingCounts(easy = 20),
+                    )
+                study.submitError = NetworkException.Connection("debug")
+                val viewModel = createViewModel(emptyList(), study, mode = LearningMode.DAILY)
+                viewModel.intent(LearningIntent.Load)
+                advanceUntilIdle()
+
+                viewModel.sideEffect.test {
+                    viewModel.intent(LearningIntent.Evaluate(StudyRating.EASY))
+                    advanceUntilIdle()
+                    val firstKey = study.submittedIdempotencyKey
+                    viewModel.state.value.isAwaitingCompletionAd shouldBe false
+                    expectNoEvents()
+
+                    study.submitError = null
+                    viewModel.intent(LearningIntent.RetryError)
+                    awaitItem() shouldBe LearningSideEffect.ShowDailyCompletionAd
+                    study.submittedIdempotencyKey shouldBe firstKey
+                    study.submitCount shouldBe 2
+                    viewModel.intent(LearningIntent.RetryError)
+                    advanceUntilIdle()
+                    expectNoEvents()
+                }
+            }
+        }
+
+        test("완료 제출 중 뒤로가기와 중단 확인이 추가 제출이나 화면 이탈을 만들지 않는다") {
+            runTest(dispatcher) {
+                val study =
+                    FakeStudyRepository(
+                        session = activeDailyStudyResult(42L, 19, 20, listOf(StudyCard(20L, "앞", "뒤"))),
+                        submitResult = StudyRatingCounts(easy = 20),
+                    ).apply { submitGate = CompletableDeferred() }
+                val viewModel = createViewModel(emptyList(), study, mode = LearningMode.DAILY)
+                viewModel.intent(LearningIntent.Load)
+                advanceUntilIdle()
+
+                viewModel.sideEffect.test {
+                    viewModel.intent(LearningIntent.Evaluate(StudyRating.EASY))
+                    runCurrent()
+                    viewModel.intent(LearningIntent.RequestStop)
+                    viewModel.intent(LearningIntent.ConfirmStop)
+                    runCurrent()
+                    study.submitCount shouldBe 1
+                    viewModel.state.value.showStopDialog shouldBe false
+                    expectNoEvents()
+
+                    study.submitGate?.complete(Unit)
+                    awaitItem() shouldBe LearningSideEffect.ShowDailyCompletionAd
+                    study.submitCount shouldBe 1
+                    expectNoEvents()
+                }
+            }
+        }
+
+        test("빈 전체 학습과 이미 완료한 일일 학습 진입에서는 광고를 요청하지 않는다") {
+            runTest(dispatcher) {
+                val emptyAll = createViewModel(emptyList())
+                val completedDaily =
+                    createViewModel(
+                        emptyList(),
+                        FakeStudyRepository(DailyStudyStartResult.Completed(studiedCardCount = 20, totalCardCount = 20)),
+                        mode = LearningMode.DAILY,
+                    )
+                listOf(emptyAll, completedDaily).forEach { viewModel ->
+                    viewModel.sideEffect.test {
+                        viewModel.intent(LearningIntent.Load)
+                        advanceUntilIdle()
+                        viewModel.state.value.isCompleted shouldBe true
+                        viewModel.state.value.isAwaitingCompletionAd shouldBe false
+                        expectNoEvents()
+                    }
+                }
+            }
+        }
+
+        test("광고 처리 중 중복 평가와 재진입 및 중단을 무시하고 완료 후에도 광고를 반복하지 않는다") {
+            runTest(dispatcher) {
+                val study =
+                    FakeStudyRepository(
+                        session = activeDailyStudyResult(42L, 19, 20, listOf(StudyCard(20L, "앞", "뒤"))),
+                        submitResult = StudyRatingCounts(easy = 20),
+                    )
+                val viewModel = createViewModel(emptyList(), study, mode = LearningMode.DAILY)
+                viewModel.intent(LearningIntent.Load)
+                advanceUntilIdle()
+
+                viewModel.sideEffect.test {
+                    viewModel.intent(LearningIntent.Evaluate(StudyRating.EASY))
+                    awaitItem() shouldBe LearningSideEffect.ShowDailyCompletionAd
+                    viewModel.intent(LearningIntent.Evaluate(StudyRating.FAIR))
+                    viewModel.intent(LearningIntent.Load)
+                    viewModel.intent(LearningIntent.RequestStop)
+                    viewModel.intent(LearningIntent.ConfirmStop)
+                    viewModel.intent(LearningIntent.ClickNavigateToHome)
+                    advanceUntilIdle()
+                    viewModel.state.value.isAwaitingCompletionAd shouldBe true
+                    viewModel.state.value.showStopDialog shouldBe false
+                    viewModel.state.value.evaluations.size shouldBe 1
+                    expectNoEvents()
+
+                    viewModel.intent(LearningIntent.CompletionAdFinished)
+                    viewModel.intent(LearningIntent.CompletionAdFinished)
+                    viewModel.intent(LearningIntent.Evaluate(StudyRating.FAIR))
+                    viewModel.intent(LearningIntent.Load)
+                    advanceUntilIdle()
+                    viewModel.state.value.isAwaitingCompletionAd shouldBe false
+                    viewModel.state.value.evaluations.size shouldBe 1
+                    expectNoEvents()
+                }
+            }
+        }
+
         test("학습 모드를 화면 상태로 노출한다") {
             LearningMode.entries.forEach { mode ->
                 createViewModel(cards = emptyList(), mode = mode).state.value.mode shouldBe mode

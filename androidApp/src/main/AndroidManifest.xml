@@ -15,6 +15,12 @@
 		android:roundIcon="@mipmap/ic_launcher_round"
 		android:supportsRtl="true" android:theme="@style/Theme.Caro">
 		<meta-data
+			android:name="com.google.android.gms.ads.APPLICATION_ID"
+			android:value="${admobAppId}" />
+		<meta-data
+			android:name="com.whatever.caro.ads.INTERSTITIAL_ID"
+			android:value="${admobInterstitialId}" />
+		<meta-data
 			android:name="com.google.firebase.messaging.default_notification_icon"
 			android:resource="@mipmap/ic_launcher" />
 		<provider

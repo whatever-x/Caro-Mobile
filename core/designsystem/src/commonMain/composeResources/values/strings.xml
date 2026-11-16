@@ -9,6 +9,7 @@
 	<!-- login -->
 	<string name="login_snackbar_cancel">Cancelled.</string>
 	<string name="login_snackbar_error">An error occurred.</string>
+	<string name="login_snackbar_no_credential">No Google sign-in information found. Check your device’s account settings.</string>
 	<string name="login_snackbar_network_error">Please check your network connection.</string>
 	<string name="login_snackbar_server_error">A server error occurred.</string>
 	<string name="login_text_logo_description">Build your daily study habit\nwith just one card</string>
@@ -168,13 +169,13 @@
 	<string name="setting_userinfo_nickname_change">Change Nickname</string>
 	<string name="setting_menu_terms_of_service">Terms of Service</string>
 	<string name="setting_menu_privacy_policy">Privacy Policy</string>
-	<string name="setting_menu_report_bug">Report a Bug</string>
+	<string name="setting_menu_report_bug">Contact Us and Report Bugs</string>
 	<string name="setting_menu_logout">Log Out</string>
 	<string name="setting_menu_delete_account">Delete Account</string>
 	<string name="setting_description_app_version">Current App Version: %1$s</string>
 	<string name="setting_privcay_policy_url">https://given-dragon.notion.site/38b870f222b980b9b0c6f471c4cf7930</string>
 	<string name="setting_terms_of_service_url">https://given-dragon.notion.site/38b870f222b980cfb51fdb9a3ca850c5</string>
-	<string name="setting_report_bug_url">https://forms.gle/NLTHq7x2j2zyiMos5</string>
+	<string name="setting_report_bug_url">https://docs.google.com/forms/d/e/1FAIpQLSeTkuyIor0qCRH1zFNTo2lgjGuvJS3kBbTzCeZLfVjsB2KMzg/viewform</string>
 	<string name="setting_snackbar_logout">Successfully logged out.</string>
 	<string name="setting_snackbar_delete_account">Account deleted successfully.</string>
 	<string name="setting_snackbar_delete_account_error">Failed to delete your account. Please try again.</string>
@@ -301,4 +302,44 @@
 	<string name="report_card_reviews_caption">Dates are study dates, and times use the device time zone when you studied.</string>
 	<string name="report_time_am">AM %1$d:%2$s</string>
 	<string name="report_time_pm">PM %1$d:%2$s</string>
+
+	<!-- Deck library -->
+	<string name="library_title">Deck Library</string>
+	<string name="library_home_description">Explore free decks</string>
+	<string name="library_preview_title">Deck Preview</string>
+	<string name="library_free">Free</string>
+	<string name="library_card_count">Cards: %1$s</string>
+	<string name="library_cards_preview">Cards</string>
+	<string name="library_add">Add to my decks</string>
+	<string name="library_adding">Adding…</string>
+	<string name="library_add_error_title">Couldn't add deck</string>
+	<string name="library_confirm">OK</string>
+	<string name="library_retry_body">Try again in a moment.</string>
+	<string name="library_retry">Try again</string>
+	<string name="library_empty_title">No decks yet</string>
+	<string name="library_empty_body">New decks will appear here when they're available.</string>
+	<string name="library_check_again">Check again</string>
+	<string name="library_load_error">Couldn't load decks</string>
+	<string name="library_preview_error">Couldn't load this deck</string>
+	<string name="library_refresh_error">Couldn't refresh. Showing your previous list.</string>
+	<string name="library_login_title">Sign in to continue</string>
+	<string name="library_login_body">Sign in to browse free decks.</string>
+	<string name="library_login">Sign in</string>
+	<string name="library_unavailable_title">This deck is unavailable</string>
+	<string name="library_unavailable_body">Choose another deck from the library.</string>
+	<string name="library_back_list">Back to library</string>
+	<string name="library_forbidden_title">Access restricted</string>
+	<string name="library_forbidden_body">This deck isn't available to your account.</string>
+	<string name="library_home">Home</string>
+	<string name="library_back">Back</string>
+	<string name="setting_notification_label">Notifications</string>
+	<string name="setting_notification_error">Could not change notification settings. Please try again.</string>
+	<string name="setting_notification_permission_title">Notification permission required</string>
+	<string name="setting_notification_permission_content">To receive notifications, allow notifications for Caro in your device settings.</string>
+	<string name="setting_notification_open_settings">App settings</string>
+	<string name="setting_notification_changing">Updating notification settings</string>
+	<string name="setting_menu_ad_privacy_options">Ad privacy options</string>
+	<string name="home_my_decks">My decks</string>
+	<string name="home_banner_page">Banner %1$d of %2$d</string>
+	<string name="home_banner_position">%1$d/%2$d</string>
 </resources>

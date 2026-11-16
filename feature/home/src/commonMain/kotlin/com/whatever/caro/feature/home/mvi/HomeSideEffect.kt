@@ -6,6 +6,12 @@ import com.whatever.caro.core.viewmodel.contract.UiSideEffect
 sealed interface HomeSideEffect : UiSideEffect {
     data object NavigateToSetting : HomeSideEffect
 
+    data object NavigateToLibrary : HomeSideEffect
+
+    data class NavigateToLibraryPreview(
+        val libraryDeckId: Long,
+    ) : HomeSideEffect
+
     data object NavigateToCreateDeck : HomeSideEffect
 
     data class NavigateToDailyLearning(

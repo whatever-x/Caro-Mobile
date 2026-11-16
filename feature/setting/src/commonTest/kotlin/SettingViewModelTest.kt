@@ -1,5 +1,8 @@
+import app.cash.turbine.ReceiveTurbine
 import app.cash.turbine.test
+import com.whatever.caro.core.ads.InterstitialAdController
 import com.whatever.caro.core.data.repository.auth.AuthRepository
+import com.whatever.caro.core.data.repository.fcm.FcmTokenRepository
 import com.whatever.caro.core.data.repository.profile.ProfileRepository
 import com.whatever.caro.core.model.auth.SocialLoginType
 import com.whatever.caro.core.model.profile.MyInfo
@@ -13,7 +16,9 @@ import com.whatever.caro.feature.setting.mvi.SettingState
 import dev.mokkery.answering.calls
 import dev.mokkery.answering.returns
 import dev.mokkery.answering.throws
+import dev.mokkery.every
 import dev.mokkery.everySuspend
+import dev.mokkery.matcher.any
 import dev.mokkery.mock
 import dev.mokkery.verify.VerifyMode.Companion.exactly
 import dev.mokkery.verifySuspend
@@ -22,7 +27,10 @@ import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runCurrent
@@ -34,6 +42,12 @@ private data class SettingFixture(
     val authRepository: AuthRepository,
     val profileRepository: ProfileRepository,
 )
+
+private fun fakeAdsController(required: MutableStateFlow<Boolean> = MutableStateFlow(false)) =
+    mock<InterstitialAdController> {
+        every { privacyOptionsRequired } returns required
+        everySuspend { showPrivacyOptions() } returns Unit
+    }
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class SettingViewModelTest : FunSpec() {
@@ -70,12 +84,398 @@ class SettingViewModelTest : FunSpec() {
                     authRepository = authRepository,
                     profileRepository = profileRepository,
                     exceptionFilter = exceptionFilter,
+                    adsController = fakeAdsController(),
+                    fcmTokenRepository =
+                        mock<FcmTokenRepository> {
+                            every { observeNotificationEnabled() } returns MutableStateFlow(false)
+                            every { updateNotificationPermission(any()) } returns Unit
+                        },
                 )
             return SettingFixture(
                 viewModel = viewModel,
                 authRepository = authRepository,
                 profileRepository = profileRepository,
             )
+        }
+
+        test("광고 개인정보 설정 표시 상태와 클릭을 ViewModel에서 처리한다") {
+            runTest {
+                val required = MutableStateFlow(false)
+                val ads = fakeAdsController(required)
+                val repository =
+                    mock<FcmTokenRepository> {
+                        every { observeNotificationEnabled() } returns MutableStateFlow(false)
+                    }
+                val viewModel = SettingViewModel(mock(), mock(), ExceptionFilter.None, repository, ads)
+                runCurrent()
+                viewModel.state.value.adPrivacyOptionsRequired shouldBe false
+                required.value = true
+                runCurrent()
+                viewModel.state.value.adPrivacyOptionsRequired shouldBe true
+
+                viewModel.intent(SettingIntent.ClickAdPrivacyOptions)
+                runCurrent()
+                verifySuspend(exactly(1)) { ads.showPrivacyOptions() }
+            }
+        }
+
+        test("알림 ON 중복 입력은 권한 요청 하나만 발생시키고 거절 시 OFF 안내를 표시한다") {
+            runTest {
+                val confirmed = MutableStateFlow(false)
+                val repository =
+                    mock<FcmTokenRepository> {
+                        every { observeNotificationEnabled() } returns confirmed
+                        every { updateNotificationPermission(any()) } returns Unit
+                    }
+                val viewModel = SettingViewModel(mock(), mock(), ExceptionFilter.None, repository, fakeAdsController())
+                viewModel.sideEffect.test {
+                    viewModel.intent(SettingIntent.ClickNotificationToggle)
+                    viewModel.intent(SettingIntent.ClickNotificationToggle)
+                    runCurrent()
+                    awaitItem() shouldBe SettingSideEffect.RequestNotificationPermission
+                    expectNoEvents()
+                    viewModel.state.value.isNotificationLoading shouldBe true
+                    viewModel.intent(SettingIntent.NotificationPermissionResult(false))
+                    runCurrent()
+                    viewModel.state.value.notificationEnabled shouldBe false
+                    viewModel.state.value.notificationPermissionDialogVisible shouldBe true
+                    viewModel.state.value.isNotificationLoading shouldBe false
+                }
+            }
+        }
+
+        test("알림 API 실패는 직전 상태와 재조작 가능 상태를 유지한다") {
+            runTest {
+                val repository =
+                    mock<FcmTokenRepository> {
+                        every { observeNotificationEnabled() } returns MutableStateFlow(true)
+                        everySuspend { setNotificationEnabled(false) } throws IllegalStateException("offline")
+                    }
+                val viewModel = SettingViewModel(mock(), mock(), ExceptionFilter.None, repository, fakeAdsController())
+                runCurrent()
+                viewModel.sideEffect.test {
+                    viewModel.intent(SettingIntent.ClickNotificationToggle)
+                    runCurrent()
+                    awaitItem() shouldBe SettingSideEffect.ShowSnackbar(SnackbarType.NOTIFICATION_CHANGE_ERROR)
+                    viewModel.state.value.notificationEnabled shouldBe true
+                    viewModel.state.value.isNotificationLoading shouldBe false
+                }
+            }
+        }
+
+        test("안내 취소 후 OS 권한 복귀만으로 알림을 켜지 않는다") {
+            runTest {
+                val repository =
+                    mock<FcmTokenRepository> {
+                        every { observeNotificationEnabled() } returns MutableStateFlow(false)
+                        every { updateNotificationPermission(any()) } returns Unit
+                    }
+                val viewModel = SettingViewModel(mock(), mock(), ExceptionFilter.None, repository, fakeAdsController())
+                viewModel.intent(SettingIntent.ClickNotificationToggle)
+                runCurrent()
+                viewModel.intent(SettingIntent.NotificationPermissionResult(false))
+                runCurrent()
+                viewModel.intent(SettingIntent.DismissNotificationPermissionDialog)
+                viewModel.intent(SettingIntent.NotificationPermissionRefreshed(true))
+                runCurrent()
+                viewModel.state.value.notificationPermissionDialogVisible shouldBe false
+                viewModel.state.value.notificationEnabled shouldBe false
+                verifySuspend(exactly(0)) { repository.setNotificationEnabled(any()) }
+            }
+        }
+
+        test("권한 요청이 취소되면 알림 로딩을 해제하고 다시 조작할 수 있다") {
+            runTest {
+                val repository =
+                    mock<FcmTokenRepository> {
+                        every { observeNotificationEnabled() } returns MutableStateFlow(false)
+                        every { updateNotificationPermission(any()) } returns Unit
+                    }
+                val viewModel = SettingViewModel(mock(), mock(), ExceptionFilter.None, repository, fakeAdsController())
+                viewModel.sideEffect.test {
+                    viewModel.intent(SettingIntent.ClickNotificationToggle)
+                    runCurrent()
+                    awaitItem() shouldBe SettingSideEffect.RequestNotificationPermission
+                    viewModel.intent(SettingIntent.DismissNotificationPermissionDialog)
+                    runCurrent()
+                    viewModel.state.value.isNotificationLoading shouldBe false
+                    viewModel.intent(SettingIntent.ClickNotificationToggle)
+                    runCurrent()
+                    awaitItem() shouldBe SettingSideEffect.RequestNotificationPermission
+                }
+            }
+        }
+
+        test("앱 설정에서 허용하고 복귀하면 대기한 ON을 한번만 처리한다") {
+            runTest {
+                val confirmed = MutableStateFlow(false)
+                val repository =
+                    mock<FcmTokenRepository> {
+                        every { observeNotificationEnabled() } returns confirmed
+                        every { updateNotificationPermission(any()) } returns Unit
+                        everySuspend { setNotificationEnabled(true) } calls { confirmed.value = true }
+                    }
+                val viewModel = SettingViewModel(mock(), mock(), ExceptionFilter.None, repository, fakeAdsController())
+                viewModel.intent(SettingIntent.ClickNotificationToggle)
+                runCurrent()
+                viewModel.intent(SettingIntent.NotificationPermissionResult(false))
+                runCurrent()
+                viewModel.intent(SettingIntent.OpenNotificationSettings)
+                runCurrent()
+                viewModel.intent(SettingIntent.NotificationPermissionRefreshed(true))
+                viewModel.intent(SettingIntent.NotificationPermissionRefreshed(true))
+                runCurrent()
+                viewModel.state.value.notificationEnabled shouldBe true
+                viewModel.state.value.isNotificationLoading shouldBe false
+                verifySuspend(exactly(1)) { repository.setNotificationEnabled(true) }
+            }
+        }
+
+        suspend fun ReceiveTurbine<SettingSideEffect>.startInquiry(
+            viewModel: SettingViewModel,
+            scope: TestScope,
+        ): Long {
+            viewModel.intent(SettingIntent.ClickReportBug)
+            scope.runCurrent()
+            return (awaitItem() as SettingSideEffect.OpenInquiry).requestId
+        }
+
+        test("URL 열기 완료보다 백그라운드와 복귀가 빠르면 완료 후 평가를 요청한다") {
+            runTest {
+                val (viewModel) = createViewModel()
+                viewModel.sideEffect.test {
+                    val requestId = startInquiry(viewModel, this@runTest)
+                    viewModel.intent(SettingIntent.AppBackgrounded)
+                    viewModel.intent(SettingIntent.AppResumed)
+                    viewModel.intent(SettingIntent.InquiryOpenResult(requestId, true))
+                    advanceUntilIdle()
+                    awaitItem() shouldBe SettingSideEffect.RequestStoreReview(requestId)
+                    expectNoEvents()
+                }
+            }
+        }
+
+        test("백그라운드 중 열기 성공은 복귀까지 평가를 기다린다") {
+            runTest {
+                val (viewModel) = createViewModel()
+                viewModel.sideEffect.test {
+                    val requestId = startInquiry(viewModel, this@runTest)
+                    viewModel.intent(SettingIntent.AppBackgrounded)
+                    viewModel.intent(SettingIntent.InquiryOpenResult(requestId, true))
+                    advanceUntilIdle()
+                    expectNoEvents()
+                    viewModel.intent(SettingIntent.AppResumed)
+                    advanceUntilIdle()
+                    awaitItem() shouldBe SettingSideEffect.RequestStoreReview(requestId)
+                }
+            }
+        }
+
+        test("열기 성공 뒤 첫 실제 복귀만 평가를 요청하고 중복 결과는 무시한다") {
+            runTest {
+                val (viewModel) = createViewModel()
+                viewModel.sideEffect.test {
+                    val requestId = startInquiry(viewModel, this@runTest)
+                    viewModel.intent(SettingIntent.InquiryOpenResult(requestId, true))
+                    viewModel.intent(SettingIntent.AppResumed)
+                    advanceUntilIdle()
+                    expectNoEvents()
+                    viewModel.intent(SettingIntent.AppBackgrounded)
+                    viewModel.intent(SettingIntent.AppResumed)
+                    advanceUntilIdle()
+                    awaitItem() shouldBe SettingSideEffect.RequestStoreReview(requestId)
+                    viewModel.intent(SettingIntent.InquiryOpenResult(requestId, true))
+                    viewModel.intent(SettingIntent.AppBackgrounded)
+                    viewModel.intent(SettingIntent.AppResumed)
+                    advanceUntilIdle()
+                    expectNoEvents()
+                }
+            }
+        }
+
+        test("성공 이후 중복 실패와 취소 결과는 확정된 열기를 되돌리지 않는다") {
+            runTest {
+                val (viewModel) = createViewModel()
+                viewModel.sideEffect.test {
+                    val requestId = startInquiry(viewModel, this@runTest)
+                    viewModel.intent(SettingIntent.InquiryOpenResult(requestId, true))
+                    viewModel.intent(SettingIntent.InquiryOpenResult(requestId, false))
+                    viewModel.intent(SettingIntent.InquiryOpenCancelled(requestId))
+                    viewModel.intent(SettingIntent.AppBackgrounded)
+                    viewModel.intent(SettingIntent.AppResumed)
+                    advanceUntilIdle()
+                    awaitItem() shouldBe SettingSideEffect.RequestStoreReview(requestId)
+                }
+            }
+        }
+
+        test("열기 성공 없이 복귀해도 평가를 요청하지 않는다") {
+            runTest {
+                val (viewModel) = createViewModel()
+                viewModel.sideEffect.test {
+                    startInquiry(viewModel, this@runTest)
+                    viewModel.intent(SettingIntent.AppBackgrounded)
+                    viewModel.intent(SettingIntent.AppResumed)
+                    advanceUntilIdle()
+                    expectNoEvents()
+                }
+            }
+        }
+
+        test("복귀 이후 실패한 URL 열기는 이후 복귀에도 평가를 요청하지 않는다") {
+            runTest {
+                val (viewModel) = createViewModel()
+                viewModel.sideEffect.test {
+                    val requestId = startInquiry(viewModel, this@runTest)
+                    viewModel.intent(SettingIntent.AppBackgrounded)
+                    viewModel.intent(SettingIntent.AppResumed)
+                    viewModel.intent(SettingIntent.InquiryOpenResult(requestId, false))
+                    viewModel.intent(SettingIntent.InquiryOpenResult(requestId, true))
+                    viewModel.intent(SettingIntent.AppBackgrounded)
+                    viewModel.intent(SettingIntent.AppResumed)
+                    advanceUntilIdle()
+                    expectNoEvents()
+                }
+            }
+        }
+
+        test("취소된 열기의 늦은 성공 결과는 평가를 만들지 않는다") {
+            runTest {
+                val (viewModel) = createViewModel()
+                viewModel.sideEffect.test {
+                    val requestId = startInquiry(viewModel, this@runTest)
+                    viewModel.intent(SettingIntent.InquiryOpenCancelled(requestId))
+                    viewModel.intent(SettingIntent.InquiryOpenResult(requestId, true))
+                    viewModel.intent(SettingIntent.AppBackgrounded)
+                    viewModel.intent(SettingIntent.AppResumed)
+                    advanceUntilIdle()
+                    expectNoEvents()
+                }
+            }
+        }
+
+        test("새 문의 이후 이전 요청의 성공 실패 취소는 새 문의를 바꾸지 않는다") {
+            runTest {
+                val (viewModel) = createViewModel()
+                viewModel.sideEffect.test {
+                    val previousId = startInquiry(viewModel, this@runTest)
+                    val requestId = startInquiry(viewModel, this@runTest)
+                    viewModel.intent(SettingIntent.InquiryOpenResult(previousId, true))
+                    viewModel.intent(SettingIntent.InquiryOpenResult(previousId, false))
+                    viewModel.intent(SettingIntent.InquiryOpenCancelled(previousId))
+                    viewModel.intent(SettingIntent.AppBackgrounded)
+                    viewModel.intent(SettingIntent.AppResumed)
+                    advanceUntilIdle()
+                    expectNoEvents()
+                    viewModel.intent(SettingIntent.InquiryOpenResult(requestId, true))
+                    advanceUntilIdle()
+                    awaitItem() shouldBe SettingSideEffect.RequestStoreReview(requestId)
+                }
+            }
+        }
+
+        test("설정 이탈은 열기 결과와 이미 발행된 평가 요청의 소유권을 무효화한다") {
+            runTest {
+                val (viewModel) = createViewModel()
+                viewModel.sideEffect.test {
+                    val requestId = startInquiry(viewModel, this@runTest)
+                    viewModel.intent(SettingIntent.InquiryOpenResult(requestId, true))
+                    viewModel.intent(SettingIntent.AppBackgrounded)
+                    viewModel.intent(SettingIntent.AppResumed)
+                    advanceUntilIdle()
+                    awaitItem() shouldBe SettingSideEffect.RequestStoreReview(requestId)
+                    viewModel.isCurrentInquiryRequest(requestId) shouldBe true
+                    viewModel.intent(SettingIntent.CancelPendingInquiry)
+                    viewModel.intent(SettingIntent.InquiryOpenResult(requestId, true))
+                    viewModel.intent(SettingIntent.AppBackgrounded)
+                    viewModel.intent(SettingIntent.AppResumed)
+                    advanceUntilIdle()
+                    viewModel.isCurrentInquiryRequest(requestId) shouldBe false
+                    expectNoEvents()
+                }
+            }
+        }
+
+        test("일반 복귀와 약관 복귀에는 평가를 요청하지 않는다") {
+            runTest {
+                val (viewModel) = createViewModel()
+                viewModel.sideEffect.test {
+                    viewModel.intent(SettingIntent.AppBackgrounded)
+                    viewModel.intent(SettingIntent.AppResumed)
+                    viewModel.intent(SettingIntent.ClickTermsOfService)
+                    advanceUntilIdle()
+                    awaitItem() shouldBe SettingSideEffect.NavigateWebView(WebViewType.TERMS_OF_SERVICE)
+                    viewModel.intent(SettingIntent.AppBackgrounded)
+                    viewModel.intent(SettingIntent.AppResumed)
+                    advanceUntilIdle()
+                    expectNoEvents()
+                }
+            }
+        }
+
+        test("새 문의 복귀는 공용 평가 요청기에 다시 위임할 수 있다") {
+            runTest {
+                val (viewModel) = createViewModel()
+                viewModel.sideEffect.test {
+                    repeat(2) {
+                        val requestId = startInquiry(viewModel, this@runTest)
+                        viewModel.intent(SettingIntent.InquiryOpenResult(requestId, true))
+                        viewModel.intent(SettingIntent.AppBackgrounded)
+                        viewModel.intent(SettingIntent.AppResumed)
+                        advanceUntilIdle()
+                        awaitItem() shouldBe SettingSideEffect.RequestStoreReview(requestId)
+                        expectNoEvents()
+                    }
+                }
+            }
+        }
+
+        test("30일 경과와 일반 복귀는 요청을 만들지 않고 새 문의 후 복귀가 필요하다") {
+            runTest {
+                val (viewModel) = createViewModel()
+                viewModel.sideEffect.test {
+                    val firstId = startInquiry(viewModel, this@runTest)
+                    viewModel.intent(SettingIntent.InquiryOpenResult(firstId, true))
+                    viewModel.intent(SettingIntent.AppBackgrounded)
+                    viewModel.intent(SettingIntent.AppResumed)
+                    runCurrent()
+                    awaitItem() shouldBe SettingSideEffect.RequestStoreReview(firstId)
+
+                    advanceTimeBy(2_592_000_000L)
+                    runCurrent()
+                    expectNoEvents()
+                    viewModel.intent(SettingIntent.AppBackgrounded)
+                    viewModel.intent(SettingIntent.AppResumed)
+                    runCurrent()
+                    expectNoEvents()
+
+                    val nextId = startInquiry(viewModel, this@runTest)
+                    viewModel.intent(SettingIntent.InquiryOpenResult(nextId, true))
+                    viewModel.intent(SettingIntent.AppBackgrounded)
+                    viewModel.intent(SettingIntent.AppResumed)
+                    runCurrent()
+                    awaitItem() shouldBe SettingSideEffect.RequestStoreReview(nextId)
+                    expectNoEvents()
+                }
+            }
+        }
+
+        test("새 ViewModel은 이전 문의의 대기를 복원하지 않는다") {
+            runTest {
+                val (previous) = createViewModel()
+                previous.sideEffect.test {
+                    val requestId = startInquiry(previous, this@runTest)
+                    previous.intent(SettingIntent.InquiryOpenResult(requestId, true))
+                    previous.intent(SettingIntent.AppBackgrounded)
+                    advanceUntilIdle()
+                }
+                val (recreated) = createViewModel()
+                recreated.sideEffect.test {
+                    recreated.intent(SettingIntent.AppResumed)
+                    advanceUntilIdle()
+                    expectNoEvents()
+                }
+            }
         }
 
         test("Initialize는 현재 사용자 정보를 상태에 반영한다") {
@@ -319,7 +719,7 @@ class SettingViewModelTest : FunSpec() {
             }
         }
 
-        test("ClickReportBug 은 REPORT_BUG 웹뷰로 이동한다") {
+        test("ClickReportBug 은 식별자가 있는 URL 열기를 요청한다") {
             runTest {
                 val (viewModel, _) = createViewModel()
 
@@ -328,7 +728,7 @@ class SettingViewModelTest : FunSpec() {
                     advanceUntilIdle()
 
                     awaitItem() shouldBe
-                        SettingSideEffect.NavigateWebView(type = WebViewType.REPORT_BUG)
+                        SettingSideEffect.OpenInquiry(requestId = 1L)
                 }
             }
         }

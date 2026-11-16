@@ -13,6 +13,7 @@ class MyInfoMapperTest : FunSpec() {
                 nickname = "캐로",
                 email = "caro@example.com",
                 loginPlatform = SocialLoginType.GOOGLE,
+                isAdult = null,
             ).toMyInfo() shouldBe
                 MyInfo(
                     nickname = "캐로",
@@ -26,6 +27,7 @@ class MyInfoMapperTest : FunSpec() {
                 nickname = null,
                 email = null,
                 loginPlatform = null,
+                isAdult = null,
             ).toMyInfo() shouldBe
                 MyInfo(
                     nickname = "",
@@ -34,11 +36,23 @@ class MyInfoMapperTest : FunSpec() {
                 )
         }
 
+        test("성인 여부를 미확인, 미성년, 성인 상태 그대로 전달한다") {
+            listOf(null, false, true).forEach { adult ->
+                MyInfoResponse(
+                    nickname = null,
+                    email = null,
+                    loginPlatform = null,
+                    isAdult = adult,
+                ).toMyInfo().isAdult shouldBe adult
+            }
+        }
+
         test("toMyNickname은 응답의 nickname을 반환한다") {
             MyInfoResponse(
                 nickname = "캐로",
                 email = "caro@example.com",
                 loginPlatform = null,
+                isAdult = null,
             ).toMyNickname() shouldBe "캐로"
         }
 
@@ -47,6 +61,7 @@ class MyInfoMapperTest : FunSpec() {
                 nickname = null,
                 email = null,
                 loginPlatform = null,
+                isAdult = null,
             ).toMyNickname() shouldBe ""
         }
     }

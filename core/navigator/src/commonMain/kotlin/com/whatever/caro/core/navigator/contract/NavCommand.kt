@@ -15,5 +15,6 @@ sealed interface NavCommand {
 
     data class ResetTo(
         val key: NavKey,
+        val expiredSessionGeneration: Long? = null,
     ) : NavCommand
 }

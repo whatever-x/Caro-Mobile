@@ -1,10 +1,13 @@
 [versions]
+google-mobile-ads = "1.6.0"
+google-ump = "4.0.0"
 agp = "9.0.0"
 android-compileSdk = "36"
 android-minSdk = "28"
 android-targetSdk = "36"
-version-code = "10001001" # major(1), minor(2), patch(2), build(3)
-version-name = "1.0.1" # major(1), minor(1), patch(1)
+version-code = "10003001" # major(1), minor(2), patch(2), build(3)
+qa-version-code = "10100003" # QA 앱의 기존 배포 순서 유지
+version-name = "1.0.3" # major(1), minor(1), patch(1)
 
 # Multiplatform
 compose-multiplatform = "1.11.0"
@@ -94,6 +97,8 @@ stability-analyzer = "0.7.2"
 google-id = "1.2.0"
 
 [libraries]
+google-mobile-ads = { module = "com.google.android.libraries.ads.mobile.sdk:ads-mobile-sdk", version.ref = "google-mobile-ads" }
+google-ump = { module = "com.google.android.ump:user-messaging-platform", version.ref = "google-ump" }
 # androidX
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "androidx-core-ktx" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "androidx-appcompat" }
@@ -251,7 +256,7 @@ firebase-crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "
 
 # Test
 mokkery = { id = "dev.mokkery", version.ref = "mokkery" }
-spotless = { id = "com.diffplug.gradle.spotless", version.ref = "spotless" }
+spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
 kotest = { id = "io.kotest", version.ref = "kotest" }
 kover = { id = "org.jetbrains.kotlinx.kover", version.ref = "kover" }
 

@@ -19,6 +19,7 @@ import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.plugins.logging.SIMPLE
 import io.ktor.http.ContentType
+import io.ktor.http.HttpMethod
 import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
@@ -27,6 +28,8 @@ object HttpClientFactory {
     private const val CLIENT_TIMEZONE_HEADER = "Client-Timezone"
     private const val ACCEPT_LANGUAGE_HEADER = "Accept-Language"
     private const val CLIENT_DEVICE_ID_HEADER = "Device-Id"
+    private const val NOTIFICATION_DEVICE_PATH = "/notifications/devices"
+    private const val COMPLETE_REGISTRATION_PATH = "/auth/complete-registration"
 
     fun createCaroClient(
         engine: HttpClientEngine,
@@ -63,6 +66,11 @@ object HttpClientFactory {
             install(Logging) {
                 logger = Logger.SIMPLE
                 level = if (CaroNetworkConfig.isDebug) LogLevel.ALL else LogLevel.NONE
+                // Device tokens and birth dates must not appear in debug logs.
+                filter {
+                    val path = it.url.build().encodedPath
+                    !path.endsWith(NOTIFICATION_DEVICE_PATH) && !path.endsWith(COMPLETE_REGISTRATION_PATH)
+                }
             }
 
             install(HttpCallValidator) {
@@ -72,6 +80,12 @@ object HttpClientFactory {
             if (authTokenProvider != null) {
                 install(AuthInterceptorPlugin) {
                     tokenProvider = authTokenProvider
+                    // Registration failures stay on the form until the user chooses to sign in again.
+                    refreshOnUnauthorized = {
+                        val path = it.url.build().encodedPath
+                        !(it.method == HttpMethod.Put && path.endsWith(NOTIFICATION_DEVICE_PATH)) &&
+                            !(it.method == HttpMethod.Post && path.endsWith(COMPLETE_REGISTRATION_PATH))
+                    }
                 }
             }
 
