@@ -11,6 +11,8 @@ sealed interface DeckDetailIntent : UiIntent {
 
     data object ClickDailyStudy : DeckDetailIntent
 
+    data object ClickLearningReport : DeckDetailIntent
+
     data object ClickSortCardList : DeckDetailIntent
 
     data object DismissSortBottomSheet : DeckDetailIntent

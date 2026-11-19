@@ -1,6 +1,7 @@
 package com.whatever.caro.composeApp.di
 
 import com.whatever.caro.core.navigator.entries.CardDetailEntry
+import com.whatever.caro.core.navigator.entries.CardReviewHistoryEntry
 import com.whatever.caro.core.navigator.entries.CreateCardEntry
 import com.whatever.caro.core.navigator.entries.CreateDeckEntry
 import com.whatever.caro.core.navigator.entries.CreateProfileEntry
@@ -11,6 +12,8 @@ import com.whatever.caro.core.navigator.entries.EditDeckEntry
 import com.whatever.caro.core.navigator.entries.EditProfileEntry
 import com.whatever.caro.core.navigator.entries.HomeEntry
 import com.whatever.caro.core.navigator.entries.LearningEntry
+import com.whatever.caro.core.navigator.entries.LearningHistoryEntry
+import com.whatever.caro.core.navigator.entries.LearningReportEntry
 import com.whatever.caro.core.navigator.entries.LibraryEntry
 import com.whatever.caro.core.navigator.entries.LibraryPreviewEntry
 import com.whatever.caro.core.navigator.entries.LoginEntry
@@ -34,6 +37,12 @@ import com.whatever.caro.feature.home.library.route.LibraryPreviewRoute
 import com.whatever.caro.feature.home.library.route.LibraryRoute
 import com.whatever.caro.feature.home.route.HomeRoute
 import com.whatever.caro.feature.learning.LearningViewModel
+import com.whatever.caro.feature.learning.report.LearningReportViewModel
+import com.whatever.caro.feature.learning.report.card.CardReviewHistoryViewModel
+import com.whatever.caro.feature.learning.report.card.route.CardReviewHistoryRoute
+import com.whatever.caro.feature.learning.report.history.LearningHistoryViewModel
+import com.whatever.caro.feature.learning.report.history.route.LearningHistoryRoute
+import com.whatever.caro.feature.learning.report.route.LearningReportRoute
 import com.whatever.caro.feature.learning.route.LearningRoute
 import com.whatever.caro.feature.login.LoginRoute
 import com.whatever.caro.feature.profile.create.CreateProfileRoute
@@ -191,6 +200,43 @@ val navEntryModule: Module =
                         parametersOf(
                             navKey.deckId,
                             navKey.mode,
+                        )
+                    },
+                navDispatcher = get(),
+            )
+        }
+
+        navigation<LearningReportEntry> { navKey ->
+            LearningReportRoute(
+                viewModel = koinViewModel<LearningReportViewModel> { parametersOf(navKey.deckId) },
+                navDispatcher = get(),
+            )
+        }
+
+        navigation<LearningHistoryEntry> { navKey ->
+            LearningHistoryRoute(
+                viewModel =
+                    koinViewModel<LearningHistoryViewModel> {
+                        parametersOf(
+                            navKey.deckId,
+                            navKey.deckName,
+                            navKey.startDate,
+                            navKey.endDate,
+                        )
+                    },
+                navDispatcher = get(),
+            )
+        }
+
+        navigation<CardReviewHistoryEntry> { navKey ->
+            CardReviewHistoryRoute(
+                viewModel =
+                    koinViewModel<CardReviewHistoryViewModel> {
+                        parametersOf(
+                            navKey.deckId,
+                            navKey.cardId,
+                            navKey.startDate,
+                            navKey.endDate,
                         )
                     },
                 navDispatcher = get(),

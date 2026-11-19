@@ -60,6 +60,10 @@ class HomeViewModel(
                 initialize()
             }
 
+            HomeIntent.ClickLearningReport -> {
+                postSideEffect(HomeSideEffect.NavigateToLearningReport)
+            }
+
             is HomeIntent.ClickStartLearning -> {
                 postSideEffect(HomeSideEffect.NavigateToDailyLearning(deckId = intent.deckId))
             }

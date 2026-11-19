@@ -22,6 +22,7 @@ import com.whatever.caro.core.navigator.entries.EditCardEntry
 import com.whatever.caro.core.navigator.entries.EditDeckEntry
 import com.whatever.caro.core.navigator.entries.HomeEntry
 import com.whatever.caro.core.navigator.entries.LearningEntry
+import com.whatever.caro.core.navigator.entries.LearningReportEntry
 import com.whatever.caro.core.ui.snackbar.SnackBarMessage
 import com.whatever.caro.core.ui.snackbar.SnackbarController
 import com.whatever.caro.feature.deck.detail.DeckDetailScreen
@@ -64,6 +65,10 @@ fun DeckDetailRoute(
                             ),
                         ),
                     )
+                }
+
+                is DeckDetailSideEffect.NavigateToLearningReport -> {
+                    navDispatcher.emit(NavCommand.To(LearningReportEntry(deckId = sideEffect.deckId)))
                 }
 
                 is DeckDetailSideEffect.NavigateToLearning -> {

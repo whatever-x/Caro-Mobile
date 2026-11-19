@@ -51,6 +51,7 @@ internal fun DeckDetailScreen(
                 title = state.deck.title,
                 isLoading = state.isCardListLoading,
                 onBack = { onIntent(DeckDetailIntent.ClickBack) },
+                onLearningReport = { onIntent(DeckDetailIntent.ClickLearningReport) },
                 onEditDeck = { onIntent(DeckDetailIntent.ClickEditDeck) },
             )
 

@@ -21,13 +21,22 @@ internal fun com.whatever.caro.feature.deck.detail.components.DeckDetailGuid(onA
     - modifier: STABLE (marked @Stable or @Immutable)
 
 @Composable
-internal fun com.whatever.caro.feature.deck.detail.components.DeckDetailTopBar(title: kotlin.String, isLoading: kotlin.Boolean, onBack: kotlin.Function0<kotlin.Unit>, onEditDeck: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+internal fun com.whatever.caro.feature.deck.detail.components.DeckDetailLoadError(onRetry: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - onRetry: STABLE (function type)
+    - modifier: STABLE (marked @Stable or @Immutable)
+
+@Composable
+internal fun com.whatever.caro.feature.deck.detail.components.DeckDetailTopBar(title: kotlin.String, isLoading: kotlin.Boolean, onBack: kotlin.Function0<kotlin.Unit>, onLearningReport: kotlin.Function0<kotlin.Unit>, onEditDeck: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
   skippable: true
   restartable: true
   params:
     - title: STABLE (String is immutable)
     - isLoading: STABLE (primitive type)
     - onBack: STABLE (function type)
+    - onLearningReport: STABLE (function type)
     - onEditDeck: STABLE (function type)
     - modifier: STABLE (marked @Stable or @Immutable)
 
@@ -112,6 +121,14 @@ internal fun com.whatever.caro.feature.deck.detail.components.lazycolumn.DeckCar
   params:
     - card: STABLE (marked @Stable or @Immutable)
     - onClick: STABLE (function type)
+    - modifier: STABLE (marked @Stable or @Immutable)
+
+@Composable
+internal fun com.whatever.caro.feature.deck.detail.components.lazycolumn.DeckDescription(description: kotlin.String, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - description: STABLE (String is immutable)
     - modifier: STABLE (marked @Stable or @Immutable)
 
 @Composable

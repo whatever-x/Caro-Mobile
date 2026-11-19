@@ -20,6 +20,8 @@ import com.whatever.caro.core.remote.datasource.streak.RemoteStreakDataSourceImp
 import com.whatever.caro.core.remote.datasource.streak.StreakDataSource
 import com.whatever.caro.core.remote.datasource.study.RemoteStudySessionDataSourceImpl
 import com.whatever.caro.core.remote.datasource.study.StudySessionDataSource
+import com.whatever.caro.core.remote.datasource.studyReport.RemoteStudyReportDataSourceImpl
+import com.whatever.caro.core.remote.datasource.studyReport.StudyReportDataSource
 import com.whatever.caro.core.remote.di.qualifier.NetworkClient
 import org.koin.core.qualifier.named
 import org.koin.dsl.bind
@@ -48,5 +50,6 @@ val remoteModule =
         single<RemoteDeckDataSourceImpl>() bind DeckDataSource::class
         single<RemoteStreakDataSourceImpl>() bind StreakDataSource::class
         single<RemoteStudySessionDataSourceImpl>() bind StudySessionDataSource::class
+        single<RemoteStudyReportDataSourceImpl>() bind StudyReportDataSource::class
         single<RemoteNotificationDataSourceImpl>() bind NotificationDataSource::class
     }

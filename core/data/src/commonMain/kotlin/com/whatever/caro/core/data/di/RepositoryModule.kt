@@ -18,6 +18,8 @@ import com.whatever.caro.core.data.repository.library.LibraryRepository
 import com.whatever.caro.core.data.repository.library.LibraryRepositoryImpl
 import com.whatever.caro.core.data.repository.profile.ProfileRepository
 import com.whatever.caro.core.data.repository.profile.ProfileRepositoryImpl
+import com.whatever.caro.core.data.repository.report.StudyReportRepository
+import com.whatever.caro.core.data.repository.report.StudyReportRepositoryImpl
 import com.whatever.caro.core.data.repository.review.ReviewRequestRepository
 import com.whatever.caro.core.data.repository.review.ReviewRequestRepositoryImpl
 import com.whatever.caro.core.data.repository.streak.StreakRepository
@@ -42,5 +44,6 @@ val repositoryModule =
         single<DeckRepositoryImpl>() bind DeckRepository::class
         single<StreakRepositoryImpl>() bind StreakRepository::class
         single<StudySessionRepositoryImpl>() bind StudySessionRepository::class
+        single<StudyReportRepositoryImpl>() bind StudyReportRepository::class
         single<ReviewRequestRepositoryImpl>() bind ReviewRequestRepository::class
     }
