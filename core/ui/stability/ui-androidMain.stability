@@ -96,6 +96,22 @@ public fun com.whatever.caro.core.ui.loading.CaroLoadingOverlayBox(isLoading: ko
     - content: STABLE (composable function type)
 
 @Composable
+private fun com.whatever.caro.core.ui.loading.LoadingInteractionBlocker(): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+
+@Composable
+internal fun com.whatever.caro.core.ui.modifier.SwipeFeedbackEffect(state: com.whatever.caro.core.ui.swipe.SwipeGestureState, motionConfig: com.whatever.caro.core.ui.swipe.SwipeGestureConfig, hapticFeedback: androidx.compose.ui.hapticfeedback.HapticFeedback, onSwipeDirectionChanged: kotlin.Function1<com.whatever.caro.core.ui.swipe.SwipeDirection?, kotlin.Unit>): kotlin.Unit
+  skippable: false
+  restartable: true
+  params:
+    - state: STABLE (marked @Stable or @Immutable)
+    - motionConfig: STABLE (marked @Stable or @Immutable)
+    - hapticFeedback: RUNTIME (requires runtime check)
+    - onSwipeDirectionChanged: STABLE (function type)
+
+@Composable
 public fun com.whatever.caro.core.ui.swipe.rememberSwipeGestureState(): com.whatever.caro.core.ui.swipe.SwipeGestureState
   skippable: true
   restartable: true

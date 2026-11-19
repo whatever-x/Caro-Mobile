@@ -29,6 +29,7 @@ object HttpClientFactory {
     private const val ACCEPT_LANGUAGE_HEADER = "Accept-Language"
     private const val CLIENT_DEVICE_ID_HEADER = "Device-Id"
     private const val NOTIFICATION_DEVICE_PATH = "/notifications/devices"
+    private const val COMPLETE_REGISTRATION_PATH = "/auth/complete-registration"
 
     fun createCaroClient(
         engine: HttpClientEngine,
@@ -65,12 +66,10 @@ object HttpClientFactory {
             install(Logging) {
                 logger = Logger.SIMPLE
                 level = if (CaroNetworkConfig.isDebug) LogLevel.ALL else LogLevel.NONE
-                // Device tokens must not appear in request bodies or query logs.
+                // Device tokens and birth dates must not appear in debug logs.
                 filter {
-                    !it.url
-                        .build()
-                        .encodedPath
-                        .endsWith(NOTIFICATION_DEVICE_PATH)
+                    val path = it.url.build().encodedPath
+                    !path.endsWith(NOTIFICATION_DEVICE_PATH) && !path.endsWith(COMPLETE_REGISTRATION_PATH)
                 }
             }
 
@@ -81,13 +80,11 @@ object HttpClientFactory {
             if (authTokenProvider != null) {
                 install(AuthInterceptorPlugin) {
                     tokenProvider = authTokenProvider
-                    // Background token synchronization must not expire the user's session.
+                    // Registration failures stay on the form until the user chooses to sign in again.
                     refreshOnUnauthorized = {
-                        it.method != HttpMethod.Put ||
-                            !it.url
-                                .build()
-                                .encodedPath
-                                .endsWith(NOTIFICATION_DEVICE_PATH)
+                        val path = it.url.build().encodedPath
+                        !(it.method == HttpMethod.Put && path.endsWith(NOTIFICATION_DEVICE_PATH)) &&
+                            !(it.method == HttpMethod.Post && path.endsWith(COMPLETE_REGISTRATION_PATH))
                     }
                 }
             }

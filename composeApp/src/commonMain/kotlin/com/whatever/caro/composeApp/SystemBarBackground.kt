@@ -15,7 +15,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.navigation3.runtime.NavKey
 import com.whatever.caro.core.designsystem.themes.CaroTheme
+import com.whatever.caro.core.navigator.entries.DeckDetailEntry
 import com.whatever.caro.core.navigator.entries.HomeEntry
+import com.whatever.caro.core.navigator.entries.LibraryEntry
+import com.whatever.caro.core.navigator.entries.LibraryPreviewEntry
 import com.whatever.caro.core.navigator.entries.LoginEntry
 import com.whatever.caro.core.navigator.entries.SplashEntry
 
@@ -38,7 +41,7 @@ internal fun systemBarBackgroundRoles(destination: NavKey?): SystemBarBackground
             )
         }
 
-        HomeEntry -> {
+        HomeEntry, LibraryEntry, is LibraryPreviewEntry, is DeckDetailEntry -> {
             SystemBarBackgroundRoles(
                 statusBar = SystemBarBackgroundRole.Brand,
                 navigationBar = SystemBarBackgroundRole.Primary,

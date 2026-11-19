@@ -42,6 +42,7 @@ import caromobile.core.designsystem.generated.resources.ic_logo_google_small
 import caromobile.core.designsystem.generated.resources.ic_tool_24
 import caromobile.core.designsystem.generated.resources.ic_x_circle_24
 import caromobile.core.designsystem.generated.resources.setting_description_app_version
+import caromobile.core.designsystem.generated.resources.setting_menu_ad_privacy_options
 import caromobile.core.designsystem.generated.resources.setting_menu_delete_account
 import caromobile.core.designsystem.generated.resources.setting_menu_logout
 import caromobile.core.designsystem.generated.resources.setting_menu_privacy_policy
@@ -106,6 +107,7 @@ private val secondMenu =
 internal fun SettingScreen(
     state: SettingState,
     appVersion: String,
+    showAdPrivacyOptions: Boolean = false,
     onIntent: (SettingIntent) -> Unit,
 ) {
     val onEnabledIntent: (SettingIntent) -> Unit = { intent ->
@@ -164,7 +166,20 @@ internal fun SettingScreen(
                 Spacer(modifier = Modifier.size(size = CaroTheme.spacing.s))
                 MenuSection(
                     modifier = Modifier.fillMaxWidth(),
-                    items = firstMenu,
+                    items =
+                        if (showAdPrivacyOptions) {
+                            firstMenu
+                                .add(
+                                    4,
+                                    SettingMenu.Menu(
+                                        content = Res.string.setting_menu_ad_privacy_options,
+                                        leadingIcon = Res.drawable.ic_lock_24,
+                                        action = SettingIntent.ClickAdPrivacyOptions,
+                                    ),
+                                ).add(5, SettingMenu.Divider)
+                        } else {
+                            firstMenu
+                        },
                     onClickMenu = onEnabledIntent,
                 )
                 Spacer(modifier = Modifier.size(size = CaroTheme.spacing.s))

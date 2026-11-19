@@ -23,5 +23,13 @@ sealed interface SettingSideEffect : UiSideEffect {
         val type: SnackbarType,
     ) : SettingSideEffect
 
+    data class OpenInquiry(
+        val requestId: Long,
+    ) : SettingSideEffect
+
+    data class RequestStoreReview(
+        val requestId: Long,
+    ) : SettingSideEffect
+
     data object PopBackStack : SettingSideEffect
 }

@@ -1,5 +1,6 @@
 package com.whatever.caro.feature.setting
 
+import com.whatever.caro.core.ads.InterstitialAdController
 import com.whatever.caro.core.data.repository.auth.AuthRepository
 import com.whatever.caro.core.data.repository.fcm.FcmTokenRepository
 import com.whatever.caro.core.data.repository.profile.ProfileRepository
@@ -18,15 +19,24 @@ class SettingViewModel(
     private val profileRepository: ProfileRepository,
     exceptionFilter: ExceptionFilter,
     private val fcmTokenRepository: FcmTokenRepository,
+    private val adsController: InterstitialAdController,
 ) : BaseViewModel<SettingState, SettingIntent, SettingSideEffect>(
         initialState = SettingState(),
         exceptionFilter = exceptionFilter,
     ) {
+    private var inquiryRequestId = 0L
+    private var pendingInquiry: PendingInquiry? = null
+    private var isAppForeground = true
     private var initializeGeneration = 0L
     private var pendingNotificationOn = false
     private var waitingForNotificationSettings = false
 
     init {
+        launch {
+            adsController.privacyOptionsRequired.collect { required ->
+                reduce { copy(adPrivacyOptionsRequired = required) }
+            }
+        }
         launch {
             suspendRunCatching {
                 fcmTokenRepository.observeNotificationEnabled().collect { enabled ->
@@ -38,6 +48,33 @@ class SettingViewModel(
 
     override suspend fun handleIntent(intent: SettingIntent) {
         when (intent) {
+            is SettingIntent.InquiryOpenResult -> {
+                val pending = pendingInquiry?.takeIf { it.requestId == intent.requestId } ?: return
+                if (pending.opened) return
+                pendingInquiry = if (intent.opened) pending.copy(opened = true) else null
+                requestReviewAfterReturn()
+            }
+
+            is SettingIntent.InquiryOpenCancelled -> {
+                val pending = pendingInquiry
+                if (pending?.requestId == intent.requestId && !pending.opened) pendingInquiry = null
+            }
+
+            SettingIntent.CancelPendingInquiry -> {
+                inquiryRequestId++
+                pendingInquiry = null
+            }
+
+            SettingIntent.AppBackgrounded -> {
+                isAppForeground = false
+                pendingInquiry = pendingInquiry?.copy(backgrounded = true)
+            }
+
+            SettingIntent.AppResumed -> {
+                isAppForeground = true
+                requestReviewAfterReturn()
+            }
+
             SettingIntent.ClickNotificationToggle -> {
                 if (currentState.isNotificationLoading || currentState.isDeletingAccount) return
                 reduce { copy(isNotificationLoading = true) }
@@ -101,6 +138,10 @@ class SettingViewModel(
                 )
             }
 
+            SettingIntent.ClickAdPrivacyOptions -> {
+                adsController.showPrivacyOptions()
+            }
+
             SettingIntent.ClickPrivacyPolicy -> {
                 postSideEffect(
                     SettingSideEffect.NavigateWebView(
@@ -110,7 +151,9 @@ class SettingViewModel(
             }
 
             SettingIntent.ClickReportBug -> {
-                postSideEffect(SettingSideEffect.NavigateWebView(type = WebViewType.REPORT_BUG))
+                val requestId = ++inquiryRequestId
+                pendingInquiry = PendingInquiry(requestId)
+                postSideEffect(SettingSideEffect.OpenInquiry(requestId))
             }
 
             SettingIntent.ClickTermsOfService -> {
@@ -155,6 +198,16 @@ class SettingViewModel(
 
     private fun notificationError() {
         postSideEffect(SettingSideEffect.ShowSnackbar(SnackbarType.NOTIFICATION_CHANGE_ERROR))
+    }
+
+    internal fun isCurrentInquiryRequest(requestId: Long): Boolean = inquiryRequestId == requestId
+
+    private fun requestReviewAfterReturn() {
+        val pending = pendingInquiry ?: return
+        if (pending.opened && pending.backgrounded && isAppForeground) {
+            pendingInquiry = null
+            postSideEffect(SettingSideEffect.RequestStoreReview(pending.requestId))
+        }
     }
 
     private suspend fun initialize() {
@@ -212,3 +265,9 @@ class SettingViewModel(
         }
     }
 }
+
+private data class PendingInquiry(
+    val requestId: Long,
+    val opened: Boolean = false,
+    val backgrounded: Boolean = false,
+)

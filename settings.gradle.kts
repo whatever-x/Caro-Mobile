@@ -8,6 +8,7 @@ pluginManagement {
                 includeGroupAndSubgroups("androidx")
                 includeGroupAndSubgroups("com.android")
                 includeGroupAndSubgroups("com.google")
+                includeGroupAndSubgroups("org.chromium.net")
             }
         }
         mavenCentral()
@@ -22,6 +23,7 @@ dependencyResolutionManagement {
                 includeGroupAndSubgroups("androidx")
                 includeGroupAndSubgroups("com.android")
                 includeGroupAndSubgroups("com.google")
+                includeGroupAndSubgroups("org.chromium.net")
             }
         }
         mavenCentral()
@@ -36,6 +38,8 @@ rootProject.name = "CaroMobile"
 
 include(":androidApp")
 include(":composeApp")
+include(":benchmark-target")
+include(":benchmark")
 
 // :Core
 include(":core:data")
@@ -47,9 +51,12 @@ include(":core:viewmodel")
 include(":core:remote")
 include(":core:datastore")
 include(":core:analytics")
+include(":core:ads")
 include(":core:crashlytics")
 include(":core:messaging")
 include(":core:util")
+include(":core:inapp-review")
+include(":core:screenshot-testing")
 
 // :Feature
 include(":feature:home")

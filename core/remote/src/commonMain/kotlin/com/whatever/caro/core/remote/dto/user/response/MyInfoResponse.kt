@@ -12,4 +12,5 @@ data class MyInfoResponse(
     val email: String?,
     /** 유저가 가입한 로그인 플랫폼 */
     val loginPlatform: SocialLoginType?,
+    val isAdult: Boolean?,
 )

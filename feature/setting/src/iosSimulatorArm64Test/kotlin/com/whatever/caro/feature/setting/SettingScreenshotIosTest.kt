@@ -1,36 +1,9 @@
 package com.whatever.caro.feature.setting
 
-import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.test.ExperimentalTestApi
-import androidx.compose.ui.test.onRoot
-import androidx.compose.ui.test.v2.runSkikoComposeUiTest
-import com.github.takahirom.roborazzi.ExperimentalRoborazziApi
-import io.github.takahirom.roborazzi.captureRoboImage
-import platform.Foundation.NSUserDefaults
+import com.whatever.caro.core.screenshot.testing.captureIosScreenshots
 import kotlin.test.Test
 
 class SettingScreenshotIosTest {
-    @OptIn(ExperimentalTestApi::class, ExperimentalRoborazziApi::class)
     @Test
-    fun initial() {
-        val defaults = NSUserDefaults.standardUserDefaults
-        val previousLanguages = defaults.objectForKey("AppleLanguages")
-        defaults.setObject(listOf(SettingScreenshotScenario.LOCALE), forKey = "AppleLanguages")
-
-        try {
-            runSkikoComposeUiTest(
-                size = Size(SettingScreenshotScenario.WIDTH_DP.toFloat(), SettingScreenshotScenario.HEIGHT_DP.toFloat()),
-            ) {
-                setContent { SettingScreenshotScenario.Render() }
-                waitForIdle()
-                onRoot().captureRoboImage(this, filePath = SettingScreenshotScenario.FILE_NAME)
-            }
-        } finally {
-            if (previousLanguages == null) {
-                defaults.removeObjectForKey("AppleLanguages")
-            } else {
-                defaults.setObject(previousLanguages, forKey = "AppleLanguages")
-            }
-        }
-    }
+    fun `모든 시나리오의 한국어와 영어 스크린샷을 캡처한다`() = captureIosScreenshots(SettingScreenshotScenario::scenarios)
 }

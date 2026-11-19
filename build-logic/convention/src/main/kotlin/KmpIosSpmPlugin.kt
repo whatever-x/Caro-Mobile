@@ -40,6 +40,16 @@ class KmpIosSpmPlugin : Plugin<Project> {
                                     add("GoogleSignIn")
                                 },
                             )
+                            remotePackageVersion(
+                                url = URI("https://github.com/googleads/swift-package-manager-google-mobile-ads.git"),
+                                version = "13.11.0",
+                                products = { add("GoogleMobileAds") },
+                            )
+                            remotePackageVersion(
+                                url = URI("https://github.com/googleads/swift-package-manager-google-user-messaging-platform.git"),
+                                version = "3.1.0",
+                                products = { add("GoogleUserMessagingPlatform") },
+                            )
                         }
 
                         exportedPackageSettings {
@@ -51,6 +61,8 @@ class KmpIosSpmPlugin : Plugin<Project> {
                                 "FirebaseCrashlytics",
                                 "FirebaseMessaging",
                                 "GoogleSignIn",
+                                "GoogleMobileAds",
+                                "GoogleUserMessagingPlatform",
                             )
                         }
                     }

@@ -1,16 +1,32 @@
 package com.whatever.caro.feature.learning
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.onNodeWithText
+import caromobile.core.designsystem.generated.resources.Res
+import caromobile.core.designsystem.generated.resources.learning_front_instruction
 import com.whatever.caro.core.designsystem.themes.CaroTheme
 import com.whatever.caro.core.model.learning.StudyCard
+import com.whatever.caro.core.screenshot.testing.ScreenshotScenario
+import com.whatever.caro.core.screenshot.testing.ScreenshotString
 import com.whatever.caro.feature.learning.mvi.LearningState
 
 internal object LearningScreenshotScenario {
     const val ID = "learning.learning.front"
-    const val FILE_NAME = "$ID.png"
-    const val WIDTH_DP = 393
-    const val HEIGHT_DP = 852
-    const val LOCALE = "ko"
+
+    fun scenarios() =
+        listOf(
+            ScreenshotScenario(
+                ID,
+                render = { Render() },
+                expectedStrings = listOf(ScreenshotString(Res.string.learning_front_instruction)),
+                beforeCapture = { strings ->
+                    onNodeWithText(
+                        strings[Res.string.learning_front_instruction],
+                    ).assertIsDisplayed()
+                },
+            ),
+        )
 
     @Composable
     fun Render() {

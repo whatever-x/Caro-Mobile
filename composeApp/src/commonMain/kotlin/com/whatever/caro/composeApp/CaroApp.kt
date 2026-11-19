@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigationevent.NavigationEventInfo
@@ -36,7 +37,10 @@ import caromobile.core.designsystem.generated.resources.Res
 import caromobile.core.designsystem.generated.resources.app_exit_dialog_button_cancel
 import caromobile.core.designsystem.generated.resources.app_exit_dialog_button_exit
 import caromobile.core.designsystem.generated.resources.app_exit_dialog_title
+import com.whatever.caro.core.ads.ConfigureAdHost
 import com.whatever.caro.core.data.repository.fcm.FcmTokenRepository
+import com.whatever.caro.core.datastore.datasource.AuthTokens
+import com.whatever.caro.core.datastore.datasource.LocalAuthDataSource
 import com.whatever.caro.core.datastore.datasource.LocalNotificationDataSource
 import com.whatever.caro.core.designsystem.components.CaroDialog
 import com.whatever.caro.core.designsystem.components.CaroDialogButton
@@ -60,6 +64,8 @@ import com.whatever.caro.core.navigator.entries.EditDeckEntry
 import com.whatever.caro.core.navigator.entries.EditProfileEntry
 import com.whatever.caro.core.navigator.entries.HomeEntry
 import com.whatever.caro.core.navigator.entries.LearningEntry
+import com.whatever.caro.core.navigator.entries.LibraryEntry
+import com.whatever.caro.core.navigator.entries.LibraryPreviewEntry
 import com.whatever.caro.core.navigator.entries.LoginEntry
 import com.whatever.caro.core.navigator.entries.SettingEntry
 import com.whatever.caro.core.navigator.entries.SplashEntry
@@ -73,6 +79,7 @@ import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
+import org.koin.compose.viewmodel.koinViewModel
 
 private val HomeSnackbarBottomPadding = 88.dp
 
@@ -90,11 +97,14 @@ fun CaroApp(
     ConfigureCaroImageLoader()
 
     val localNotificationDataSource = koinInject<LocalNotificationDataSource>()
+    val localAuthDataSource = koinInject<LocalAuthDataSource>()
     val notificationPermissionController = rememberNotificationPermissionController()
-    var notificationStartupComplete by remember { mutableStateOf(false) }
+    val startupViewModel = koinViewModel<AppStartupViewModel>()
+    val startupState by startupViewModel.state.collectAsStateWithLifecycle()
     val notificationScope = rememberCoroutineScope()
     LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
-        if (notificationStartupComplete) {
+        startupViewModel.intent(AppStartupIntent.RefreshEligibility)
+        if (startupState.notificationFinished) {
             notificationScope.launch {
                 try {
                     fcmTokenRepository.updateNotificationPermission(notificationPermissionController.isGranted())
@@ -106,15 +116,15 @@ fun CaroApp(
         }
     }
     LaunchedEffect(localNotificationDataSource, notificationPermissionController) {
+        if (startupState.notificationFinished) return@LaunchedEffect
         try {
             requestInitialNotificationPermission(localNotificationDataSource, notificationPermissionController)
             fcmTokenRepository.updateNotificationPermission(notificationPermissionController.isGranted())
         } catch (exception: Exception) {
             if (exception is CancellationException) throw exception
             Napier.w { "Initial notification permission request failed" }
-        } finally {
-            notificationStartupComplete = true
         }
+        startupViewModel.intent(AppStartupIntent.NotificationFinished)
     }
 
     val savedStateConfiguration =
@@ -134,6 +144,8 @@ fun CaroApp(
                             subclass(EditCardEntry::class, EditCardEntry.serializer())
                             subclass(DeleteCardsEntry::class, DeleteCardsEntry.serializer())
                             subclass(HomeEntry::class, HomeEntry.serializer())
+                            subclass(LibraryEntry::class, LibraryEntry.serializer())
+                            subclass(LibraryPreviewEntry::class, LibraryPreviewEntry.serializer())
                             subclass(SettingEntry::class, SettingEntry.serializer())
                             subclass(EditDeckEntry::class, EditDeckEntry.serializer())
                             subclass(LearningEntry::class, LearningEntry.serializer())
@@ -143,6 +155,10 @@ fun CaroApp(
         }
 
     val backStack = rememberNavBackStack(savedStateConfiguration, SplashEntry)
+    val allowConsent = backStack.lastOrNull() is HomeEntry || backStack.lastOrNull() is SettingEntry
+    ConfigureAdHost(allowConsent) { available, formShowing ->
+        startupViewModel.intent(AppStartupIntent.AdHostChanged(available, formShowing))
+    }
 
     LaunchedEffect(messagingClient, fcmTokenRepository) {
         fcmTokenRepository.syncTokens(messagingClient.tokenFlow)
@@ -166,8 +182,13 @@ fun CaroApp(
                 }
 
                 is NavCommand.ResetTo -> {
-                    backStack.clear()
-                    backStack.add(command.key)
+                    val generation = command.expiredSessionGeneration
+                    if (generation == null ||
+                        isCurrentExpiredSession(AuthSessionEvent.Expired(generation), localAuthDataSource.fetchTokens())
+                    ) {
+                        backStack.clear()
+                        backStack.add(command.key)
+                    }
                 }
             }
         }
@@ -176,9 +197,9 @@ fun CaroApp(
     LaunchedEffect(authSessionEventBus, navDispatcher) {
         authSessionEventBus.events.collect { event ->
             when (event) {
-                AuthSessionEvent.Expired -> {
+                is AuthSessionEvent.Expired -> {
                     Napier.w { "Auth session expired → navigate to LoginEntry" }
-                    navDispatcher.emit(NavCommand.ResetTo(LoginEntry))
+                    navDispatcher.emit(NavCommand.ResetTo(LoginEntry, expiredSessionGeneration = event.generation))
                 }
             }
         }
@@ -306,3 +327,8 @@ private fun AppExitDialog(
         },
     )
 }
+
+internal fun isCurrentExpiredSession(
+    event: AuthSessionEvent.Expired,
+    current: AuthTokens,
+): Boolean = current.generation == event.generation && current.accessToken == null

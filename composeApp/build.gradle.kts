@@ -19,12 +19,14 @@ kotlin {
         }
         commonMain.dependencies {
             implementation(projects.core.data)
+            implementation(projects.core.ads)
             implementation(projects.core.datastore)
             implementation(projects.core.designsystem)
             implementation(projects.core.ui)
             implementation(projects.core.viewmodel)
             implementation(projects.core.navigator)
             implementation(projects.core.model)
+            implementation(projects.core.inappReview)
             implementation(projects.core.remote)
             api(projects.core.analytics)
             api(projects.core.crashlytics)

@@ -1,13 +1,14 @@
 package com.whatever.caro.core.data.repository.auth
 
 import com.whatever.caro.core.data.repository.fcm.FcmTokenRepository
+import com.whatever.caro.core.datastore.datasource.AuthTokens
 import com.whatever.caro.core.datastore.datasource.LocalAuthDataSource
 import com.whatever.caro.core.model.auth.AuthSession
 import com.whatever.caro.core.model.auth.SocialLoginType
 import com.whatever.caro.core.model.exception.CaroAuthException
 import com.whatever.caro.core.remote.datasource.auth.AuthDataSource
 import com.whatever.caro.core.remote.datasource.auth.NonAuthDataSource
-import com.whatever.caro.core.remote.dto.auth.request.CompleteRegistrationRequest
+import com.whatever.caro.core.remote.dto.auth.request.CompleteRegistrationV11Request
 import com.whatever.caro.core.remote.dto.auth.request.RefreshTokenRequest
 import com.whatever.caro.core.remote.dto.auth.request.SocialLoginRequest
 import com.whatever.caro.core.remote.dto.auth.response.SocialLoginResponse
@@ -24,6 +25,7 @@ import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.test.runTest
+import kotlinx.datetime.LocalDate
 
 class AuthRepositoryImplTest : FunSpec() {
     init {
@@ -41,6 +43,9 @@ class AuthRepositoryImplTest : FunSpec() {
             remoteNonAuthDataSource = remoteNonAuthDataSource,
             localAuthDataSource = localAuthDataSource,
             fcmTokenRepository = fcmTokenRepository,
+            adEligibilityGate =
+                com.whatever.caro.core.data.repository.ads
+                    .AdEligibilityGate(),
         )
 
         test("로그아웃은 FCM 삭제를 인증 로그아웃과 로컬 세션 삭제보다 먼저 수행한다") {
@@ -70,7 +75,7 @@ class AuthRepositoryImplTest : FunSpec() {
 
                         override suspend fun withdraw() = error("unused")
 
-                        override suspend fun completeRegistration(request: CompleteRegistrationRequest): TokenResponse = error("unused")
+                        override suspend fun completeRegistration(request: CompleteRegistrationV11Request): TokenResponse = error("unused")
                     }
                 val local = mock<LocalAuthDataSource> { everySuspend { clear() } returns Unit }
                 repositoryWith(remoteAuthDataSource = remote, localAuthDataSource = local, fcmTokenRepository = fcm).logout()
@@ -108,8 +113,7 @@ class AuthRepositoryImplTest : FunSpec() {
                     }
                 val localAuthDataSource =
                     mock<LocalAuthDataSource> {
-                        everySuspend { saveTokens(any(), any()) } returns Unit
-                        everySuspend { saveRegistrationComplete(any()) } returns Unit
+                        everySuspend { saveSession(any(), any(), any()) } returns Unit
                     }
                 val repository =
                     repositoryWith(
@@ -128,7 +132,7 @@ class AuthRepositoryImplTest : FunSpec() {
                     remoteNonAuthDataSource.socialLogin(
                         SocialLoginRequest(provider = SocialLoginType.GOOGLE, idToken = "idToken"),
                     )
-                    localAuthDataSource.saveTokens(accessToken = "access", refreshToken = "refresh")
+                    localAuthDataSource.saveSession("access", "refresh", true)
                 }
             }
         }
@@ -146,8 +150,7 @@ class AuthRepositoryImplTest : FunSpec() {
                     }
                 val localAuthDataSource =
                     mock<LocalAuthDataSource> {
-                        everySuspend { saveTokens(any(), any()) } returns Unit
-                        everySuspend { saveRegistrationComplete(any()) } returns Unit
+                        everySuspend { saveSession(any(), any(), any()) } returns Unit
                     }
                 val repository =
                     repositoryWith(
@@ -163,8 +166,7 @@ class AuthRepositoryImplTest : FunSpec() {
 
                 result shouldBe false
                 verifySuspend {
-                    localAuthDataSource.saveTokens(accessToken = "access", refreshToken = "refresh")
-                    localAuthDataSource.saveRegistrationComplete(false)
+                    localAuthDataSource.saveSession("access", "refresh", false)
                 }
             }
         }
@@ -306,8 +308,7 @@ class AuthRepositoryImplTest : FunSpec() {
                     }
                 val localAuthDataSource =
                     mock<LocalAuthDataSource> {
-                        everySuspend { saveTokens(any(), any()) } returns Unit
-                        everySuspend { saveRegistrationComplete(any()) } returns Unit
+                        everySuspend { saveSession(any(), any(), any()) } returns Unit
                     }
                 val repository =
                     repositoryWith(
@@ -319,18 +320,19 @@ class AuthRepositoryImplTest : FunSpec() {
                     repository.completeRegistration(
                         nickname = "caro",
                         termsAgreed = true,
+                        birthDate = "2000-01-01",
                     )
 
                 result shouldBe AuthSession(accessToken = "access", refreshToken = "refresh")
                 verifySuspend {
                     remoteAuthDataSource.completeRegistration(
-                        CompleteRegistrationRequest(
+                        CompleteRegistrationV11Request(
                             nickname = "caro",
                             isTermsAgreed = true,
+                            birthDate = LocalDate(2000, 1, 1),
                         ),
                     )
-                    localAuthDataSource.saveTokens(accessToken = "access", refreshToken = "refresh")
-                    localAuthDataSource.saveRegistrationComplete(true)
+                    localAuthDataSource.saveSession("access", "refresh", true)
                 }
             }
         }
@@ -361,9 +363,8 @@ class AuthRepositoryImplTest : FunSpec() {
             runTest {
                 val localAuthDataSource =
                     mock<LocalAuthDataSource> {
-                        everySuspend { fetchAccessToken() } returns "oldAccess"
-                        everySuspend { fetchRefreshToken() } returns "oldRefresh"
-                        everySuspend { saveTokens(any(), any()) } returns Unit
+                        everySuspend { fetchTokens() } returns AuthTokens("oldAccess", "oldRefresh")
+                        everySuspend { replaceTokensIfCurrent(any(), any(), any()) } returns true
                     }
                 val remoteNonAuthDataSource =
                     mock<NonAuthDataSource> {
@@ -382,7 +383,7 @@ class AuthRepositoryImplTest : FunSpec() {
                     remoteNonAuthDataSource.refreshToken(
                         RefreshTokenRequest(accessToken = "oldAccess", refreshToken = "oldRefresh"),
                     )
-                    localAuthDataSource.saveTokens(accessToken = "newAccess", refreshToken = "newRefresh")
+                    localAuthDataSource.replaceTokensIfCurrent(AuthTokens("oldAccess", "oldRefresh"), "newAccess", "newRefresh")
                 }
             }
         }
@@ -391,8 +392,7 @@ class AuthRepositoryImplTest : FunSpec() {
             runTest {
                 val localAuthDataSource =
                     mock<LocalAuthDataSource> {
-                        everySuspend { fetchAccessToken() } returns null
-                        everySuspend { fetchRefreshToken() } returns "oldRefresh"
+                        everySuspend { fetchTokens() } returns AuthTokens(null, "oldRefresh")
                     }
                 val repository = repositoryWith(localAuthDataSource = localAuthDataSource)
 

@@ -11,6 +11,8 @@ import com.whatever.caro.core.navigator.entries.EditDeckEntry
 import com.whatever.caro.core.navigator.entries.EditProfileEntry
 import com.whatever.caro.core.navigator.entries.HomeEntry
 import com.whatever.caro.core.navigator.entries.LearningEntry
+import com.whatever.caro.core.navigator.entries.LibraryEntry
+import com.whatever.caro.core.navigator.entries.LibraryPreviewEntry
 import com.whatever.caro.core.navigator.entries.LoginEntry
 import com.whatever.caro.core.navigator.entries.SettingEntry
 import com.whatever.caro.core.navigator.entries.SplashEntry
@@ -27,6 +29,9 @@ import com.whatever.caro.feature.deck.detail.DeckDetailViewModel
 import com.whatever.caro.feature.deck.detail.route.DeckDetailRoute
 import com.whatever.caro.feature.deck.edit.EditDeckRoute
 import com.whatever.caro.feature.deck.edit.EditDeckViewModel
+import com.whatever.caro.feature.home.library.LibraryPreviewViewModel
+import com.whatever.caro.feature.home.library.route.LibraryPreviewRoute
+import com.whatever.caro.feature.home.library.route.LibraryRoute
 import com.whatever.caro.feature.home.route.HomeRoute
 import com.whatever.caro.feature.learning.LearningViewModel
 import com.whatever.caro.feature.learning.route.LearningRoute
@@ -112,6 +117,12 @@ val navEntryModule: Module =
             )
         }
 
+        navigation<LibraryEntry> {
+            LibraryRoute(koinViewModel(), get())
+        }
+        navigation<LibraryPreviewEntry> { key ->
+            LibraryPreviewRoute(koinViewModel<LibraryPreviewViewModel> { parametersOf(key.libraryDeckId) }, get())
+        }
         navigation<HomeEntry> {
             HomeRoute(
                 viewModel = koinViewModel(),

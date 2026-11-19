@@ -80,7 +80,6 @@ knowledge_base:
   code_guidelines:
     filePatterns:
       - '**/AGENTS.md'
-      - '**/CLAUDE.md'
 code_generation:
   docstrings:
     language: ko-KR

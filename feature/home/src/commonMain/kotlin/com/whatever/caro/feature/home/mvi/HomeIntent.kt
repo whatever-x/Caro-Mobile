@@ -6,6 +6,13 @@ import com.whatever.caro.core.viewmodel.contract.UiIntent
 sealed interface HomeIntent : UiIntent {
     data object Initialize : HomeIntent
 
+    data object ClickLibrary : HomeIntent
+
+    data class ClickBanner(
+        val bannerId: String,
+        val revision: Long,
+    ) : HomeIntent
+
     data object ClickRetry : HomeIntent
 
     data object ClickSettingButton : HomeIntent

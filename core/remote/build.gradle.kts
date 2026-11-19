@@ -31,6 +31,7 @@ kotlin {
             implementation(libs.ktor.client.core)
             implementation(libs.ktor.serialization.kotlinx.json)
             implementation(libs.kotlinx.coroutines.core)
+            implementation(libs.kotlinx.date.time)
             implementation(libs.bundles.ktor.client.plugin)
             implementation(libs.ktorfit.lib)
         }
@@ -67,6 +68,12 @@ buildkonfig {
     packageName = "com.whatever.caro.core.remote.generated"
 
     defaultConfigs {
+        buildConfigField(
+            FieldSpec.Type.STRING,
+            "APP_VERSION",
+            libs.versions.version.name
+                .get(),
+        )
         buildConfigField(FieldSpec.Type.STRING, "SERVER_BASE_URL", "")
         buildConfigField(FieldSpec.Type.BOOLEAN, "IS_DEBUG", "true")
     }

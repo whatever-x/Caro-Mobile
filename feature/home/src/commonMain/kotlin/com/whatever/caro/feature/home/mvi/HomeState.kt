@@ -1,5 +1,6 @@
 package com.whatever.caro.feature.home.mvi
 
+import com.whatever.caro.core.model.banner.HomeBanner
 import com.whatever.caro.core.model.deck.Deck
 import com.whatever.caro.core.viewmodel.contract.UiState
 import kotlinx.collections.immutable.ImmutableList
@@ -11,6 +12,7 @@ data class HomeState(
     val decks: ImmutableList<Deck> = persistentListOf(),
     val isLoading: Boolean = true,
     val hasLoadError: Boolean = false,
+    val banners: ImmutableList<HomeBanner> = persistentListOf(),
 ) : UiState {
     val isLoadedContentVisible: Boolean
         get() = isLoading.not()
