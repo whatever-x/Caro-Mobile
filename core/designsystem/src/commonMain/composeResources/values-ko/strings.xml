@@ -168,6 +168,8 @@
     <string name="setting_menu_terms_of_service">이용약관</string>
     <string name="setting_menu_privacy_policy">개인정보 처리방침</string>
     <string name="setting_menu_report_bug">문의 및 버그 제보</string>
+    <string name="setting_privcay_policy_url">https://given-dragon.notion.site/38b870f222b980b9b0c6f471c4cf7930</string>
+    <string name="setting_terms_of_service_url">https://given-dragon.notion.site/38b870f222b980cfb51fdb9a3ca850c5</string>
     <string name="setting_report_bug_url">https://docs.google.com/forms/d/e/1FAIpQLSesAOudCkfFsblSs_74H9mRBBLzfFKnAIhm42TTWujUK2BnPg/viewform</string>
     <string name="setting_menu_logout">로그아웃</string>
     <string name="setting_menu_delete_account">계정탈퇴</string>

@@ -173,8 +173,8 @@
 	<string name="setting_menu_logout">Log Out</string>
 	<string name="setting_menu_delete_account">Delete Account</string>
 	<string name="setting_description_app_version">Current App Version: %1$s</string>
-	<string name="setting_privcay_policy_url">https://given-dragon.notion.site/38b870f222b980b9b0c6f471c4cf7930</string>
-	<string name="setting_terms_of_service_url">https://given-dragon.notion.site/38b870f222b980cfb51fdb9a3ca850c5</string>
+	<string name="setting_privcay_policy_url">https://given-dragon.notion.site/3bb870f222b9809281e4e3b6ddd120e3</string>
+	<string name="setting_terms_of_service_url">https://given-dragon.notion.site/3bb870f222b980fa84aed2a5f711d8a2</string>
 	<string name="setting_report_bug_url">https://docs.google.com/forms/d/e/1FAIpQLSeTkuyIor0qCRH1zFNTo2lgjGuvJS3kBbTzCeZLfVjsB2KMzg/viewform</string>
 	<string name="setting_snackbar_logout">Successfully logged out.</string>
 	<string name="setting_snackbar_delete_account">Account deleted successfully.</string>
