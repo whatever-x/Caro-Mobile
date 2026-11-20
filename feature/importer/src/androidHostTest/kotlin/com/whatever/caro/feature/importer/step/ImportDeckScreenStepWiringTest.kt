@@ -77,7 +77,7 @@ class ImportDeckScreenStepWiringTest {
     }
 
     @Test
-    fun `붙여넣기 단계에서 다음을 누르면 앱 언어의 덱 이름과 빈 면 문구와 날짜 표기를 담아 보낸다`() {
+    fun `붙여넣기 단계에서 다음을 누르면 앱 언어의 덱 이름과 설명, 빈 면 문구, 날짜 표기를 담아 보낸다`() {
         show(ImportDeckState(step = ImportStep.Paste, isPaste = true, pasteText = "학교\t학교"))
 
         composeRule.onNodeWithText("다음").performClick()
@@ -88,6 +88,7 @@ class ImportDeckScreenStepWiringTest {
                     sourceName = "붙여 넣은 카드",
                     dateStyle = SpreadsheetDateStyle.YEAR_MONTH_DAY,
                     emptySideText = "(비어 있음)",
+                    description = "붙여 넣은 내용으로 만들었어요",
                 ),
             )
     }

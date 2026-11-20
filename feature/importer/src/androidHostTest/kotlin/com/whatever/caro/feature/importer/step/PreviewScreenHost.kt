@@ -28,13 +28,17 @@ import androidx.compose.ui.unit.DpRect
 import androidx.compose.ui.unit.dp
 import com.whatever.caro.core.designsystem.themes.CaroTheme
 import com.whatever.caro.feature.importer.ImportDeckScreen
+import com.whatever.caro.feature.importer.logic.applyingDeckInfo
 import com.whatever.caro.feature.importer.logic.filterCards
+import com.whatever.caro.feature.importer.logic.openingDeckInfo
+import com.whatever.caro.feature.importer.logic.withDeckInfoDescription
+import com.whatever.caro.feature.importer.logic.withDeckInfoName
 import com.whatever.caro.feature.importer.mvi.ImportDeckIntent
 import com.whatever.caro.feature.importer.mvi.ImportDeckState
 import com.whatever.caro.feature.importer.transform.ImportCard
 import io.kotest.matchers.shouldBe
 
-/** 미리보기 입력 네 가지를 ViewModel과 같은 방식으로 상태에 반영해 다시 그린다. 보낸 입력은 [intents]에 남는다. */
+/** 미리보기 입력과 덱 정보 시트 입력을 ViewModel과 같은 방식으로 상태에 반영해 다시 그린다. 보낸 입력은 [intents]에 남는다. */
 internal class PreviewScreenHost(
     private val composeRule: ComposeContentTestRule,
 ) {
@@ -92,10 +96,20 @@ internal class PreviewScreenHost(
                 }
 
                 else -> {
-                    state
+                    state.withDeckInfoIntent(intent)
                 }
             }
     }
+
+    private fun ImportDeckState.withDeckInfoIntent(intent: ImportDeckIntent): ImportDeckState =
+        when (intent) {
+            ImportDeckIntent.ClickChangeDeckInfo -> openingDeckInfo()
+            is ImportDeckIntent.UpdateDeckInfoName -> withDeckInfoName(intent.name)
+            is ImportDeckIntent.UpdateDeckInfoDescription -> withDeckInfoDescription(intent.description)
+            ImportDeckIntent.ApplyDeckInfo -> applyingDeckInfo()
+            ImportDeckIntent.DismissDeckInfo -> copy(deckInfoDraft = null)
+            else -> this
+        }
 }
 
 /** 카드 항목이다. 뒷면이 같은 빈 면 문구인 카드가 여럿이라 앞면과 뒷면 글로 함께 찾는다. */

@@ -132,6 +132,16 @@ class ImportLoadingOverlayTest {
     }
 
     @Test
+    fun `덱을 만드는 중 카드는 파일 이름 없이 덱을 만든다는 문구만 보여준다`() {
+        showOverlay(ImportLoading.CreatingDeck)
+
+        composeRule.mainClock.advanceTimeBy(200)
+
+        val texts = composeRule.onNode(isPoliteLiveRegion).fetchSemanticsNode().config[SemanticsProperties.Text]
+        texts.map { text -> text.text } shouldBe listOf("덱을 만들고 있어요")
+    }
+
+    @Test
     fun `로딩 중에는 200ms 전에도 밑에 깔린 내용의 semantics 노드가 없다`() {
         showOverlay(ImportLoading.ReadingFile(fileName = "deck.apkg"))
 

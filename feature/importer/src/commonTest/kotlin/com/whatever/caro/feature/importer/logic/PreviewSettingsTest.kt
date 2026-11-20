@@ -11,6 +11,7 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.persistentSetOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.collections.immutable.toImmutableSet
 
@@ -34,6 +35,44 @@ class PreviewSettingsTest : FunSpec() {
                 val table = PreviewSamples.ankiTable.copy(subdecks = PreviewSamples.ankiTable.subdecks.take(1))
 
                 rowsOf(table, PreviewSamples.ankiPreview).first() shouldBe row(SettingRowKind.Subdeck, SettingTag.SubdeckAll(1))
+            }
+
+            test("하위 덱을 일부만 고르면 전체 수 중 고른 수를 보이고 하나만 고르면 합침 태그를 숨긴다") {
+                val table = PreviewSamples.ankiTable
+                val rows =
+                    previewSettingRows(
+                        table,
+                        ImportSelection(subdeckIds = persistentSetOf("nouns")),
+                        defaultFieldMappings(table),
+                        PreviewSamples.ankiPreview,
+                    )
+
+                rows.first() shouldBe row(SettingRowKind.Subdeck, SettingTag.SubdeckSome(total = 2, selected = 1))
+            }
+
+            test("유형의 가져오기를 끄기만 하면 앞뒷면 자동 지정이고 유형 수는 가져오는 유형만 센다") {
+                val defaults = defaultFieldMappings(PreviewSamples.ankiTable)
+                val firstId = defaults.keys.first()
+
+                cardLayoutRowOf(defaults + (firstId to defaults.getValue(firstId).copy(excluded = true))) shouldBe
+                    row(SettingRowKind.CardLayout, SettingTag.NoteTypeCount(1), SettingTag.SidesAuto)
+            }
+
+            test("가져오는 유형의 앞뒷면 항목을 기본에서 바꾸면 앞뒷면 직접 지정이다") {
+                val defaults = defaultFieldMappings(PreviewSamples.ankiTable)
+                val firstId = defaults.keys.first()
+
+                cardLayoutRowOf(defaults + (firstId to swappedSides(defaults.getValue(firstId)))) shouldBe
+                    row(SettingRowKind.CardLayout, SettingTag.NoteTypeCount(2), SettingTag.SidesManual)
+            }
+
+            test("앞뒷면을 바꾼 유형의 가져오기를 끄면 가져오는 유형만 보아 앞뒷면 자동 지정이다") {
+                val defaults = defaultFieldMappings(PreviewSamples.ankiTable)
+                val firstId = defaults.keys.first()
+                val swappedOff = swappedSides(defaults.getValue(firstId)).copy(excluded = true)
+
+                cardLayoutRowOf(defaults + (firstId to swappedOff)) shouldBe
+                    row(SettingRowKind.CardLayout, SettingTag.NoteTypeCount(1), SettingTag.SidesAuto)
             }
 
             test("빈 카드와 Image Occlusion이 없으면 제외 줄을 숨긴다") {
@@ -110,6 +149,18 @@ class PreviewSettingsTest : FunSpec() {
         val selection = ImportSelection(subdeckIds = table.subdecks.map { subdeck -> subdeck.id }.toImmutableSet())
         return previewSettingRows(table, selection, defaultFieldMappings(table), preview)
     }
+
+    private fun cardLayoutRowOf(mappings: Map<String, FieldMapping>): SettingRow {
+        val table = PreviewSamples.ankiTable
+        val selection = ImportSelection(subdeckIds = table.subdecks.map { subdeck -> subdeck.id }.toImmutableSet())
+        return previewSettingRows(table, selection, mappings, PreviewSamples.ankiPreview).single { row ->
+            row.kind ==
+                SettingRowKind.CardLayout
+        }
+    }
+
+    private fun swappedSides(mapping: FieldMapping): FieldMapping =
+        mapping.copy(targets = mapOf(FieldMapping.FRONT to mapping.backFields, FieldMapping.BACK to mapping.frontFields))
 
     private fun named(vararg names: String): ImmutableList<TextCheckHeader> =
         names.map { name -> TextCheckHeader.Named(name) }.toImmutableList()

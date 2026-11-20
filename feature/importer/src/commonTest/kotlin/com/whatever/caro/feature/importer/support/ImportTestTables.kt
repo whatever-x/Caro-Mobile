@@ -10,6 +10,13 @@ import com.whatever.caro.core.importparser.model.ParsedTable
 import com.whatever.caro.feature.importer.ImportFixtures
 
 internal object ImportTestTables {
+    const val ANKI_MAIN = "modern_anki21b_main.apkg"
+
+    // ANKI_MAIN의 하위 덱이다. 노트 수는 차례로 310, 403, 504이고 selection-0 변형은 ANKI_GRAMMAR만 고른 결과다.
+    const val ANKI_GRAMMAR = "1791602016834"
+    const val ANKI_N4 = "1791602016837"
+    const val ANKI_N5 = "1791602016836"
+
     private const val XLSX_ID = "xlsx"
     private const val TEXT_ID = "text"
     private val FIELD_NAMES = listOf("열 1", "열 2")
@@ -57,20 +64,24 @@ internal object ImportTestTables {
         )
     }
 
+    /** 열 이름은 파서가 이름 없는 열에 붙이는 "열 n"이다. */
     fun text(
         sourceName: String = "words.txt",
         rows: Int = 3,
         delimiter: String = "\t",
         hasHeaderRow: Boolean = false,
-    ): ParsedTable =
-        ParsedTable(
+        columns: Int = FIELD_NAMES.size,
+    ): ParsedTable {
+        val fieldNames = List(columns) { index -> "열 ${index + 1}" }
+        return ParsedTable(
             format = ImportFormat.TEXT,
             sourceName = sourceName,
             htmlMode = HtmlMode.PLAIN,
-            noteTypes = listOf(noteType(TEXT_ID, sourceName, rows)),
-            rows = rows(TEXT_ID, rows),
+            noteTypes = listOf(noteType(TEXT_ID, sourceName, rows, fieldNames)),
+            rows = rows(TEXT_ID, rows, fieldNames),
             layout = ParsedLayout(delimiter = delimiter, hasHeaderRow = hasHeaderRow),
         )
+    }
 
     /** 비어 있지 않은 줄이 하나도 없는 입력이다. */
     fun blankText(sourceName: String = "words.txt"): ParsedTable =
@@ -87,13 +98,15 @@ internal object ImportTestTables {
         id: String,
         name: String,
         noteCount: Int,
-    ): ParsedNoteType = ParsedNoteType(id = id, name = name, fieldNames = FIELD_NAMES, isCloze = false, noteCount = noteCount)
+        fieldNames: List<String> = FIELD_NAMES,
+    ): ParsedNoteType = ParsedNoteType(id = id, name = name, fieldNames = fieldNames, isCloze = false, noteCount = noteCount)
 
     private fun rows(
         noteTypeId: String,
         count: Int,
+        fieldNames: List<String> = FIELD_NAMES,
     ): List<ParsedRow> =
         List(count) { index ->
-            ParsedRow(noteTypeId = noteTypeId, fields = FIELD_NAMES.associateWith { name -> "$name-${index + 1}" })
+            ParsedRow(noteTypeId = noteTypeId, fields = fieldNames.associateWith { name -> "$name-${index + 1}" })
         }
 }
