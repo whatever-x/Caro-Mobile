@@ -1,0 +1,181 @@
+{
+  "fixture": "apkg/modern_filtered_deck.apkg",
+  "format": "APKG",
+  "htmlMode": "HTML",
+  "subdecks": [
+    {
+      "id": null,
+      "path": "Lang::Vocab::N4",
+      "noteCount": 2
+    },
+    {
+      "id": null,
+      "path": "Lang::Vocab::N5",
+      "noteCount": 5
+    }
+  ],
+  "notesWithoutDeck": 0,
+  "noteTypes": [
+    {
+      "id": null,
+      "name": "Basic",
+      "fieldNames": [
+        "Front",
+        "Back"
+      ],
+      "isCloze": false,
+      "noteCount": 7
+    }
+  ],
+  "totalNotes": 7,
+  "warnings": [],
+  "rows": [
+    {
+      "rowIndex": 0,
+      "subdeckPath": "Lang::Vocab::N5",
+      "fieldValues": [
+        "filtered-1",
+        "필터 1"
+      ]
+    },
+    {
+      "rowIndex": 1,
+      "subdeckPath": "Lang::Vocab::N5",
+      "fieldValues": [
+        "filtered-2",
+        "필터 2"
+      ]
+    },
+    {
+      "rowIndex": 2,
+      "subdeckPath": "Lang::Vocab::N5",
+      "fieldValues": [
+        "filtered-3",
+        "필터 3"
+      ]
+    },
+    {
+      "rowIndex": 3,
+      "subdeckPath": "Lang::Vocab::N5",
+      "fieldValues": [
+        "filtered-4",
+        "필터 4"
+      ]
+    },
+    {
+      "rowIndex": 4,
+      "subdeckPath": "Lang::Vocab::N5",
+      "fieldValues": [
+        "filtered-5",
+        "필터 5"
+      ]
+    },
+    {
+      "rowIndex": 5,
+      "subdeckPath": "Lang::Vocab::N4",
+      "fieldValues": [
+        "stay-1",
+        "그대로 1"
+      ]
+    },
+    {
+      "rowIndex": 6,
+      "subdeckPath": "Lang::Vocab::N4",
+      "fieldValues": [
+        "stay-2",
+        "그대로 2"
+      ]
+    }
+  ],
+  "cards": {
+    "items": [
+      {
+        "rowIndex": 0,
+        "front": "filtered-1",
+        "back": "필터 1",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 1,
+        "front": "filtered-2",
+        "back": "필터 2",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 2,
+        "front": "filtered-3",
+        "back": "필터 3",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 3,
+        "front": "filtered-4",
+        "back": "필터 4",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 4,
+        "front": "filtered-5",
+        "back": "필터 5",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 5,
+        "front": "stay-1",
+        "back": "그대로 1",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 6,
+        "front": "stay-2",
+        "back": "그대로 2",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "mediaRemoved": 0,
+        "excluded": false
+      }
+    ]
+  },
+  "previewStats": {
+    "cardCount": 7,
+    "excludedCount": 0,
+    "emptyReplacedCount": 0,
+    "truncatedCount": 0,
+    "mediaRemovedCount": 0
+  },
+  "limit": {
+    "exceeded": false
+  }
+}

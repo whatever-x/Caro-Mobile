@@ -1,0 +1,93 @@
+{
+  "fixture": "text/header_word_substring_no_title.tsv",
+  "format": "TEXT",
+  "sourceName": "header_word_substring_no_title.tsv",
+  "encoding": "UTF-8",
+  "htmlMode": "PLAIN",
+  "separator": "\t",
+  "hasHeaderRow": false,
+  "noteTypes": [
+    {
+      "id": "text",
+      "name": "header_word_substring_no_title.tsv",
+      "fieldNames": [
+        "열 1",
+        "열 2"
+      ],
+      "isCloze": false,
+      "noteCount": 3
+    }
+  ],
+  "rowCount": 3,
+  "warnings": [],
+  "rows": [
+    {
+      "index": 0,
+      "fieldValues": [
+        "word0001",
+        "뜻0001"
+      ]
+    },
+    {
+      "index": 1,
+      "fieldValues": [
+        "word0002",
+        "뜻0002"
+      ]
+    },
+    {
+      "index": 2,
+      "fieldValues": [
+        "word0003",
+        "뜻0003"
+      ]
+    }
+  ],
+  "cards": {
+    "items": [
+      {
+        "rowIndex": 0,
+        "front": "word0001",
+        "back": "뜻0001",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 1,
+        "front": "word0002",
+        "back": "뜻0002",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 2,
+        "front": "word0003",
+        "back": "뜻0003",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "mediaRemoved": 0,
+        "excluded": false
+      }
+    ]
+  },
+  "previewStats": {
+    "cardCount": 3,
+    "excludedCount": 0,
+    "emptyReplacedCount": 0,
+    "truncatedCount": 0,
+    "mediaRemovedCount": 0
+  },
+  "limit": {
+    "exceeded": false
+  }
+}

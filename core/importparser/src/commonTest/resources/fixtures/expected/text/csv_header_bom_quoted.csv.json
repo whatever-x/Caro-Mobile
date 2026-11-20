@@ -1,0 +1,97 @@
+{
+  "fixture": "text/csv_header_bom_quoted.csv",
+  "format": "TEXT",
+  "sourceName": "csv_header_bom_quoted.csv",
+  "encoding": "UTF-8",
+  "htmlMode": "PLAIN",
+  "separator": ",",
+  "hasHeaderRow": true,
+  "noteTypes": [
+    {
+      "id": "text",
+      "name": "csv_header_bom_quoted.csv",
+      "fieldNames": [
+        "term",
+        "definition",
+        "example"
+      ],
+      "isCloze": false,
+      "noteCount": 3
+    }
+  ],
+  "rowCount": 3,
+  "warnings": [],
+  "rows": [
+    {
+      "index": 0,
+      "fieldValues": [
+        "apple",
+        "사과, 능금",
+        "I eat an apple.\nShe eats apples."
+      ]
+    },
+    {
+      "index": 1,
+      "fieldValues": [
+        "say \"hi\"",
+        "인사하다",
+        ""
+      ]
+    },
+    {
+      "index": 2,
+      "fieldValues": [
+        "ringo",
+        "뜻; 의미",
+        "りんご"
+      ]
+    }
+  ],
+  "cards": {
+    "items": [
+      {
+        "rowIndex": 0,
+        "front": "apple",
+        "back": "사과, 능금\nI eat an apple.\nShe eats apples.",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 1,
+        "front": "say \"hi\"",
+        "back": "인사하다",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 2,
+        "front": "ringo",
+        "back": "뜻; 의미\nりんご",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "mediaRemoved": 0,
+        "excluded": false
+      }
+    ]
+  },
+  "previewStats": {
+    "cardCount": 3,
+    "excludedCount": 0,
+    "emptyReplacedCount": 0,
+    "truncatedCount": 0,
+    "mediaRemovedCount": 0
+  },
+  "limit": {
+    "exceeded": false
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "fixture": "apkg/broken_truncated_zip.apkg",
+  "error": {
+    "kind": "CORRUPT_FILE"
+  },
+  "format": "APKG",
+  "warnings": []
+}

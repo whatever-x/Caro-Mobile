@@ -1,0 +1,273 @@
+{
+  "fixture": "text/no_header_br_self_closing_div_attr.txt",
+  "format": "TEXT",
+  "sourceName": "no_header_br_self_closing_div_attr.txt",
+  "encoding": "UTF-8",
+  "htmlMode": "HTML",
+  "separator": "\t",
+  "hasHeaderRow": false,
+  "noteTypes": [
+    {
+      "id": "text",
+      "name": "no_header_br_self_closing_div_attr.txt",
+      "fieldNames": [
+        "열 1",
+        "열 2"
+      ],
+      "isCloze": false,
+      "noteCount": 13
+    }
+  ],
+  "rowCount": 13,
+  "warnings": [],
+  "rows": [
+    {
+      "index": 0,
+      "fieldValues": [
+        "line1<br />line2",
+        "줄1<BR/>줄2"
+      ]
+    },
+    {
+      "index": 1,
+      "fieldValues": [
+        "stack",
+        "<div class=\"x\">위</div>\n<div class=\"x\">아래</div>"
+      ]
+    },
+    {
+      "index": 2,
+      "fieldValues": [
+        "blank line",
+        "a<div><br></div><div>b</div>"
+      ]
+    },
+    {
+      "index": 3,
+      "fieldValues": [
+        "list",
+        "<ul><li>하나</li><li>둘</li></ul>"
+      ]
+    },
+    {
+      "index": 4,
+      "fieldValues": [
+        "두 줄\n원문",
+        "위<br><br>아래"
+      ]
+    },
+    {
+      "index": 5,
+      "fieldValues": [
+        "a < b",
+        "<hr/>구분선 뒤"
+      ]
+    },
+    {
+      "index": 6,
+      "fieldValues": [
+        "x<y and y>z",
+        "HTML 파일에서도 그대로"
+      ]
+    },
+    {
+      "index": 7,
+      "fieldValues": [
+        "<style>.x{color:red}</style>스타일 뒤",
+        "<script>var a = 1 < 2;</script>스크립트 뒤<!-- 주석 -->"
+      ]
+    },
+    {
+      "index": 8,
+      "fieldValues": [
+        "<ruby>漢字<rt>かんじ</rt></ruby>",
+        "<foo>모르는 태그</foo> <b>굵게</b>"
+      ]
+    },
+    {
+      "index": 9,
+      "fieldValues": [
+        "<ruby>漢字<rp>(</rp><rt>かんじ</rt><rp>)</rp></ruby>",
+        "<ruby><rb>漢</rb><rt>かん</rt><rb>字</rb><rt>じ</rt></ruby>"
+      ]
+    },
+    {
+      "index": 10,
+      "fieldValues": [
+        "<ruby>漢字</ruby>",
+        "<ruby>漢字<rt></rt></ruby> 漢字[かんじ]"
+      ]
+    },
+    {
+      "index": 11,
+      "fieldValues": [
+        "<ruby>漢<rt>かん</ruby>字 <ruby>日<rt> </rt></ruby>",
+        "<video controls><source src=\"a.mp4\"><source src=\"a.webm\"></video>동영상 뒤"
+      ]
+    },
+    {
+      "index": 12,
+      "fieldValues": [
+        "<audio src=\"a.mp3\"></audio>소리 뒤",
+        "<img src=\"b.png\"><embed src=\"c.swf\"><iframe src=\"d.html\">대체 글</iframe><source src=\"e.mp3\">"
+      ]
+    }
+  ],
+  "cards": {
+    "items": [
+      {
+        "rowIndex": 0,
+        "front": "line1\nline2",
+        "back": "줄1\n줄2",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 1,
+        "front": "stack",
+        "back": "위\n아래",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 2,
+        "front": "blank line",
+        "back": "a\n\nb",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 3,
+        "front": "list",
+        "back": "하나\n둘",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 4,
+        "front": "두 줄 원문",
+        "back": "위\n\n아래",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 5,
+        "front": "a < b",
+        "back": "구분선 뒤",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 6,
+        "front": "x<y and y>z",
+        "back": "HTML 파일에서도 그대로",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 7,
+        "front": "스타일 뒤",
+        "back": "스크립트 뒤",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 8,
+        "front": "漢字(かんじ)",
+        "back": "<foo>모르는 태그</foo> 굵게",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 9,
+        "front": "漢字(かんじ)",
+        "back": "漢(かん)字(じ)",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 10,
+        "front": "漢字",
+        "back": "漢字 漢字[かんじ]",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 11,
+        "front": "漢(かん)字 日",
+        "back": "동영상 뒤",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "mediaRemoved": 1,
+        "excluded": false
+      },
+      {
+        "rowIndex": 12,
+        "front": "소리 뒤",
+        "back": "대체 글",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "mediaRemoved": 5,
+        "excluded": false
+      }
+    ]
+  },
+  "previewStats": {
+    "cardCount": 13,
+    "excludedCount": 0,
+    "emptyReplacedCount": 0,
+    "truncatedCount": 0,
+    "mediaRemovedCount": 6
+  },
+  "limit": {
+    "exceeded": false
+  }
+}

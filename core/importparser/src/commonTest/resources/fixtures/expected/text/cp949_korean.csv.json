@@ -1,0 +1,115 @@
+{
+  "fixture": "text/cp949_korean.csv",
+  "format": "TEXT",
+  "sourceName": "cp949_korean.csv",
+  "encoding": "CP949",
+  "htmlMode": "PLAIN",
+  "separator": ",",
+  "hasHeaderRow": true,
+  "noteTypes": [
+    {
+      "id": "text",
+      "name": "cp949_korean.csv",
+      "fieldNames": [
+        "단어",
+        "뜻"
+      ],
+      "isCloze": false,
+      "noteCount": 4
+    }
+  ],
+  "rowCount": 4,
+  "warnings": [
+    {
+      "code": "ENCODING_FALLBACK_CP949"
+    }
+  ],
+  "rows": [
+    {
+      "index": 0,
+      "fieldValues": [
+        "사과",
+        "apple"
+      ]
+    },
+    {
+      "index": 1,
+      "fieldValues": [
+        "똠방각하",
+        "확장 한글 똠"
+      ]
+    },
+    {
+      "index": 2,
+      "fieldValues": [
+        "햏",
+        "확장 한글 햏"
+      ]
+    },
+    {
+      "index": 3,
+      "fieldValues": [
+        "읽기",
+        "따옴표, 쉼표"
+      ]
+    }
+  ],
+  "cards": {
+    "items": [
+      {
+        "rowIndex": 0,
+        "front": "사과",
+        "back": "apple",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 1,
+        "front": "똠방각하",
+        "back": "확장 한글 똠",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 2,
+        "front": "햏",
+        "back": "확장 한글 햏",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 3,
+        "front": "읽기",
+        "back": "따옴표, 쉼표",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "mediaRemoved": 0,
+        "excluded": false
+      }
+    ]
+  },
+  "previewStats": {
+    "cardCount": 4,
+    "excludedCount": 0,
+    "emptyReplacedCount": 0,
+    "truncatedCount": 0,
+    "mediaRemovedCount": 0
+  },
+  "limit": {
+    "exceeded": false
+  }
+}

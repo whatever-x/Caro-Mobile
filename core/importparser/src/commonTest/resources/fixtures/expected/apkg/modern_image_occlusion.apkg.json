@@ -1,0 +1,86 @@
+{
+  "fixture": "apkg/modern_image_occlusion.apkg",
+  "format": "APKG",
+  "htmlMode": "HTML",
+  "subdecks": [
+    {
+      "id": null,
+      "path": "Diagrams",
+      "noteCount": 4,
+      "imageOcclusionNoteCount": 2
+    }
+  ],
+  "notesWithoutDeck": 0,
+  "noteTypes": [
+    {
+      "id": null,
+      "name": "Basic",
+      "fieldNames": [
+        "Front",
+        "Back"
+      ],
+      "isCloze": false,
+      "isImageOcclusion": false,
+      "noteCount": 2,
+      "selectedCardCount": 2
+    },
+    {
+      "id": null,
+      "name": "Image Occlusion",
+      "fieldNames": [
+        "Occlusion",
+        "Image",
+        "Header",
+        "Back Extra",
+        "Comments"
+      ],
+      "isCloze": true,
+      "isImageOcclusion": true,
+      "noteCount": 2,
+      "selectedCardCount": 3
+    }
+  ],
+  "totalNotes": 4,
+  "warnings": [
+    {
+      "code": "APKG_IMAGE_OCCLUSION_EXCLUDED",
+      "count": 3
+    }
+  ],
+  "cards": {
+    "items": [
+      {
+        "rowIndex": 0,
+        "front": "label-1",
+        "back": "라벨 1",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 1,
+        "front": "label-2",
+        "back": "라벨 2",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "mediaRemoved": 0,
+        "excluded": false
+      }
+    ]
+  },
+  "previewStats": {
+    "cardCount": 2,
+    "excludedCount": 0,
+    "emptyReplacedCount": 0,
+    "truncatedCount": 0,
+    "mediaRemovedCount": 0
+  },
+  "limit": {
+    "exceeded": false
+  }
+}

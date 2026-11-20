@@ -1,0 +1,267 @@
+{
+  "fixture": "text/edge_rows.tsv",
+  "format": "TEXT",
+  "sourceName": "edge_rows.tsv",
+  "encoding": "UTF-8",
+  "htmlMode": "PLAIN",
+  "separator": "\t",
+  "hasHeaderRow": false,
+  "noteTypes": [
+    {
+      "id": "text",
+      "name": "edge_rows.tsv",
+      "fieldNames": [
+        "열 1",
+        "열 2",
+        "열 3"
+      ],
+      "isCloze": false,
+      "noteCount": 12
+    }
+  ],
+  "rowCount": 12,
+  "warnings": [
+    {
+      "code": "TEXT_INCONSISTENT_COLUMNS",
+      "count": 11
+    }
+  ],
+  "rows": [
+    {
+      "index": 0,
+      "fieldValues": [
+        "",
+        "뒷면만 있음",
+        ""
+      ]
+    },
+    {
+      "index": 1,
+      "fieldValues": [
+        "앞면만 있음",
+        "",
+        ""
+      ]
+    },
+    {
+      "index": 2,
+      "fieldValues": [
+        "[sound:only1.mp3]",
+        "[sound:only2.mp3]",
+        ""
+      ]
+    },
+    {
+      "index": 3,
+      "fieldValues": [
+        "가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가",
+        "501자 앞면",
+        ""
+      ]
+    },
+    {
+      "index": 4,
+      "fieldValues": [
+        "1000자 뒷면",
+        "가나다라마바사아자차abcdefghij가나다라마바사아자차abcdefghij가나다라마바사아자차abcdefghij가나다라마바사아자차abcdefghij가나다라마바사아자차abcdefghij가나다라마바사아자차abcdefghij가나다라마바사아자차abcdefghij가나다라마바사아자차abcdefghij가나다라마바사아자차abcdefghij가나다라마바사아자차abcdefghij가나다라마바사아자차abcdefghij가나다라마바사아자차abcdefghij가나다라마바사아자차abcdefghij가나다라마바사아자차abcdefghij가나다라마바사아자차abcdefghij가나다라마바사아자차abcdefghij가나다라마바사아자차abcdefghij가나다라마바사아자차abcdefghij가나다라마바사아자차abcdefghij가나다라마바사아자차abcdefghij가나다라마바사아자차abcdefghij가나다라마바사아자차abcdefghij가나다라마바사아자차abcdefghij가나다라마바사아자차abcdefghij가나다라마바사아자차abcdefghij가나다라마바사아자차abcdefghij가나다라마바사아자차abcdefghij가나다라마바사아자차abcdefghij가나다라마바사아자차abcdefghij가나다라마바사아자차abcdefghij가나다라마바사아자차abcdefghij가나다라마바사아자차abcdefghij가나다라마바사아자차abcdefghij가나다라마바사아자차abcdefghij가나다라마바사아자차abcdefghij가나다라마바사아자차abcdefghij가나다라마바사아자차abcdefghij가나다라마바사아자차abcdefghij가나다라마바사아자차abcdefghij가나다라마바사아자차abcdefghij가나다라마바사아자차abcdefghij가나다라마바사아자차abcdefghij가나다라마바사아자차abcdefghij가나다라마바사아자차abcdefghij가나다라마바사아자차abcdefghij가나다라마바사아자차abcdefghij가나다라마바사아자차abcdefghij가나다라마바사아자차abcdefghij가나다라마바사아자차abcdefghij가나다라마바사아자차abcdefghij",
+        ""
+      ]
+    },
+    {
+      "index": 5,
+      "fieldValues": [
+        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\ud83d\ude00b",
+        "서로게이트 경계에서 자름",
+        ""
+      ]
+    },
+    {
+      "index": 6,
+      "fieldValues": [
+        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\ud83d\ude00bb",
+        "서로게이트 쌍 보존",
+        ""
+      ]
+    },
+    {
+      "index": 7,
+      "fieldValues": [
+        "나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나",
+        "정확히 500자",
+        ""
+      ]
+    },
+    {
+      "index": 8,
+      "fieldValues": [
+        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\ud83d\ude00",
+        "UTF-16 500 단위",
+        ""
+      ]
+    },
+    {
+      "index": 9,
+      "fieldValues": [
+        "열 하나만 있는 행",
+        "",
+        ""
+      ]
+    },
+    {
+      "index": 10,
+      "fieldValues": [
+        "세 열",
+        "둘째",
+        "셋째"
+      ]
+    },
+    {
+      "index": 11,
+      "fieldValues": [
+        "마지막 행",
+        "정상",
+        ""
+      ]
+    }
+  ],
+  "cards": {
+    "items": [
+      {
+        "rowIndex": 0,
+        "front": "빈 항목입니다",
+        "back": "뒷면만 있음",
+        "frontReplaced": true,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 1,
+        "front": "앞면만 있음",
+        "back": "빈 항목입니다",
+        "frontReplaced": false,
+        "backReplaced": true,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 2,
+        "excluded": true,
+        "mediaRemoved": 0
+      },
+      {
+        "rowIndex": 3,
+        "front": "가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가",
+        "back": "501자 앞면",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": true,
+        "backTruncated": false,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 4,
+        "front": "1000자 뒷면",
+        "back": "가나다라마바사아자차abcdefghij가나다라마바사아자차abcdefghij가나다라마바사아자차abcdefghij가나다라마바사아자차abcdefghij가나다라마바사아자차abcdefghij가나다라마바사아자차abcdefghij가나다라마바사아자차abcdefghij가나다라마바사아자차abcdefghij가나다라마바사아자차abcdefghij가나다라마바사아자차abcdefghij가나다라마바사아자차abcdefghij가나다라마바사아자차abcdefghij가나다라마바사아자차abcdefghij가나다라마바사아자차abcdefghij가나다라마바사아자차abcdefghij가나다라마바사아자차abcdefghij가나다라마바사아자차abcdefghij가나다라마바사아자차abcdefghij가나다라마바사아자차abcdefghij가나다라마바사아자차abcdefghij가나다라마바사아자차abcdefghij가나다라마바사아자차abcdefghij가나다라마바사아자차abcdefghij가나다라마바사아자차abcdefghij가나다라마바사아자차abcdefghij",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": true,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 5,
+        "front": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "back": "서로게이트 경계에서 자름",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": true,
+        "backTruncated": false,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 6,
+        "front": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\ud83d\ude00",
+        "back": "서로게이트 쌍 보존",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": true,
+        "backTruncated": false,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 7,
+        "front": "나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나나",
+        "back": "정확히 500자",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 8,
+        "front": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\ud83d\ude00",
+        "back": "UTF-16 500 단위",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 9,
+        "front": "열 하나만 있는 행",
+        "back": "빈 항목입니다",
+        "frontReplaced": false,
+        "backReplaced": true,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 10,
+        "front": "세 열",
+        "back": "둘째\n셋째",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 11,
+        "front": "마지막 행",
+        "back": "정상",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "mediaRemoved": 0,
+        "excluded": false
+      }
+    ]
+  },
+  "previewStats": {
+    "cardCount": 11,
+    "excludedCount": 1,
+    "emptyReplacedCount": 3,
+    "truncatedCount": 4,
+    "mediaRemovedCount": 0
+  },
+  "limit": {
+    "exceeded": false
+  }
+}

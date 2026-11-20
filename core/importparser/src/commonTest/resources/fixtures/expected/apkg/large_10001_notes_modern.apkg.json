@@ -1,0 +1,82 @@
+{
+  "fixture": "apkg/large_10001_notes_modern.apkg",
+  "format": "APKG",
+  "htmlMode": "HTML",
+  "subdecks": [
+    {
+      "id": null,
+      "path": "Big::Part1",
+      "noteCount": 5000
+    },
+    {
+      "id": null,
+      "path": "Big::Part2",
+      "noteCount": 5000
+    },
+    {
+      "id": null,
+      "path": "Big::Part3",
+      "noteCount": 1
+    }
+  ],
+  "notesWithoutDeck": 0,
+  "noteTypes": [
+    {
+      "id": "1700000001",
+      "name": "Basic",
+      "fieldNames": [
+        "Front",
+        "Back"
+      ],
+      "isCloze": false,
+      "noteCount": 10001
+    }
+  ],
+  "totalNotes": 10001,
+  "warnings": [],
+  "rows": [
+    {
+      "rowIndex": 0,
+      "fieldValues": [
+        "filler00001",
+        "채움00001"
+      ]
+    },
+    {
+      "rowIndex": 10000,
+      "fieldValues": [
+        "filler10001",
+        "채움10001"
+      ]
+    }
+  ],
+  "selectionExamples": [
+    {
+      "selectedPaths": [
+        "Big::Part1",
+        "Big::Part2",
+        "Big::Part3"
+      ],
+      "cardCount": 10001,
+      "exceeded": true
+    },
+    {
+      "selectedPaths": [
+        "Big::Part1",
+        "Big::Part2"
+      ],
+      "cardCount": 10000,
+      "exceeded": false
+    },
+    {
+      "selectedPaths": [
+        "Big::Part3"
+      ],
+      "cardCount": 1,
+      "exceeded": false
+    }
+  ],
+  "limit": {
+    "exceededWithDefaultSelection": true
+  }
+}

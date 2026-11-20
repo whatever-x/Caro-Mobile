@@ -1,0 +1,51 @@
+{
+  "fixture": "xlsx/large_10001_rows.xlsx",
+  "format": "XLSX",
+  "sourceName": "large_10001_rows.xlsx",
+  "htmlMode": "PLAIN",
+  "sheets": [
+    {
+      "index": 0,
+      "name": "Sheet1",
+      "rowCount": 10002
+    }
+  ],
+  "hasHeaderRow": true,
+  "noteTypes": [
+    {
+      "id": "xlsx",
+      "name": "Sheet1",
+      "fieldNames": [
+        "front",
+        "back"
+      ],
+      "isCloze": false,
+      "noteCount": 10001
+    }
+  ],
+  "dataRowCount": 10001,
+  "rows": [
+    {
+      "index": 0,
+      "fieldValues": [
+        "filler00001",
+        "채움00001"
+      ]
+    },
+    {
+      "index": 10000,
+      "fieldValues": [
+        "filler10001",
+        "채움10001"
+      ]
+    }
+  ],
+  "warnings": [],
+  "limit": {
+    "exceeded": true,
+    "rowsKept": 10001
+  },
+  "previewStats": {
+    "cardCount": 10001
+  }
+}

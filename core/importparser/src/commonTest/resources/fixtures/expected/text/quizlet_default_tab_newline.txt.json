@@ -1,0 +1,129 @@
+{
+  "fixture": "text/quizlet_default_tab_newline.txt",
+  "format": "TEXT",
+  "sourceName": "quizlet_default_tab_newline.txt",
+  "encoding": "UTF-8",
+  "htmlMode": "PLAIN",
+  "separator": "\t",
+  "hasHeaderRow": false,
+  "noteTypes": [
+    {
+      "id": "text",
+      "name": "quizlet_default_tab_newline.txt",
+      "fieldNames": [
+        "열 1",
+        "열 2"
+      ],
+      "isCloze": false,
+      "noteCount": 5
+    }
+  ],
+  "rowCount": 5,
+  "warnings": [],
+  "rows": [
+    {
+      "index": 0,
+      "fieldValues": [
+        "abandon",
+        "버리다"
+      ]
+    },
+    {
+      "index": 1,
+      "fieldValues": [
+        "benevolent",
+        "자비로운"
+      ]
+    },
+    {
+      "index": 2,
+      "fieldValues": [
+        "candid",
+        "솔직한"
+      ]
+    },
+    {
+      "index": 3,
+      "fieldValues": [
+        "diligent",
+        "부지런한"
+      ]
+    },
+    {
+      "index": 4,
+      "fieldValues": [
+        "eager",
+        "열망하는"
+      ]
+    }
+  ],
+  "cards": {
+    "items": [
+      {
+        "rowIndex": 0,
+        "front": "abandon",
+        "back": "버리다",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 1,
+        "front": "benevolent",
+        "back": "자비로운",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 2,
+        "front": "candid",
+        "back": "솔직한",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 3,
+        "front": "diligent",
+        "back": "부지런한",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 4,
+        "front": "eager",
+        "back": "열망하는",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "mediaRemoved": 0,
+        "excluded": false
+      }
+    ]
+  },
+  "previewStats": {
+    "cardCount": 5,
+    "excludedCount": 0,
+    "emptyReplacedCount": 0,
+    "truncatedCount": 0,
+    "mediaRemovedCount": 0
+  },
+  "limit": {
+    "exceeded": false
+  }
+}

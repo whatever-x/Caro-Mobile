@@ -1,0 +1,59 @@
+{
+  "fixture": "text/quizlet_custom_comma_semicolon.txt",
+  "format": "TEXT",
+  "sourceName": "quizlet_custom_comma_semicolon.txt",
+  "encoding": "UTF-8",
+  "htmlMode": "PLAIN",
+  "separator": ";",
+  "hasHeaderRow": false,
+  "noteTypes": [
+    {
+      "id": "text",
+      "name": "quizlet_custom_comma_semicolon.txt",
+      "fieldNames": [
+        "열 1",
+        "열 2",
+        "열 3"
+      ],
+      "isCloze": false,
+      "noteCount": 1
+    }
+  ],
+  "rowCount": 1,
+  "warnings": [],
+  "rows": [
+    {
+      "index": 0,
+      "fieldValues": [
+        "abandon,버리다",
+        "benevolent,자비로운",
+        "candid,솔직한"
+      ]
+    }
+  ],
+  "cards": {
+    "items": [
+      {
+        "rowIndex": 0,
+        "front": "abandon,버리다",
+        "back": "benevolent,자비로운\ncandid,솔직한",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "mediaRemoved": 0,
+        "excluded": false
+      }
+    ]
+  },
+  "previewStats": {
+    "cardCount": 1,
+    "excludedCount": 0,
+    "emptyReplacedCount": 0,
+    "truncatedCount": 0,
+    "mediaRemovedCount": 0
+  },
+  "limit": {
+    "exceeded": false
+  }
+}

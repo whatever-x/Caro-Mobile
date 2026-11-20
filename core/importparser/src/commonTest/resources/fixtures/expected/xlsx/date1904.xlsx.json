@@ -1,0 +1,121 @@
+{
+  "fixture": "xlsx/date1904.xlsx",
+  "format": "XLSX",
+  "sourceName": "date1904.xlsx",
+  "htmlMode": "PLAIN",
+  "sheets": [
+    {
+      "index": 0,
+      "name": "Sheet1",
+      "rowCount": 5
+    }
+  ],
+  "warnings": [],
+  "perSheet": [
+    {
+      "sheetIndex": 0,
+      "noteTypes": [
+        {
+          "id": "xlsx",
+          "name": "Sheet1",
+          "fieldNames": [
+            "front",
+            "back"
+          ],
+          "isCloze": false,
+          "noteCount": 4
+        }
+      ],
+      "rowCount": 4,
+      "warnings": [],
+      "rows": [
+        {
+          "index": 0,
+          "fieldValues": [
+            "date 14",
+            "2027-03-16"
+          ]
+        },
+        {
+          "index": 1,
+          "fieldValues": [
+            "date 14 zero",
+            "1904-01-01"
+          ]
+        },
+        {
+          "index": 2,
+          "fieldValues": [
+            "datetime 22",
+            "2027-03-16 12:00"
+          ]
+        },
+        {
+          "index": 3,
+          "fieldValues": [
+            "general",
+            "45000"
+          ]
+        }
+      ],
+      "cards": {
+        "items": [
+          {
+            "rowIndex": 0,
+            "backEn": "3/16/2027",
+            "front": "date 14",
+            "back": "2027-03-16",
+            "frontReplaced": false,
+            "backReplaced": false,
+            "frontTruncated": false,
+            "backTruncated": false,
+            "mediaRemoved": 0,
+            "excluded": false
+          },
+          {
+            "rowIndex": 1,
+            "backEn": "1/1/1904",
+            "front": "date 14 zero",
+            "back": "1904-01-01",
+            "frontReplaced": false,
+            "backReplaced": false,
+            "frontTruncated": false,
+            "backTruncated": false,
+            "mediaRemoved": 0,
+            "excluded": false
+          },
+          {
+            "rowIndex": 2,
+            "backEn": "3/16/2027 12:00",
+            "front": "datetime 22",
+            "back": "2027-03-16 12:00",
+            "frontReplaced": false,
+            "backReplaced": false,
+            "frontTruncated": false,
+            "backTruncated": false,
+            "mediaRemoved": 0,
+            "excluded": false
+          },
+          {
+            "rowIndex": 3,
+            "front": "general",
+            "back": "45000",
+            "frontReplaced": false,
+            "backReplaced": false,
+            "frontTruncated": false,
+            "backTruncated": false,
+            "mediaRemoved": 0,
+            "excluded": false
+          }
+        ]
+      },
+      "previewStats": {
+        "cardCount": 4,
+        "excludedCount": 0,
+        "emptyReplacedCount": 0,
+        "truncatedCount": 0,
+        "mediaRemovedCount": 0
+      }
+    }
+  ]
+}

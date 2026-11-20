@@ -1,0 +1,111 @@
+{
+  "fixture": "text/semicolon_no_header.csv",
+  "format": "TEXT",
+  "sourceName": "semicolon_no_header.csv",
+  "encoding": "UTF-8",
+  "htmlMode": "PLAIN",
+  "separator": ";",
+  "hasHeaderRow": false,
+  "noteTypes": [
+    {
+      "id": "text",
+      "name": "semicolon_no_header.csv",
+      "fieldNames": [
+        "열 1",
+        "열 2"
+      ],
+      "isCloze": false,
+      "noteCount": 4
+    }
+  ],
+  "rowCount": 4,
+  "warnings": [],
+  "rows": [
+    {
+      "index": 0,
+      "fieldValues": [
+        "Haus",
+        "집, 주택"
+      ]
+    },
+    {
+      "index": 1,
+      "fieldValues": [
+        "Baum",
+        "나무"
+      ]
+    },
+    {
+      "index": 2,
+      "fieldValues": [
+        "Brot",
+        "빵"
+      ]
+    },
+    {
+      "index": 3,
+      "fieldValues": [
+        "Tisch; Möbel",
+        "탁자"
+      ]
+    }
+  ],
+  "cards": {
+    "items": [
+      {
+        "rowIndex": 0,
+        "front": "Haus",
+        "back": "집, 주택",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 1,
+        "front": "Baum",
+        "back": "나무",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 2,
+        "front": "Brot",
+        "back": "빵",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 3,
+        "front": "Tisch; Möbel",
+        "back": "탁자",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "mediaRemoved": 0,
+        "excluded": false
+      }
+    ]
+  },
+  "previewStats": {
+    "cardCount": 4,
+    "excludedCount": 0,
+    "emptyReplacedCount": 0,
+    "truncatedCount": 0,
+    "mediaRemovedCount": 0
+  },
+  "limit": {
+    "exceeded": false
+  }
+}

@@ -1,0 +1,127 @@
+{
+  "fixture": "apkg/legacy_edge_cases.apkg",
+  "format": "APKG",
+  "htmlMode": "HTML",
+  "subdecks": [
+    {
+      "id": "2059400010",
+      "path": "Edge",
+      "noteCount": 4
+    }
+  ],
+  "notesWithoutDeck": 1,
+  "noteTypes": [
+    {
+      "id": "1700000001",
+      "name": "Basic",
+      "fieldNames": [
+        "Front",
+        "Back"
+      ],
+      "isCloze": false,
+      "noteCount": 4
+    }
+  ],
+  "totalNotes": 5,
+  "warnings": [
+    {
+      "code": "APKG_FIELD_COUNT_MISMATCH",
+      "count": 2
+    }
+  ],
+  "rows": [
+    {
+      "rowIndex": 0,
+      "subdeckPath": "Edge",
+      "fieldValues": [
+        "extra field",
+        "has 3 parts"
+      ]
+    },
+    {
+      "rowIndex": 1,
+      "subdeckPath": "Edge",
+      "fieldValues": [
+        "missing back",
+        ""
+      ]
+    },
+    {
+      "rowIndex": 2,
+      "subdeckPath": "Edge",
+      "fieldValues": [
+        "<br>",
+        "&nbsp;"
+      ]
+    },
+    {
+      "rowIndex": 3,
+      "subdeckPath": "Edge",
+      "fieldValues": [
+        "정상 앞",
+        "정상 뒤"
+      ]
+    }
+  ],
+  "cards": {
+    "items": [
+      {
+        "rowIndex": 0,
+        "front": "extra field",
+        "back": "has 3 parts",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 1,
+        "front": "missing back",
+        "back": "빈 항목입니다",
+        "frontReplaced": false,
+        "backReplaced": true,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 2,
+        "excluded": true,
+        "mediaRemoved": 0
+      },
+      {
+        "rowIndex": 3,
+        "front": "정상 앞",
+        "back": "정상 뒤",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "mediaRemoved": 0,
+        "excluded": false
+      }
+    ]
+  },
+  "previewStats": {
+    "cardCount": 3,
+    "excludedCount": 1,
+    "emptyReplacedCount": 1,
+    "truncatedCount": 0,
+    "mediaRemovedCount": 0
+  },
+  "selectionExamples": [
+    {
+      "selectedPaths": [
+        "Edge"
+      ],
+      "noteCount": 4,
+      "cardCount": 3
+    }
+  ],
+  "limit": {
+    "exceeded": false
+  }
+}

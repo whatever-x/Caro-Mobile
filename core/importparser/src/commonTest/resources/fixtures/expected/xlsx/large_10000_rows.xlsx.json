@@ -1,0 +1,51 @@
+{
+  "fixture": "xlsx/large_10000_rows.xlsx",
+  "format": "XLSX",
+  "sourceName": "large_10000_rows.xlsx",
+  "htmlMode": "PLAIN",
+  "sheets": [
+    {
+      "index": 0,
+      "name": "Sheet1",
+      "rowCount": 10001
+    }
+  ],
+  "hasHeaderRow": true,
+  "noteTypes": [
+    {
+      "id": "xlsx",
+      "name": "Sheet1",
+      "fieldNames": [
+        "front",
+        "back"
+      ],
+      "isCloze": false,
+      "noteCount": 10000
+    }
+  ],
+  "dataRowCount": 10000,
+  "rows": [
+    {
+      "index": 0,
+      "fieldValues": [
+        "filler00001",
+        "채움00001"
+      ]
+    },
+    {
+      "index": 9999,
+      "fieldValues": [
+        "filler10000",
+        "채움10000"
+      ]
+    }
+  ],
+  "warnings": [],
+  "limit": {
+    "exceeded": false,
+    "rowsKept": 10000
+  },
+  "previewStats": {
+    "cardCount": 10000
+  }
+}
