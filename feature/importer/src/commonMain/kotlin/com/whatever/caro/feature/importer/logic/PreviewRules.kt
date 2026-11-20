@@ -7,7 +7,7 @@ import com.whatever.caro.feature.importer.transform.ImportCard
 import com.whatever.caro.feature.importer.transform.ImportPreview
 import com.whatever.caro.feature.importer.transform.ImportPreviewBuilder
 
-internal enum class NoCardsKind {
+enum class NoCardsKind {
     ImageOcclusionOnly,
     NoContent,
 }

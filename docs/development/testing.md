@@ -65,7 +65,9 @@
 ./gradlew koverAllVerify
 ```
 
-[커버리지 컨벤션](../../build-logic/convention/src/main/kotlin/KoverPlugin.kt)은 `:core:data`의 RepositoryImpl과 `:feature:*`의 ViewModel을 대상으로 합니다. 현재 Gradle 검증 하한은 라인 커버리지 50%입니다. PR 댓글의 80% 표시 기준과 구분합니다. 대상 집계는 [루트 빌드 설정](../../build.gradle.kts)을 확인합니다.
+[커버리지 컨벤션](../../build-logic/convention/src/main/kotlin/KoverPlugin.kt)은 `:core:data`의 RepositoryImpl과 `:feature:*`의 ViewModel을 대상으로 합니다. 현재 Gradle 검증 하한은 라인 커버리지 50%입니다. PR 댓글의 80% 표시 기준과 구분합니다.
+`:feature:importer`만 별도 규칙으로 라인 커버리지 하한을 80%로 둡니다.
+대상 집계는 [루트 빌드 설정](../../build.gradle.kts)을 확인합니다.
 
 스크린샷의 공통 기준은 [스크린샷 테스트 규칙](screenshot-testing.md), 작성 절차와 예제는
 [스크린샷 작성 스킬](../../.agents/skills/caro-screenshot-testing/SKILL.md)을 따릅니다.
