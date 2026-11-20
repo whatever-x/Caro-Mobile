@@ -116,6 +116,15 @@
 - **삭제된 엔드포인트**: 메서드 제거. 호출부도 함께 정리한다.
 - **삭제된 태그**: 인터페이스 파일 삭제 + `apiModule` binding 제거 + 모든 호출부 정리.
 
+## 수동 선언 예외
+
+스펙으로 만들 수 없어 직접 선언한 메서드다. 스펙에 없어도 지우거나 생성 결과로 덮어쓰지 않는다.
+
+| 메서드 | 직접 선언한 이유 |
+| --- | --- |
+| `CardApi.requestCreateCardChunk` | 같은 경로·메서드의 1.0 카드 생성(`requestCreateCards`)과 Swagger에서 한 operation으로 합쳐져 생성할 수 없다. `API-Version: 1.1`과 `Idempotency-Key` 헤더가 빠지면 `ApiVersionHeaderTest`가 실패한다. |
+| `CardDataSource.createCardChunk`와 `RemoteCardDataSourceImpl`의 구현 | 위 API 메서드를 감싸는 DataSource 메서드라 함께 남긴다. |
+
 ---
 
 # RemoteDataSource 매핑

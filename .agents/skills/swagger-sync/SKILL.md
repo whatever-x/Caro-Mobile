@@ -79,6 +79,7 @@ cron 자동화는 사용하지 않으며, 사용자가 트리거할 때마다
      명시적으로 `security: []`인 엔드포인트만 NON_AUTH qualifier로
      `core/remote/di/ApiModule.kt`의 `apiModule`에 binding을 등록/갱신한다.
    - 스펙에서 사라진 엔드포인트/태그는 호출부 정리까지 함께 한다.
+   - `reference/rules.md`의 "수동 선언 예외" 목록에 있는 메서드는 스펙에 없어도 지우지 않는다.
 
 8. **도메인별 RemoteDataSource를 매핑한다.**
    - 태그별 Ktorfit API를 도메인 단위 DataSource(`core/remote/datasource/{domain}/`)로 감싸고
@@ -88,6 +89,7 @@ cron 자동화는 사용하지 않으며, 사용자가 트리거할 때마다
    - 같은 API가 `apiModule`에서 AUTH·NON_AUTH 두 qualifier로 등록된 경우, DataSource도
      qualifier별로 2개 생성해 `RemoteModule`에서 `get(named(...))`로 명시 주입한다.
    - 스펙에서 사라진 엔드포인트/도메인은 DataSource·바인딩·호출부까지 함께 정리한다.
+   - `reference/rules.md`의 "수동 선언 예외" 목록에 있는 메서드는 스펙에 없어도 지우지 않는다.
 
 9. `verify` 스크립트 실행 → 컴파일 검증.
    - 실패 시: 원인을 분석해 수정 후 재시도. 3회 실패하면 중단하고 사용자에게 보고.

@@ -3,33 +3,30 @@ package com.whatever.caro.feature.card.delete.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import caromobile.core.designsystem.generated.resources.Res
 import caromobile.core.designsystem.generated.resources.card_content_description_checkbox
-import caromobile.core.designsystem.generated.resources.ic_check_16
+import com.whatever.caro.core.designsystem.components.CaroCheckbox
 import com.whatever.caro.core.designsystem.modifier.noRippleClickable
 import com.whatever.caro.core.designsystem.themes.CaroTheme
 import com.whatever.caro.feature.card.delete.model.DeleteCardItem
-import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
 private val CardItemHeight = 81.dp
-private val CheckboxSize = 22.dp
 private val HairlineThickness = 1.dp
 private const val CARD_TEXT_MAX_LINES = 1
 
@@ -38,6 +35,8 @@ internal fun DeleteCardListItem(
     item: DeleteCardItem,
     onClick: () -> Unit,
 ) {
+    val selectedDescription = stringResource(Res.string.card_content_description_checkbox)
+
     Row(
         modifier =
             Modifier
@@ -50,7 +49,11 @@ internal fun DeleteCardListItem(
                     color = CaroTheme.color.border.primary,
                     shape = CaroTheme.shape.m,
                 ).noRippleClickable(onClick = onClick)
-                .padding(
+                .semantics {
+                    if (item.isSelected) {
+                        contentDescription = selectedDescription
+                    }
+                }.padding(
                     horizontal = CaroTheme.spacing.xl2,
                     vertical = CaroTheme.spacing.xl,
                 ),
@@ -75,45 +78,6 @@ internal fun DeleteCardListItem(
                 overflow = TextOverflow.Ellipsis,
             )
         }
-        SelectCheckbox(isSelected = item.isSelected)
-    }
-}
-
-@Composable
-internal fun SelectCheckbox(isSelected: Boolean) {
-    val backgroundColor =
-        if (isSelected) {
-            CaroTheme.color.surface.brand
-        } else {
-            Color.Transparent
-        }
-    val borderColor =
-        if (isSelected) {
-            CaroTheme.color.border.brand
-        } else {
-            CaroTheme.color.border.primary
-        }
-
-    Box(
-        modifier =
-            Modifier
-                .size(CheckboxSize)
-                .clip(CaroTheme.shape.xs)
-                .background(backgroundColor)
-                .border(
-                    width = HairlineThickness,
-                    color = borderColor,
-                    shape = CaroTheme.shape.xs,
-                ),
-        contentAlignment = Alignment.Center,
-    ) {
-        if (isSelected) {
-            Icon(
-                modifier = Modifier.size(CaroTheme.spacing.l),
-                painter = painterResource(Res.drawable.ic_check_16),
-                contentDescription = stringResource(Res.string.card_content_description_checkbox),
-                tint = CaroTheme.color.icon.inverse,
-            )
-        }
+        CaroCheckbox(state = if (item.isSelected) ToggleableState.On else ToggleableState.Off)
     }
 }

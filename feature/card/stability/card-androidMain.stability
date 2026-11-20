@@ -14,12 +14,13 @@ private fun com.whatever.caro.feature.card.AddCardButton(enabled: kotlin.Boolean
     - onClick: STABLE (function type)
 
 @Composable
-private fun com.whatever.caro.feature.card.AddedCardsSection(addedCount: kotlin.Int, addedCards: kotlinx.collections.immutable.ImmutableList<com.whatever.caro.feature.card.mvi.StagedCard>, onRemove: kotlin.Function1<kotlin.Long, kotlin.Unit>): kotlin.Unit
+private fun com.whatever.caro.feature.card.AddedCardsSection(addedCount: kotlin.Int, addedCards: kotlinx.collections.immutable.ImmutableList<com.whatever.caro.feature.card.mvi.StagedCard>, scrollToEndKey: kotlin.Long, onRemove: kotlin.Function1<kotlin.Long, kotlin.Unit>): kotlin.Unit
   skippable: true
   restartable: true
   params:
     - addedCount: STABLE (primitive type)
     - addedCards: STABLE (known stable type)
+    - scrollToEndKey: STABLE (primitive type)
     - onRemove: STABLE (function type)
 
 @Composable
@@ -57,6 +58,14 @@ internal fun com.whatever.caro.feature.card.CreateCardScreen(state: com.whatever
     - onIntent: STABLE (function type)
 
 @Composable
+private fun com.whatever.caro.feature.card.DiscardConfirmDialog(onLeave: kotlin.Function0<kotlin.Unit>, onStay: kotlin.Function0<kotlin.Unit>): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - onLeave: STABLE (function type)
+    - onStay: STABLE (function type)
+
+@Composable
 private fun com.whatever.caro.feature.card.EditBottomBar(enabled: kotlin.Boolean, onClick: kotlin.Function0<kotlin.Unit>): kotlin.Unit
   skippable: true
   restartable: true
@@ -73,11 +82,12 @@ internal fun com.whatever.caro.feature.card.EditCardScreen(state: com.whatever.c
     - onIntent: STABLE (function type)
 
 @Composable
-private fun com.whatever.caro.feature.card.FieldCounter(count: kotlin.String): kotlin.Unit
+private fun com.whatever.caro.feature.card.FieldCounter(count: kotlin.String, isMaxReached: kotlin.Boolean): kotlin.Unit
   skippable: true
   restartable: true
   params:
     - count: STABLE (String is immutable)
+    - isMaxReached: STABLE (primitive type)
 
 @Composable
 private fun com.whatever.caro.feature.card.FieldCounter(count: kotlin.String): kotlin.Unit
@@ -211,13 +221,6 @@ internal fun com.whatever.caro.feature.card.delete.components.SelectAllTextButto
   restartable: true
   params:
     - onClick: STABLE (function type)
-
-@Composable
-internal fun com.whatever.caro.feature.card.delete.components.SelectCheckbox(isSelected: kotlin.Boolean): kotlin.Unit
-  skippable: true
-  restartable: true
-  params:
-    - isSelected: STABLE (primitive type)
 
 @Composable
 private fun com.whatever.caro.feature.card.detail.CardDetailBottomBar(enabled: kotlin.Boolean, onPrevious: kotlin.Function0<kotlin.Unit>, onNext: kotlin.Function0<kotlin.Unit>): kotlin.Unit

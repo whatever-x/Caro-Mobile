@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <resources>
+	<!-- common -->
+	<string name="checkbox_state_partially_selected">Partially selected</string>
 	<!-- app -->
 	<string name="app_exit_dialog_title">Exit the app?</string>
 	<string name="app_exit_dialog_button_exit">Exit</string>
