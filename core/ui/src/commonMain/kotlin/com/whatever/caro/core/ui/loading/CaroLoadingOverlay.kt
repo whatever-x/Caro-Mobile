@@ -4,6 +4,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
@@ -17,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.unit.dp
 import androidx.navigationevent.NavigationEventInfo
@@ -141,6 +143,12 @@ fun CaroLoadingOverlay(modifier: Modifier = Modifier) {
 
 @Composable
 internal fun ScreenLoadingLottie(modifier: Modifier = Modifier) {
+    // Lottie는 파일을 비동기로 읽고 프레임이 시간에 따라 달라진다. 미리보기와 스크린샷 테스트에서는 그림 없이 같은 크기의 자리만 둬야 결과가 매번 같다.
+    if (LocalInspectionMode.current) {
+        Spacer(modifier = modifier.size(ScreenLoadingSize))
+        return
+    }
+
     val composition by rememberLottieComposition {
         LottieCompositionSpec.JsonString(
             Res.readBytes(path = LOTTIE_SCREEN_LOADING_PATH).decodeToString(),

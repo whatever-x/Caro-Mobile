@@ -67,7 +67,7 @@ internal fun buildTextCheckTable(table: ParsedTable): TextCheckTable {
 }
 
 /** 비었거나 겹치는 이름, 파서가 그 열 자리에 만든 이름은 사용자가 쓴 제목이 아니므로 번호로 돌려준다. */
-private fun headerOf(
+internal fun headerOf(
     name: String,
     number: Int,
     isDuplicated: Boolean,
@@ -110,7 +110,7 @@ internal fun delimiterChips(selected: Char): List<DelimiterChip> {
     return if (selected in BuiltInDelimiters) chips else chips + DelimiterChip(selected, delimiterKind(selected), isSelected = true)
 }
 
-private fun delimiterKind(delimiter: Char): DelimiterKind? =
+internal fun delimiterKind(delimiter: Char): DelimiterKind? =
     when (delimiter) {
         '\t' -> DelimiterKind.TAB
         ',' -> DelimiterKind.COMMA
