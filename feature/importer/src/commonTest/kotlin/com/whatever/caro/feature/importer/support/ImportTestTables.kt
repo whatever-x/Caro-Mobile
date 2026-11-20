@@ -72,6 +72,17 @@ internal object ImportTestTables {
             layout = ParsedLayout(delimiter = delimiter, hasHeaderRow = hasHeaderRow),
         )
 
+    /** 비어 있지 않은 줄이 하나도 없는 입력이다. */
+    fun blankText(sourceName: String = "words.txt"): ParsedTable =
+        ParsedTable(
+            format = ImportFormat.TEXT,
+            sourceName = sourceName,
+            htmlMode = HtmlMode.PLAIN,
+            noteTypes = emptyList(),
+            rows = emptyList(),
+            layout = ParsedLayout(delimiter = "\t", hasHeaderRow = false),
+        )
+
     private fun noteType(
         id: String,
         name: String,

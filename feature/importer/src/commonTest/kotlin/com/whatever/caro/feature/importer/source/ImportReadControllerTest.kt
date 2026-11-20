@@ -69,6 +69,19 @@ class ImportReadControllerTest : FunSpec() {
             }
         }
 
+        test("읽기 전에 막는 파일도 정리한 파일 이름을 먼저 알린다") {
+            runTest(rig.dispatcher) {
+                val harness = rig.create()
+                val named = mutableListOf<String>()
+
+                harness.pick(FakePickedImportFile.ofSize("notes‮.docx", size = 100), onNamed = { name -> named += name })
+                advanceUntilIdle()
+
+                named shouldBe listOf("notes.docx")
+                harness.reader.calls.shouldBeEmpty()
+            }
+        }
+
         test("Anki 파일의 첫 읽기는 하위 덱 요약만 읽고 그 밖의 파일은 전체를 읽는다") {
             runTest(rig.dispatcher) {
                 val reader = FakeImportSourceReader().returns(ImportTestTables.apkgSummary("modern_anki21b_main.apkg"))
