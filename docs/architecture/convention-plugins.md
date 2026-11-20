@@ -92,3 +92,15 @@ Feature는 `caro.screenshot`이 추가한 **commonTest 의존성**으로만 플�
 Kotest·JUnit Platform은 `caro.kmp.test`, JUnit4 Robolectric 실행용 Vintage·Compose manifest는 Host Test에 유지합니다.
 Roborazzi 플러그인은 Feature에만 적용하며 기존 record/compare 태스크와 `separateOutputDirs=true`를 유지합니다.
 프로필·소스 배치·Dialog Window 계약은 [스크린샷 규칙](../development/screenshot-testing.md)이 원본입니다.
+
+## 파서 모듈
+
+[:core:importparser](../../core/importparser/build.gradle.kts)는 `caro.kmp`·`caro.kmp.android`·`caro.kotlin.serialization`·`caro.kmp.test`를 사용합니다.
+앱 조립용 framework export를 피하기 위해 `caro.kmp.ios`를 적용하지 않습니다.
+대신 `iosArm64()`와 `iosSimulatorArm64()`를 직접 선언합니다.
+서버에서 같은 파서를 재사용할 수 있도록 `jvm` 타깃을 함께 선언합니다. 바이트코드는 Android 타깃과 같은 17로 고정합니다.
+`jvmTest`는 컨벤션 플러그인의 설정 대상이 아니므로 이 모듈에서 Kotest runner 의존성과 JUnit Platform 실행을 직접 설정합니다.
+`caro.cmp`·`caro.koin`·`caro.kover`는 적용하지 않습니다.
+
+iOS 시뮬레이터 테스트는 작업 디렉터리가 모듈 경로가 아닙니다.
+그래서 `generateFixtureRoot` 태스크가 fixture 디렉터리의 절대 경로 상수를 생성하고, `commonTest`가 이 생성 소스를 포함합니다.
