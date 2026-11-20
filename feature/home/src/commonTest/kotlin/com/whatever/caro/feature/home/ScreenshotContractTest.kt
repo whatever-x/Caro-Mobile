@@ -10,7 +10,8 @@ class ScreenshotContractTest : FunSpec() {
         test("화면별 팩토리는 두 플랫폼에서 자신의 시나리오 ID를 유지한다") {
             for (platform in listOf("android", "ios")) {
                 val captures = screenshotCaptures(platform, HomeScreenshotScenario::scenarios)
-                captures.map { it.scenario.id }.toSet() shouldBe setOf(HomeScreenshotScenario.ID)
+                captures.map { it.scenario.id }.toSet() shouldBe
+                    setOf(HomeScreenshotScenario.ID, HomeScreenshotScenario.CREATE_SHEET_ID)
                 captures.map { it.language }.toSet() shouldBe ScreenshotConfiguration.languages.toSet()
             }
         }

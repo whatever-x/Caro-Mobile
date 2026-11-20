@@ -74,7 +74,7 @@ class EditDeckScreenSemanticsAndroidTest {
 
     private companion object {
         const val CONFIRM_LABEL = "수정하기"
-        const val TIP_LINE = "한 덱에 최대 200장의 카드를 담을 수 있어요."
+        const val TIP_LINE = "카드는 한 번에 200장까지 추가할 수 있어요."
         val FILLED_STATE = EditDeckState(name = "Android", description = "기초 학습")
     }
 }

@@ -43,6 +43,10 @@
       "variant": "default"
     },
     {
+      "id": "home.home.create_sheet",
+      "variant": "default"
+    },
+    {
       "id": "library.preview.normal",
       "variant": "default"
     },
