@@ -63,6 +63,72 @@
       "variant": "narrow"
     }
   ],
+  "importer": [
+    {
+      "id": "importer.source.default",
+      "variant": "default"
+    },
+    {
+      "id": "importer.paste.empty",
+      "variant": "default"
+    },
+    {
+      "id": "importer.paste.too_long",
+      "variant": "default"
+    },
+    {
+      "id": "importer.paste.too_long.small.large-font",
+      "variant": "small-large-font"
+    },
+    {
+      "id": "importer.loading.file",
+      "variant": "default"
+    },
+    {
+      "id": "importer.loading.paste",
+      "variant": "default"
+    },
+    {
+      "id": "importer.preview.anki",
+      "variant": "default"
+    },
+    {
+      "id": "importer.preview.xlsx",
+      "variant": "default"
+    },
+    {
+      "id": "importer.preview.text",
+      "variant": "default"
+    },
+    {
+      "id": "importer.preview.filtered",
+      "variant": "default"
+    },
+    {
+      "id": "importer.preview.warnings",
+      "variant": "default"
+    },
+    {
+      "id": "importer.preview.banner",
+      "variant": "default"
+    },
+    {
+      "id": "importer.preview.anki.small.large-font",
+      "variant": "small-large-font"
+    },
+    {
+      "id": "importer.dialog.discard",
+      "variant": "default"
+    },
+    {
+      "id": "importer.dialog.too_many_cards",
+      "variant": "default"
+    },
+    {
+      "id": "importer.dialog.no_cards.image_occlusion",
+      "variant": "default"
+    }
+  ],
   "learning": [
     {
       "id": "learning.learning.front",
