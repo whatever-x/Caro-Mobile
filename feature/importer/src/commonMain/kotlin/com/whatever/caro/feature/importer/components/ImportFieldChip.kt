@@ -26,6 +26,7 @@ internal fun ImportFieldChip(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     count: String? = null,
+    role: Role = Role.Tab,
 ) {
     val shape = CaroTheme.shape.xxl
     val containerColor = if (isSelected) CaroTheme.color.surface.brand else CaroTheme.color.surface.primary
@@ -37,7 +38,7 @@ internal fun ImportFieldChip(
                 .clip(shape)
                 .background(containerColor)
                 .border(ChipBorderWidth, borderColor, shape)
-                .selectable(selected = isSelected, role = Role.Tab, onClick = onClick)
+                .selectable(selected = isSelected, role = role, onClick = onClick)
                 .padding(horizontal = CaroTheme.spacing.m, vertical = ChipVerticalPadding),
         horizontalArrangement = Arrangement.spacedBy(CaroTheme.spacing.xs),
         verticalAlignment = Alignment.CenterVertically,

@@ -25,8 +25,10 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import caromobile.core.designsystem.generated.resources.Res
+import caromobile.core.designsystem.generated.resources.import_loading_creating_deck
 import caromobile.core.designsystem.generated.resources.import_loading_file
 import caromobile.core.designsystem.generated.resources.import_loading_paste
+import caromobile.core.designsystem.generated.resources.import_loading_preview
 import com.whatever.caro.core.designsystem.themes.CaroTheme
 import com.whatever.caro.core.ui.loading.CaroLoadingCard
 import com.whatever.caro.core.ui.loading.rememberDelayedVisible
@@ -128,8 +130,15 @@ private fun ImportLoadingCard(loading: ImportLoading) {
         when (loading) {
             is ImportLoading.ReadingFile -> Res.string.import_loading_file
             ImportLoading.ReadingPaste -> Res.string.import_loading_paste
+            is ImportLoading.BuildingPreview -> Res.string.import_loading_preview
+            ImportLoading.CreatingDeck -> Res.string.import_loading_creating_deck
         }
-    val fileName = (loading as? ImportLoading.ReadingFile)?.fileName
+    val fileName =
+        when (loading) {
+            is ImportLoading.ReadingFile -> loading.fileName
+            is ImportLoading.BuildingPreview -> loading.fileName
+            ImportLoading.ReadingPaste, ImportLoading.CreatingDeck -> null
+        }
 
     CaroLoadingCard(
         message = stringResource(message),

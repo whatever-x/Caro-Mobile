@@ -7,6 +7,7 @@ import com.whatever.caro.core.importparser.model.ParsedTable
 import com.whatever.caro.core.model.importing.FieldMapping
 import com.whatever.caro.feature.importer.mvi.ImportSelection
 import com.whatever.caro.feature.importer.transform.ImportPreview
+import com.whatever.caro.feature.importer.transform.defaultFieldMappings
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 
@@ -30,6 +31,11 @@ internal sealed interface SettingTag {
         val count: Int,
     ) : SettingTag
 
+    data class SubdeckSome(
+        val total: Int,
+        val selected: Int,
+    ) : SettingTag
+
     data object SubdeckMerged : SettingTag
 
     data class NoteTypeCount(
@@ -37,6 +43,8 @@ internal sealed interface SettingTag {
     ) : SettingTag
 
     data object SidesAuto : SettingTag
+
+    data object SidesManual : SettingTag
 
     data class SheetName(
         val name: String,
@@ -110,9 +118,11 @@ private fun subdeckTags(
     table: ParsedTable,
     selection: ImportSelection,
 ): List<SettingTag> {
+    val total = table.subdecks.size
     val selected = table.subdecks.count { subdeck -> subdeck.id in selection.subdeckIds }
     return listOfNotNull(
-        SettingTag.SubdeckAll(selected).takeIf { selected > 0 && selected == table.subdecks.size },
+        SettingTag.SubdeckAll(selected).takeIf { selected > 0 && selected == total },
+        SettingTag.SubdeckSome(total, selected).takeIf { selected in 1 until total },
         SettingTag.SubdeckMerged.takeIf { selected >= MIN_SUBDECKS_TO_MERGE },
     )
 }
@@ -133,14 +143,21 @@ private fun delimiterTag(table: ParsedTable): SettingTag? =
         ?.takeIf { delimiter -> delimiter.isNotEmpty() }
         ?.let { delimiter -> SettingTag.Delimiter(delimiter.singleOrNull()?.let(::delimiterKind), delimiter) }
 
-/** Anki는 유형마다 항목이 달라 항목 이름 대신 유형 수를 보인다. 텍스트와 엑셀은 유형이 하나다. */
+/**
+ * Anki는 유형마다 항목이 달라 항목 이름 대신 가져오는 유형 수를 보인다. 텍스트와 엑셀은 유형이 하나다.
+ * 직접 지정은 가져오는 유형의 앞뒷면 항목이 기본과 다를 때다. 유형을 끈 것은 유형 수 태그가 이미 보이므로 앞뒷면 태그에 넣지 않는다.
+ */
 private fun cardLayoutTags(
     table: ParsedTable,
     mappings: Map<String, FieldMapping>,
 ): List<SettingTag> {
     val types = importableNoteTypes(table)
     if (table.format == ImportFormat.APKG) {
-        return if (types.isEmpty()) emptyList() else listOf(SettingTag.NoteTypeCount(types.size), SettingTag.SidesAuto)
+        if (types.isEmpty()) return emptyList()
+        val defaults = defaultFieldMappings(table)
+        val enabled = types.filter { type -> mappings[type.id]?.excluded != true }
+        val isManual = enabled.any { type -> (mappings[type.id] ?: defaults[type.id])?.targets != defaults[type.id]?.targets }
+        return listOf(SettingTag.NoteTypeCount(enabled.size), if (isManual) SettingTag.SidesManual else SettingTag.SidesAuto)
     }
     val type = types.firstOrNull() ?: return emptyList()
     val mapping = mappings[type.id] ?: return emptyList()

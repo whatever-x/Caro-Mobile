@@ -30,9 +30,15 @@ val generateFixtureRoot =
         }
     }
 
-// 공통 규칙(50%)은 그대로 두고 importer의 LINE 기준만 더 높게 잡는다. 보고서에는 caro.kover가 고른 ViewModel 클래스만 들어간다.
+// 공통 규칙(50%)은 그대로 두고 importer의 LINE 기준만 더 높게 잡는다.
+// caro.kover는 이름에 ViewModel이 든 클래스만 재므로, ViewModel에서 나눈 설정 처리와 저장 처리 클래스를 측정 대상에 더한다.
 kover {
     reports {
+        filters {
+            includes {
+                classes("**ImportSettingsEditor*", "**ImportSaveSession*")
+            }
+        }
         verify {
             rule("ImportDeckViewModel") {
                 minBound(80)

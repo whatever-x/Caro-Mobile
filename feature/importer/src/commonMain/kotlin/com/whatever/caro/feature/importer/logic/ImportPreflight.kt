@@ -61,15 +61,12 @@ private fun sheetPreflight(
     }
 }
 
-/**
- * Image Occlusion 노트는 행으로 옮기지 않으므로 상한을 셀 때 뺀다.
- * 혼자서 상한 안에 드는 하위 덱이 없으면 하위 덱을 골라도 상한을 맞출 수 없으므로 [ImportPreflight.TooMany]다.
- */
+/** 혼자서 상한 안에 드는 하위 덱이 없으면 하위 덱을 골라도 상한을 맞출 수 없으므로 [ImportPreflight.TooMany]다. */
 private fun subdeckPreflight(
     table: ParsedTable,
     maxCards: Int,
 ): ImportPreflight {
-    val counts = table.subdecks.map { subdeck -> subdeck.noteCount - subdeck.imageOcclusionNoteCount }
+    val counts = table.subdecks.map(::subdeckCardCount)
     return when {
         counts.sum() <= maxCards -> ImportPreflight.Ok
         counts.any { count -> count in 1..maxCards } -> ImportPreflight.SubdeckFirst

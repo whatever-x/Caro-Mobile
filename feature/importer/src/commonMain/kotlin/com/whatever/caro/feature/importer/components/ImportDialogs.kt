@@ -22,6 +22,7 @@ import com.whatever.caro.core.designsystem.components.CaroDialogButton
 import com.whatever.caro.core.designsystem.themes.CaroTheme
 import com.whatever.caro.feature.importer.mvi.ImportDeckIntent
 import com.whatever.caro.feature.importer.mvi.ImportDialog
+import com.whatever.caro.feature.importer.mvi.isDismissible
 import kotlinx.collections.immutable.ImmutableList
 
 /** 창을 띄우지 않고 내용만 확인하는 테스트가 틀을 바꿔 끼울 수 있도록 분리했다. */
@@ -44,14 +45,21 @@ private val CaroImportDialogFrame: ImportDialogFrame = { onDismissRequest, prope
     )
 }
 
-// 지금 띄우는 대화상자는 모두 바깥 누름과 뒤로 가기가 DismissDialog를 보내는 버튼([확인], [취소])과 같다.
-private val ImportDialogProperties =
+private val DismissibleDialogProperties =
     DialogProperties(
         dismissOnBackPress = true,
         dismissOnClickOutside = true,
         usePlatformDefaultWidth = false,
     )
 
+private val FixedDialogProperties =
+    DialogProperties(
+        dismissOnBackPress = false,
+        dismissOnClickOutside = false,
+        usePlatformDefaultWidth = false,
+    )
+
+/** 닫을 수 있는 대화상자의 바깥 누름과 뒤로 가기는 DismissDialog를 보내는 버튼([확인], [취소], [계속 가져오기])과 같다. */
 @Composable
 internal fun ImportDialogs(
     dialog: ImportDialog?,
@@ -60,10 +68,11 @@ internal fun ImportDialogs(
 ) {
     if (dialog == null) return
     val content = importDialogContent(dialog)
+    val isDismissible = dialog.isDismissible
 
     frame(
-        { onIntent(ImportDeckIntent.DismissDialog) },
-        ImportDialogProperties,
+        { if (isDismissible) onIntent(ImportDeckIntent.DismissDialog) },
+        if (isDismissible) DismissibleDialogProperties else FixedDialogProperties,
         { ImportDialogTitle(content.title) },
         { ImportDialogButtons(content.buttons, onIntent) },
         { ImportDialogBody(content.body) },

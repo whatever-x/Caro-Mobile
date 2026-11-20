@@ -2,8 +2,10 @@ package com.whatever.caro.feature.importer.step
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -26,6 +28,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import caromobile.core.designsystem.generated.resources.Res
 import caromobile.core.designsystem.generated.resources.import_button_close
+import caromobile.core.designsystem.generated.resources.import_button_import
 import caromobile.core.designsystem.generated.resources.import_content_description_filter_result
 import caromobile.core.designsystem.generated.resources.import_label_side_back
 import caromobile.core.designsystem.generated.resources.import_label_side_front
@@ -34,9 +37,11 @@ import com.whatever.caro.core.importparser.model.ParsedTable
 import com.whatever.caro.core.ui.card.CaroFullTextDialog
 import com.whatever.caro.core.ui.card.CaroFullTextSection
 import com.whatever.caro.core.util.NumberFormatter.formatWithComma
+import com.whatever.caro.feature.importer.components.ImportBottomBar
 import com.whatever.caro.feature.importer.logic.cardTypeName
 import com.whatever.caro.feature.importer.logic.cardTypeNames
 import com.whatever.caro.feature.importer.logic.visibleFilters
+import com.whatever.caro.feature.importer.mvi.DeckInfoDraft
 import com.whatever.caro.feature.importer.mvi.ImportDeckIntent
 import com.whatever.caro.feature.importer.mvi.ImportDeckState
 import com.whatever.caro.feature.importer.mvi.ImportPreviewFilter
@@ -61,6 +66,7 @@ internal fun PreviewStep(
     state: ImportDeckState,
     onIntent: (ImportDeckIntent) -> Unit,
     modifier: Modifier = Modifier,
+    importFocusRequester: FocusRequester? = null,
 ) {
     val table = state.table ?: return
     val preview = state.preview ?: return
@@ -69,29 +75,52 @@ internal fun PreviewStep(
     val returnFocus = remember { FocusRequester() }
     val openedIndex = rememberOpenedCardIndex(state.detailCard, returnFocus)
 
-    Box(modifier = modifier.fillMaxSize()) {
-        PreviewList(
-            state = state,
-            table = table,
-            preview = preview,
-            listState = listState,
-            openedIndex = openedIndex,
-            returnFocus = returnFocus,
-            onIntent = onIntent,
-        )
-        // 화면에 보이는 변화가 없는 필터 결과를 스크린 리더로만 알린다. 새로 생긴 노드에는 알림이 가지 않을 수 있어 처음부터 두고 설명만 바꾼다.
-        Box(
-            modifier =
-                Modifier
-                    .size(LiveRegionSize)
-                    .semantics {
-                        liveRegion = LiveRegionMode.Polite
-                        contentDescription = announcement.orEmpty()
-                    },
+    Column(modifier = modifier.fillMaxSize()) {
+        Box(modifier = Modifier.weight(1f).fillMaxWidth()) {
+            PreviewList(
+                state = state,
+                table = table,
+                preview = preview,
+                listState = listState,
+                openedIndex = openedIndex,
+                returnFocus = returnFocus,
+                onIntent = onIntent,
+            )
+            // 화면에 보이는 변화가 없는 필터 결과를 스크린 리더로만 알린다. 새로 생긴 노드에는 알림이 가지 않을 수 있어 처음부터 두고 설명만 바꾼다.
+            Box(
+                modifier =
+                    Modifier
+                        .size(LiveRegionSize)
+                        .semantics {
+                            liveRegion = LiveRegionMode.Polite
+                            contentDescription = announcement.orEmpty()
+                        },
+            )
+        }
+        StepBottomDivider(isVisible = listState.canScrollForward || listState.canScrollBackward)
+        ImportBottomBar(
+            buttonText = stringResource(Res.string.import_button_import),
+            onClick = { onIntent(ImportDeckIntent.ClickImport) },
+            focusRequester = importFocusRequester,
         )
     }
 
     state.detailCard?.let { card -> CardDetailDialog(card = card, onDismissRequest = { onIntent(ImportDeckIntent.CloseCardDetail) }) }
+    state.deckInfoDraft?.let { draft -> PreviewDeckInfoSheet(draft = draft, onIntent = onIntent) }
+}
+
+@Composable
+private fun PreviewDeckInfoSheet(
+    draft: DeckInfoDraft,
+    onIntent: (ImportDeckIntent) -> Unit,
+) {
+    DeckInfoSheet(
+        draft = draft,
+        onNameChange = { name -> onIntent(ImportDeckIntent.UpdateDeckInfoName(name)) },
+        onDescriptionChange = { description -> onIntent(ImportDeckIntent.UpdateDeckInfoDescription(description)) },
+        onApply = { onIntent(ImportDeckIntent.ApplyDeckInfo) },
+        onDismissRequest = { onIntent(ImportDeckIntent.DismissDeckInfo) },
+    )
 }
 
 /** [returnFocus]는 전체 보기를 연 카드([openedIndex])에만 붙어, 닫은 뒤 그 카드가 포커스를 돌려받는다. */
@@ -121,6 +150,8 @@ private fun PreviewList(
                 table = table,
                 preview = preview,
                 onDismissBanner = { onIntent(ImportDeckIntent.DismissDelimiterBanner) },
+                onChangeSetting = { kind -> onIntent(ImportDeckIntent.ClickChangeSetting(kind)) },
+                onChangeDeckInfo = { onIntent(ImportDeckIntent.ClickChangeDeckInfo) },
                 modifier = itemModifier,
             )
         }

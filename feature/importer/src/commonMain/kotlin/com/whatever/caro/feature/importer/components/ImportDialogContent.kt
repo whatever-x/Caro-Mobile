@@ -23,6 +23,8 @@ import caromobile.core.designsystem.generated.resources.import_dialog_file_too_l
 import caromobile.core.designsystem.generated.resources.import_dialog_file_too_large_xlsx
 import caromobile.core.designsystem.generated.resources.import_dialog_paste_failed_body
 import caromobile.core.designsystem.generated.resources.import_dialog_paste_failed_title
+import caromobile.core.designsystem.generated.resources.import_dialog_preview_failed_body
+import caromobile.core.designsystem.generated.resources.import_dialog_preview_failed_title
 import caromobile.core.designsystem.generated.resources.import_dialog_read_failed_body
 import caromobile.core.designsystem.generated.resources.import_dialog_read_failed_title
 import caromobile.core.designsystem.generated.resources.import_dialog_too_many_cards_body
@@ -95,6 +97,10 @@ internal fun importDialogContent(dialog: ImportDialog): ImportDialogContent =
             tooManyCardsContent(isPaste = dialog.isPaste)
         }
 
+        ImportDialog.PreviewFailed -> {
+            confirmContent(Res.string.import_dialog_preview_failed_title, Res.string.import_dialog_preview_failed_body)
+        }
+
         ImportDialog.DiscardConfirm -> {
             ImportDialogContent(
                 title = stringResource(Res.string.import_dialog_discard_title),
@@ -105,6 +111,28 @@ internal fun importDialogContent(dialog: ImportDialog): ImportDialogContent =
                         button(Res.string.import_dialog_button_cancel, ImportDialogButtonStyle.Tertiary, ImportDeckIntent.DismissDialog),
                     ),
             )
+        }
+
+        ImportDialog.DeckCreateFailed -> {
+            deckCreateFailedContent()
+        }
+
+        ImportDialog.StopConfirm -> {
+            stopConfirmContent()
+        }
+
+        is ImportDialog.Paused,
+        is ImportDialog.PartialFailure,
+        -> {
+            retryOrViewDeckContent(dialog)
+        }
+
+        is ImportDialog.KeyConflict -> {
+            keyConflictContent(dialog)
+        }
+
+        ImportDialog.DeckUnavailable -> {
+            deckUnavailableContent()
         }
     }
 
@@ -137,7 +165,7 @@ private fun confirmButton(): ImportDialogButton =
     button(Res.string.import_dialog_button_confirm, ImportDialogButtonStyle.Brand, ImportDeckIntent.DismissDialog)
 
 @Composable
-private fun button(
+internal fun button(
     label: StringResource,
     style: ImportDialogButtonStyle,
     intent: ImportDeckIntent,
