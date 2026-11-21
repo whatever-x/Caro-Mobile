@@ -14,6 +14,7 @@ import com.whatever.caro.core.navigator.contract.NavCommand.To
 import com.whatever.caro.core.navigator.dispatcher.NavigationDispatcher
 import com.whatever.caro.core.navigator.entries.CreateDeckEntry
 import com.whatever.caro.core.navigator.entries.DeckDetailEntry
+import com.whatever.caro.core.navigator.entries.ImportDeckEntry
 import com.whatever.caro.core.navigator.entries.LearningEntry
 import com.whatever.caro.core.navigator.entries.LibraryEntry
 import com.whatever.caro.core.navigator.entries.LibraryPreviewEntry
@@ -65,6 +66,10 @@ fun HomeRoute(
 
                 is HomeSideEffect.NavigateToCreateDeck -> {
                     navDispatcher.emit(command = To(key = CreateDeckEntry))
+                }
+
+                HomeSideEffect.NavigateToImportDeck -> {
+                    navDispatcher.emit(command = To(key = ImportDeckEntry))
                 }
 
                 is HomeSideEffect.NavigateToDeckDetail -> {

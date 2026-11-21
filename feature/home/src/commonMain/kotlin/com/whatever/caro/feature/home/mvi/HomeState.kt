@@ -13,6 +13,7 @@ data class HomeState(
     val isLoading: Boolean = true,
     val hasLoadError: Boolean = false,
     val banners: ImmutableList<HomeBanner> = persistentListOf(),
+    val isCreateDeckBottomSheetVisible: Boolean = false,
 ) : UiState {
     val isLoadedContentVisible: Boolean
         get() = isLoading.not()

@@ -154,20 +154,7 @@ class HomeViewModelTest : FunSpec() {
             }
         }
 
-        test("ClickCreateDeck 은 NavigateToCreateDeck 을 방출한다") {
-            runTest(testDispatcher) {
-                val viewModel = viewModelWith()
-
-                viewModel.sideEffect.test {
-                    viewModel.intent(HomeIntent.ClickCreateDeck)
-                    advanceUntilIdle()
-
-                    awaitItem() shouldBe HomeSideEffect.NavigateToCreateDeck
-                }
-            }
-        }
-
-        test("ClickCreateDeckButton 은 NavigateToCreateDeck 을 방출한다") {
+        test("덱 만들기 버튼을 누르면 화면을 옮기지 않고 덱 만들기 시트를 연다") {
             runTest(testDispatcher) {
                 val viewModel = viewModelWith()
 
@@ -175,8 +162,96 @@ class HomeViewModelTest : FunSpec() {
                     viewModel.intent(HomeIntent.ClickCreateDeckButton)
                     advanceUntilIdle()
 
-                    awaitItem() shouldBe HomeSideEffect.NavigateToCreateDeck
+                    viewModel.state.value.isCreateDeckBottomSheetVisible shouldBe true
+                    expectNoEvents()
                 }
+            }
+        }
+
+        test("덱 만들기 시트를 닫으면 화면을 옮기지 않고 시트만 닫힌다") {
+            runTest(testDispatcher) {
+                val viewModel = viewModelWith()
+                viewModel.intent(HomeIntent.ClickCreateDeckButton)
+                advanceUntilIdle()
+
+                viewModel.sideEffect.test {
+                    viewModel.intent(HomeIntent.DismissCreateDeckBottomSheet)
+                    advanceUntilIdle()
+
+                    viewModel.state.value.isCreateDeckBottomSheetVisible shouldBe false
+                    expectNoEvents()
+                }
+            }
+        }
+
+        val sheetChoices =
+            listOf(
+                Triple("직접 만들기", HomeIntent.ClickCreateDeck, HomeSideEffect.NavigateToCreateDeck),
+                Triple("가져와서 만들기", HomeIntent.ClickImportDeck, HomeSideEffect.NavigateToImportDeck),
+            )
+
+        sheetChoices.forEach { (name, choice, navigation) ->
+            val (otherName, otherChoice) = sheetChoices.single { it.second != choice }
+
+            test("시트에서 ${name}를 고르면 시트를 닫고 고른 화면으로 한 번 이동한다") {
+                runTest(testDispatcher) {
+                    val viewModel = viewModelWith()
+                    viewModel.intent(HomeIntent.ClickCreateDeckButton)
+                    advanceUntilIdle()
+
+                    viewModel.sideEffect.test {
+                        viewModel.intent(choice)
+                        advanceUntilIdle()
+
+                        viewModel.state.value.isCreateDeckBottomSheetVisible shouldBe false
+                        awaitItem() shouldBe navigation
+                        expectNoEvents()
+                    }
+                }
+            }
+
+            test("시트에서 ${name}를 고른 직후 $otherName 입력이 와도 이동은 한 번만 나간다") {
+                runTest(testDispatcher) {
+                    val viewModel = viewModelWith()
+                    viewModel.intent(HomeIntent.ClickCreateDeckButton)
+                    advanceUntilIdle()
+
+                    viewModel.sideEffect.test {
+                        viewModel.intent(choice)
+                        viewModel.intent(otherChoice)
+                        advanceUntilIdle()
+
+                        awaitItem() shouldBe navigation
+                        expectNoEvents()
+                    }
+                }
+            }
+
+            test("시트가 닫혀 있을 때 $name 입력이 오면 이동하지 않는다") {
+                runTest(testDispatcher) {
+                    val viewModel = viewModelWith()
+
+                    viewModel.sideEffect.test {
+                        viewModel.intent(choice)
+                        advanceUntilIdle()
+
+                        expectNoEvents()
+                    }
+                }
+            }
+        }
+
+        test("홈을 다시 불러와도 열려 있던 덱 만들기 시트는 닫히지 않는다") {
+            runTest(testDispatcher) {
+                val viewModel = viewModelWith()
+                viewModel.intent(HomeIntent.ClickCreateDeckButton)
+                advanceUntilIdle()
+
+                // 앱이 백그라운드에서 돌아오면 홈을 다시 불러오는데, 그때 사용자가 보던 시트가 사라지면 안 된다.
+                viewModel.intent(HomeIntent.Initialize)
+                advanceUntilIdle()
+
+                viewModel.state.value.isCreateDeckBottomSheetVisible shouldBe true
             }
         }
 

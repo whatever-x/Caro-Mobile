@@ -20,6 +20,87 @@ private fun com.whatever.caro.feature.home.HomeStreakBanner(state: com.whatever.
     - state: STABLE (class with no mutable properties)
 
 @Composable
+private fun com.whatever.caro.feature.home.banner.BannerPager(items: kotlinx.collections.immutable.ImmutableList<com.whatever.caro.feature.home.banner.LoadedBanner>, isVisibleAndIdle: kotlin.Boolean, autoAdvanceStopped: kotlin.Boolean, selectedBannerKey: kotlin.String?, onStopAutoAdvance: kotlin.Function0<kotlin.Unit>, onSelectedBanner: kotlin.Function1<kotlin.String, kotlin.Unit>, onBannerClick: kotlin.Function1<com.whatever.caro.core.model.banner.HomeBanner, kotlin.Unit>): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - items: STABLE (known stable type)
+    - isVisibleAndIdle: STABLE (primitive type)
+    - autoAdvanceStopped: STABLE (primitive type)
+    - selectedBannerKey: STABLE (class with no mutable properties)
+    - onStopAutoAdvance: STABLE (function type)
+    - onSelectedBanner: STABLE (function type)
+    - onBannerClick: STABLE (function type)
+
+@Composable
+internal fun com.whatever.caro.feature.home.banner.HomeBannerSection(banners: kotlinx.collections.immutable.ImmutableList<com.whatever.caro.core.model.banner.HomeBanner>, isVisibleAndIdle: kotlin.Boolean, autoAdvanceStopped: kotlin.Boolean, selectedBannerKey: kotlin.String?, onStopAutoAdvance: kotlin.Function0<kotlin.Unit>, onSelectedBanner: kotlin.Function1<kotlin.String, kotlin.Unit>, onBannerClick: kotlin.Function1<com.whatever.caro.core.model.banner.HomeBanner, kotlin.Unit>, onLibraryClick: kotlin.Function0<kotlin.Unit>): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - banners: STABLE (known stable type)
+    - isVisibleAndIdle: STABLE (primitive type)
+    - autoAdvanceStopped: STABLE (primitive type)
+    - selectedBannerKey: STABLE (class with no mutable properties)
+    - onStopAutoAdvance: STABLE (function type)
+    - onSelectedBanner: STABLE (function type)
+    - onBannerClick: STABLE (function type)
+    - onLibraryClick: STABLE (function type)
+
+@Composable
+internal fun com.whatever.caro.feature.home.banner.rememberBannerAutoAdvanceAllowed(): kotlin.Boolean
+  skippable: true
+  restartable: true
+  params:
+
+@Composable
+internal fun com.whatever.caro.feature.home.component.CreateDeckSheet(onCreateDeck: kotlin.Function0<kotlin.Unit>, onImportDeck: kotlin.Function0<kotlin.Unit>, onDismissRequest: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - onCreateDeck: STABLE (function type)
+    - onImportDeck: STABLE (function type)
+    - onDismissRequest: STABLE (function type)
+    - modifier: STABLE (marked @Stable or @Immutable)
+
+@Composable
+internal fun com.whatever.caro.feature.home.component.CreateDeckSheetContainerColor(): androidx.compose.ui.graphics.Color
+  skippable: true
+  restartable: true
+  params:
+
+@Composable
+internal fun com.whatever.caro.feature.home.component.CreateDeckSheetContent(onCreateDeck: kotlin.Function0<kotlin.Unit>, onImportDeck: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - onCreateDeck: STABLE (function type)
+    - onImportDeck: STABLE (function type)
+    - modifier: STABLE (marked @Stable or @Immutable)
+
+@Composable
+internal fun com.whatever.caro.feature.home.component.CreateDeckSheetHandle(): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+
+@Composable
+private fun com.whatever.caro.feature.home.component.CreateDeckSheetItem(title: kotlin.String, body: kotlin.String, icon: org.jetbrains.compose.resources.DrawableResource, onClick: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - title: STABLE (String is immutable)
+    - body: STABLE (String is immutable)
+    - icon: STABLE (marked @Stable or @Immutable)
+    - onClick: STABLE (function type)
+    - modifier: STABLE (marked @Stable or @Immutable)
+
+@Composable
+internal fun com.whatever.caro.feature.home.component.CreateDeckSheetShape(): androidx.compose.ui.graphics.Shape
+  skippable: true
+  restartable: true
+  params:
+
+@Composable
 private fun com.whatever.caro.feature.home.component.CtaButton(state: com.whatever.caro.core.model.deck.DeckState, onClick: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
   skippable: true
   restartable: true
@@ -58,6 +139,95 @@ private fun com.whatever.caro.feature.home.component.ProgressContent(modifier: a
     - modifier: STABLE (marked @Stable or @Immutable)
     - deckState: STABLE (class with no mutable properties)
     - todayLearningPercentage: STABLE (primitive type)
+
+@Composable
+internal fun com.whatever.caro.feature.home.library.HomeDeckHeader(onLibraryClick: kotlin.Function0<kotlin.Unit>): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - onLibraryClick: STABLE (function type)
+
+@Composable
+internal fun com.whatever.caro.feature.home.library.LibraryAddErrorDialog(onDismiss: kotlin.Function0<kotlin.Unit>): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - onDismiss: STABLE (function type)
+
+@Composable
+internal fun com.whatever.caro.feature.home.library.LibraryCardCount(count: kotlin.Int): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - count: STABLE (primitive type)
+
+@Composable
+internal fun com.whatever.caro.feature.home.library.LibraryDeckHeading(deck: com.whatever.caro.core.model.library.LibraryDeck, preview: kotlin.Boolean): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - deck: STABLE (marked @Stable or @Immutable)
+    - preview: STABLE (primitive type)
+
+@Composable
+internal fun com.whatever.caro.feature.home.library.LibraryFailureContent(failure: com.whatever.caro.feature.home.library.mvi.LibraryFailure, preview: kotlin.Boolean, onRetry: kotlin.Function0<kotlin.Unit>, onBack: kotlin.Function0<kotlin.Unit>, onLogin: kotlin.Function0<kotlin.Unit>, onHome: kotlin.Function0<kotlin.Unit>): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - failure: STABLE (class with no mutable properties)
+    - preview: STABLE (primitive type)
+    - onRetry: STABLE (function type)
+    - onBack: STABLE (function type)
+    - onLogin: STABLE (function type)
+    - onHome: STABLE (function type)
+
+@Composable
+internal fun com.whatever.caro.feature.home.library.LibraryLoading(): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+
+@Composable
+private fun com.whatever.caro.feature.home.library.LibraryMessage(title: kotlin.String, body: kotlin.String, action: kotlin.String, onClick: kotlin.Function0<kotlin.Unit>): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - title: STABLE (String is immutable)
+    - body: STABLE (String is immutable)
+    - action: STABLE (String is immutable)
+    - onClick: STABLE (function type)
+
+@Composable
+internal fun com.whatever.caro.feature.home.library.LibraryPreviewScreen(state: com.whatever.caro.feature.home.library.mvi.LibraryPreviewState, onIntent: kotlin.Function1<com.whatever.caro.feature.home.library.mvi.LibraryPreviewIntent, kotlin.Unit>): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - state: STABLE (class with no mutable properties)
+    - onIntent: STABLE (function type)
+
+@Composable
+internal fun com.whatever.caro.feature.home.library.LibraryProvidedCard(deck: com.whatever.caro.core.model.library.LibraryDeck, onClick: kotlin.Function0<kotlin.Unit>): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - deck: STABLE (marked @Stable or @Immutable)
+    - onClick: STABLE (function type)
+
+@Composable
+internal fun com.whatever.caro.feature.home.library.LibraryScreen(state: com.whatever.caro.feature.home.library.mvi.LibraryState, onIntent: kotlin.Function1<com.whatever.caro.feature.home.library.mvi.LibraryIntent, kotlin.Unit>): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - state: STABLE (class with no mutable properties)
+    - onIntent: STABLE (function type)
+
+@Composable
+internal fun com.whatever.caro.feature.home.library.LibraryTopBar(title: kotlin.String, onBack: kotlin.Function0<kotlin.Unit>): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - title: STABLE (String is immutable)
+    - onBack: STABLE (function type)
 
 @Composable
 private fun com.whatever.caro.feature.home.toBannerContent(): com.whatever.caro.feature.home.HomeStreakBannerContent?
