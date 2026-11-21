@@ -182,7 +182,7 @@ iOS는 콘텐츠 태그로 대상을 선택한다. 선택한 콘텐츠를 측정
 ## 명령과 산출물
 
 다음 명령은 실행이 허용된 작업에서만 사용한다. 공통 모듈을 변경한 경우 Home만으로 회귀 검증을 끝내지 않는다.
-등록된 9개 Feature의 Android/iOS·ko/en 전체가 대상이다. CI는 경로 필터 없이 모두 실행한다.
+등록된 10개 Feature의 Android/iOS·ko/en 전체가 대상이다. CI는 경로 필터 없이 모두 실행한다.
 
 ```bash
 ./gradlew :core:screenshot-testing:testAndroidHostTest

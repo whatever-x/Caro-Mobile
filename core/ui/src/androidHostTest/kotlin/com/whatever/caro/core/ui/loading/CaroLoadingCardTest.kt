@@ -1,14 +1,21 @@
 package com.whatever.caro.core.ui.loading
 
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.getUnclippedBoundsInRoot
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import com.whatever.caro.core.designsystem.themes.CaroTheme
+import io.kotest.matchers.shouldBe
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -83,6 +90,26 @@ class CaroLoadingCardTest {
         showCard(message = MESSAGE, detail = DETAIL)
 
         contentDescriptionNodes().assertCountEquals(0)
+    }
+
+    @Test
+    fun `inspection mode에서는 그림을 그리지 않아도 문구가 같은 자리에 놓인다`() {
+        var isInspection by mutableStateOf(false)
+        composeRule.mainClock.autoAdvance = false
+        composeRule.setContent {
+            CompositionLocalProvider(LocalInspectionMode provides isInspection) {
+                CaroTheme {
+                    CaroLoadingCard(message = MESSAGE)
+                }
+            }
+        }
+        composeRule.mainClock.advanceTimeByFrame()
+        val topWithAnimation = composeRule.onNodeWithText(MESSAGE).getUnclippedBoundsInRoot().top
+
+        isInspection = true
+        composeRule.mainClock.advanceTimeByFrame()
+
+        composeRule.onNodeWithText(MESSAGE).getUnclippedBoundsInRoot().top shouldBe topWithAnimation
     }
 
     private companion object {

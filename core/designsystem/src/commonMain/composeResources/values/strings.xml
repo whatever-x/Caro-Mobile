@@ -355,6 +355,7 @@
 	<string name="import_content_description_back">Back</string>
 	<string name="import_content_description_filter_result">%1$s, %2$s cards</string>
 	<string name="import_content_description_dismiss_banner">Dismiss notice</string>
+	<string name="import_content_description_cards_to_import">%1$s cards to import</string>
 
 	<!-- Deck library -->
 	<string name="library_title">Deck Library</string>
