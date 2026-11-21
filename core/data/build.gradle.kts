@@ -21,5 +21,8 @@ kotlin {
             implementation(libs.kotlinx.coroutines.core)
             implementation(libs.kotlinx.date.time)
         }
+        commonTest.dependencies {
+            implementation(libs.kotlinx.serialization.json)
+        }
     }
 }

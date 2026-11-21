@@ -48,6 +48,7 @@
 
 `:composeApp`은 `:core:util`·`:core:screenshot-testing`·`:core:importparser`를 제외한 core 모듈에 직접 의존합니다.
 `:feature:home`은 `:core:util`에 의존합니다.
+`:feature:importer`는 `:core:util`·`:core:importparser`에 의존하며, 아직 `:composeApp`에 연결하지 않습니다.
 `:core:analytics`·`:core:crashlytics`·`:core:messaging`과 `:feature:login`은 `api`, 나머지 프로젝트 모듈은 `implementation`으로 선언합니다.
 등록 원본은 [composeApp의 빌드 설정](../../composeApp/build.gradle.kts)과 [Android 앱의 빌드 설정](../../androidApp/build.gradle.kts)입니다.
 iOS는 Gradle 앱 모듈 대신 Xcode 프로젝트에서 공유 KMP 프레임워크를 연동합니다.
@@ -97,6 +98,7 @@ iOS는 Gradle 앱 모듈 대신 Xcode 프로젝트에서 공유 KMP 프레임워
 | `:feature:deck` | 없음 |
 | `:feature:deck-detail` | `:core:model` |
 | `:feature:home` | `:core:model`, `:core:util` |
+| `:feature:importer` | `:core:model`, `:core:importparser`, `:core:util` |
 | `:feature:learning` | `:core:model`, `:core:ads` |
 | `:feature:login` | `:core:model` |
 | `:feature:profile` | `:core:model` |

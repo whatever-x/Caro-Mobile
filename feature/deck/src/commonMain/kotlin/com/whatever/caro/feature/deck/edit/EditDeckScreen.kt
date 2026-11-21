@@ -41,6 +41,9 @@ import caromobile.core.designsystem.generated.resources.deck_field_placeholder_d
 import caromobile.core.designsystem.generated.resources.deck_field_placeholder_name
 import caromobile.core.designsystem.generated.resources.ic_chevron_left_24
 import caromobile.core.designsystem.generated.resources.ic_x_circle_24
+import com.whatever.caro.core.designsystem.components.CaroCtaButton
+import com.whatever.caro.core.designsystem.components.CaroFieldCounter
+import com.whatever.caro.core.designsystem.components.CaroRequiredFieldHeader
 import com.whatever.caro.core.designsystem.components.CaroTextArea
 import com.whatever.caro.core.designsystem.components.CaroTextField
 import com.whatever.caro.core.designsystem.components.CaroTopBar
@@ -48,11 +51,8 @@ import com.whatever.caro.core.designsystem.modifier.noRippleClickable
 import com.whatever.caro.core.designsystem.themes.CaroTheme
 import com.whatever.caro.core.ui.keyboard.rememberImeReadyAwaiter
 import com.whatever.caro.core.ui.loading.CaroLoadingOverlayBox
-import com.whatever.caro.feature.deck.component.CtaButton
 import com.whatever.caro.feature.deck.component.DeckTipSection
-import com.whatever.caro.feature.deck.component.FieldCounter
 import com.whatever.caro.feature.deck.component.PageHorizontalPadding
-import com.whatever.caro.feature.deck.component.RequiredFieldHeader
 import com.whatever.caro.feature.deck.edit.mvi.EditDeckIntent
 import com.whatever.caro.feature.deck.edit.mvi.EditDeckState
 import org.jetbrains.compose.resources.painterResource
@@ -121,8 +121,8 @@ internal fun EditDeckScreen(
                     value = state.name,
                     onValueChange = { onIntent(EditDeckIntent.UpdateName(it)) },
                     placeholder = stringResource(Res.string.deck_field_placeholder_name),
-                    header = { RequiredFieldHeader(label = stringResource(Res.string.deck_field_label_name)) },
-                    footer = { FieldCounter(count = state.nameCount) },
+                    header = { CaroRequiredFieldHeader(label = stringResource(Res.string.deck_field_label_name)) },
+                    footer = { CaroFieldCounter(count = state.nameCount) },
                     focusRequester = nameFocusRequester,
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
                     keyboardActions = KeyboardActions(onNext = { descriptionFocusRequester.requestFocus() }),
@@ -147,15 +147,15 @@ internal fun EditDeckScreen(
                     value = state.description,
                     onValueChange = { onIntent(EditDeckIntent.UpdateDescription(it)) },
                     placeholder = stringResource(Res.string.deck_field_placeholder_description),
-                    header = { RequiredFieldHeader(label = stringResource(Res.string.deck_field_label_description)) },
-                    footer = { FieldCounter(count = state.descriptionCount) },
+                    header = { CaroRequiredFieldHeader(label = stringResource(Res.string.deck_field_label_description)) },
+                    footer = { CaroFieldCounter(count = state.descriptionCount) },
                     focusRequester = descriptionFocusRequester,
                 )
                 DeckTipSection()
             }
 
-            CtaButton(
-                enabled = state.isConfirmEnabled,
+            CaroCtaButton(
+                text = stringResource(Res.string.deck_button_edit),
                 onClick = { onIntent(EditDeckIntent.ClickConfirm) },
                 modifier =
                     Modifier
@@ -165,7 +165,7 @@ internal fun EditDeckScreen(
                             horizontal = PageHorizontalPadding,
                             vertical = CaroTheme.spacing.l,
                         ),
-                text = stringResource(Res.string.deck_button_edit),
+                enabled = state.isConfirmEnabled,
             )
         }
     }

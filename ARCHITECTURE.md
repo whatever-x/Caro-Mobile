@@ -49,6 +49,7 @@ flowchart TB
         messaging[":core:messaging"]
         util[":core:util"]
         inappReview["앱 내 평가 요청<br/>:core:inapp-review"]
+        importparser[":core:importparser"]
     end
 
     subgraph buildPlugins["빌드 플러그인"]
@@ -69,10 +70,11 @@ flowchart TB
     feature -.->|기능별 추가| model
     feature -.->|기능별 추가| util
     feature -.->|기능별 추가| inappReview
+    feature -.->|기능별 추가| importparser
 ```
 
 모든 feature는 공통 기반에 의존합니다.
-`:core:model`·`:core:util`·`:core:inapp-review`로 향하는 점선은 일부 feature가 직접 선언한 의존성입니다.
+`:core:model`·`:core:util`·`:core:inapp-review`·`:core:importparser`로 향하는 점선은 일부 feature가 직접 선언한 의존성입니다.
 빌드 플러그인은 별도 영역으로 표시하며, 적용 대상은 [빌드 로직 구성](#7-빌드-로직-구성)에서 확인합니다.
 
 | 구성 | 책임 |
@@ -142,6 +144,7 @@ flowchart LR
     feature -.->|일부 feature만 직접 의존| model[":core:model"]
     feature -.->|일부 feature만 직접 의존| util[":core:util"]
     feature -.->|일부 feature만 직접 의존| inappReview[":core:inapp-review"]
+    feature -.->|일부 feature만 직접 의존| importparser[":core:importparser"]
 ```
 
 | 공통 의존 모듈 | feature에서 사용하는 책임 |

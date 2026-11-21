@@ -1,6 +1,8 @@
 package com.whatever.caro.core.data.mapper
 
 import com.whatever.caro.core.model.card.CardContent
+import com.whatever.caro.core.remote.dto.card.request.CreateCardItemDto
+import com.whatever.caro.core.remote.dto.card.request.CreateCardsRequest
 import com.whatever.caro.core.remote.dto.card.response.CardResponse
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
@@ -40,6 +42,25 @@ class CardMapperTest : FunSpec() {
             val content = CardContent(front = "hello", back = "안녕")
 
             content.toFields() shouldBe mapOf("front" to "hello", "back" to "안녕")
+        }
+
+        test("toCreateCardsRequest는 카드 목록을 순서대로 BASIC 생성 요청 항목으로 변환한다") {
+            val request = listOf(CardContent(front = "a", back = "1"), CardContent(front = "b", back = "2")).toCreateCardsRequest()
+
+            request shouldBe
+                CreateCardsRequest(
+                    items =
+                        listOf(
+                            CreateCardItemDto(
+                                fields = mapOf("front" to "a", "back" to "1"),
+                                cardType = CreateCardItemDto.CardTypeDto.BASIC,
+                            ),
+                            CreateCardItemDto(
+                                fields = mapOf("front" to "b", "back" to "2"),
+                                cardType = CreateCardItemDto.CardTypeDto.BASIC,
+                            ),
+                        ),
+                )
         }
     }
 }

@@ -104,3 +104,4 @@ Roborazzi 플러그인은 Feature에만 적용하며 기존 record/compare 태�
 
 iOS 시뮬레이터 테스트는 작업 디렉터리가 모듈 경로가 아닙니다.
 그래서 `generateFixtureRoot` 태스크가 fixture 디렉터리의 절대 경로 상수를 생성하고, `commonTest`가 이 생성 소스를 포함합니다.
+[:feature:importer](../../feature/importer/build.gradle.kts)도 파서 모듈의 fixture를 읽으려고 같은 태스크를 두며, 이 태스크는 `:core:importparser`의 fixture 디렉터리 경로를 상수로 생성합니다.
