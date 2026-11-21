@@ -1,6 +1,7 @@
 package com.whatever.caro.feature.importer.di
 
 import com.whatever.caro.core.importparser.ImportParser
+import com.whatever.caro.feature.importer.ImportDeckViewModel
 import com.whatever.caro.feature.importer.platform.platformIoDispatcher
 import com.whatever.caro.feature.importer.save.ImportSaveCoordinator
 import com.whatever.caro.feature.importer.save.ImportSaveCoordinatorFactory
@@ -15,9 +16,11 @@ import okio.FileSystem
 import org.koin.dsl.bind
 import org.koin.dsl.module
 import org.koin.plugin.module.dsl.single
+import org.koin.plugin.module.dsl.viewModel
 
 val importerModule =
     module {
+        viewModel<ImportDeckViewModel>()
         single { ImportParser(FileSystem.SYSTEM) }
         single<ParserImportSourceReader>() bind ImportSourceReader::class
         single<ImportLimitsConfig>()

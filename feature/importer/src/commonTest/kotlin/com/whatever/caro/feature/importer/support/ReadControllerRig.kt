@@ -27,7 +27,10 @@ internal class ReadControllerHarness(
     val tempStorage: FakeImportTempStorage,
     private val callerScope: CoroutineScope,
 ) {
-    fun pick(file: PickedImportFile): Deferred<ImportReadResult> = callerScope.async { controller.readPickedFile(file, DATE_STYLE) }
+    fun pick(
+        file: PickedImportFile,
+        onNamed: (String) -> Unit = {},
+    ): Deferred<ImportReadResult> = callerScope.async { controller.readPickedFile(file, DATE_STYLE, onNamed) }
 
     fun paste(text: String): Deferred<ImportReadResult> = callerScope.async { controller.readPaste(text, PASTE_SOURCE_NAME, DATE_STYLE) }
 

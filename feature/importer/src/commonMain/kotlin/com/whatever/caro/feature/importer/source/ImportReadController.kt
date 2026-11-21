@@ -77,16 +77,18 @@ internal class ImportReadController(
         scope.launch(dispatchers.io) { clearIgnoringFailure(tempStorage::clearStale) }
     }
 
+    /** [onNamed]는 정리한 파일 이름을 [scope]의 dispatcher에서 받는다. 로딩 오버레이가 provider를 다시 부르지 않고 읽기와 같은 이름을 보이게 한다. */
     suspend fun readPickedFile(
         file: PickedImportFile,
         dateStyle: SpreadsheetDateStyle,
+        onNamed: (String) -> Unit = {},
     ): ImportReadResult {
         discardSource()
         return startRead(
             stage = ImportReadStage.First,
             // 앞선 읽기를 기다리다 취소되면 copyAndRead의 정리에 닿지 못해 선택기가 남긴 사본이 남는다.
             onCancelledBeforeRead = { withContext(dispatchers.io) { file.discard() } },
-        ) { copyAndRead(file, dateStyle) }
+        ) { copyAndRead(file, dateStyle, onNamed) }
     }
 
     suspend fun readPaste(
@@ -226,10 +228,12 @@ internal class ImportReadController(
     private suspend fun copyAndRead(
         file: PickedImportFile,
         dateStyle: SpreadsheetDateStyle,
+        onNamed: (String) -> Unit,
     ): ImportReadResult {
         val copySource =
             try {
                 val (name, size) = withContext(dispatchers.io) { sanitizeDisplayName(file.displayName()) to file.sizeBytes() }
+                onNamed(name)
                 rejectBeforeCopy(name, size)?.let { rejection -> return rejection }
                 val destination = withContext(dispatchers.io) { tempStorage.newFile() }
                 val copy = ImportReadSource.File(destination, name, dateStyle)
