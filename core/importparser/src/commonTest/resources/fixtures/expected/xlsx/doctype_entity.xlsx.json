@@ -1,0 +1,8 @@
+{
+  "fixture": "xlsx/doctype_entity.xlsx",
+  "error": {
+    "kind": "UNSUPPORTED_FILE"
+  },
+  "format": "XLSX",
+  "warnings": []
+}

@@ -1,0 +1,468 @@
+{
+  "fixture": "apkg/modern_anki21b_main.apkg",
+  "format": "APKG",
+  "htmlMode": "HTML",
+  "subdecks": [
+    {
+      "id": null,
+      "path": "Lang::Grammar",
+      "noteCount": 310
+    },
+    {
+      "id": null,
+      "path": "Lang::Vocab::N4",
+      "noteCount": 403
+    },
+    {
+      "id": null,
+      "path": "Lang::Vocab::N5",
+      "noteCount": 504
+    }
+  ],
+  "notesWithoutDeck": 0,
+  "noteTypes": [
+    {
+      "id": "1700000001",
+      "name": "Basic",
+      "fieldNames": [
+        "Front",
+        "Back"
+      ],
+      "isCloze": false,
+      "noteCount": 303
+    },
+    {
+      "id": "1700000002",
+      "name": "Basic (and reversed card)",
+      "fieldNames": [
+        "Front",
+        "Back"
+      ],
+      "isCloze": false,
+      "noteCount": 102
+    },
+    {
+      "id": "1700000003",
+      "name": "Vocab",
+      "fieldNames": [
+        "Word",
+        "Meaning",
+        "Example",
+        "Reading"
+      ],
+      "isCloze": false,
+      "noteCount": 504
+    },
+    {
+      "id": "1700000004",
+      "name": "Cloze",
+      "fieldNames": [
+        "Text",
+        "Back Extra"
+      ],
+      "isCloze": true,
+      "noteCount": 308
+    }
+  ],
+  "totalNotes": 1217,
+  "warnings": [],
+  "rows": [
+    {
+      "rowIndex": 0,
+      "subdeckPath": "Lang::Vocab::N5",
+      "fieldValues": [
+        "食べる",
+        "먹다",
+        "<div>毎朝パンを<b>食べる</b>。</div>",
+        "たべる[sound:taberu.wav]"
+      ]
+    },
+    {
+      "rowIndex": 1,
+      "subdeckPath": "Lang::Grammar",
+      "fieldValues": [
+        "<div>water</div>",
+        "<b>물</b><br><img src=\"water.png\">"
+      ]
+    },
+    {
+      "rowIndex": 2,
+      "subdeckPath": "Lang::Vocab::N5",
+      "fieldValues": [
+        "水",
+        "물",
+        "",
+        "みず"
+      ]
+    },
+    {
+      "rowIndex": 3,
+      "subdeckPath": "Lang::Vocab::N5",
+      "fieldValues": [
+        "&#54620;&#xAE00;",
+        "Korean alphabet",
+        "<ul><li>가</li><li>나</li></ul>",
+        "<span style=\"color:red\">hangeul</span>"
+      ]
+    },
+    {
+      "rowIndex": 4,
+      "subdeckPath": "Lang::Vocab::N5",
+      "fieldValues": [
+        "",
+        "뜻만 있음",
+        "",
+        ""
+      ]
+    },
+    {
+      "rowIndex": 505,
+      "subdeckPath": "Lang::Vocab::N4",
+      "fieldValues": [
+        "Q&amp;A &lt;tag&gt;",
+        "질문과 답변&nbsp;"
+      ]
+    },
+    {
+      "rowIndex": 506,
+      "subdeckPath": "Lang::Vocab::N4",
+      "fieldValues": [
+        "<!-- hidden -->visible<style>.x{color:red}</style>",
+        "<script>alert(1)</script>보임"
+      ]
+    },
+    {
+      "rowIndex": 507,
+      "subdeckPath": "Lang::Vocab::N4",
+      "fieldValues": [
+        "sun",
+        "해"
+      ]
+    },
+    {
+      "rowIndex": 508,
+      "subdeckPath": "Lang::Grammar",
+      "fieldValues": [
+        "moon",
+        "달"
+      ]
+    },
+    {
+      "rowIndex": 909,
+      "subdeckPath": "Lang::Grammar",
+      "fieldValues": [
+        "{{c1::Canberra}} is the capital of {{c2::Australia}}.",
+        ""
+      ]
+    },
+    {
+      "rowIndex": 910,
+      "subdeckPath": "Lang::Grammar",
+      "fieldValues": [
+        "{{c1::Seoul::city}} is in {{c2::Korea::country}}.",
+        "수도"
+      ]
+    },
+    {
+      "rowIndex": 911,
+      "subdeckPath": "Lang::Grammar",
+      "fieldValues": [
+        "시간 표기 {{c1::12::시::분}}",
+        ""
+      ]
+    },
+    {
+      "rowIndex": 912,
+      "subdeckPath": "Lang::Grammar",
+      "fieldValues": [
+        "우리 {{c1::큰 {{c2::집}} 앞}} 정원",
+        ""
+      ]
+    },
+    {
+      "rowIndex": 913,
+      "subdeckPath": "Lang::Grammar",
+      "fieldValues": [
+        "{{c1,2::서울}}은 {{c3::한국}}의 수도이다.",
+        ""
+      ]
+    },
+    {
+      "rowIndex": 914,
+      "subdeckPath": "Lang::Grammar",
+      "fieldValues": [
+        "{{c1::닫힘}} 그리고 {{c2::열림",
+        ""
+      ]
+    },
+    {
+      "rowIndex": 915,
+      "subdeckPath": "Lang::Grammar",
+      "fieldValues": [
+        "{{c1::<b>bold</b>}} answer<br><img src=\"cloze.png\">",
+        "<i>extra</i> [sound:extra.wav]"
+      ]
+    },
+    {
+      "rowIndex": 916,
+      "subdeckPath": "Lang::Grammar",
+      "fieldValues": [
+        "{{c1::a {{c2::b}}::hint}}",
+        ""
+      ]
+    }
+  ],
+  "cards": {
+    "items": [
+      {
+        "rowIndex": 0,
+        "front": "食べる",
+        "back": "먹다\n毎朝パンを食べる。\nたべる",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "mediaRemoved": 1,
+        "excluded": false
+      },
+      {
+        "rowIndex": 1,
+        "front": "water",
+        "back": "물",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "mediaRemoved": 1,
+        "excluded": false
+      },
+      {
+        "rowIndex": 2,
+        "front": "水",
+        "back": "물\nみず",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 3,
+        "front": "한글",
+        "back": "Korean alphabet\n가\n나\nhangeul",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 4,
+        "front": "빈 항목입니다",
+        "back": "뜻만 있음",
+        "frontReplaced": true,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 5,
+        "front": "vocab-n5-0001",
+        "back": "n5 뜻 0001\n例文 0001\n예문 0001\nよみ0001",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 505,
+        "front": "Q&A <tag>",
+        "back": "질문과 답변",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 506,
+        "front": "visible",
+        "back": "보임",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 507,
+        "front": "sun",
+        "back": "해",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 508,
+        "front": "moon",
+        "back": "달",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 509,
+        "front": "basic-n4-0001",
+        "back": "뒷면 0001",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 809,
+        "front": "pair-0001",
+        "back": "짝-0001",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 909,
+        "front": "[...] is the capital of [...].",
+        "back": "Canberra is the capital of Australia.",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 910,
+        "front": "[city] is in [country].",
+        "back": "Seoul is in Korea.\n수도",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 911,
+        "front": "시간 표기 [시::분]",
+        "back": "시간 표기 12",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 912,
+        "front": "우리 [...] 정원",
+        "back": "우리 큰 집 앞 정원",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 913,
+        "front": "[...]은 [...]의 수도이다.",
+        "back": "서울은 한국의 수도이다.",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 914,
+        "front": "[...] 그리고 {{c2::열림",
+        "back": "닫힘 그리고 {{c2::열림",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 915,
+        "front": "[...] answer",
+        "back": "bold answer\nextra",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "mediaRemoved": 2,
+        "excluded": false
+      },
+      {
+        "rowIndex": 916,
+        "front": "[hint]",
+        "back": "a b",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 917,
+        "front": "문장 [...] 끝",
+        "back": "문장 빈칸 0001 끝",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "mediaRemoved": 0,
+        "excluded": false
+      }
+    ]
+  },
+  "previewStats": {
+    "cardCount": 1217,
+    "excludedCount": 0,
+    "emptyReplacedCount": 1,
+    "truncatedCount": 0,
+    "mediaRemovedCount": 4
+  },
+  "selectionExamples": [
+    {
+      "selectedPaths": [
+        "Lang::Grammar"
+      ],
+      "noteCount": 310
+    }
+  ],
+  "limit": {
+    "exceeded": false
+  }
+}

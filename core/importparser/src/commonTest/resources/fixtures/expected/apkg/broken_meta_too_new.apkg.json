@@ -1,0 +1,8 @@
+{
+  "fixture": "apkg/broken_meta_too_new.apkg",
+  "error": {
+    "kind": "UNSUPPORTED_FILE"
+  },
+  "format": "APKG",
+  "warnings": []
+}

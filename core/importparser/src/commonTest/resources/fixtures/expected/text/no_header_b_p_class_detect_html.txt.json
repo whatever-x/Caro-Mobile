@@ -1,0 +1,93 @@
+{
+  "fixture": "text/no_header_b_p_class_detect_html.txt",
+  "format": "TEXT",
+  "sourceName": "no_header_b_p_class_detect_html.txt",
+  "encoding": "UTF-8",
+  "htmlMode": "HTML",
+  "separator": "\t",
+  "hasHeaderRow": false,
+  "noteTypes": [
+    {
+      "id": "text",
+      "name": "no_header_b_p_class_detect_html.txt",
+      "fieldNames": [
+        "열 1",
+        "열 2"
+      ],
+      "isCloze": false,
+      "noteCount": 3
+    }
+  ],
+  "rowCount": 3,
+  "warnings": [],
+  "rows": [
+    {
+      "index": 0,
+      "fieldValues": [
+        "<b>run</b>",
+        "달리다"
+      ]
+    },
+    {
+      "index": 1,
+      "fieldValues": [
+        "walk",
+        "<p class=ex>걷다</p>"
+      ]
+    },
+    {
+      "index": 2,
+      "fieldValues": [
+        "Tom &amp; Jerry",
+        "<b>톰</b>과 제리"
+      ]
+    }
+  ],
+  "cards": {
+    "items": [
+      {
+        "rowIndex": 0,
+        "front": "run",
+        "back": "달리다",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 1,
+        "front": "walk",
+        "back": "걷다",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 2,
+        "front": "Tom & Jerry",
+        "back": "톰과 제리",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "mediaRemoved": 0,
+        "excluded": false
+      }
+    ]
+  },
+  "previewStats": {
+    "cardCount": 3,
+    "excludedCount": 0,
+    "emptyReplacedCount": 0,
+    "truncatedCount": 0,
+    "mediaRemovedCount": 0
+  },
+  "limit": {
+    "exceeded": false
+  }
+}

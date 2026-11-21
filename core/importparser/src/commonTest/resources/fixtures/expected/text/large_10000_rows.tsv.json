@@ -1,0 +1,47 @@
+{
+  "fixture": "text/large_10000_rows.tsv",
+  "format": "TEXT",
+  "sourceName": "large_10000_rows.tsv",
+  "encoding": "UTF-8",
+  "htmlMode": "PLAIN",
+  "separator": "\t",
+  "hasHeaderRow": false,
+  "noteTypes": [
+    {
+      "id": "text",
+      "name": "large_10000_rows.tsv",
+      "fieldNames": [
+        "열 1",
+        "열 2"
+      ],
+      "isCloze": false,
+      "noteCount": 10000
+    }
+  ],
+  "rowCount": 10000,
+  "warnings": [],
+  "rows": [
+    {
+      "index": 0,
+      "fieldValues": [
+        "filler00001",
+        "채움00001"
+      ]
+    },
+    {
+      "index": 9999,
+      "fieldValues": [
+        "filler10000",
+        "채움10000"
+      ]
+    }
+  ],
+  "limit": {
+    "exceeded": false,
+    "parserStopsKeepingValuesAtRow": null,
+    "rowsKept": 10000
+  },
+  "previewStats": {
+    "cardCount": 10000
+  }
+}

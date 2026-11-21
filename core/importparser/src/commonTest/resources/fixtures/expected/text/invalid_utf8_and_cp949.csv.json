@@ -1,0 +1,8 @@
+{
+  "fixture": "text/invalid_utf8_and_cp949.csv",
+  "error": {
+    "kind": "ENCODING_UNDETERMINED"
+  },
+  "format": "TEXT",
+  "warnings": []
+}

@@ -57,6 +57,7 @@ include(":core:messaging")
 include(":core:util")
 include(":core:inapp-review")
 include(":core:screenshot-testing")
+include(":core:importparser")
 
 // :Feature
 include(":feature:home")

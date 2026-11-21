@@ -1,0 +1,677 @@
+{
+  "fixture": "xlsx/wordlist_multi_sheet.xlsx",
+  "format": "XLSX",
+  "sourceName": "wordlist_multi_sheet.xlsx",
+  "htmlMode": "PLAIN",
+  "sheets": [
+    {
+      "index": 0,
+      "name": "Day1",
+      "rowCount": 7
+    },
+    {
+      "index": 1,
+      "name": "Day2",
+      "rowCount": 26
+    },
+    {
+      "index": 2,
+      "name": "Notes",
+      "rowCount": 0
+    }
+  ],
+  "warnings": [],
+  "perSheet": [
+    {
+      "sheetIndex": 0,
+      "noteTypes": [
+        {
+          "id": "xlsx",
+          "name": "Day1",
+          "fieldNames": [
+            "word",
+            "meaning",
+            "example",
+            "level"
+          ],
+          "isCloze": false,
+          "noteCount": 6
+        }
+      ],
+      "rowCount": 6,
+      "warnings": [],
+      "rows": [
+        {
+          "index": 0,
+          "fieldValues": [
+            "apple",
+            "사과",
+            "I eat an apple.",
+            "1"
+          ]
+        },
+        {
+          "index": 1,
+          "fieldValues": [
+            "食べる",
+            "먹다",
+            "",
+            "2"
+          ]
+        },
+        {
+          "index": 2,
+          "fieldValues": [
+            "run",
+            "달리다",
+            "He runs every day.",
+            "1"
+          ]
+        },
+        {
+          "index": 3,
+          "fieldValues": [
+            "",
+            "운영하다",
+            "She runs a shop.",
+            "2"
+          ]
+        },
+        {
+          "index": 4,
+          "fieldValues": [
+            "",
+            "뜻만 있는 행",
+            "",
+            ""
+          ]
+        },
+        {
+          "index": 5,
+          "fieldValues": [
+            "bank",
+            "은행",
+            "",
+            "3"
+          ]
+        }
+      ],
+      "cards": {
+        "items": [
+          {
+            "rowIndex": 0,
+            "front": "apple",
+            "back": "사과\nI eat an apple.\n1",
+            "frontReplaced": false,
+            "backReplaced": false,
+            "frontTruncated": false,
+            "backTruncated": false,
+            "mediaRemoved": 0,
+            "excluded": false
+          },
+          {
+            "rowIndex": 1,
+            "front": "食べる",
+            "back": "먹다\n2",
+            "frontReplaced": false,
+            "backReplaced": false,
+            "frontTruncated": false,
+            "backTruncated": false,
+            "mediaRemoved": 0,
+            "excluded": false
+          },
+          {
+            "rowIndex": 2,
+            "front": "run",
+            "back": "달리다\nHe runs every day.\n1",
+            "frontReplaced": false,
+            "backReplaced": false,
+            "frontTruncated": false,
+            "backTruncated": false,
+            "mediaRemoved": 0,
+            "excluded": false
+          },
+          {
+            "rowIndex": 3,
+            "front": "빈 항목입니다",
+            "back": "운영하다\nShe runs a shop.\n2",
+            "frontReplaced": true,
+            "backReplaced": false,
+            "frontTruncated": false,
+            "backTruncated": false,
+            "mediaRemoved": 0,
+            "excluded": false
+          },
+          {
+            "rowIndex": 4,
+            "front": "빈 항목입니다",
+            "back": "뜻만 있는 행",
+            "frontReplaced": true,
+            "backReplaced": false,
+            "frontTruncated": false,
+            "backTruncated": false,
+            "mediaRemoved": 0,
+            "excluded": false
+          },
+          {
+            "rowIndex": 5,
+            "front": "bank",
+            "back": "은행\n3",
+            "frontReplaced": false,
+            "backReplaced": false,
+            "frontTruncated": false,
+            "backTruncated": false,
+            "mediaRemoved": 0,
+            "excluded": false
+          }
+        ]
+      },
+      "previewStats": {
+        "cardCount": 6,
+        "excludedCount": 0,
+        "emptyReplacedCount": 2,
+        "truncatedCount": 0,
+        "mediaRemovedCount": 0
+      }
+    },
+    {
+      "sheetIndex": 1,
+      "noteTypes": [
+        {
+          "id": "xlsx",
+          "name": "Day2",
+          "fieldNames": [
+            "front",
+            "back"
+          ],
+          "isCloze": false,
+          "noteCount": 25
+        }
+      ],
+      "rowCount": 25,
+      "warnings": [
+        {
+          "code": "XLSX_NUMBER_FORMAT_RAW",
+          "count": 3
+        },
+        {
+          "code": "XLSX_FORMULA_WITHOUT_VALUE",
+          "count": 1
+        }
+      ],
+      "rows": [
+        {
+          "index": 0,
+          "fieldValues": [
+            "general 0.1+0.2",
+            "0.3"
+          ]
+        },
+        {
+          "index": 1,
+          "fieldValues": [
+            "general integer",
+            "1234567"
+          ]
+        },
+        {
+          "index": 2,
+          "fieldValues": [
+            "general negative",
+            "-0.5"
+          ]
+        },
+        {
+          "index": 3,
+          "fieldValues": [
+            "general 15 digits",
+            "123456789.123457"
+          ]
+        },
+        {
+          "index": 4,
+          "fieldValues": [
+            "general small",
+            "0.000123"
+          ]
+        },
+        {
+          "index": 5,
+          "fieldValues": [
+            "percent 9",
+            "13%"
+          ]
+        },
+        {
+          "index": 6,
+          "fieldValues": [
+            "percent 10",
+            "12.50%"
+          ]
+        },
+        {
+          "index": 7,
+          "fieldValues": [
+            "thousands 3",
+            "1,235"
+          ]
+        },
+        {
+          "index": 8,
+          "fieldValues": [
+            "thousands 4",
+            "1,234.50"
+          ]
+        },
+        {
+          "index": 9,
+          "fieldValues": [
+            "date 14",
+            "2023-03-15"
+          ]
+        },
+        {
+          "index": 10,
+          "fieldValues": [
+            "datetime 22",
+            "2023-03-15 18:00"
+          ]
+        },
+        {
+          "index": 11,
+          "fieldValues": [
+            "time 21",
+            "16:30:00"
+          ]
+        },
+        {
+          "index": 12,
+          "fieldValues": [
+            "date 14 serial 60",
+            "1900-02-29"
+          ]
+        },
+        {
+          "index": 13,
+          "fieldValues": [
+            "date 14 serial 61",
+            "1900-03-01"
+          ]
+        },
+        {
+          "index": 14,
+          "fieldValues": [
+            "currency custom",
+            "1234.5"
+          ]
+        },
+        {
+          "index": 15,
+          "fieldValues": [
+            "custom 0.000",
+            "3.14159"
+          ]
+        },
+        {
+          "index": 16,
+          "fieldValues": [
+            "custom date",
+            "45000"
+          ]
+        },
+        {
+          "index": 17,
+          "fieldValues": [
+            "boolean true",
+            "TRUE"
+          ]
+        },
+        {
+          "index": 18,
+          "fieldValues": [
+            "boolean false",
+            "FALSE"
+          ]
+        },
+        {
+          "index": 19,
+          "fieldValues": [
+            "formula cached number",
+            "0.3"
+          ]
+        },
+        {
+          "index": 20,
+          "fieldValues": [
+            "formula cached string",
+            "abcd"
+          ]
+        },
+        {
+          "index": 21,
+          "fieldValues": [
+            "formula without cache",
+            ""
+          ]
+        },
+        {
+          "index": 22,
+          "fieldValues": [
+            "error value",
+            "#DIV/0!"
+          ]
+        },
+        {
+          "index": 23,
+          "fieldValues": [
+            "inline string",
+            "인라인 문자열"
+          ]
+        },
+        {
+          "index": 24,
+          "fieldValues": [
+            "phonetic",
+            "漢字"
+          ]
+        }
+      ],
+      "cards": {
+        "items": [
+          {
+            "rowIndex": 0,
+            "front": "general 0.1+0.2",
+            "back": "0.3",
+            "frontReplaced": false,
+            "backReplaced": false,
+            "frontTruncated": false,
+            "backTruncated": false,
+            "mediaRemoved": 0,
+            "excluded": false
+          },
+          {
+            "rowIndex": 1,
+            "front": "general integer",
+            "back": "1234567",
+            "frontReplaced": false,
+            "backReplaced": false,
+            "frontTruncated": false,
+            "backTruncated": false,
+            "mediaRemoved": 0,
+            "excluded": false
+          },
+          {
+            "rowIndex": 2,
+            "front": "general negative",
+            "back": "-0.5",
+            "frontReplaced": false,
+            "backReplaced": false,
+            "frontTruncated": false,
+            "backTruncated": false,
+            "mediaRemoved": 0,
+            "excluded": false
+          },
+          {
+            "rowIndex": 3,
+            "front": "general 15 digits",
+            "back": "123456789.123457",
+            "frontReplaced": false,
+            "backReplaced": false,
+            "frontTruncated": false,
+            "backTruncated": false,
+            "mediaRemoved": 0,
+            "excluded": false
+          },
+          {
+            "rowIndex": 4,
+            "front": "general small",
+            "back": "0.000123",
+            "frontReplaced": false,
+            "backReplaced": false,
+            "frontTruncated": false,
+            "backTruncated": false,
+            "mediaRemoved": 0,
+            "excluded": false
+          },
+          {
+            "rowIndex": 5,
+            "front": "percent 9",
+            "back": "13%",
+            "frontReplaced": false,
+            "backReplaced": false,
+            "frontTruncated": false,
+            "backTruncated": false,
+            "mediaRemoved": 0,
+            "excluded": false
+          },
+          {
+            "rowIndex": 6,
+            "front": "percent 10",
+            "back": "12.50%",
+            "frontReplaced": false,
+            "backReplaced": false,
+            "frontTruncated": false,
+            "backTruncated": false,
+            "mediaRemoved": 0,
+            "excluded": false
+          },
+          {
+            "rowIndex": 7,
+            "front": "thousands 3",
+            "back": "1,235",
+            "frontReplaced": false,
+            "backReplaced": false,
+            "frontTruncated": false,
+            "backTruncated": false,
+            "mediaRemoved": 0,
+            "excluded": false
+          },
+          {
+            "rowIndex": 8,
+            "front": "thousands 4",
+            "back": "1,234.50",
+            "frontReplaced": false,
+            "backReplaced": false,
+            "frontTruncated": false,
+            "backTruncated": false,
+            "mediaRemoved": 0,
+            "excluded": false
+          },
+          {
+            "rowIndex": 9,
+            "backEn": "3/15/2023",
+            "front": "date 14",
+            "back": "2023-03-15",
+            "frontReplaced": false,
+            "backReplaced": false,
+            "frontTruncated": false,
+            "backTruncated": false,
+            "mediaRemoved": 0,
+            "excluded": false
+          },
+          {
+            "rowIndex": 10,
+            "backEn": "3/15/2023 18:00",
+            "front": "datetime 22",
+            "back": "2023-03-15 18:00",
+            "frontReplaced": false,
+            "backReplaced": false,
+            "frontTruncated": false,
+            "backTruncated": false,
+            "mediaRemoved": 0,
+            "excluded": false
+          },
+          {
+            "rowIndex": 11,
+            "front": "time 21",
+            "back": "16:30:00",
+            "frontReplaced": false,
+            "backReplaced": false,
+            "frontTruncated": false,
+            "backTruncated": false,
+            "mediaRemoved": 0,
+            "excluded": false
+          },
+          {
+            "rowIndex": 12,
+            "backEn": "2/29/1900",
+            "front": "date 14 serial 60",
+            "back": "1900-02-29",
+            "frontReplaced": false,
+            "backReplaced": false,
+            "frontTruncated": false,
+            "backTruncated": false,
+            "mediaRemoved": 0,
+            "excluded": false
+          },
+          {
+            "rowIndex": 13,
+            "backEn": "3/1/1900",
+            "front": "date 14 serial 61",
+            "back": "1900-03-01",
+            "frontReplaced": false,
+            "backReplaced": false,
+            "frontTruncated": false,
+            "backTruncated": false,
+            "mediaRemoved": 0,
+            "excluded": false
+          },
+          {
+            "rowIndex": 14,
+            "front": "currency custom",
+            "back": "1234.5",
+            "frontReplaced": false,
+            "backReplaced": false,
+            "frontTruncated": false,
+            "backTruncated": false,
+            "mediaRemoved": 0,
+            "excluded": false
+          },
+          {
+            "rowIndex": 15,
+            "front": "custom 0.000",
+            "back": "3.14159",
+            "frontReplaced": false,
+            "backReplaced": false,
+            "frontTruncated": false,
+            "backTruncated": false,
+            "mediaRemoved": 0,
+            "excluded": false
+          },
+          {
+            "rowIndex": 16,
+            "front": "custom date",
+            "back": "45000",
+            "frontReplaced": false,
+            "backReplaced": false,
+            "frontTruncated": false,
+            "backTruncated": false,
+            "mediaRemoved": 0,
+            "excluded": false
+          },
+          {
+            "rowIndex": 17,
+            "front": "boolean true",
+            "back": "TRUE",
+            "frontReplaced": false,
+            "backReplaced": false,
+            "frontTruncated": false,
+            "backTruncated": false,
+            "mediaRemoved": 0,
+            "excluded": false
+          },
+          {
+            "rowIndex": 18,
+            "front": "boolean false",
+            "back": "FALSE",
+            "frontReplaced": false,
+            "backReplaced": false,
+            "frontTruncated": false,
+            "backTruncated": false,
+            "mediaRemoved": 0,
+            "excluded": false
+          },
+          {
+            "rowIndex": 19,
+            "front": "formula cached number",
+            "back": "0.3",
+            "frontReplaced": false,
+            "backReplaced": false,
+            "frontTruncated": false,
+            "backTruncated": false,
+            "mediaRemoved": 0,
+            "excluded": false
+          },
+          {
+            "rowIndex": 20,
+            "front": "formula cached string",
+            "back": "abcd",
+            "frontReplaced": false,
+            "backReplaced": false,
+            "frontTruncated": false,
+            "backTruncated": false,
+            "mediaRemoved": 0,
+            "excluded": false
+          },
+          {
+            "rowIndex": 21,
+            "front": "formula without cache",
+            "back": "빈 항목입니다",
+            "frontReplaced": false,
+            "backReplaced": true,
+            "frontTruncated": false,
+            "backTruncated": false,
+            "mediaRemoved": 0,
+            "excluded": false
+          },
+          {
+            "rowIndex": 22,
+            "front": "error value",
+            "back": "#DIV/0!",
+            "frontReplaced": false,
+            "backReplaced": false,
+            "frontTruncated": false,
+            "backTruncated": false,
+            "mediaRemoved": 0,
+            "excluded": false
+          },
+          {
+            "rowIndex": 23,
+            "front": "inline string",
+            "back": "인라인 문자열",
+            "frontReplaced": false,
+            "backReplaced": false,
+            "frontTruncated": false,
+            "backTruncated": false,
+            "mediaRemoved": 0,
+            "excluded": false
+          },
+          {
+            "rowIndex": 24,
+            "front": "phonetic",
+            "back": "漢字",
+            "frontReplaced": false,
+            "backReplaced": false,
+            "frontTruncated": false,
+            "backTruncated": false,
+            "mediaRemoved": 0,
+            "excluded": false
+          }
+        ]
+      },
+      "previewStats": {
+        "cardCount": 25,
+        "excludedCount": 0,
+        "emptyReplacedCount": 1,
+        "truncatedCount": 0,
+        "mediaRemovedCount": 0
+      }
+    },
+    {
+      "sheetIndex": 2,
+      "rowCount": 0,
+      "emptyResult": true,
+      "warnings": []
+    }
+  ]
+}

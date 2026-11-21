@@ -1,0 +1,13 @@
+{
+  "fixture": "apkg/empty_zero_notes.apkg",
+  "format": "APKG",
+  "htmlMode": "HTML",
+  "subdecks": [],
+  "notesWithoutDeck": 0,
+  "noteTypes": [],
+  "totalNotes": 0,
+  "warnings": [],
+  "previewStats": {
+    "cardCount": 0
+  }
+}

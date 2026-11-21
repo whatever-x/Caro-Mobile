@@ -1,0 +1,161 @@
+{
+  "fixture": "text/anki_notes_html_true_headers.txt",
+  "format": "TEXT",
+  "sourceName": "anki_notes_html_true_headers.txt",
+  "encoding": "UTF-8",
+  "htmlMode": "HTML",
+  "separator": "\t",
+  "hasHeaderRow": false,
+  "noteTypes": [
+    {
+      "id": "text",
+      "name": "anki_notes_html_true_headers.txt",
+      "fieldNames": [
+        "열 1",
+        "열 2",
+        "열 3",
+        "열 4"
+      ],
+      "isCloze": false,
+      "noteCount": 6
+    }
+  ],
+  "rowCount": 6,
+  "warnings": [],
+  "rows": [
+    {
+      "index": 0,
+      "fieldValues": [
+        "<b>apple</b>",
+        "사과<br>an edible fruit",
+        "",
+        ""
+      ]
+    },
+    {
+      "index": 1,
+      "fieldValues": [
+        "食べる",
+        "먹다&nbsp;(to eat)",
+        "<div>毎朝パンを食べる。</div><div>매일 아침 빵을 먹는다.</div>",
+        "たべる [sound:taberu.mp3]"
+      ]
+    },
+    {
+      "index": 2,
+      "fieldValues": [
+        "{{c1::Seoul}} is the capital of {{c2::Korea::country}}.",
+        "Tom &amp; Jerry <img src=\"a.png\">",
+        "",
+        ""
+      ]
+    },
+    {
+      "index": 3,
+      "fieldValues": [
+        "{{c1,2::서울}}은 한국의 수도이다.",
+        "",
+        "",
+        ""
+      ]
+    },
+    {
+      "index": 4,
+      "fieldValues": [
+        "여러 줄\n두 번째 줄",
+        "<p>단락</p>&lt;b&gt;는 글자",
+        "",
+        ""
+      ]
+    },
+    {
+      "index": 5,
+      "fieldValues": [
+        "<!-- 주석 -->보이는 글<style>.x{color:red}</style>",
+        "<span style=\"color:red\">&#54620;&#xAE00;</span><script>var a=1;</script>",
+        "",
+        ""
+      ]
+    }
+  ],
+  "cards": {
+    "items": [
+      {
+        "rowIndex": 0,
+        "front": "apple",
+        "back": "사과\nan edible fruit",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 1,
+        "front": "食べる",
+        "back": "먹다 (to eat)\n毎朝パンを食べる。\n매일 아침 빵을 먹는다.\nたべる",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "mediaRemoved": 1,
+        "excluded": false
+      },
+      {
+        "rowIndex": 2,
+        "front": "[...] is the capital of [country].",
+        "back": "Seoul is the capital of Korea.\nTom & Jerry",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "mediaRemoved": 1,
+        "excluded": false
+      },
+      {
+        "rowIndex": 3,
+        "front": "[...]은 한국의 수도이다.",
+        "back": "서울은 한국의 수도이다.",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 4,
+        "front": "여러 줄 두 번째 줄",
+        "back": "단락\n<b>는 글자",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 5,
+        "front": "보이는 글",
+        "back": "한글",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "mediaRemoved": 0,
+        "excluded": false
+      }
+    ]
+  },
+  "previewStats": {
+    "cardCount": 6,
+    "excludedCount": 0,
+    "emptyReplacedCount": 0,
+    "truncatedCount": 0,
+    "mediaRemovedCount": 2
+  },
+  "limit": {
+    "exceeded": false
+  }
+}

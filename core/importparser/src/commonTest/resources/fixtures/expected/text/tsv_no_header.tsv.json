@@ -1,0 +1,97 @@
+{
+  "fixture": "text/tsv_no_header.tsv",
+  "format": "TEXT",
+  "sourceName": "tsv_no_header.tsv",
+  "encoding": "UTF-8",
+  "htmlMode": "PLAIN",
+  "separator": "\t",
+  "hasHeaderRow": false,
+  "noteTypes": [
+    {
+      "id": "text",
+      "name": "tsv_no_header.tsv",
+      "fieldNames": [
+        "열 1",
+        "열 2",
+        "열 3"
+      ],
+      "isCloze": false,
+      "noteCount": 3
+    }
+  ],
+  "rowCount": 3,
+  "warnings": [],
+  "rows": [
+    {
+      "index": 0,
+      "fieldValues": [
+        "one",
+        "하나",
+        "いち"
+      ]
+    },
+    {
+      "index": 1,
+      "fieldValues": [
+        "two",
+        "둘",
+        "に"
+      ]
+    },
+    {
+      "index": 2,
+      "fieldValues": [
+        "three",
+        "셋",
+        "さん"
+      ]
+    }
+  ],
+  "cards": {
+    "items": [
+      {
+        "rowIndex": 0,
+        "front": "one",
+        "back": "하나\nいち",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 1,
+        "front": "two",
+        "back": "둘\nに",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "mediaRemoved": 0,
+        "excluded": false
+      },
+      {
+        "rowIndex": 2,
+        "front": "three",
+        "back": "셋\nさん",
+        "frontReplaced": false,
+        "backReplaced": false,
+        "frontTruncated": false,
+        "backTruncated": false,
+        "mediaRemoved": 0,
+        "excluded": false
+      }
+    ]
+  },
+  "previewStats": {
+    "cardCount": 3,
+    "excludedCount": 0,
+    "emptyReplacedCount": 0,
+    "truncatedCount": 0,
+    "mediaRemovedCount": 0
+  },
+  "limit": {
+    "exceeded": false
+  }
+}
