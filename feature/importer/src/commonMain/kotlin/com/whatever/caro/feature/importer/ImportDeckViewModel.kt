@@ -7,15 +7,20 @@ import com.whatever.caro.core.importparser.model.ParsedTable
 import com.whatever.caro.core.viewmodel.BaseViewModel
 import com.whatever.caro.core.viewmodel.ExceptionFilter
 import com.whatever.caro.feature.importer.logic.ImportPreflight
+import com.whatever.caro.feature.importer.logic.applyingDeckInfo
+import com.whatever.caro.feature.importer.logic.deckDescriptionPrefill
 import com.whatever.caro.feature.importer.logic.deckNamePrefill
 import com.whatever.caro.feature.importer.logic.filterCards
 import com.whatever.caro.feature.importer.logic.nextPasteOverflowed
 import com.whatever.caro.feature.importer.logic.noCardsKind
+import com.whatever.caro.feature.importer.logic.openingDeckInfo
 import com.whatever.caro.feature.importer.logic.pickFailedDialog
 import com.whatever.caro.feature.importer.logic.preflight
-import com.whatever.caro.feature.importer.logic.previewFilterCounts
 import com.whatever.caro.feature.importer.logic.readFailureDialog
+import com.whatever.caro.feature.importer.logic.showingPreview
 import com.whatever.caro.feature.importer.logic.tooLargePickDialog
+import com.whatever.caro.feature.importer.logic.withDeckInfoDescription
+import com.whatever.caro.feature.importer.logic.withDeckInfoName
 import com.whatever.caro.feature.importer.mvi.ImportDeckIntent
 import com.whatever.caro.feature.importer.mvi.ImportDeckSideEffect
 import com.whatever.caro.feature.importer.mvi.ImportDeckState
@@ -24,7 +29,12 @@ import com.whatever.caro.feature.importer.mvi.ImportLoading
 import com.whatever.caro.feature.importer.mvi.ImportPreviewFilter
 import com.whatever.caro.feature.importer.mvi.ImportSelection
 import com.whatever.caro.feature.importer.mvi.ImportStep
+import com.whatever.caro.feature.importer.mvi.SettingsEntry
+import com.whatever.caro.feature.importer.mvi.SettingsKind
+import com.whatever.caro.feature.importer.mvi.dismissingDialog
+import com.whatever.caro.feature.importer.mvi.isAcceptedWhileBusy
 import com.whatever.caro.feature.importer.platform.PickResult
+import com.whatever.caro.feature.importer.save.ImportSaveCoordinatorFactory
 import com.whatever.caro.feature.importer.source.ImportDispatchers
 import com.whatever.caro.feature.importer.source.ImportFileCopy
 import com.whatever.caro.feature.importer.source.ImportLimitsConfig
@@ -37,7 +47,6 @@ import com.whatever.caro.feature.importer.transform.ImportCard
 import com.whatever.caro.feature.importer.transform.ImportPreviewBuilder
 import com.whatever.caro.feature.importer.transform.defaultFieldMappings
 import io.github.aakira.napier.Napier
-import kotlinx.collections.immutable.toImmutableMap
 import kotlinx.collections.immutable.toImmutableSet
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineStart
@@ -53,6 +62,7 @@ class ImportDeckViewModel internal constructor(
     fileCopy: ImportFileCopy,
     private val limits: ImportLimitsConfig,
     private val dispatchers: ImportDispatchers,
+    saveCoordinatorFactory: ImportSaveCoordinatorFactory,
     exceptionFilter: ExceptionFilter,
 ) : BaseViewModel<ImportDeckState, ImportDeckIntent, ImportDeckSideEffect>(ImportDeckState(), exceptionFilter) {
     private val readController = ImportReadController(viewModelScope, sourceReader, tempStorage, fileCopy, limits, dispatchers)
@@ -62,11 +72,15 @@ class ImportDeckViewModel internal constructor(
     // 첫 읽기부터 미리보기까지 이어지는 이 처리를 함께 취소해야 멈춘 뒤에 받아 둔 결과로 다음 읽기나 미리보기 계산을 시작하지 않는다.
     private var readFlow: Job? = null
 
+    private val host = Host()
+    private val settings = ImportSettingsEditor(host, readController, previewBuilder, limits, dispatchers)
+    private val saveSession = ImportSaveSession(host, saveCoordinatorFactory, dispatchers)
+
     override suspend fun handleIntent(intent: ImportDeckIntent) {
-        if (currentState.isBusy && !intent.isAcceptedWhileBusy()) return
+        if (currentState.isBusy && !intent.isAcceptedWhileBusy) return
         when (intent) {
             ImportDeckIntent.ClickBack -> onClickBack()
-            ImportDeckIntent.DismissDialog -> reduce { copy(dialog = null) }
+            ImportDeckIntent.DismissDialog -> reduce { dismissingDialog() }
             ImportDeckIntent.ConfirmDiscard -> onConfirmDiscard()
             ImportDeckIntent.ClickPickFile -> onClickPickFile()
             ImportDeckIntent.ClickPaste -> onClickPaste()
@@ -77,6 +91,27 @@ class ImportDeckViewModel internal constructor(
             is ImportDeckIntent.ClickCard -> onClickCard(intent.card)
             ImportDeckIntent.CloseCardDetail -> reduce { copy(detailCard = null) }
             ImportDeckIntent.DismissDelimiterBanner -> reduce { copy(isDelimiterBannerDismissed = true) }
+            is ImportDeckIntent.ClickChangeSetting -> settings.openFromPreview(intent.kind)
+            is ImportDeckIntent.ToggleSubdeck -> settings.toggleSubdeck(intent.id)
+            ImportDeckIntent.ToggleAllSubdecks -> settings.toggleAllSubdecks()
+            is ImportDeckIntent.SelectSheet -> settings.selectSheet(intent.index)
+            is ImportDeckIntent.SelectDelimiter -> settings.selectDelimiter(intent.delimiter)
+            is ImportDeckIntent.ChangeHeaderRow -> settings.changeHeaderRow(intent.hasHeaderRow)
+            is ImportDeckIntent.ToggleNoteType -> settings.toggleNoteType(intent.noteTypeId)
+            is ImportDeckIntent.ToggleField -> settings.toggleField(intent.noteTypeId, intent.target, intent.fieldName)
+            ImportDeckIntent.ClickApplySettings -> settings.apply()
+            ImportDeckIntent.ClickChangeDeckInfo -> reduce { openingDeckInfo() }
+            is ImportDeckIntent.UpdateDeckInfoName -> reduce { withDeckInfoName(intent.name) }
+            is ImportDeckIntent.UpdateDeckInfoDescription -> reduce { withDeckInfoDescription(intent.description) }
+            ImportDeckIntent.ApplyDeckInfo -> reduce { applyingDeckInfo() }
+            ImportDeckIntent.DismissDeckInfo -> reduce { copy(deckInfoDraft = null) }
+            ImportDeckIntent.ClickImport -> saveSession.startImport()
+            ImportDeckIntent.RetryCreateDeck -> saveSession.retryCreateDeck()
+            ImportDeckIntent.ClickStop -> saveSession.requestStop()
+            ImportDeckIntent.ConfirmStop -> saveSession.confirmStop()
+            ImportDeckIntent.RetrySave -> saveSession.retry()
+            ImportDeckIntent.ClickViewDeck -> saveSession.viewDeck()
+            ImportDeckIntent.ClickGoHome -> saveSession.goHome()
         }
     }
 
@@ -85,21 +120,44 @@ class ImportDeckViewModel internal constructor(
         super.onCleared()
     }
 
+    /** 설정 화면의 처리는 원본을 남긴 채 그 처리만 멈추고, 첫 읽기는 원본까지 버린다. */
     private fun onClickBack() {
         val state = currentState
         when {
-            state.dialog != null -> reduce { copy(dialog = null) }
+            state.dialog != null -> reduce { dismissingDialog() }
             state.detailCard != null -> reduce { copy(detailCard = null) }
+            state.deckInfoDraft != null -> reduce { copy(deckInfoDraft = null) }
+            state.loading == ImportLoading.CreatingDeck -> Unit
+            state.step is ImportStep.Settings && (state.loading != null || state.pendingDraftSelection != null) -> settings.stop()
             state.loading != null -> discardSource()
             else -> goBackFromStep(state)
         }
     }
 
     private fun goBackFromStep(state: ImportDeckState) {
-        when (state.step) {
-            ImportStep.Source -> postSideEffect(ImportDeckSideEffect.NavigateBack)
-            ImportStep.Paste -> reduce { copy(step = ImportStep.Source, isPaste = false) }
-            ImportStep.Preview -> if (state.isPaste) discardSource() else reduce { copy(dialog = ImportDialog.DiscardConfirm) }
+        when (val step = state.step) {
+            ImportStep.Source -> {
+                postSideEffect(ImportDeckSideEffect.NavigateBack)
+            }
+
+            ImportStep.Paste -> {
+                reduce { copy(step = ImportStep.Source, isPaste = false) }
+            }
+
+            ImportStep.Preview -> {
+                if (state.isPaste) discardSource() else reduce { copy(dialog = ImportDialog.DiscardConfirm) }
+            }
+
+            is ImportStep.Settings -> {
+                when (step.entry) {
+                    SettingsEntry.FromPreview -> settings.leave()
+                    SettingsEntry.Gate -> reduce { copy(dialog = ImportDialog.DiscardConfirm) }
+                }
+            }
+
+            ImportStep.Saving -> {
+                saveSession.requestStop()
+            }
         }
     }
 
@@ -118,7 +176,7 @@ class ImportDeckViewModel internal constructor(
     }
 
     private fun onClickCard(card: ImportCard) {
-        if (currentState.step == ImportStep.Preview) reduce { copy(detailCard = card) }
+        if (currentState.step == ImportStep.Preview && currentState.deckInfoDraft == null) reduce { copy(detailCard = card) }
     }
 
     private suspend fun onFilePicked(intent: ImportDeckIntent.FilePicked) {
@@ -143,7 +201,7 @@ class ImportDeckViewModel internal constructor(
             }
 
             is PickResult.Picked -> {
-                startRead(ImportLoading.ReadingFile(fileName = null), intent.emptySideText) {
+                startRead(ImportLoading.ReadingFile(fileName = null), intent.emptySideText, intent.descriptionTemplate) {
                     readController.readPickedFile(result.file, intent.dateStyle, onNamed = ::showFileName)
                 }
             }
@@ -168,7 +226,7 @@ class ImportDeckViewModel internal constructor(
     private fun onClickPasteNext(intent: ImportDeckIntent.ClickPasteNext) {
         val state = currentState
         if (state.step != ImportStep.Paste || !state.isPasteNextEnabled) return
-        startRead(ImportLoading.ReadingPaste, intent.emptySideText) {
+        startRead(ImportLoading.ReadingPaste, intent.emptySideText, intent.description) {
             readController.readPaste(state.pasteText, intent.sourceName, intent.dateStyle)
         }
     }
@@ -182,27 +240,42 @@ class ImportDeckViewModel internal constructor(
     private fun startRead(
         loading: ImportLoading,
         emptySideText: String,
+        descriptionText: String,
         read: suspend () -> ImportReadResult,
     ) {
-        reduce { copy(loading = loading, isPickerOpen = false) }
-        readFlow = launch(start = CoroutineStart.UNDISPATCHED) { judgeFirstRead(read(), emptySideText) }
+        reduce { copy(loading = loading, isPickerOpen = false, emptySideText = emptySideText) }
+        readFlow = launch(start = CoroutineStart.UNDISPATCHED) { judgeFirstRead(read(), emptySideText, descriptionText) }
     }
 
     private suspend fun judgeFirstRead(
         result: ImportReadResult,
         emptySideText: String,
+        descriptionText: String,
     ) {
         val table = tableOrFail(result) ?: return
+        // 설명 기본값은 설정과 무관하므로 먼저 고칠 것 화면을 거쳐 미리보기를 처음 여는 경우에도 쓰도록 여기서 한 번 채운다.
+        reduce { copy(deckDescription = deckDescriptionPrefill(table.sourceName, isPaste, descriptionText)) }
         when (val check = preflight(table, limits.maxCards)) {
-            ImportPreflight.Ok -> openPreview(fullTable(table) ?: return, sheetIndex = 0, emptySideText)
+            ImportPreflight.Ok -> {
+                openPreview(fullTable(table) ?: return, sheetIndex = 0, emptySideText)
+            }
 
-            is ImportPreflight.PickSheet -> openFirstDataSheet(table, check.candidates, emptySideText)
+            is ImportPreflight.PickSheet -> {
+                openFirstDataSheet(table, check.candidates, emptySideText)
+            }
 
-            // 먼저 고칠 것 화면이 생기기 전까지는 하위 덱이나 시트부터 골라야 하는 경우도 너무 많다는 대화상자로 막는다.
-            ImportPreflight.SubdeckFirst,
-            ImportPreflight.SheetFirst,
-            ImportPreflight.TooMany,
-            -> discardSource(ImportDialog.TooManyCards(currentState.isPaste))
+            ImportPreflight.SubdeckFirst -> {
+                val allSubdecks = table.subdecks.map { subdeck -> subdeck.id }.toImmutableSet()
+                settings.openGate(SettingsKind.Subdeck, table, ImportSelection(subdeckIds = allSubdecks))
+            }
+
+            ImportPreflight.SheetFirst -> {
+                settings.openGate(SettingsKind.Sheet, table, ImportSelection(sheetIndex = 0))
+            }
+
+            ImportPreflight.TooMany -> {
+                discardSource(ImportDialog.TooManyCards(currentState.isPaste))
+            }
         }
     }
 
@@ -219,10 +292,10 @@ class ImportDeckViewModel internal constructor(
         for (sheet in candidates) {
             val reread = tableOrFail(readController.reread(ImportReadStage.First, sheetIndex = sheet.index)) ?: return
             if (reread.rows.isEmpty()) continue
-            if (preflight(reread, limits.maxCards, sheet.index) == ImportPreflight.Ok) {
-                openPreview(reread, sheet.index, emptySideText)
-            } else {
-                discardSource(ImportDialog.TooManyCards(currentState.isPaste))
+            when (preflight(reread, limits.maxCards, sheet.index)) {
+                ImportPreflight.Ok -> openPreview(reread, sheet.index, emptySideText)
+                ImportPreflight.SheetFirst -> settings.openGate(SettingsKind.Sheet, reread, ImportSelection(sheetIndex = sheet.index))
+                else -> discardSource(ImportDialog.TooManyCards(currentState.isPaste))
             }
             return
         }
@@ -262,19 +335,7 @@ class ImportDeckViewModel internal constructor(
             return
         }
         val selection = ImportSelection(subdeckIds = table.subdecks.map { subdeck -> subdeck.id }.toImmutableSet(), sheetIndex = sheetIndex)
-        reduce {
-            copy(
-                step = ImportStep.Preview,
-                loading = null,
-                table = table,
-                selection = selection,
-                mappings = mappings.toImmutableMap(),
-                preview = preview,
-                filterCounts = previewFilterCounts(preview.cards),
-                filteredCards = preview.cards,
-                deckName = deckNamePrefill(table, isPaste, selection),
-            )
-        }
+        reduce { showingPreview(table, selection, mappings, preview, deckNamePrefill(table, isPaste, selection)) }
     }
 
     private fun failPreview(error: Throwable) {
@@ -305,6 +366,7 @@ class ImportDeckViewModel internal constructor(
      */
     private fun discardSource(dialog: ImportDialog? = null) {
         readFlow?.cancel()
+        settings.cancelWork()
         readController.discard()
         reduce {
             ImportDeckState(
@@ -316,11 +378,18 @@ class ImportDeckViewModel internal constructor(
             )
         }
     }
-}
 
-private fun ImportDeckIntent.isAcceptedWhileBusy(): Boolean =
-    this == ImportDeckIntent.ClickBack ||
-        this == ImportDeckIntent.DismissDialog ||
-        this == ImportDeckIntent.ConfirmDiscard ||
-        this == ImportDeckIntent.CloseCardDetail ||
-        this is ImportDeckIntent.FilePicked
+    private inner class Host :
+        ImportSettingsHost,
+        ImportSaveHost {
+        override val state: ImportDeckState get() = currentState
+
+        override fun reduce(transform: ImportDeckState.() -> ImportDeckState) = this@ImportDeckViewModel.reduce(transform)
+
+        override fun postSideEffect(effect: ImportDeckSideEffect) = this@ImportDeckViewModel.postSideEffect(effect)
+
+        override fun launch(block: suspend () -> Unit): Job = this@ImportDeckViewModel.launch { block() }
+
+        override fun releaseSource() = readController.discard()
+    }
+}

@@ -269,10 +269,67 @@
 	<string name="import_chip_delimiter_space">Space</string>
 	<string name="import_chip_delimiter_colon">Colon :</string>
 	<string name="import_label_column">Column %1$s</string>
+	<string name="import_button_apply">Apply</string>
+	<string name="import_button_preview">Preview</string>
+	<string name="import_banner_over_limit_first">You can import up to %1$s cards at a time, so this screen appears before the preview.</string>
+	<string name="import_title_subdeck">Choose subdecks</string>
+	<string name="import_subtitle_subdeck">Choose the subdecks to import</string>
+	<string name="import_hint_subdeck_merge">The subdecks you choose are combined into one deck.</string>
+	<string name="import_label_select_all">Select all</string>
+	<string name="import_hint_subdeck_note_count">Reversed cards and cards with several blanks are imported as one card, so the count may be lower than in Anki. Cards with both sides empty are skipped.</string>
+	<string name="import_summary_selected_label">Selected cards</string>
+	<string name="import_summary_over">%1$s cards (over limit)</string>
+	<string name="import_summary_limit">/ max %1$s cards</string>
+	<string name="import_reason_subdeck_over_limit">Select fewer subdecks, or export from Anki one subdeck at a time.</string>
+	<string name="import_title_sheet">Choose a sheet</string>
+	<string name="import_subtitle_sheet">Choose the sheet to import</string>
+	<string name="import_hint_sheet_only_selected">Other sheets are not imported.</string>
+	<string name="import_label_row_count">%1$s rows</string>
+	<string name="import_label_sheet_empty">Empty</string>
+	<string name="import_label_row_over_limit">Over %1$s rows</string>
+	<string name="import_label_header_row">Use the first row as column names</string>
+	<string name="import_hint_header_row_on">The first row is used as column names and isn’t imported as a card.</string>
+	<string name="import_hint_header_row_off">The first row is imported as a card too.</string>
+	<string name="import_reason_sheet_empty">This sheet is empty. Please choose another sheet.</string>
+	<string name="import_reason_sheet_over_limit">This sheet has more than %1$s rows. Please choose another sheet.</string>
+	<string name="import_title_text_check">Check the separator</string>
+	<string name="import_subtitle_text_check">Check that the columns were split correctly</string>
+	<string name="import_hint_text_check_auto">The separator was chosen automatically.\nIf the columns look wrong, change it below.</string>
+	<string name="import_label_header_from_file">The column names written in the file are used as they are</string>
+	<string name="import_label_first_card_preview">First card preview</string>
+	<string name="import_label_split_result">Split result</string>
+	<string name="import_label_table_info">%1$s columns, first %3$s of %2$s rows</string>
+	<string name="import_label_table_info_truncated">%2$s of %1$s columns, first %4$s of %3$s rows</string>
+	<string name="import_hint_table_more_columns">You can also choose the remaining columns when you set up the cards.</string>
+	<string name="import_label_table_row">Row %1$s</string>
+	<string name="import_label_table_cell">%1$s: %2$s</string>
+	<string name="import_loading_resplit">Splitting again</string>
 	<!-- import mapping -->
 	<string name="import_label_fields_more">%1$s and %2$s more</string>
 	<string name="import_label_side_front">Front</string>
 	<string name="import_label_side_back">Back</string>
+	<string name="import_title_mapping">Set up cards</string>
+	<string name="import_subtitle_mapping">Choose the items for the front and back</string>
+	<string name="import_hint_mapping_merge">If you choose several items for one side, they are joined with line breaks in the order you chose.</string>
+	<string name="import_tag_field_count">%1$s items</string>
+	<string name="import_label_import_toggle">Import</string>
+	<string name="import_label_front_fields">Items for the front</string>
+	<string name="import_label_back_fields">Items for the back</string>
+	<string name="import_label_cloze_banner">Cloze cards are created automatically</string>
+	<string name="import_hint_cloze_banner">The front shows the sentence with blanks hidden as [...]. The back shows the filled-in sentence and extra notes.</string>
+	<string name="import_label_cloze_fields">Items for the cloze sentence</string>
+	<string name="import_label_cloze_extra_fields">Items for the extra notes</string>
+	<string name="import_label_not_importable">Can’t be imported</string>
+	<string name="import_hint_image_occlusion">These cards hide part of an image for you to recall.</string>
+	<string name="import_reason_mapping_no_type">Check ‘Import’ for at least one type.</string>
+	<string name="import_reason_preview_empty">There are no cards to import. Put items that have content on the front or back.</string>
+	<string name="import_button_pick_fields">Choose items (%2$s of %1$s)</string>
+	<string name="import_hint_pick_order">They are joined with line breaks in the order you chose.</string>
+	<string name="import_label_order">No. %1$s</string>
+	<string name="import_label_side_cloze">Cloze sentence</string>
+	<string name="import_label_side_extra">Extra notes</string>
+	<string name="import_label_in_side">Already in %1$s</string>
+	<string name="import_button_done">Done</string>
 	<!-- import preview -->
 	<string name="import_title_preview">Preview</string>
 	<string name="import_value_paste_source">Pasted text</string>
@@ -286,7 +343,9 @@
 	<string name="import_tag_subdeck_all">All %1$s</string>
 	<string name="import_tag_subdeck_merged">Merged into one deck</string>
 	<string name="import_tag_note_type_count">%1$s types</string>
+	<string name="import_tag_subdeck_some">%2$s of %1$s</string>
 	<string name="import_tag_sides_auto">Front and back set automatically</string>
+	<string name="import_tag_sides_manual">Front and back set manually</string>
 	<string name="import_tag_front_fields">Front: %1$s</string>
 	<string name="import_tag_back_fields">Back: %1$s</string>
 	<string name="import_tag_back_none">No back</string>
@@ -313,9 +372,26 @@
 	<string name="import_warning_xlsx_number_format">Some numbers may look different from how they appeared in Excel.\nCheck them in the card list.</string>
 	<string name="import_warning_apkg_field_mismatch">%1$s cards have a mismatched number of items.\nCheck them in the card list.</string>
 	<string name="import_banner_delimiter_check">%1$s lines weren’t split into columns.\nCheck that the separator is right.</string>
+	<string name="import_button_change_delimiter">Change separator</string>
+	<string name="import_button_change">Change</string>
+	<string name="import_loading_preview">Creating the preview</string>
 	<!-- import deck info -->
 	<string name="import_value_empty_field">(Empty)</string>
 	<string name="import_value_paste_deck_name">Pasted cards</string>
+	<string name="import_title_deck_info">Deck info</string>
+	<string name="import_value_file_description">Imported from %1$s</string>
+	<string name="import_value_paste_description">Created from pasted text</string>
+	<string name="import_button_import">Import</string>
+	<string name="import_loading_creating_deck">Creating the deck</string>
+	<!-- import saving -->
+	<string name="import_title_saving">Saving cards</string>
+	<string name="import_subtitle_saving">Saving your cards</string>
+	<string name="import_label_saving_progress">%1$s / %2$s cards</string>
+	<string name="import_hint_saving_stop_warning">If you stop or close the app, only the cards saved so far stay in the deck.</string>
+	<string name="import_button_stop_import">Stop importing</string>
+	<string name="import_state_retrying">The connection was lost. Trying again.</string>
+	<string name="import_state_finishing">Finishing up</string>
+	<string name="import_state_stopping">Stopping. %1$s cards saved so far.</string>
 	<!-- import parse error dialog -->
 	<string name="import_dialog_file_too_large_title">The file is too large</string>
 	<string name="import_dialog_file_too_large_body">Files up to 100MB can be imported.</string>
@@ -347,15 +423,57 @@
 	<!-- import flow dialog -->
 	<string name="import_dialog_discard_title">Go back to the start?</string>
 	<string name="import_dialog_discard_body">The file you read and the settings you chose will be lost.</string>
+	<string name="import_dialog_preview_failed_title">The preview couldn’t be created</string>
+	<string name="import_dialog_preview_failed_body">Please try again in a moment.</string>
+	<!-- import save dialog -->
+	<string name="import_dialog_deck_create_failed_title">The deck couldn’t be created</string>
+	<string name="import_dialog_deck_create_failed_body">Check your network and try again.</string>
+	<string name="import_dialog_stop_title">Stop importing?</string>
+	<string name="import_dialog_stop_body">Cards saved so far, including the ones being saved now, stay in the deck.\nThe remaining cards can’t be imported later.</string>
+	<string name="import_dialog_paused_title">Saving paused</string>
+	<string name="import_dialog_partial_failure_title">Some cards couldn’t be saved</string>
+	<string name="import_dialog_key_conflict_title">Saving can’t continue</string>
+	<string name="import_dialog_deck_unavailable_title">The deck can’t be found</string>
+	<string name="import_dialog_deck_unavailable_body">The deck may have been deleted on another device.</string>
+	<string name="import_dialog_saved_cards">%1$s cards were saved.</string>
+	<string name="import_dialog_saved_none">No cards have been saved yet.</string>
+	<string name="import_dialog_saved_unconfirmed">%1$s cards were saved,\nand some more may have been saved.</string>
+	<string name="import_dialog_saved_none_unconfirmed">We couldn’t confirm whether any cards were saved.</string>
+	<string name="import_dialog_cause_check_network">Check your network and try again.</string>
+	<string name="import_dialog_cause_try_later">Please try again in a moment.</string>
+	<string name="import_dialog_cause_retry_or_view_deck">Try again, or view the deck with the cards saved so far.</string>
+	<string name="import_dialog_cause_retry_or_view_empty_deck">Try again, or view the empty deck.</string>
+	<string name="import_dialog_cause_view_deck">You can view the deck with the cards saved so far.</string>
+	<string name="import_dialog_cause_check_in_deck">Open the deck to check which cards were saved.</string>
 	<!-- import dialog button -->
 	<string name="import_dialog_button_confirm">OK</string>
 	<string name="import_dialog_button_discard">Go back</string>
 	<string name="import_dialog_button_cancel">Cancel</string>
+	<string name="import_dialog_button_retry">Try again</string>
+	<string name="import_dialog_button_stop">Stop</string>
+	<string name="import_dialog_button_continue">Keep importing</string>
+	<string name="import_dialog_button_stop_and_view_deck">Stop and view deck</string>
+	<string name="import_dialog_button_view_deck">View deck</string>
+	<string name="import_dialog_button_go_home">Go home</string>
+	<!-- import snackbar -->
+	<string name="import_snackbar_completed">%1$s cards imported</string>
+	<string name="import_snackbar_partial">%2$s of %1$s cards imported</string>
+	<string name="import_snackbar_empty_deck">Couldn’t import the cards, so an empty deck was left</string>
+	<string name="import_snackbar_unconfirmed">We couldn’t confirm how many cards were saved.\nCheck the card list.</string>
+	<string name="import_snackbar_deck_invalid_input">The deck couldn’t be created. Check the name and description.</string>
 	<!-- import accessibility -->
 	<string name="import_content_description_back">Back</string>
 	<string name="import_content_description_filter_result">%1$s, %2$s cards</string>
 	<string name="import_content_description_dismiss_banner">Dismiss notice</string>
 	<string name="import_content_description_cards_to_import">%1$s cards to import</string>
+	<string name="import_content_description_change_setting">Change %1$s</string>
+	<string name="import_content_description_table_row">Row %1$s, %2$s</string>
+	<string name="import_content_description_field_order_state">Selected, %1$s, position %2$s</string>
+	<string name="import_content_description_pick_fields">Choose items for %1$s, %3$s of %2$s selected</string>
+	<string name="import_content_description_field_moved">Moved from %1$s to %2$s, position %3$s</string>
+	<string name="import_content_description_image_occlusion">%1$s, %2$s cards, can’t be imported</string>
+	<string name="import_content_description_saved_progress">%2$s of %1$s cards saved</string>
+	<string name="import_content_description_title_with_notice">%1$s, %2$s</string>
 
 	<!-- Deck library -->
 	<string name="library_title">Deck Library</string>

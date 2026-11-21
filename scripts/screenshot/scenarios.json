@@ -89,6 +89,10 @@
       "variant": "default"
     },
     {
+      "id": "importer.loading.creating_deck",
+      "variant": "default"
+    },
+    {
       "id": "importer.preview.anki",
       "variant": "default"
     },
@@ -126,6 +130,110 @@
     },
     {
       "id": "importer.dialog.no_cards.image_occlusion",
+      "variant": "default"
+    },
+    {
+      "id": "importer.preview.change",
+      "variant": "default"
+    },
+    {
+      "id": "importer.preview.import",
+      "variant": "default"
+    },
+    {
+      "id": "importer.preview.deck_input_error",
+      "variant": "default"
+    },
+    {
+      "id": "importer.settings.subdeck",
+      "variant": "default"
+    },
+    {
+      "id": "importer.settings.subdeck.partial",
+      "variant": "default"
+    },
+    {
+      "id": "importer.settings.sheet",
+      "variant": "default"
+    },
+    {
+      "id": "importer.settings.sheet.empty",
+      "variant": "default"
+    },
+    {
+      "id": "importer.settings.delimiter",
+      "variant": "default"
+    },
+    {
+      "id": "importer.settings.delimiter.resplit",
+      "variant": "default"
+    },
+    {
+      "id": "importer.settings.mapping",
+      "variant": "default"
+    },
+    {
+      "id": "importer.settings.mapping.image_occlusion",
+      "variant": "default"
+    },
+    {
+      "id": "importer.settings.mapping.single",
+      "variant": "default"
+    },
+    {
+      "id": "importer.settings.mapping.many_fields",
+      "variant": "default"
+    },
+    {
+      "id": "importer.gate.subdeck",
+      "variant": "default"
+    },
+    {
+      "id": "importer.gate.subdeck.small.large-font",
+      "variant": "small-large-font"
+    },
+    {
+      "id": "importer.gate.sheet",
+      "variant": "default"
+    },
+    {
+      "id": "importer.dialog.preview_failed",
+      "variant": "default"
+    },
+    {
+      "id": "importer.dialog.deck_create_failed",
+      "variant": "default"
+    },
+    {
+      "id": "importer.dialog.stop_confirm",
+      "variant": "default"
+    },
+    {
+      "id": "importer.dialog.paused",
+      "variant": "default"
+    },
+    {
+      "id": "importer.dialog.partial_failure",
+      "variant": "default"
+    },
+    {
+      "id": "importer.dialog.key_conflict",
+      "variant": "default"
+    },
+    {
+      "id": "importer.dialog.deck_unavailable",
+      "variant": "default"
+    },
+    {
+      "id": "importer.saving.progress",
+      "variant": "default"
+    },
+    {
+      "id": "importer.saving.retrying",
+      "variant": "default"
+    },
+    {
+      "id": "importer.saving.stopping",
       "variant": "default"
     }
   ],

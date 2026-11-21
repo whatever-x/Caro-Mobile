@@ -159,12 +159,23 @@ private fun FilterChipRow(
 }
 
 /** 위아래로 [extension]만큼 더 큰 자리에 그리고, 부모에게는 그만큼 뺀 높이를 알린다. */
-private fun Modifier.overlapVertically(extension: Dp): Modifier =
+internal fun Modifier.overlapVertically(extension: Dp): Modifier =
     layout { measurable, constraints ->
         val extensionPx = extension.roundToPx()
         val placeable = measurable.measure(constraints.offset(vertical = extensionPx * 2))
         layout(placeable.width, placeable.height - extensionPx * 2) { placeable.place(0, -extensionPx) }
     }
+
+/** 좌우로 [extension]만큼 더 큰 자리에 그리고, 부모에게는 그만큼 뺀 폭을 알린다. */
+internal fun Modifier.overlapHorizontally(extension: Dp): Modifier =
+    layout { measurable, constraints ->
+        val extensionPx = extension.roundToPx()
+        val placeable = measurable.measure(constraints.offset(horizontal = extensionPx * 2))
+        layout(placeable.width - extensionPx * 2, placeable.height) { placeable.place(-extensionPx, 0) }
+    }
+
+/** [FilterChipRow]와 같은 이유로 칩 둘레 48dp가 칩 줄 안에 들게 한다. 가로 스크롤은 넓힌 자리를 잘라 내므로 가로로 미는 칩 줄에는 쓰지 않는다. */
+internal fun Modifier.chipRowTouchArea(): Modifier = overlapVertically(ChipRowTouchExtension).padding(vertical = ChipRowTouchExtension)
 
 /** 미디어 설명의 수는 칩의 카드 수가 아니라 지운 미디어 참조 수다. */
 @Composable
@@ -200,7 +211,7 @@ private fun ImportPreviewFilter.hint(mediaRemovedCount: Int): String? =
 internal fun PreviewCardItem(
     card: ImportCard,
     typeName: String?,
-    onClick: () -> Unit,
+    onClick: (() -> Unit)?,
     modifier: Modifier = Modifier,
 ) {
     val flags = remember(card) { cardFlags(card) }
@@ -213,9 +224,15 @@ internal fun PreviewCardItem(
                 .clip(CaroTheme.shape.m)
                 .background(CaroTheme.color.surface.primary)
                 .border(BorderWidth, CaroTheme.color.border.secondary, CaroTheme.shape.m)
-                .focusProperties { canFocus = true }
-                .clickable(interactionSource = interactionSource, indication = ripple(), role = Role.Button, onClick = onClick)
-                .padding(BorderWidth)
+                .then(
+                    if (onClick == null) {
+                        Modifier
+                    } else {
+                        Modifier
+                            .focusProperties { canFocus = true }
+                            .clickable(interactionSource = interactionSource, indication = ripple(), role = Role.Button, onClick = onClick)
+                    },
+                ).padding(BorderWidth)
                 .padding(CaroTheme.spacing.xl),
         verticalArrangement = Arrangement.spacedBy(CaroTheme.spacing.m),
     ) {

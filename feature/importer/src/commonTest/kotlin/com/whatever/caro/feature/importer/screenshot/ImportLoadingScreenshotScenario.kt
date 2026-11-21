@@ -3,6 +3,7 @@ package com.whatever.caro.feature.importer.screenshot
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.onNodeWithText
 import caromobile.core.designsystem.generated.resources.Res
+import caromobile.core.designsystem.generated.resources.import_loading_creating_deck
 import caromobile.core.designsystem.generated.resources.import_loading_file
 import caromobile.core.designsystem.generated.resources.import_loading_paste
 import com.whatever.caro.core.screenshot.testing.ScreenshotScenario
@@ -16,6 +17,7 @@ import com.whatever.caro.feature.importer.support.PreviewSamples
 internal object ImportLoadingScreenshotScenario {
     const val FILE_ID = "importer.loading.file"
     const val PASTE_ID = "importer.loading.paste"
+    const val CREATING_DECK_ID = "importer.loading.creating_deck"
 
     fun scenarios(): List<ScreenshotScenario> =
         listOf(
@@ -46,6 +48,22 @@ internal object ImportLoadingScreenshotScenario {
                 expectedStrings = listOf(ScreenshotString(Res.string.import_loading_paste)),
                 beforeCapture = { strings ->
                     onNodeWithText(strings[Res.string.import_loading_paste], useUnmergedTree = true).assertIsDisplayed()
+                },
+            ),
+            ScreenshotScenario(
+                CREATING_DECK_ID,
+                render = {
+                    RenderImportScreenWithoutLoadingAnimation(
+                        PreviewSamples
+                            .state(
+                                PreviewSamples.ankiTable,
+                                PreviewSamples.ankiPreview,
+                            ).copy(loading = ImportLoading.CreatingDeck),
+                    )
+                },
+                expectedStrings = listOf(ScreenshotString(Res.string.import_loading_creating_deck)),
+                beforeCapture = { strings ->
+                    onNodeWithText(strings[Res.string.import_loading_creating_deck], useUnmergedTree = true).assertIsDisplayed()
                 },
             ),
         )

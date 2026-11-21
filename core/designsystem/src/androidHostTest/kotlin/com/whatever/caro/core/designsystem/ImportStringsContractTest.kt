@@ -49,6 +49,12 @@ class ImportStringsContractTest : FunSpec() {
             gapped.map { it.label }.shouldBeEmpty()
         }
 
+        test("키마다 줄바꿈 escape 수가 ko와 en에서 같다") {
+            val mismatched = expectedKeys().filter { key -> lineBreakCount(StringsLocale.Ko, key) != lineBreakCount(StringsLocale.En, key) }
+
+            mismatched.shouldBeEmpty()
+        }
+
         test("값에 실제 줄바꿈이 없다") {
             val multiline = localizedValues().filter { '\n' in it.value || '\r' in it.value }
 
@@ -113,10 +119,13 @@ private val KEY_KINDS =
         "warning",
         "banner",
         "tag",
+        "state",
         "dialog",
+        "snackbar",
         "content_description",
     )
 
+private const val LINE_BREAK_ESCAPE = "\\n"
 private val LIMIT_NUMBER = Regex("""(?<![\d,])(10,?000|5,?000|1,?000,?000)(?![\d,])""")
 private val KEY_FORMAT = Regex("""import_(${KEY_KINDS.joinToString("|")})(_[a-z0-9]+)+""")
 private val STRAIGHT_QUOTE = Regex("""['"]""")
@@ -156,3 +165,8 @@ private fun valueOf(
     locale: StringsLocale,
     key: String,
 ): String = ImportStringsXml.valueOf(locale, key)
+
+private fun lineBreakCount(
+    locale: StringsLocale,
+    key: String,
+): Int = valueOf(locale, key).split(LINE_BREAK_ESCAPE).size - 1

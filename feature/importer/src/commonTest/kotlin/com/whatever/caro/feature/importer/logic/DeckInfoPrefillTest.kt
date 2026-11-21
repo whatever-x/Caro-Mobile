@@ -130,6 +130,29 @@ class DeckInfoPrefillTest : FunSpec() {
                 name(textTable("a".repeat(49) + "😀.txt")) shouldBe "a".repeat(49)
             }
         }
+
+        context("덱 설명") {
+            test("파일은 틀의 파일 이름 자리에 확장자까지 넣는다") {
+                deckDescriptionPrefill("JLPT N5 단어.apkg", isPaste = false, text = DESCRIPTION_TEMPLATE) shouldBe "JLPT N5 단어.apkg에서 가져왔어요"
+            }
+
+            test("붙여넣기는 넘겨받은 설명을 그대로 쓰고 붙여 넣은 내용은 쓰지 않는다") {
+                deckDescriptionPrefill("붙여 넣은 카드", isPaste = true, text = PASTE_DESCRIPTION) shouldBe PASTE_DESCRIPTION
+            }
+
+            test("파일 이름은 120자로 줄여 틀 뒷부분이 잘리지 않게 한다") {
+                val description = deckDescriptionPrefill("c".repeat(200) + ".txt", isPaste = false, text = DESCRIPTION_TEMPLATE)
+
+                description.length shouldBe 120 + "에서 가져왔어요".length
+                description.endsWith(".txt에서 가져왔어요") shouldBe true
+            }
+
+            test("긴 틀은 설명을 500자에서 자른다") {
+                val template = FILE_NAME_PLACEHOLDER + "d".repeat(600)
+
+                deckDescriptionPrefill("words.txt", isPaste = false, text = template).length shouldBe 500
+            }
+        }
     }
 
     private fun name(
@@ -186,3 +209,6 @@ class DeckInfoPrefillTest : FunSpec() {
     private fun noteType(id: String) =
         ParsedNoteType(id = id, name = id, fieldNames = listOf("열 1", "열 2"), isCloze = false, noteCount = 10)
 }
+
+private const val DESCRIPTION_TEMPLATE = "{file}에서 가져왔어요"
+private const val PASTE_DESCRIPTION = "붙여 넣은 내용으로 만들었어요"

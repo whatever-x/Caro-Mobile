@@ -167,7 +167,14 @@ class ImportDeckViewModelPasteTest : FunSpec() {
                     harness.send(ImportDeckIntent.ClickPaste)
                     harness.send(ImportDeckIntent.UpdatePasteText("a\tb"))
 
-                    harness.send(ImportDeckIntent.ClickPasteNext("Pasted cards", SpreadsheetDateStyle.MONTH_DAY_YEAR, "(empty)"))
+                    harness.send(
+                        ImportDeckIntent.ClickPasteNext(
+                            "Pasted cards",
+                            SpreadsheetDateStyle.MONTH_DAY_YEAR,
+                            "(empty)",
+                            "Created from pasted text",
+                        ),
+                    )
                     advanceUntilIdle()
 
                     val call =
@@ -273,6 +280,7 @@ class ImportDeckViewModelPasteTest : FunSpec() {
             ImportViewModelHarness.PASTE_SOURCE_NAME,
             ImportViewModelHarness.DATE_STYLE,
             ImportViewModelHarness.EMPTY_SIDE_TEXT,
+            ImportViewModelHarness.PASTE_DESCRIPTION,
         )
 
     private companion object {
